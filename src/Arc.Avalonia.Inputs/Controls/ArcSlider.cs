@@ -13,20 +13,6 @@ using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Inputs.Controls;
 
-/// <summary>A tick on a slider track, optionally labelled.</summary>
-public sealed class ArcSliderMark
-{
-    public ArcSliderMark(double value, string? label = null)
-    {
-        Value = value;
-        Label = label;
-    }
-
-    public double Value { get; }
-
-    public string? Label { get; }
-}
-
 /// <summary>
 /// A single-value slider with a quiet track, an accent fill, optional ticks, a value bubble while
 /// dragging and arrow, Home, End and PageUp/PageDown support.

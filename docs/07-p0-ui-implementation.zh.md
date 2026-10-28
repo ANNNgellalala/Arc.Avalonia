@@ -31,19 +31,19 @@
 
 | P0 slug | 控件 | 文件（项目） | 页面 / Order | 关键状态 | 意图事件 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-transcript` | `ArcAgentTranscript` | `Arc.Avalonia.Content/Controls/ArcAgentTranscript.cs` | Agent transcript / 20001 | Idle / Running / AwaitingInput / Done / Failed / Stopped；事件级 Pending/Running/Done/Failed/Skipped；可展开详情 | `RetryRequested(event)` |
-| `run-control-bar` | `ArcRunControlBar` | `Arc.Avalonia.SpecialAIWidgets/Controls/ArcRunControlBar.cs` | Run control bar / 20002 | Running / Paused / Stopped / TakenOver；当前步骤/耗时 | `StopRequested`、`StopAfterStepRequested`、`PauseRequested`、`ResumeRequested`、`SteerRequested(string)`、`TakeoverRequested` |
+| `agent-transcript` | `ArcAgentTranscript` | `Arc.Avalonia.AgentUI/Controls/ArcAgentTranscript.cs` | Agent transcript / 20001 | Idle / Running / AwaitingInput / Done / Failed / Stopped；事件级 Pending/Running/Done/Failed/Skipped；可展开详情 | `RetryRequested(event)` |
+| `run-control-bar` | `ArcRunControlBar` | `Arc.Avalonia.AgentUI/Controls/ArcRunControlBar.cs` | Run control bar / 20002 | Running / Paused / Stopped / TakenOver；当前步骤/耗时 | `StopRequested`、`StopAfterStepRequested`、`PauseRequested`、`ResumeRequested`、`SteerRequested(string)`、`TakeoverRequested` |
 | `tool-approval-sheet` | `ArcToolApprovalSheet` | `.../Controls/ArcToolApprovalSheet.cs` | Tool approval sheet / 20003 | Checkout / Editing / Submitting / Decided / Expired / Cancelled；Risk Low/Medium/High；Scope Once/Task/Hour/Always | `ApproveRequested(decision)`、`DenyRequested(reason)`、`DelegateRequested` |
 | `agent-ask-card` | `ArcAgentAskCard` | `.../Controls/ArcAgentAskCard.cs` | Agent question card / 20004 | Question / Answered / Skipped / Deferred / Expired；单选/多选/自由文本 | `Submitted(answer)`、`DeferredRequested` |
 | `background-run-dock` | `ArcBackgroundRunDock` | `.../Controls/ArcBackgroundRunDock.cs` | Background run dock / 20006 | Idle / Running / NeedsAttention / Paused；进度线 | `PauseRequested`、`StopRequested`、`ExpandRequested` |
-| `agent-attention-inbox` | `ArcAgentAttentionInbox` | `Arc.Avalonia.BlocksAI/Controls/ArcAgentAttentionInbox.cs` | Agent attention inbox / 20005 | 分组（Approval/Ask/Failure/Routine/Suggestion）+ New/Seen/InProgress/Resolved/Expired；空态 | `ItemActionRequested(id)`、`Dismissed(id)` |
+| `agent-attention-inbox` | `ArcAgentAttentionInbox` | `Arc.Avalonia.AgentUI/Controls/ArcAgentAttentionInbox.cs` | Agent attention inbox / 20005 | 分组（Approval/Ask/Failure/Routine/Suggestion）+ New/Seen/InProgress/Resolved/Expired；空态 | `ItemActionRequested(id)`、`Dismissed(id)` |
 
 ### 3.2 Today / 生活域（5 项，Group `P0 · Today`）
 
 | P0 slug | 控件 | 文件（项目） | 页面 / Order | 关键状态 | 意图事件 |
 | --- | --- | --- | --- | --- | --- |
-| `reminder-row` | `ArcReminderRow` | `Arc.Avalonia.Feedback/Controls/ArcReminderRow.cs` | Reminder row / 20013 | Upcoming / Due / Overdue / Snoozed / Done / Missed；重复/来源；展开动作 | `CompletedChanged(bool)`、`SnoozeRequested(TimeSpan)`、`RescheduleRequested`、`SkipRequested` |
-| `daily-brief` | `ArcDailyBrief` | `Arc.Avalonia.BlocksApp/Controls/LifeTodayKit.cs` | Daily brief / 20011 | Loading / Ready / PartiallyLoading / Error；建议 Pending/Accepted/Dismissed/Snoozed | `AcceptSuggestionRequested`、`IgnoreSuggestionRequested`、`SnoozeSuggestionRequested`、`OpenAgendaRequested`、`OpenRemindersRequested`、`RetryRequested` |
+| `reminder-row` | `ArcReminderRow` | `Arc.Avalonia.LifeToday/Controls/ArcReminderRow.cs` | Reminder row / 20013 | Upcoming / Due / Overdue / Snoozed / Done / Missed；重复/来源；展开动作 | `CompletedChanged(bool)`、`SnoozeRequested(TimeSpan)`、`RescheduleRequested`、`SkipRequested` |
+| `daily-brief` | `ArcDailyBrief` | `Arc.Avalonia.LifeToday/Controls/LifeTodayKit.cs` | Daily brief / 20011 | Loading / Ready / PartiallyLoading / Error；建议 Pending/Accepted/Dismissed/Snoozed | `AcceptSuggestionRequested`、`IgnoreSuggestionRequested`、`SnoozeSuggestionRequested`、`OpenAgendaRequested`、`OpenRemindersRequested`、`RetryRequested` |
 | `day-agenda` | `ArcDayAgenda` | `.../LifeTodayKit.cs` | Day agenda / 20012 | Loading / Empty / Populated / Conflict / Error；全天条 + 小时网格 + Now 线 | `PreviousDayRequested`、`NextDayRequested`、`TodayRequested`、`ItemActivated(id)`、`AddRequested`、`RetryRequested` |
 | `reminder-center` | `ArcReminderCenter` | `.../LifeTodayKit.cs` | Reminder center / 20014 | Normal / Empty / Loading / Error；分组计数 + 过滤 + 跨项目复用 `ArcReminderRow` | `CompleteRequested`、`SnoozeRequested`、`RescheduleRequested`、`SkipRequested`、`SnoozeAllRequested`、`AddRequested`、`RetryRequested` |
 | `medication-schedule` | `ArcMedicationSchedule` | `.../LifeTodayKit.cs` | Medication schedule / 20015 | Normal / Empty / Paused；Pending/Taken/Missed/Snoozed；库存/续方 | `TakeRequested`、`SnoozeRequested`、`SkipRequested`、`UndoTakenRequested`、`RefillRequested`、`PauseRequested`、`ResumeRequested`、`EditPlanRequested`、`AddRequested` |
@@ -53,8 +53,8 @@
 | P0 slug | 控件 | 文件（项目） | 页面 / Order | 关键能力 |
 | --- | --- | --- | --- | --- |
 | `virtualized-list` | `ArcVirtualList : ListBox` | `Arc.Avalonia/Controls/ArcVirtualList.cs` | Virtualized list / 20021（Gallery） | `VirtualizingStackPanel` 行级虚拟化；`StickToBottom`、`ScrollState`（AtTop/InMiddle/AtBottom）、`ScrollToEnd()`、`ScrollToIndex(int)`、集合变化粘底 |
-| `quick-capture-bar` | `ArcQuickCaptureBar` | `Arc.Avalonia.AdvancedInputs/Controls/ArcQuickCaptureBar.cs` | Quick capture bar / 20022 | 状态 Idle/Parsing/Parsed/Ambiguous/Error；`Text`、`Chips`（Kind：Time/Person/Amount/List/Note）、`Hint`；Enter 提交 / Esc 取消 / chip 行内删除 |
-| `routine-schedule-editor` | `ArcRoutineScheduleEditor` | `Arc.Avalonia.Pickers/Controls/ArcRoutineScheduleEditor.cs` | Routine schedule editor / 20023 | Repeat（Daily/Weekdays/Weekly/Monthly/Custom）、周几、时间/时区、Misfire（RunOnce/Skip/Ask）、Overlap（Skip/Queue/Allow）、next-run 预览、`CreateSpec()`；只产出展示契约 |
+| `quick-capture-bar` | `ArcQuickCaptureBar` | `Arc.Avalonia.LifeToday/Controls/ArcQuickCaptureBar.cs` | Quick capture bar / 20022 | 状态 Idle/Parsing/Parsed/Ambiguous/Error；`Text`、`Chips`（Kind：Time/Person/Amount/List/Note）、`Hint`；Enter 提交 / Esc 取消 / chip 行内删除 |
+| `routine-schedule-editor` | `ArcRoutineScheduleEditor` | `Arc.Avalonia.LifeToday/Controls/ArcRoutineScheduleEditor.cs` | Routine schedule editor / 20023 | Repeat（Daily/Weekdays/Weekly/Monthly/Custom）、周几、时间/时区、Misfire（RunOnce/Skip/Ask）、Overlap（Skip/Queue/Allow）、next-run 预览、`CreateSpec()`；只产出展示契约 |
 
 ## 4. 验证
 
@@ -136,25 +136,25 @@ smoke 会遍历全部 233 个页面（含 14 个新页）并反复切换，验�
 src/Arc.Avalonia/Controls/ArcUi.cs                         （共享组合辅助，新增）
 src/Arc.Avalonia/Controls/ArcVirtualList.cs
 src/Arc.Avalonia.Gallery/Pages/VirtualListDemoPage.cs
-src/Arc.Avalonia.AdvancedInputs/Controls/ArcQuickCaptureBar.cs
+src/Arc.Avalonia.LifeToday/Controls/ArcQuickCaptureBar.cs
 src/Arc.Avalonia.AdvancedInputs/Pages/QuickCaptureBarPage.cs
-src/Arc.Avalonia.Pickers/Controls/ArcRoutineScheduleEditor.cs
+src/Arc.Avalonia.LifeToday/Controls/ArcRoutineScheduleEditor.cs
 src/Arc.Avalonia.Pickers/Pages/RoutineScheduleEditorPage.cs
-src/Arc.Avalonia.Content/Controls/ArcAgentTranscript.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcAgentTranscript.cs
 src/Arc.Avalonia.Content/Pages/AgentTranscriptPage.cs
-src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcRunControlBar.cs
-src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolApprovalSheet.cs
-src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentAskCard.cs
-src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcBackgroundRunDock.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcRunControlBar.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcToolApprovalSheet.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcAgentAskCard.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcBackgroundRunDock.cs
 src/Arc.Avalonia.SpecialAIWidgets/Pages/RunControlBarPage.cs
 src/Arc.Avalonia.SpecialAIWidgets/Pages/ToolApprovalSheetPage.cs
 src/Arc.Avalonia.SpecialAIWidgets/Pages/AgentAskCardPage.cs
 src/Arc.Avalonia.SpecialAIWidgets/Pages/BackgroundRunDockPage.cs
-src/Arc.Avalonia.BlocksAI/Controls/ArcAgentAttentionInbox.cs
+src/Arc.Avalonia.AgentUI/Controls/ArcAgentAttentionInbox.cs
 src/Arc.Avalonia.BlocksAI/Pages/AgentAttentionInboxPage.cs
-src/Arc.Avalonia.Feedback/Controls/ArcReminderRow.cs
+src/Arc.Avalonia.LifeToday/Controls/ArcReminderRow.cs
 src/Arc.Avalonia.Feedback/Pages/ReminderRowPage.cs
-src/Arc.Avalonia.BlocksApp/Controls/LifeTodayKit.cs
+src/Arc.Avalonia.LifeToday/Controls/LifeTodayKit.cs
 src/Arc.Avalonia.BlocksApp/Pages/DailyBriefPage.cs
 src/Arc.Avalonia.BlocksApp/Pages/DayAgendaPage.cs
 src/Arc.Avalonia.BlocksApp/Pages/ReminderCenterPage.cs

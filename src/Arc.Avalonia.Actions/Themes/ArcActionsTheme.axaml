@@ -13,6 +13,11 @@
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcActions.Messages.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcMegaMenu.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcShareAccess.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcActionButton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcExpandingButtonGroup.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcFloatingButtonGroup.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcIconMorph.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcUserMenu.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

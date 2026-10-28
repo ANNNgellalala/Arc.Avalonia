@@ -1,0 +1,27 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:aa="using:Arc.Avalonia.Actions.Controls">
+
+  <!-- A flat pill on the surface; the buttons inside are the animation. -->
+  <ControlTheme x:Key="{x:Type aa:ArcExpandingButtonGroup}" TargetType="aa:ArcExpandingButtonGroup">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Tray"
+                Background="{DynamicResource ArcSurface}"
+                BorderBrush="{DynamicResource ArcBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusPill}"
+                Padding="3"
+                HorizontalAlignment="Left">
+          <StackPanel x:Name="ItemsHost"
+                      Orientation="Horizontal"
+                      Spacing="2"
+                      Background="Transparent"
+                      VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

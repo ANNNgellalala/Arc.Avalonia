@@ -12,6 +12,5 @@
     <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
-    <ProjectReference Include="..\Arc.Avalonia.AdvancedInputs\Arc.Avalonia.AdvancedInputs.csproj" />
   </ItemGroup>
 </Project>

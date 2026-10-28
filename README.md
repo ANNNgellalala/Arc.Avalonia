@@ -38,6 +38,12 @@ Read the analysis first:
   background dock, reminder row, daily brief, day agenda, reminder center, medication schedule,
   virtualized list, quick capture, routine editor) with 14 gallery pages, build/audit verification and
   known limitations.
+* [`docs/08-project-structure-review.zh.md`](docs/08-project-structure-review.zh.md) — directory and project
+  division review: what lives where, how the 23 catalog categories map onto the projects, and which
+  boundaries need to change.
+* [`docs/09-project-restructure-phase1.zh.md`](docs/09-project-restructure-phase1.zh.md) — the Phase 1
+  restructure record: P0 hygiene, AgentUI/LifeToday extraction, AdvancedInputs/AdvancedActions merge,
+  verification, and the explicitly deferred Phase 2 plan.
 
 ## Gallery
 
@@ -105,15 +111,15 @@ More: [components](docs/images/components-light.png), [icons](docs/images/icons-
 
 | Project | Contents |
 | --- | --- |
-| `src/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner` |
+| `src/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList` |
 | `src/Arc.Avalonia.Demo` | `ArcPage` contract, `DemoUi` layout helpers, reflection page discovery |
-| `src/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders |
-| `src/Arc.Avalonia.Actions` | Buttons, menus, navigation, disclosure, overlays, messages |
+| `src/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
+| `src/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
+| `src/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
+| `src/Arc.Avalonia.Actions` | Buttons, menus, navigation, disclosure, overlays, messages, plus action button, floating/expanding button groups, icon morph, user menu |
 | `src/Arc.Avalonia.Feedback` | Feedback, progress, avatars, cards, tables, activity |
 | `src/Arc.Avalonia.Charts` | Custom-drawn data visualisation on the Arc series palette |
 | `src/Arc.Avalonia.Pickers` | Calendar, date/time range, colour, file dropzone, signature |
-| `src/Arc.Avalonia.AdvancedInputs` | Inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
-| `src/Arc.Avalonia.AdvancedActions` | Action button, floating and expanding button groups, icon morph, user menu |
 | `src/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
 | `src/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, chat thread, onboarding checklist |
 | `src/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |

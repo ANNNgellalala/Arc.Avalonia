@@ -12,6 +12,16 @@
         <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcToggle.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSegmentedControl.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSlider.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcAdvancedShared.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcBillingToggle.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcExpandingSearch.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcInlineEdit.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcMentionInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcMorphSelect.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcPhoneInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcRadioCards.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcScrubInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcShortcutRecorder.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

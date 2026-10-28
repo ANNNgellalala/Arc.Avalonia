@@ -9,16 +9,16 @@ type, colour, motion intent) matters more than API-name parity.
 
 | Path | Owner | Contents |
 | --- | --- | --- |
-| `src/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, typography styles |
+| `src/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles |
 | `src/Arc.Avalonia.Demo` | Lead | `ArcPage` contract, `DemoUi` layout helpers, page discovery |
+| `src/Arc.Avalonia.AgentUI` | agent-ui agent | P0 agent transcript / run bar / approval sheet / question card / background dock / attention inbox |
+| `src/Arc.Avalonia.LifeToday` | life-today agent | P0 reminder row/center, daily brief, day agenda, medication schedule, quick capture, routine editor |
 | `src/Arc.Avalonia.Gallery` | Lead | shell window, shot harness, foundations page |
-| `src/Arc.Avalonia.Inputs` | input agent | text fields, selects, toggles, sliders |
-| `src/Arc.Avalonia.Actions` | action agent | buttons/menus, navigation, disclosure, overlays, messages |
+| `src/Arc.Avalonia.Inputs` | input agent | text fields, selects, toggles, sliders, inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
+| `src/Arc.Avalonia.Actions` | action agent | buttons/menus, navigation, disclosure, overlays, messages, action button, floating/expanding button groups, icon morph, user menu |
 | `src/Arc.Avalonia.Feedback` | feedback agent | feedback/progress, avatars/cards, tables, activity |
 | `src/Arc.Avalonia.Charts` | chart agent | data visualisation controls |
 | `src/Arc.Avalonia.Pickers` | picker agent | calendar/date/time/colour, file dropzone, signature |
-| `src/Arc.Avalonia.AdvancedInputs` | advanced input agent | inline edit, scrub, phone, mention, shortcut recorder, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
-| `src/Arc.Avalonia.AdvancedActions` | advanced action agent | action button, floating/expanding button groups, icon morph, user menu |
 | `src/Arc.Avalonia.Effects` | effects agent | text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
 | `src/Arc.Avalonia.Content` | content agent | rich text editor, reorderable list, chat thread, onboarding checklist |
 | `src/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |

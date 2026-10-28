@@ -15,6 +15,5 @@
     <ProjectReference Include="..\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
-    <ProjectReference Include="..\Arc.Avalonia.AdvancedInputs\Arc.Avalonia.AdvancedInputs.csproj" />
   </ItemGroup>
 </Project>

@@ -9,15 +9,15 @@ Avalonia 12.1.4 / .NET 10，纯 C# 与 XAML，不依赖任何第三方 UI 或图
 
 | 项目 | 职责 |
 | --- | --- |
-| `Arc.Avalonia` | 基础层：OKLCH 色彩引擎、调色板与主题管理、字体与排版、动效、161 个 Lucide 图标、`ArcButton` / `ArcCard` / `ArcBadge` / `ArcIcon` / `ArcSpinner` |
+| `Arc.Avalonia` | 基础层：OKLCH 色彩引擎、调色板与主题管理、字体与排版、动效、161 个 Lucide 图标、`ArcButton` / `ArcCard` / `ArcBadge` / `ArcIcon` / `ArcSpinner` / `ArcVirtualList` |
 | `Arc.Avalonia.Demo` | `ArcPage` 页面契约、`DemoUi` 布局助手、基于反射的页面发现 |
-| `Arc.Avalonia.Inputs` | 输入框、特殊输入、选择器、开关、滑杆 |
-| `Arc.Avalonia.Actions` | 按钮组、菜单、导航、折叠、浮层、消息 |
+| `Arc.Avalonia.AgentUI` | P0 Agent UI：transcript、run control bar、tool approval sheet、question card、background dock、attention inbox |
+| `Arc.Avalonia.LifeToday` | P0 Today：reminder row/center、daily brief、day agenda、medication schedule、quick capture、routine editor |
+| `Arc.Avalonia.Inputs` | 输入框、特殊输入、选择器、开关、滑杆，以及 inline edit、scrub/phone/mention/shortcut 输入、expanding search、morph select、弹性/直方图滑杆、billing toggle、radio cards（原 AdvancedInputs 已并入） |
+| `Arc.Avalonia.Actions` | 按钮组、菜单、导航、折叠、浮层、消息，以及 action button、floating/expanding 按钮组、icon morph、user menu（原 AdvancedActions 已并入） |
 | `Arc.Avalonia.Feedback` | 反馈、进度、头像、卡片、表格、活动流 |
 | `Arc.Avalonia.Charts` | 基于系列色板的自绘图表 |
 | `Arc.Avalonia.Pickers` | 日历、日期/范围/时间、颜色、文件拖放、签名 |
-| `Arc.Avalonia.AdvancedInputs` | 行内编辑、scrub / 电话 / 提及 / 快捷键录制输入、展开搜索、morph select、弹性滑杆、直方图范围滑杆、billing toggle、radio cards |
-| `Arc.Avalonia.AdvancedActions` | action button、floating / expanding 按钮组、icon morph、user menu |
 | `Arc.Avalonia.Effects` | 文字 reveal / in-view / morph / shimmer、announcement bar、cookie consent、hover card、bottom sheet、expandable card |
 | `Arc.Avalonia.Content` | markdown 富文本编辑器、可拖拽排序列表、聊天线程、onboarding checklist |
 | `Arc.Avalonia.Media` | hold to confirm、swipe actions、reactions、image compare、carousel、card stack、scroll area、resizable panels |

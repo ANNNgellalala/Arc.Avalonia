@@ -11,8 +11,6 @@
     <StyleInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcFeedbackTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Charts/Themes/ArcChartsTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcPickersTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcAdvancedInputsTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.AdvancedActions/Themes/ArcAdvancedActionsTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcEffectsTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Content/Themes/ArcContentTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />

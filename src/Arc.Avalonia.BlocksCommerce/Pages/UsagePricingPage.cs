@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Arc.Avalonia.AdvancedInputs.Controls;
+using Arc.Avalonia.Inputs.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feedback.Controls;

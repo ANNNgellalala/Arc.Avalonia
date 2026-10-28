@@ -4,8 +4,6 @@
   </Folder>
   <Folder Name="/Components/">
     <Project Path="src/Arc.Avalonia.Actions/Arc.Avalonia.Actions.csproj" />
-    <Project Path="src/Arc.Avalonia.AdvancedActions/Arc.Avalonia.AdvancedActions.csproj" />
-    <Project Path="src/Arc.Avalonia.AdvancedInputs/Arc.Avalonia.AdvancedInputs.csproj" />
     <Project Path="src/Arc.Avalonia.Charts/Arc.Avalonia.Charts.csproj" />
     <Project Path="src/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
     <Project Path="src/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
