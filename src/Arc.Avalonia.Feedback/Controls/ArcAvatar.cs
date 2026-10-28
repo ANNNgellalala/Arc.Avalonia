@@ -201,7 +201,7 @@ public class ArcAvatar : TemplatedControl
         {
             _surface.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
             _initials.IsVisible = true;
-            _initials.Text = ArcUi.Initials(DisplayName);
+            _initials.Text = FeedbackUi.Initials(DisplayName);
             _initials.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
         }
 

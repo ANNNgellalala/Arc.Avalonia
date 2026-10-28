@@ -175,7 +175,7 @@ public class ArcTimeline : TemplatedControl
 
         if (events.Count == 0)
         {
-            content.Children.Add(ArcUi.Text("No activity yet.", "arc-caption"));
+            content.Children.Add(FeedbackUi.Text("No activity yet.", "arc-caption"));
         }
 
         if (double.IsNaN(MaxHeight) || MaxHeight <= 0)
@@ -221,7 +221,7 @@ public class ArcTimeline : TemplatedControl
         row.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
         row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
 
-        var time = ArcUi.Numeric(item.At.LocalDateTime.ToString("HH:mm", CultureInfo.InvariantCulture), "arc-caption");
+        var time = FeedbackUi.Numeric(item.At.LocalDateTime.ToString("HH:mm", CultureInfo.InvariantCulture), "arc-caption");
         time.TextAlignment = TextAlignment.Right;
         time.Margin = new Thickness(0, 2, 10, 0);
         time.VerticalAlignment = VerticalAlignment.Top;
@@ -254,16 +254,16 @@ public class ArcTimeline : TemplatedControl
         title.Classes.Add("arc-body-sm");
         if (!string.IsNullOrWhiteSpace(item.Actor))
         {
-            ArcUi.AddRun(title, item.Actor!, null, FontWeight.Medium);
-            ArcUi.AddRun(title, " ");
+            FeedbackUi.AddRun(title, item.Actor!, null, FontWeight.Medium);
+            FeedbackUi.AddRun(title, " ");
         }
 
-        ArcUi.AddRun(title, item.Title);
+        FeedbackUi.AddRun(title, item.Title);
         body.Children.Add(title);
 
         if (!string.IsNullOrWhiteSpace(item.Meta))
         {
-            body.Children.Add(ArcUi.Text(item.Meta, "arc-caption"));
+            body.Children.Add(FeedbackUi.Text(item.Meta, "arc-caption"));
         }
 
         if (item.Detail is not null)
@@ -272,7 +272,7 @@ public class ArcTimeline : TemplatedControl
                 ? new TextBlock
                 {
                     Text = text,
-                    FontFamily = ArcUi.MonoFamily,
+                    FontFamily = FeedbackUi.MonoFamily,
                     FontSize = 12,
                     TextWrapping = TextWrapping.Wrap
                 }.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary)
@@ -394,7 +394,7 @@ public class ArcTimeline : TemplatedControl
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 }
-                : ArcUi.Icon(icon, 13, foreground)
+                : FeedbackUi.Icon(icon, 13, foreground)
         };
         node.Paint(Border.BackgroundProperty, background);
 

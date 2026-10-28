@@ -288,12 +288,12 @@ public class ArcStepper : TemplatedControl
     private Control BuildCaption(IReadOnlyList<ArcStep> steps)
     {
         var index = Math.Clamp(Current, 0, steps.Count - 1);
-        return ArcUi.Text($"Step {index + 1} of {steps.Count}: {steps[index].Label}", "arc-caption");
+        return FeedbackUi.Text($"Step {index + 1} of {steps.Count}: {steps[index].Label}", "arc-caption");
     }
 
     private Control BuildCompleteNote()
     {
-        var row = ArcUi.Row(6, ArcUi.Icon("check", 14, ArcTokens.Success), ArcUi.Text(CompleteLabel, "arc-caption"));
+        var row = FeedbackUi.Row(6, FeedbackUi.Icon("check", 14, ArcTokens.Success), FeedbackUi.Text(CompleteLabel, "arc-caption"));
         row.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
         return row;
     }
@@ -350,7 +350,7 @@ public class ArcStepper : TemplatedControl
 
         if (!Compact)
         {
-            var label = ArcUi.Text(step.Label, "arc-label");
+            var label = FeedbackUi.Text(step.Label, "arc-label");
             label.HorizontalAlignment = HorizontalAlignment.Center;
             label.TextAlignment = TextAlignment.Center;
             label.TextWrapping = TextWrapping.Wrap;
@@ -417,7 +417,7 @@ public class ArcStepper : TemplatedControl
             row.Children.Add(gutter);
 
             var content = new StackPanel { Spacing = 4, Margin = new Thickness(14, 2, 0, index < steps.Count - 1 ? 22 : 0) };
-            var label = ArcUi.Text(steps[index].Label, "arc-label");
+            var label = FeedbackUi.Text(steps[index].Label, "arc-label");
             label.TextWrapping = TextWrapping.Wrap;
             content.Children.Add(label);
 
@@ -465,7 +465,7 @@ public class ArcStepper : TemplatedControl
     {
         if (!string.IsNullOrWhiteSpace(step.Error))
         {
-            var error = ArcUi.Text(step.Error, "arc-caption");
+            var error = FeedbackUi.Text(step.Error, "arc-caption");
             error.Paint(TextBlock.ForegroundProperty, ArcTokens.Warning);
             return error;
         }
@@ -480,7 +480,7 @@ public class ArcStepper : TemplatedControl
             return null;
         }
 
-        return ArcUi.Text(step.Description, "arc-caption");
+        return FeedbackUi.Text(step.Description, "arc-caption");
     }
 
     private Control BuildMarker(ArcStep step, int index)
@@ -504,19 +504,19 @@ public class ArcStepper : TemplatedControl
         {
             marker.Paint(Border.BackgroundProperty, ArcTokens.WarningSubtle);
             marker.Paint(Border.BorderBrushProperty, ArcTokens.Warning);
-            marker.Child = ArcUi.Icon("triangle-alert", 14, ArcTokens.Warning);
+            marker.Child = FeedbackUi.Icon("triangle-alert", 14, ArcTokens.Warning);
         }
         else if (done)
         {
             marker.Paint(Border.BackgroundProperty, ArcTokens.Accent);
             marker.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-            marker.Child = ArcUi.Icon("check", 14, ArcTokens.AccentForeground);
+            marker.Child = FeedbackUi.Icon("check", 14, ArcTokens.AccentForeground);
         }
         else if (current)
         {
             marker.Paint(Border.BackgroundProperty, ArcTokens.Surface);
             marker.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-            var number = ArcUi.Numeric($"{index + 1}", "arc-label");
+            var number = FeedbackUi.Numeric($"{index + 1}", "arc-label");
             number.FontSize = 13;
             number.HorizontalAlignment = HorizontalAlignment.Center;
             number.VerticalAlignment = VerticalAlignment.Center;
@@ -527,7 +527,7 @@ public class ArcStepper : TemplatedControl
         {
             marker.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
             marker.Paint(Border.BorderBrushProperty, ArcTokens.Border);
-            var number = ArcUi.Numeric($"{index + 1}", "arc-label");
+            var number = FeedbackUi.Numeric($"{index + 1}", "arc-label");
             number.FontSize = 13;
             number.HorizontalAlignment = HorizontalAlignment.Center;
             number.VerticalAlignment = VerticalAlignment.Center;

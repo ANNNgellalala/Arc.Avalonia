@@ -203,7 +203,7 @@ public class ArcCommentThread : TemplatedControl
 
             if (_thread.Count > 0)
             {
-                root.Children.Add(ArcUi.Divider());
+                root.Children.Add(FeedbackUi.Divider());
             }
 
             root.Children.Add(BuildComposer());
@@ -230,17 +230,17 @@ public class ArcCommentThread : TemplatedControl
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
         if (!string.IsNullOrWhiteSpace(Title))
         {
-            left.Children.Add(ArcUi.Text(Title!, "arc-label"));
+            left.Children.Add(FeedbackUi.Text(Title!, "arc-label"));
         }
 
         var count = CountAll(_thread);
-        var countText = ArcUi.Caption($"{count} {ArcUi.Plural(count, "comment", "comments")}");
+        var countText = FeedbackUi.Caption($"{count} {FeedbackUi.Plural(count, "comment", "comments")}");
         left.Children.Add(countText);
         grid.Children.Add(left);
 
         if (Resolved)
         {
-            var chip = ArcUi.Pill(ArcUi.Text("Resolved", "arc-label"), ArcTokens.SuccessSubtle, ArcTokens.Success);
+            var chip = FeedbackUi.Pill(FeedbackUi.Text("Resolved", "arc-label"), ArcTokens.SuccessSubtle, ArcTokens.Success);
             Grid.SetColumn(chip, 1);
             grid.Children.Add(chip);
 
@@ -279,12 +279,12 @@ public class ArcCommentThread : TemplatedControl
 
     private Control BuildResolvedNote()
     {
-        var row = ArcUi.Row(8,
-            ArcUi.Icon("check", 15, ArcTokens.Success),
-            ArcUi.Text("This thread is resolved. Reopen it to keep the discussion going.", "arc-body-sm", "arc-secondary"));
+        var row = FeedbackUi.Row(8,
+            FeedbackUi.Icon("check", 15, ArcTokens.Success),
+            FeedbackUi.Text("This thread is resolved. Reopen it to keep the discussion going.", "arc-body-sm", "arc-secondary"));
         var border = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusControl),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusControl),
             Padding = new Thickness(14, 10),
             Child = row
         };
@@ -309,7 +309,7 @@ public class ArcCommentThread : TemplatedControl
         };
         grid.Children.Add(avatar);
 
-        _composer = ArcUi.Input(Placeholder, 44);
+        _composer = FeedbackUi.Input(Placeholder, 44);
         _composer.AcceptsReturn = true;
         _composer.TextWrapping = TextWrapping.Wrap;
         _composer.MaxHeight = 120;
@@ -409,19 +409,19 @@ public class ArcCommentThread : TemplatedControl
         row.Children.Add(content);
 
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
-        var author = ArcUi.Text(comment.Author.Name, "arc-label");
+        var author = FeedbackUi.Text(comment.Author.Name, "arc-label");
         header.Children.Add(author);
-        header.Children.Add(ArcUi.Text(comment.CreatedAt, "arc-caption"));
+        header.Children.Add(FeedbackUi.Text(comment.CreatedAt, "arc-caption"));
         if (comment.Edited)
         {
-            header.Children.Add(ArcUi.Text("edited", "arc-caption"));
+            header.Children.Add(FeedbackUi.Text("edited", "arc-caption"));
         }
 
         content.Children.Add(header);
 
         if (comment.Deleted)
         {
-            content.Children.Add(ArcUi.Text("This comment was deleted.", "arc-body-sm", "arc-muted"));
+            content.Children.Add(FeedbackUi.Text("This comment was deleted.", "arc-body-sm", "arc-muted"));
         }
         else
         {
@@ -511,17 +511,17 @@ public class ArcCommentThread : TemplatedControl
         var emoji = new TextBlock
         {
             Text = reaction.Emoji,
-            FontFamily = ArcUi.EmojiFamily,
+            FontFamily = FeedbackUi.EmojiFamily,
             FontSize = 13,
             VerticalAlignment = VerticalAlignment.Center
         };
-        var count = ArcUi.Numeric(reaction.Users.Count.ToString(), "arc-caption");
+        var count = FeedbackUi.Numeric(reaction.Users.Count.ToString(), "arc-caption");
         count.FontSize = 11.5;
 
-        var row = ArcUi.Row(4, emoji, count);
+        var row = FeedbackUi.Row(4, emoji, count);
         var chip = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             Padding = new Thickness(8, 2, 9, 3),
             Child = row,
             Cursor = new Cursor(StandardCursorType.Hand),
@@ -554,14 +554,14 @@ public class ArcCommentThread : TemplatedControl
     {
         var border = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusControl),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusControl),
             Padding = new Thickness(12),
             Margin = new Thickness(0, 6, 0, 0)
         };
         border.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
 
         var stack = new StackPanel { Spacing = 8 };
-        var box = ArcUi.Input($"Reply to {comment.Author.Name}", 38);
+        var box = FeedbackUi.Input($"Reply to {comment.Author.Name}", 38);
         box.AcceptsReturn = true;
         box.TextWrapping = TextWrapping.Wrap;
         box.MaxHeight = 120;

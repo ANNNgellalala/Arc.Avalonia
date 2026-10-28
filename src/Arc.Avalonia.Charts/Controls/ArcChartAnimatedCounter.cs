@@ -11,31 +11,31 @@ namespace Arc.Avalonia.Charts;
 /// An odometer-style number with tabular figures, a small label, prefix and suffix. It settles
 /// quickly on a value change and skips travel entirely when Arc reduced motion is on.
 /// </summary>
-public class ArcAnimatedCounter : ArcChartBase
+public class ArcChartAnimatedCounter : ArcChartBase
 {
     public static readonly StyledProperty<double> ValueProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, double>(nameof(Value));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, double>(nameof(Value));
 
     public static readonly StyledProperty<string?> LabelProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, string?>(nameof(Label));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, string?>(nameof(Label));
 
     public static readonly StyledProperty<string?> PrefixProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, string?>(nameof(Prefix));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, string?>(nameof(Prefix));
 
     public static readonly StyledProperty<string?> SuffixProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, string?>(nameof(Suffix));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, string?>(nameof(Suffix));
 
     public static readonly StyledProperty<int> DecimalsProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, int>(nameof(Decimals));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, int>(nameof(Decimals));
 
     public static readonly StyledProperty<bool> AnimateOnLoadProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, bool>(nameof(AnimateOnLoad));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, bool>(nameof(AnimateOnLoad));
 
     public static readonly StyledProperty<TimeSpan> AnimationDurationProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, TimeSpan>(nameof(AnimationDuration), TimeSpan.FromMilliseconds(480));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, TimeSpan>(nameof(AnimationDuration), TimeSpan.FromMilliseconds(480));
 
     public static readonly StyledProperty<Func<double, string>?> ValueFormatProperty =
-        AvaloniaProperty.Register<ArcAnimatedCounter, Func<double, string>?>(nameof(ValueFormat));
+        AvaloniaProperty.Register<ArcChartAnimatedCounter, Func<double, string>?>(nameof(ValueFormat));
 
     private DispatcherTimer? _timer;
     private Stopwatch? _watch;
@@ -43,18 +43,18 @@ public class ArcAnimatedCounter : ArcChartBase
     private double _to;
     private double _displayValue;
 
-    static ArcAnimatedCounter()
+    static ArcChartAnimatedCounter()
     {
-        AffectsRender<ArcAnimatedCounter>(
+        AffectsRender<ArcChartAnimatedCounter>(
             LabelProperty,
             PrefixProperty,
             SuffixProperty,
             DecimalsProperty,
             ValueFormatProperty);
-        ValueProperty.Changed.AddClassHandler<ArcAnimatedCounter>((counter, _) => counter.OnValueChanged());
+        ValueProperty.Changed.AddClassHandler<ArcChartAnimatedCounter>((counter, _) => counter.OnValueChanged());
     }
 
-    public ArcAnimatedCounter()
+    public ArcChartAnimatedCounter()
     {
         _displayValue = Value;
     }

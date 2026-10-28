@@ -249,7 +249,7 @@ public class ArcSortableDataTable : TemplatedControl
 
         var shell = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPanel),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPanel),
             BorderThickness = new Thickness(1),
             ClipToBounds = true
         };
@@ -260,7 +260,7 @@ public class ArcSortableDataTable : TemplatedControl
 
         var header = BuildHeader(columns, keys);
         root.Children.Add(header);
-        root.Children.Add(ArcUi.Divider());
+        root.Children.Add(FeedbackUi.Divider());
 
         _body = new StackPanel();
         if (rows.Count == 0)
@@ -310,7 +310,7 @@ public class ArcSortableDataTable : TemplatedControl
             {
                 all.Paint(Border.BackgroundProperty, ArcTokens.Accent);
                 all.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-                all.Child = ArcUi.Icon(mixed ? "minus" : "check", 12, ArcTokens.AccentForeground);
+                all.Child = FeedbackUi.Icon(mixed ? "minus" : "check", 12, ArcTokens.AccentForeground);
             }
             else
             {
@@ -357,14 +357,14 @@ public class ArcSortableDataTable : TemplatedControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = column.Numeric ? HorizontalAlignment.Right : HorizontalAlignment.Left
             };
-            var label = ArcUi.Text(column.Label, "arc-label");
+            var label = FeedbackUi.Text(column.Label, "arc-label");
             label.FontSize = ArcResources.Double(ArcTokens.TextXs);
             label.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
             content.Children.Add(label);
 
             if (column.Sortable)
             {
-                content.Children.Add(ArcUi.Icon(
+                content.Children.Add(FeedbackUi.Icon(
                     sorted ? (_sort!.Direction == ArcSortDirection.Asc ? "arrow-up" : "arrow-down") : "arrow-up-down",
                     12,
                     sorted ? ArcTokens.Foreground : ArcTokens.TextMuted));
@@ -422,7 +422,7 @@ public class ArcSortableDataTable : TemplatedControl
             {
                 box.Paint(Border.BackgroundProperty, ArcTokens.Accent);
                 box.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-                box.Child = ArcUi.Icon("check", 12, ArcTokens.AccentForeground);
+                box.Child = FeedbackUi.Icon("check", 12, ArcTokens.AccentForeground);
             }
             else
             {
@@ -460,7 +460,7 @@ public class ArcSortableDataTable : TemplatedControl
             };
             if (column.Numeric)
             {
-                cell.FontFeatures = ArcUi.Tabular;
+                cell.FontFeatures = FeedbackUi.Tabular;
             }
 
             cell.Paint(TextBlock.ForegroundProperty, ArcTokens.Foreground);
@@ -611,7 +611,7 @@ public class ArcSortableDataTable : TemplatedControl
         var line = new Grid { Margin = new Thickness(2, 8, 2, 0) };
         line.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
         line.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-        var caption = ArcUi.Caption(text);
+        var caption = FeedbackUi.Caption(text);
         line.Children.Add(caption);
 
         if (Selectable && _selected.Count > 0)

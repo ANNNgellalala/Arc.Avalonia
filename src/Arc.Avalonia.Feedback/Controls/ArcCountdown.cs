@@ -216,10 +216,10 @@ public class ArcCountdown : TemplatedControl
         dot.Paint(Border.BackgroundProperty, ArcTokens.Success);
         _liveDot = dot;
 
-        var row = ArcUi.Row(8, dot, ArcUi.Text(CompleteLabel, "arc-label"));
+        var row = FeedbackUi.Row(8, dot, FeedbackUi.Text(CompleteLabel, "arc-label"));
         var pill = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             Padding = new Thickness(14, 7, 16, 7),
             HorizontalAlignment = HorizontalAlignment.Left,
             Child = row
@@ -238,20 +238,20 @@ public class ArcCountdown : TemplatedControl
         var panel = new StackPanel { Spacing = 10 };
         if (!string.IsNullOrWhiteSpace(Label))
         {
-            panel.Children.Add(ArcUi.Text(Label, "arc-caption"));
+            panel.Children.Add(FeedbackUi.Text(Label, "arc-caption"));
         }
 
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 24 };
         foreach (var (value, unit) in parts)
         {
             var block = new StackPanel { Spacing = 2 };
-            var number = ArcUi.Numeric(value);
+            var number = FeedbackUi.Numeric(value);
             number.FontSize = ArcResources.Double(ArcTokens.Text3xl);
             number.FontWeight = FontWeight.Medium;
             number.LineHeight = 40;
             number.LetterSpacing = -1;
             block.Children.Add(number);
-            block.Children.Add(ArcUi.Text(unit, "arc-caption"));
+            block.Children.Add(FeedbackUi.Text(unit, "arc-caption"));
             row.Children.Add(block);
         }
 
@@ -262,12 +262,12 @@ public class ArcCountdown : TemplatedControl
     private Control BuildCompact(IReadOnlyList<(string Value, string Unit)> parts)
     {
         var text = string.Join(" ", parts.Select(part => $"{CompactValue(part.Value)}{Short(part.Unit)}"));
-        var number = ArcUi.Numeric(text, "arc-label");
+        var number = FeedbackUi.Numeric(text, "arc-label");
         number.FontSize = 13;
 
         var pill = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             Padding = new Thickness(12, 5, 12, 6),
             HorizontalAlignment = HorizontalAlignment.Left,
             Child = number

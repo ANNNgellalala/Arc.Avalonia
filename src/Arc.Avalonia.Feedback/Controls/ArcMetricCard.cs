@@ -131,7 +131,7 @@ public class ArcMetricCard : ArcCard
         var top = new Grid();
         top.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
         top.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-        var label = ArcUi.Text(Label, "arc-label");
+        var label = FeedbackUi.Text(Label, "arc-label");
         label.TextTrimming = TextTrimming.CharacterEllipsis;
         top.Children.Add(label);
 
@@ -153,7 +153,7 @@ public class ArcMetricCard : ArcCard
             VerticalAlignment = VerticalAlignment.Bottom
         };
 
-        _valueText = ArcUi.Numeric(string.Empty);
+        _valueText = FeedbackUi.Numeric(string.Empty);
         _valueText.FontSize = ArcResources.Double(ArcTokens.Text3xl);
         _valueText.FontWeight = FontWeight.Medium;
         _valueText.LineHeight = 40;
@@ -163,7 +163,7 @@ public class ArcMetricCard : ArcCard
 
         if (!string.IsNullOrWhiteSpace(Suffix))
         {
-            var suffix = ArcUi.Text(Suffix, "arc-body-lg", "arc-secondary");
+            var suffix = FeedbackUi.Text(Suffix, "arc-body-lg", "arc-secondary");
             suffix.VerticalAlignment = VerticalAlignment.Bottom;
             suffix.Margin = new Thickness(2, 0, 0, 4);
             numberRow.Children.Add(suffix);
@@ -173,7 +173,7 @@ public class ArcMetricCard : ArcCard
 
         if (!string.IsNullOrWhiteSpace(Context))
         {
-            var context = ArcUi.Text(Context, "arc-caption");
+            var context = FeedbackUi.Text(Context, "arc-caption");
             context.TextTrimming = TextTrimming.CharacterEllipsis;
             root.Children.Add(context);
         }
@@ -281,8 +281,8 @@ public class ArcMetricCard : ArcCard
         };
 
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
-        row.Children.Add(ArcUi.Icon(icon, 12, foreground));
-        var label = ArcUi.Numeric(text);
+        row.Children.Add(FeedbackUi.Icon(icon, 12, foreground));
+        var label = FeedbackUi.Numeric(text);
         label.FontSize = ArcResources.Double(ArcTokens.TextXs);
         label.FontWeight = FontWeight.Medium;
         label.Paint(TextBlock.ForegroundProperty, foreground);
@@ -290,7 +290,7 @@ public class ArcMetricCard : ArcCard
 
         var chip = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             Padding = new Thickness(8, 3, 10, 3),
             Child = row,
             HorizontalAlignment = HorizontalAlignment.Right,

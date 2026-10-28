@@ -229,7 +229,7 @@ public class ArcPresenceStack : TemplatedControl
         _labelsCanvas = e.NameScope.Find<Canvas>("PART_Labels");
         _others = e.NameScope.Find<TextBlock>("PART_Others");
         _labelTranslate = new TranslateTransform();
-        _labelText = ArcUi.Text(string.Empty);
+        _labelText = FeedbackUi.Text(string.Empty);
         _labelText.FontSize = ArcResources.Double(ArcTokens.TextXs);
         _labelText.FontWeight = FontWeight.Medium;
         _labelText.TextTrimming = TextTrimming.CharacterEllipsis;
@@ -237,7 +237,7 @@ public class ArcPresenceStack : TemplatedControl
         _label = new Border
         {
             Padding = new Thickness(9, 3, 9, 3),
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             BorderThickness = new Thickness(1),
             IsVisible = false,
             IsHitTestVisible = false,
@@ -532,7 +532,7 @@ public class ArcPresenceStack : TemplatedControl
         if (_overflowChip is null)
         {
             _overflowTranslate = new TranslateTransform();
-            _overflowText = ArcUi.Numeric("+0");
+            _overflowText = FeedbackUi.Numeric("+0");
             _overflowText.FontWeight = FontWeight.Medium;
             _overflowText.HorizontalAlignment = HorizontalAlignment.Center;
             _overflowText.VerticalAlignment = VerticalAlignment.Center;
@@ -626,7 +626,7 @@ public class ArcPresenceStack : TemplatedControl
         else
         {
             avatar.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
-            var initials = ArcUi.Text(ArcUi.Initials(member.Name));
+            var initials = FeedbackUi.Text(FeedbackUi.Initials(member.Name));
             initials.FontSize = Math.Clamp(diameter * 0.36, 10, 16);
             initials.FontWeight = FontWeight.Medium;
             initials.HorizontalAlignment = HorizontalAlignment.Center;

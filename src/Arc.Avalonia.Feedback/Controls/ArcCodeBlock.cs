@@ -116,7 +116,7 @@ public class ArcCodeBlock : TemplatedControl
 
         var shell = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPanel),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPanel),
             BorderThickness = new Thickness(1),
             ClipToBounds = true
         };
@@ -134,19 +134,19 @@ public class ArcCodeBlock : TemplatedControl
         header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
 
-        var name = ArcUi.Text(string.IsNullOrWhiteSpace(Filename) ? "Source code" : Filename!, "arc-caption");
-        name.FontFamily = ArcUi.MonoFamily;
+        var name = FeedbackUi.Text(string.IsNullOrWhiteSpace(Filename) ? "Source code" : Filename!, "arc-caption");
+        name.FontFamily = FeedbackUi.MonoFamily;
         name.FontSize = 12;
         name.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
         name.TextTrimming = TextTrimming.CharacterEllipsis;
         name.VerticalAlignment = VerticalAlignment.Center;
         header.Children.Add(name);
 
-        var language = ArcUi.Text(Language.ToLowerInvariant());
-        language.FontFamily = ArcUi.MonoFamily;
+        var language = FeedbackUi.Text(Language.ToLowerInvariant());
+        language.FontFamily = FeedbackUi.MonoFamily;
         language.FontSize = 11;
         language.Margin = new Thickness(0, 0, 8, 0);
-        var badge = ArcUi.Pill(language, ArcTokens.SurfaceMuted, ArcTokens.TextMuted, 8, 2);
+        var badge = FeedbackUi.Pill(language, ArcTokens.SurfaceMuted, ArcTokens.TextMuted, 8, 2);
         Grid.SetColumn(badge, 1);
         header.Children.Add(badge);
 
@@ -163,7 +163,7 @@ public class ArcCodeBlock : TemplatedControl
         header.Children.Add(copy);
         grid.Children.Add(header);
 
-        var divider = ArcUi.Divider();
+        var divider = FeedbackUi.Divider();
         Grid.SetRow(divider, 1);
         grid.Children.Add(divider);
 
@@ -175,7 +175,7 @@ public class ArcCodeBlock : TemplatedControl
         var numbers = new TextBlock
         {
             Text = string.Join("\n", Enumerable.Range(1, shown.Length)),
-            FontFamily = ArcUi.MonoFamily,
+            FontFamily = FeedbackUi.MonoFamily,
             FontSize = 12.5,
             LineHeight = 20,
             TextAlignment = TextAlignment.Right,
@@ -183,7 +183,7 @@ public class ArcCodeBlock : TemplatedControl
             Margin = new Thickness(16, 12, 12, 14),
             MinWidth = 26
         };
-        numbers.FontFeatures = ArcUi.Tabular;
+        numbers.FontFeatures = FeedbackUi.Tabular;
         numbers.Paint(TextBlock.ForegroundProperty, ArcTokens.TextMuted);
         body.Children.Add(numbers);
 
@@ -211,8 +211,8 @@ public class ArcCodeBlock : TemplatedControl
         if (collapsed)
         {
             var toggleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
-            toggleRow.Children.Add(ArcUi.Icon("chevron-down", 14, ArcTokens.TextSecondary));
-            toggleRow.Children.Add(ArcUi.Text($"Show all {lines.Length} lines", "arc-caption"));
+            toggleRow.Children.Add(FeedbackUi.Icon("chevron-down", 14, ArcTokens.TextSecondary));
+            toggleRow.Children.Add(FeedbackUi.Text($"Show all {lines.Length} lines", "arc-caption"));
 
             var toggle = new ArcFlatButton
             {
@@ -248,7 +248,7 @@ public class ArcCodeBlock : TemplatedControl
     {
         var block = new TextBlock
         {
-            FontFamily = ArcUi.MonoFamily,
+            FontFamily = FeedbackUi.MonoFamily,
             FontSize = 12.5,
             LineHeight = 20,
             TextWrapping = TextWrapping.NoWrap
@@ -256,7 +256,7 @@ public class ArcCodeBlock : TemplatedControl
 
         foreach (var (text, token) in Tokenize(source))
         {
-            ArcUi.AddRun(block, text, token);
+            FeedbackUi.AddRun(block, text, token);
         }
 
         return block;

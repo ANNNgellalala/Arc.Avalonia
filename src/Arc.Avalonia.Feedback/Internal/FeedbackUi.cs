@@ -22,7 +22,7 @@ namespace Arc.Avalonia.Feedback.Controls;
 /// bits of chrome that every composite control needs. Keeping the token lookup in one place means
 /// every generated child follows a theme or accent swap without a rebuild.
 /// </summary>
-internal static class ArcUi
+internal static class FeedbackUi
 {
     public static readonly FontFeatureCollection Tabular = CreateTabular();
 

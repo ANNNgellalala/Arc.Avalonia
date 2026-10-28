@@ -201,11 +201,11 @@ public class ArcTreeView : TemplatedControl
         };
         grid.Children.Add(chevron);
 
-        var icon = ArcUi.Icon(node.Icon ?? (branch ? "folder" : "file"), 15, selected ? ArcTokens.AccentStrong : ArcTokens.TextSecondary);
+        var icon = FeedbackUi.Icon(node.Icon ?? (branch ? "folder" : "file"), 15, selected ? ArcTokens.AccentStrong : ArcTokens.TextSecondary);
         Grid.SetColumn(icon, 1);
         grid.Children.Add(icon);
 
-        var label = ArcUi.Text(node.Label, "arc-body-sm");
+        var label = FeedbackUi.Text(node.Label, "arc-body-sm");
         label.TextTrimming = TextTrimming.CharacterEllipsis;
         label.VerticalAlignment = VerticalAlignment.Center;
         label.Paint(TextBlock.ForegroundProperty, selected ? ArcTokens.Foreground : ArcTokens.TextSecondary);

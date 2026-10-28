@@ -1,28 +1,36 @@
 <Solution>
-  <Folder Name="/src/">
+  <Folder Name="/Foundation/">
+    <Project Path="src/Arc.Avalonia/Arc.Avalonia.csproj" />
+  </Folder>
+  <Folder Name="/Components/">
     <Project Path="src/Arc.Avalonia.Actions/Arc.Avalonia.Actions.csproj" />
     <Project Path="src/Arc.Avalonia.AdvancedActions/Arc.Avalonia.AdvancedActions.csproj" />
     <Project Path="src/Arc.Avalonia.AdvancedInputs/Arc.Avalonia.AdvancedInputs.csproj" />
+    <Project Path="src/Arc.Avalonia.Charts/Arc.Avalonia.Charts.csproj" />
+    <Project Path="src/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
+    <Project Path="src/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
+    <Project Path="src/Arc.Avalonia.Feedback/Arc.Avalonia.Feedback.csproj" />
+    <Project Path="src/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj" />
+    <Project Path="src/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
+    <Project Path="src/Arc.Avalonia.Pickers/Arc.Avalonia.Pickers.csproj" />
+  </Folder>
+  <Folder Name="/Special/">
+    <Project Path="src/Arc.Avalonia.SpecialAIExplainers/Arc.Avalonia.SpecialAIExplainers.csproj" />
+    <Project Path="src/Arc.Avalonia.SpecialAIWidgets/Arc.Avalonia.SpecialAIWidgets.csproj" />
+    <Project Path="src/Arc.Avalonia.SpecialGlass/Arc.Avalonia.SpecialGlass.csproj" />
+    <Project Path="src/Arc.Avalonia.SpecialMedia/Arc.Avalonia.SpecialMedia.csproj" />
+    <Project Path="src/Arc.Avalonia.SpecialMotion/Arc.Avalonia.SpecialMotion.csproj" />
+  </Folder>
+  <Folder Name="/Blocks/">
     <Project Path="src/Arc.Avalonia.BlocksAI/Arc.Avalonia.BlocksAI.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksApp/Arc.Avalonia.BlocksApp.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksCommerce/Arc.Avalonia.BlocksCommerce.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksData/Arc.Avalonia.BlocksData.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksMarketing/Arc.Avalonia.BlocksMarketing.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksTeam/Arc.Avalonia.BlocksTeam.csproj" />
-    <Project Path="src/Arc.Avalonia.Charts/Arc.Avalonia.Charts.csproj" />
-    <Project Path="src/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
+  </Folder>
+  <Folder Name="/App/">
     <Project Path="src/Arc.Avalonia.Demo/Arc.Avalonia.Demo.csproj" />
-    <Project Path="src/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
-    <Project Path="src/Arc.Avalonia.Feedback/Arc.Avalonia.Feedback.csproj" />
     <Project Path="src/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj" />
-    <Project Path="src/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj" />
-    <Project Path="src/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
-    <Project Path="src/Arc.Avalonia.Pickers/Arc.Avalonia.Pickers.csproj" />
-    <Project Path="src/Arc.Avalonia.SpecialAIExplainers/Arc.Avalonia.SpecialAIExplainers.csproj" />
-    <Project Path="src/Arc.Avalonia.SpecialAIWidgets/Arc.Avalonia.SpecialAIWidgets.csproj" />
-    <Project Path="src/Arc.Avalonia.SpecialGlass/Arc.Avalonia.SpecialGlass.csproj" />
-    <Project Path="src/Arc.Avalonia.SpecialMedia/Arc.Avalonia.SpecialMedia.csproj" />
-    <Project Path="src/Arc.Avalonia.SpecialMotion/Arc.Avalonia.SpecialMotion.csproj" />
-    <Project Path="src/Arc.Avalonia/Arc.Avalonia.csproj" />
   </Folder>
 </Solution>

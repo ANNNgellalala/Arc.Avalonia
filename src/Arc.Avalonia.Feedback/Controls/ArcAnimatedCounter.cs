@@ -113,7 +113,7 @@ public class ArcAnimatedCounter : TemplatedControl
 
         if (_valueText is not null)
         {
-            _valueText.FontFeatures = ArcUi.Tabular;
+            _valueText.FontFeatures = FeedbackUi.Tabular;
         }
 
         UpdateParts();

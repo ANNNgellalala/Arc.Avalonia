@@ -196,7 +196,7 @@ public class ArcAvatarGroup : TemplatedControl
                     Text = $"+{overflow}",
                     FontSize = Math.Clamp(diameter * 0.3, 10, 18),
                     FontWeight = FontWeight.Medium,
-                    FontFeatures = ArcUi.Tabular,
+                    FontFeatures = FeedbackUi.Tabular,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 }

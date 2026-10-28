@@ -203,7 +203,7 @@ public class ArcFilterToolbar : TemplatedControl
         if (ShowSearch)
         {
             var panel = new Panel { Width = 260, Margin = new Thickness(0, 0, 10, 8), VerticalAlignment = VerticalAlignment.Center };
-            var box = ArcUi.Input(SearchPlaceholder, 36);
+            var box = FeedbackUi.Input(SearchPlaceholder, 36);
             box.Padding = new Thickness(32, 6, 30, 6);
             box.Text = SearchText;
             box.TextChanged += (_, _) => SetCurrentValue(SearchTextProperty, box.Text ?? string.Empty);
@@ -279,7 +279,7 @@ public class ArcFilterToolbar : TemplatedControl
 
         if (ResultCount is { } count)
         {
-            var caption = ArcUi.Caption($"{count.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} {ResultLabel}");
+            var caption = FeedbackUi.Caption($"{count.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} {ResultLabel}");
             caption.Margin = new Thickness(2, 0, 12, 8);
             caption.VerticalAlignment = VerticalAlignment.Center;
             _host.Children.Add(caption);
@@ -333,7 +333,7 @@ public class ArcFilterToolbar : TemplatedControl
     {
         var surface = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPanel),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPanel),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(6),
             MinWidth = 220,
@@ -349,7 +349,7 @@ public class ArcFilterToolbar : TemplatedControl
     private Control BuildChip(ArcFilterChip chip)
     {
         var text = string.IsNullOrWhiteSpace(chip.Value) ? chip.Label : $"{chip.Label}: {chip.Value}";
-        var label = ArcUi.Text(text);
+        var label = FeedbackUi.Text(text);
         label.FontSize = ArcResources.Double(ArcTokens.TextXs);
         label.FontWeight = FontWeight.Medium;
         label.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
@@ -364,10 +364,10 @@ public class ArcFilterToolbar : TemplatedControl
         };
         remove.Click += (_, _) => RemoveFilter(chip.Id);
 
-        var row = ArcUi.Row(4, label, remove);
+        var row = FeedbackUi.Row(4, label, remove);
         var border = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPill),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPill),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(10, 2, 3, 2),
             Margin = new Thickness(0, 0, 8, 8),
@@ -383,7 +383,7 @@ public class ArcFilterToolbar : TemplatedControl
     private Control BuildAddButton()
     {
         var content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
-        content.Children.Add(ArcUi.Icon("plus", 14, ArcTokens.TextSecondary));
+        content.Children.Add(FeedbackUi.Icon("plus", 14, ArcTokens.TextSecondary));
         content.Children.Add(new TextBlock { Text = "Add filter", Classes = { "arc-body-sm" }, VerticalAlignment = VerticalAlignment.Center });
 
         _addButton = new ArcButton
@@ -406,7 +406,7 @@ public class ArcFilterToolbar : TemplatedControl
     {
         var label = SortOptions?.FirstOrDefault(option => option.Key == SortKey)?.Label ?? "Sort";
         var content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
-        content.Children.Add(ArcUi.Icon("arrow-up-down", 14, ArcTokens.TextSecondary));
+        content.Children.Add(FeedbackUi.Icon("arrow-up-down", 14, ArcTokens.TextSecondary));
         content.Children.Add(new TextBlock { Text = label, Classes = { "arc-body-sm" }, VerticalAlignment = VerticalAlignment.Center });
 
         _sortButton = new ArcButton
@@ -436,9 +436,9 @@ public class ArcFilterToolbar : TemplatedControl
         _filterMenu.Children.Add(MenuHeading("Add filter"));
         foreach (var field in Fields ?? Enumerable.Empty<ArcFilterField>())
         {
-            var row = ArcUi.Row(8, ArcUi.Text(field.Label, "arc-body-sm"));
+            var row = FeedbackUi.Row(8, FeedbackUi.Text(field.Label, "arc-body-sm"));
             row.HorizontalAlignment = HorizontalAlignment.Stretch;
-            var chevron = ArcUi.Icon("chevron-right", 13, ArcTokens.TextMuted);
+            var chevron = FeedbackUi.Icon("chevron-right", 13, ArcTokens.TextMuted);
             chevron.HorizontalAlignment = HorizontalAlignment.Right;
             var line = new Grid();
             line.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
@@ -508,7 +508,7 @@ public class ArcFilterToolbar : TemplatedControl
             row.Children.Add(new TextBlock { Text = option.Label, Classes = { "arc-body-sm" }, VerticalAlignment = VerticalAlignment.Center });
             if (active)
             {
-                var check = ArcUi.Icon("check", 14, ArcTokens.AccentStrong);
+                var check = FeedbackUi.Icon("check", 14, ArcTokens.AccentStrong);
                 Grid.SetColumn(check, 1);
                 row.Children.Add(check);
             }
@@ -536,7 +536,7 @@ public class ArcFilterToolbar : TemplatedControl
 
     private static Control MenuHeading(string text)
     {
-        var heading = ArcUi.Text(text, "arc-caption");
+        var heading = FeedbackUi.Text(text, "arc-caption");
         heading.Margin = new Thickness(10, 4, 10, 6);
         return heading;
     }

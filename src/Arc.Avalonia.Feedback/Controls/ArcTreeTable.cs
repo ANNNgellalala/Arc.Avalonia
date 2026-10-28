@@ -876,11 +876,11 @@ public class ArcTreeTable : TemplatedControl
             Spacing = 10,
             VerticalAlignment = VerticalAlignment.Center
         };
-        var label = ArcUi.Text(Label, "arc-label");
+        var label = FeedbackUi.Text(Label, "arc-label");
         label.FontSize = ArcResources.Double(ArcTokens.TextSm);
         label.Paint(TextBlock.ForegroundProperty, ArcTokens.Foreground);
         left.Children.Add(label);
-        _countText = ArcUi.Caption(string.Empty);
+        _countText = FeedbackUi.Caption(string.Empty);
         _countText.Paint(TextBlock.ForegroundProperty, ArcTokens.TextMuted);
         left.Children.Add(_countText);
         grid.Children.Add(left);
@@ -1022,7 +1022,7 @@ public class ArcTreeTable : TemplatedControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = alignment
             };
-            var label = ArcUi.Text(column.Header, "arc-label");
+            var label = FeedbackUi.Text(column.Header, "arc-label");
             label.FontSize = ArcResources.Double(ArcTokens.TextXs);
             label.FontWeight = FontWeight.Medium;
             label.TextTrimming = TextTrimming.CharacterEllipsis;
@@ -1036,7 +1036,7 @@ public class ArcTreeTable : TemplatedControl
                 var icon = sorted
                     ? _sortDescending ? "arrow-down" : "arrow-up"
                     : "arrow-up-down";
-                var indicator = ArcUi.Icon(
+                var indicator = FeedbackUi.Icon(
                     icon,
                     12,
                     sorted ? ArcTokens.AccentStrong : ArcTokens.TextMuted);
@@ -1145,7 +1145,7 @@ public class ArcTreeTable : TemplatedControl
 
         box.Paint(Border.BackgroundProperty, ArcTokens.Accent);
         box.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-        box.Child = ArcUi.Icon(
+        box.Child = FeedbackUi.Icon(
             state == CheckState.Mixed ? "minus" : "check",
             12,
             ArcTokens.AccentForeground);
@@ -1347,7 +1347,7 @@ public class ArcTreeTable : TemplatedControl
                 };
                 if (column.Align == ArcTreeTableAlign.Right)
                 {
-                    label.FontFeatures = ArcUi.Tabular;
+                    label.FontFeatures = FeedbackUi.Tabular;
                 }
 
                 label.Paint(TextBlock.ForegroundProperty, ArcTokens.Foreground);
@@ -1490,7 +1490,7 @@ public class ArcTreeTable : TemplatedControl
         }
 
         var rotate = new RotateTransform(expanded ? 90 : 0);
-        var chevron = ArcUi.Icon(
+        var chevron = FeedbackUi.Icon(
             "chevron-right",
             12,
             expanded ? ArcTokens.TextSecondary : ArcTokens.TextMuted);
@@ -1546,16 +1546,16 @@ public class ArcTreeTable : TemplatedControl
         if (item.Kind == DisplayKind.Loading)
         {
             host.Children.Add(new ArcSpinner { Size = 14, StrokeWidth = 2 });
-            var text = ArcUi.Caption("Loading children…");
+            var text = FeedbackUi.Caption("Loading children…");
             text.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
             host.Children.Add(text);
             AutomationProperties.SetName(host, $"Loading children of {LabelOf(row)}");
         }
         else
         {
-            var icon = ArcUi.Icon("triangle-alert", 14, ArcTokens.Warning);
+            var icon = FeedbackUi.Icon("triangle-alert", 14, ArcTokens.Warning);
             host.Children.Add(icon);
-            var text = ArcUi.Caption($"Couldn't load children of {LabelOf(row)}.");
+            var text = FeedbackUi.Caption($"Couldn't load children of {LabelOf(row)}.");
             text.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
             host.Children.Add(text);
             var retry = new ArcFlatButton

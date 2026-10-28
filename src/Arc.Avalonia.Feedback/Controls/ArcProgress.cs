@@ -150,7 +150,7 @@ public class ArcProgress : TemplatedControl
 
         if (_valueText is not null)
         {
-            _valueText.FontFeatures = ArcUi.Tabular;
+            _valueText.FontFeatures = FeedbackUi.Tabular;
         }
 
         if (_check is not null)

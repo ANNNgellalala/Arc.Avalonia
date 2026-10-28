@@ -13,16 +13,16 @@ namespace Arc.Avalonia.Charts;
 /// A contribution-style calendar: seven rows and one column per week, five tint steps derived
 /// from the accent series, month labels, weekday labels, and a date/count tooltip.
 /// </summary>
-public class ArcActivityHeatmap : ArcChartBase
+public class ArcChartActivityHeatmap : ArcChartBase
 {
     public static readonly StyledProperty<IReadOnlyList<int>?> ValuesProperty =
-        AvaloniaProperty.Register<ArcActivityHeatmap, IReadOnlyList<int>?>(nameof(Values));
+        AvaloniaProperty.Register<ArcChartActivityHeatmap, IReadOnlyList<int>?>(nameof(Values));
 
     public static readonly StyledProperty<DateTime> StartDateProperty =
-        AvaloniaProperty.Register<ArcActivityHeatmap, DateTime>(nameof(StartDate), DateTime.Today);
+        AvaloniaProperty.Register<ArcChartActivityHeatmap, DateTime>(nameof(StartDate), DateTime.Today);
 
     public static readonly StyledProperty<string?> UnitProperty =
-        AvaloniaProperty.Register<ArcActivityHeatmap, string?>(nameof(Unit), "activity");
+        AvaloniaProperty.Register<ArcChartActivityHeatmap, string?>(nameof(Unit), "activity");
 
     private static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
     private Rect _grid;
@@ -31,13 +31,13 @@ public class ArcActivityHeatmap : ArcChartBase
     private int _weeks;
     private int _activeIndex = -1;
 
-    static ArcActivityHeatmap()
+    static ArcChartActivityHeatmap()
     {
-        AffectsRender<ArcActivityHeatmap>(ValuesProperty, StartDateProperty, UnitProperty);
-        ValuesProperty.Changed.AddClassHandler<ArcActivityHeatmap>((chart, _) => chart._activeIndex = -1);
+        AffectsRender<ArcChartActivityHeatmap>(ValuesProperty, StartDateProperty, UnitProperty);
+        ValuesProperty.Changed.AddClassHandler<ArcChartActivityHeatmap>((chart, _) => chart._activeIndex = -1);
     }
 
-    public ArcActivityHeatmap()
+    public ArcChartActivityHeatmap()
     {
         Focusable = true;
         Height = 190;

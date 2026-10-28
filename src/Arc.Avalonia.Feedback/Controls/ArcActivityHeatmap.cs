@@ -349,7 +349,7 @@ public sealed class ArcHeatmapGrid : Control
         var background = ArcResources.Color(ArcTokens.Background);
         var dark = background.R + background.G + background.B < 384;
         var baseCell = ArcResources.Brush(dark ? ArcTokens.BorderSubtle : ArcTokens.ControlTrack);
-        var typeface = new Typeface(ArcUi.Font(ArcTokens.FontBody));
+        var typeface = new Typeface(FeedbackUi.Font(ArcTokens.FontBody));
 
         var level = Math.Max(1, Thresholds is { Count: >= 3 } thresholds ? thresholds[2] : 1);
 

@@ -45,7 +45,7 @@ public sealed class ChartsMorePage : ArcPage
             Card(
                 "Activity heatmap",
                 "Contributions, last sixteen weeks",
-                new ArcActivityHeatmap
+                new ArcChartActivityHeatmap
                 {
                     Values = ChartsData.Activity(),
                     StartDate = new DateTime(2025, 12, 29),
@@ -56,7 +56,7 @@ public sealed class ChartsMorePage : ArcPage
             Card(
                 "Animated counter",
                 "Monthly recurring revenue",
-                new ArcAnimatedCounter
+                new ArcChartAnimatedCounter
                 {
                     Value = 1284,
                     Prefix = "$",

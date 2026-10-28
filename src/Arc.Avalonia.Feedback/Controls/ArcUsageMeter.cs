@@ -231,7 +231,7 @@ public class ArcUsageMeter : TemplatedControl
         var header = new Grid();
         header.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
         header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-        header.Children.Add(ArcUi.Text(Label, "arc-label"));
+        header.Children.Add(FeedbackUi.Text(Label, "arc-label"));
         var badge = BuildBadge(share, over, warn);
         Grid.SetColumn(badge, 1);
         header.Children.Add(badge);
@@ -242,8 +242,8 @@ public class ArcUsageMeter : TemplatedControl
         root.Children.Add(_bar);
 
         var noun = string.IsNullOrWhiteSpace(Unit) ? Label.ToLowerInvariant() : Unit;
-        var caption = ArcUi.Text(
-            $"{ArcUi.CompactNumber(used)} of {ArcUi.CompactNumber(limit)} {noun}",
+        var caption = FeedbackUi.Text(
+            $"{FeedbackUi.CompactNumber(used)} of {FeedbackUi.CompactNumber(limit)} {noun}",
             "arc-caption");
         caption.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
         root.Children.Add(caption);
@@ -254,7 +254,7 @@ public class ArcUsageMeter : TemplatedControl
         {
             var index = i;
             var item = BuildLegendItem(
-                ArcUi.SeriesKey(i),
+                FeedbackUi.SeriesKey(i),
                 segments[i].Label,
                 $"{segments[i].Value.ToString("0." + new string('#', Math.Max(0, Decimals)), CultureInfo.InvariantCulture)}{unitText}",
                 index);
@@ -286,7 +286,7 @@ public class ArcUsageMeter : TemplatedControl
             over ? ArcTokens.Danger : ArcTokens.ControlTrack,
             over ? OverLabel : FreeLabel,
             over
-                ? $"{ArcUi.CompactNumber(Math.Abs(remainder))}{unitText}"
+                ? $"{FeedbackUi.CompactNumber(Math.Abs(remainder))}{unitText}"
                 : $"{remainder.ToString("0." + new string('#', Math.Max(0, Decimals)), CultureInfo.InvariantCulture)}{unitText}",
             segments.Count);
         _legendItems.Add(remainderItem);
@@ -297,7 +297,7 @@ public class ArcUsageMeter : TemplatedControl
 
         UpdateHighlight();
         AutomationProperties.SetName(this, Label);
-        AutomationProperties.SetHelpText(this, $"{ArcUi.CompactNumber(used)} of {ArcUi.CompactNumber(limit)} {noun}, {Math.Round(share * 100)} percent");
+        AutomationProperties.SetHelpText(this, $"{FeedbackUi.CompactNumber(used)} of {FeedbackUi.CompactNumber(limit)} {noun}, {Math.Round(share * 100)} percent");
     }
 
     private Control BuildBadge(double share, bool over, bool warn)
@@ -307,13 +307,13 @@ public class ArcUsageMeter : TemplatedControl
         var background = over ? ArcTokens.DangerSubtle : warn ? ArcTokens.WarningSubtle : ArcTokens.SurfaceMuted;
         var foreground = over ? ArcTokens.Danger : warn ? ArcTokens.Warning : ArcTokens.TextSecondary;
 
-        var block = ArcUi.Text(text);
+        var block = FeedbackUi.Text(text);
         block.FontSize = ArcResources.Double(ArcTokens.TextXs);
         block.FontWeight = FontWeight.Medium;
-        var pill = ArcUi.Pill(block, background, foreground);
+        var pill = FeedbackUi.Pill(block, background, foreground);
         if (over || warn)
         {
-            block.FontFeatures = ArcUi.Tabular;
+            block.FontFeatures = FeedbackUi.Tabular;
         }
 
         return pill;
@@ -324,12 +324,12 @@ public class ArcUsageMeter : TemplatedControl
         var dot = new Border { Width = 8, Height = 8, CornerRadius = new CornerRadius(4), VerticalAlignment = VerticalAlignment.Center };
         dot.Paint(Border.BackgroundProperty, token);
 
-        var label = ArcUi.Text(name, "arc-caption");
+        var label = FeedbackUi.Text(name, "arc-caption");
         label.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
-        var amount = ArcUi.Numeric(value, "arc-caption");
+        var amount = FeedbackUi.Numeric(value, "arc-caption");
         amount.Paint(TextBlock.ForegroundProperty, ArcTokens.TextMuted);
 
-        var row = ArcUi.Row(6, dot, label, amount);
+        var row = FeedbackUi.Row(6, dot, label, amount);
         var item = new Border
         {
             CornerRadius = new CornerRadius(8),
@@ -413,7 +413,7 @@ public sealed class ArcUsageBar : Control
                 var opacity = Highlight < 0 || Highlight == i ? 1 : 0.42;
                 using (context.PushOpacity(opacity))
                 {
-                    context.DrawRectangle(ArcResources.Brush(ArcUi.SeriesKey(i)), null, new Rect(left, top, drawWidth, height), radius, radius);
+                    context.DrawRectangle(ArcResources.Brush(FeedbackUi.SeriesKey(i)), null, new Rect(left, top, drawWidth, height), radius, radius);
                 }
 
                 cursor += drawWidth + gap;

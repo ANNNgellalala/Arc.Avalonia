@@ -122,12 +122,12 @@ public class ArcEmptyState : TemplatedControl
             Height = 56,
             CornerRadius = new CornerRadius(28),
             HorizontalAlignment = HorizontalAlignment.Center,
-            Child = ArcUi.Icon(Icon ?? "folder", 24, ArcTokens.TextSecondary)
+            Child = FeedbackUi.Icon(Icon ?? "folder", 24, ArcTokens.TextSecondary)
         };
         illustration.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
         root.Children.Add(illustration);
 
-        var title = ArcUi.Text(Title, "arc-heading");
+        var title = FeedbackUi.Text(Title, "arc-heading");
         title.HorizontalAlignment = HorizontalAlignment.Center;
         title.TextAlignment = TextAlignment.Center;
         title.TextWrapping = TextWrapping.Wrap;
@@ -136,7 +136,7 @@ public class ArcEmptyState : TemplatedControl
 
         if (!string.IsNullOrWhiteSpace(Description))
         {
-            var description = ArcUi.Text(Description, "arc-body-sm", "arc-secondary");
+            var description = FeedbackUi.Text(Description, "arc-body-sm", "arc-secondary");
             description.HorizontalAlignment = HorizontalAlignment.Center;
             description.TextAlignment = TextAlignment.Center;
             description.TextWrapping = TextWrapping.Wrap;

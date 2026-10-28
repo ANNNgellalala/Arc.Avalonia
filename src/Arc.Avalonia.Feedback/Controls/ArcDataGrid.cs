@@ -543,11 +543,11 @@ public class ArcDataGrid : TemplatedControl
             Spacing = 10,
             VerticalAlignment = VerticalAlignment.Center
         };
-        var label = ArcUi.Text(Label, "arc-label");
+        var label = FeedbackUi.Text(Label, "arc-label");
         label.FontSize = ArcResources.Double(ArcTokens.TextSm);
         label.Paint(TextBlock.ForegroundProperty, ArcTokens.Foreground);
         left.Children.Add(label);
-        _countText = ArcUi.Caption(string.Empty);
+        _countText = FeedbackUi.Caption(string.Empty);
         _countText.Paint(TextBlock.ForegroundProperty, ArcTokens.TextMuted);
         left.Children.Add(_countText);
         root.Children.Add(left);
@@ -558,11 +558,11 @@ public class ArcDataGrid : TemplatedControl
             Spacing = 6,
             VerticalAlignment = VerticalAlignment.Center
         };
-        content.Children.Add(ArcUi.Icon("columns-3", 14, ArcTokens.TextSecondary));
-        var text = ArcUi.Text("Columns", "arc-body-sm");
+        content.Children.Add(FeedbackUi.Icon("columns-3", 14, ArcTokens.TextSecondary));
+        var text = FeedbackUi.Text("Columns", "arc-body-sm");
         text.FontSize = 13;
         content.Children.Add(text);
-        content.Children.Add(ArcUi.Icon("chevron-down", 12, ArcTokens.TextMuted));
+        content.Children.Add(FeedbackUi.Icon("chevron-down", 12, ArcTokens.TextMuted));
 
         _columnsButton = new ArcButton
         {
@@ -597,7 +597,7 @@ public class ArcDataGrid : TemplatedControl
     {
         var surface = new Border
         {
-            CornerRadius = ArcUi.Radius(ArcTokens.RadiusPanel),
+            CornerRadius = FeedbackUi.Radius(ArcTokens.RadiusPanel),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(6),
             MinWidth = 220,
@@ -630,7 +630,7 @@ public class ArcDataGrid : TemplatedControl
         }
 
         _columnsMenu.Children.Clear();
-        var heading = ArcUi.Text("Columns", "arc-caption");
+        var heading = FeedbackUi.Text("Columns", "arc-caption");
         heading.Margin = new Thickness(10, 4, 10, 6);
         _columnsMenu.Children.Add(heading);
 
@@ -643,14 +643,14 @@ public class ArcDataGrid : TemplatedControl
             var row = new Grid { ColumnDefinitions = new ColumnDefinitions("20,*") };
             if (visible)
             {
-                row.Children.Add(ArcUi.Icon("check", 14, ArcTokens.AccentStrong));
+                row.Children.Add(FeedbackUi.Icon("check", 14, ArcTokens.AccentStrong));
             }
             else
             {
                 row.Children.Add(new Border { Width = 14, Height = 14 });
             }
 
-            var label = ArcUi.Text(column.Header, "arc-body-sm");
+            var label = FeedbackUi.Text(column.Header, "arc-body-sm");
             label.Paint(TextBlock.ForegroundProperty, visible ? ArcTokens.Foreground : ArcTokens.TextMuted);
             Grid.SetColumn(label, 1);
             row.Children.Add(label);
@@ -764,7 +764,7 @@ public class ArcDataGrid : TemplatedControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = AlignToAlignment(column.Align)
             };
-            var label = ArcUi.Text(column.Header, "arc-label");
+            var label = FeedbackUi.Text(column.Header, "arc-label");
             label.FontSize = ArcResources.Double(ArcTokens.TextXs);
             label.FontWeight = FontWeight.Medium;
             label.Paint(TextBlock.ForegroundProperty, sorted ? ArcTokens.Foreground : ArcTokens.TextSecondary);
@@ -776,7 +776,7 @@ public class ArcDataGrid : TemplatedControl
                 var icon = sorted
                     ? (_sortDescending ? "arrow-down" : "arrow-up")
                     : "arrow-up-down";
-                var indicator = ArcUi.Icon(icon, 12, sorted ? ArcTokens.AccentStrong : ArcTokens.TextMuted);
+                var indicator = FeedbackUi.Icon(icon, 12, sorted ? ArcTokens.AccentStrong : ArcTokens.TextMuted);
                 indicator.Opacity = sorted ? 1 : 0.4;
                 content.Children.Add(indicator);
             }
@@ -1052,15 +1052,15 @@ public class ArcDataGrid : TemplatedControl
                 Height = 44,
                 CornerRadius = new CornerRadius(22),
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Child = ArcUi.Icon("table", 20, ArcTokens.TextSecondary)
+                Child = FeedbackUi.Icon("table", 20, ArcTokens.TextSecondary)
             };
             icon.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
 
-            var title = ArcUi.Text(EmptyMessage, "arc-label");
+            var title = FeedbackUi.Text(EmptyMessage, "arc-label");
             title.FontSize = ArcResources.Double(ArcTokens.TextSm);
             title.HorizontalAlignment = HorizontalAlignment.Center;
             title.TextAlignment = TextAlignment.Center;
-            var description = ArcUi.Text(EmptyDescription);
+            var description = FeedbackUi.Text(EmptyDescription);
             description.FontSize = ArcResources.Double(ArcTokens.TextXs);
             description.TextAlignment = TextAlignment.Center;
             description.TextWrapping = TextWrapping.Wrap;
@@ -1160,7 +1160,7 @@ public class ArcDataGrid : TemplatedControl
                 };
                 if (column.Align == ArcGridAlign.Right)
                 {
-                    label.FontFeatures = ArcUi.Tabular;
+                    label.FontFeatures = FeedbackUi.Tabular;
                 }
 
                 label.Paint(TextBlock.ForegroundProperty, ArcTokens.Foreground);
@@ -1261,7 +1261,7 @@ public class ArcDataGrid : TemplatedControl
         {
             box.Paint(Border.BackgroundProperty, ArcTokens.Accent);
             box.Paint(Border.BorderBrushProperty, ArcTokens.Accent);
-            box.Child = ArcUi.Icon(mixed ? "minus" : "check", 12, ArcTokens.AccentForeground);
+            box.Child = FeedbackUi.Icon(mixed ? "minus" : "check", 12, ArcTokens.AccentForeground);
         }
         else
         {
@@ -1420,7 +1420,7 @@ public class ArcDataGrid : TemplatedControl
                 Padding = new Thickness(12, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
-                FontFeatures = ArcUi.Tabular
+                FontFeatures = FeedbackUi.Tabular
             };
             label.Paint(TextBlock.ForegroundProperty, index == 0 ? ArcTokens.TextSecondary : ArcTokens.TextMuted);
             if (index > 0)

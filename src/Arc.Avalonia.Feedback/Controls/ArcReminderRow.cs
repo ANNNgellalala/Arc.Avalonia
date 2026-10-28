@@ -8,7 +8,7 @@ using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-// The Feedback assembly also has an internal ArcUi helper for its older components, so the shared P0
+// The Feedback assembly also has an internal FeedbackUi helper for its older components, so the shared P0
 // composition helpers from the foundation are aliased explicitly.
 using Ui = Arc.Avalonia.Controls.ArcUi;
 

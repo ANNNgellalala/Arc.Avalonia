@@ -5,7 +5,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feedback.Controls;
 
-// The Feedback assembly contains an internal ArcUi helper too, so the shared foundation helpers are
+// The Feedback assembly contains an internal FeedbackUi helper too, so the shared foundation helpers are
 // aliased explicitly in this assembly.
 using Ui = Arc.Avalonia.Controls.ArcUi;
 

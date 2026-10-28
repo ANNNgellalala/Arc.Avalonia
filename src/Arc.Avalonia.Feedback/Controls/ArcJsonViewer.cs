@@ -216,7 +216,7 @@ public class ArcJsonViewer : TemplatedControl
             searchRow.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
 
             var field = new Panel();
-            var box = ArcUi.Input("Search keys and values", 36);
+            var box = FeedbackUi.Input("Search keys and values", 36);
             box.Padding = new Thickness(34, 6, 34, 6);
             box.Text = Query ?? string.Empty;
             box.TextChanged += (_, _) =>
@@ -232,7 +232,7 @@ public class ArcJsonViewer : TemplatedControl
                 }
             };
             field.Children.Add(box);
-            var icon = ArcUi.Icon("search", 15, ArcTokens.TextMuted);
+            var icon = FeedbackUi.Icon("search", 15, ArcTokens.TextMuted);
             icon.HorizontalAlignment = HorizontalAlignment.Left;
             icon.Margin = new Thickness(12, 0, 0, 0);
             field.Children.Add(icon);
@@ -254,7 +254,7 @@ public class ArcJsonViewer : TemplatedControl
             field.Children.Add(clear);
             searchRow.Children.Add(field);
 
-            _matchText = ArcUi.Caption(string.Empty);
+            _matchText = FeedbackUi.Caption(string.Empty);
             _matchText.Margin = new Thickness(10, 0, 0, 0);
             _matchText.VerticalAlignment = VerticalAlignment.Center;
             Grid.SetColumn(_matchText, 1);
@@ -293,7 +293,7 @@ public class ArcJsonViewer : TemplatedControl
             pathGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             _pathText = new TextBlock
             {
-                FontFamily = ArcUi.MonoFamily,
+                FontFamily = FeedbackUi.MonoFamily,
                 FontSize = 11.5,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center
@@ -317,7 +317,7 @@ public class ArcJsonViewer : TemplatedControl
             Grid.SetColumn(copyPath, 1);
             pathGrid.Children.Add(copyPath);
 
-            _statusText = ArcUi.Caption(string.Empty);
+            _statusText = FeedbackUi.Caption(string.Empty);
             _statusText.HorizontalAlignment = HorizontalAlignment.Right;
             _statusText.Margin = new Thickness(0, 4, 0, 0);
             _statusText.Paint(TextBlock.ForegroundProperty, ArcTokens.TextSecondary);
@@ -399,7 +399,7 @@ public class ArcJsonViewer : TemplatedControl
         {
             _matchText.Text = string.IsNullOrWhiteSpace(Query)
                 ? string.Empty
-                : $"{matches} {ArcUi.Plural(matches, "match", "matches")}";
+                : $"{matches} {FeedbackUi.Plural(matches, "match", "matches")}";
         }
 
         Refresh();
@@ -437,7 +437,7 @@ public class ArcJsonViewer : TemplatedControl
 
         if (_root is not { } root)
         {
-            _tree.Children.Add(ArcUi.Text("No data.", "arc-caption"));
+            _tree.Children.Add(FeedbackUi.Text("No data.", "arc-caption"));
             return;
         }
 
@@ -553,7 +553,7 @@ public class ArcJsonViewer : TemplatedControl
             var key = new TextBlock
             {
                 Text = row.Key,
-                FontFamily = ArcUi.MonoFamily,
+                FontFamily = FeedbackUi.MonoFamily,
                 FontSize = 12.5,
                 VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis
@@ -572,7 +572,7 @@ public class ArcJsonViewer : TemplatedControl
                 var colon = new TextBlock
                 {
                     Text = ":",
-                    FontFamily = ArcUi.MonoFamily,
+                    FontFamily = FeedbackUi.MonoFamily,
                     FontSize = 12.5,
                     Margin = new Thickness(1, 0, 6, 0),
                     VerticalAlignment = VerticalAlignment.Center
@@ -587,7 +587,7 @@ public class ArcJsonViewer : TemplatedControl
                 var value = new TextBlock
                 {
                     Text = row.Value,
-                    FontFamily = ArcUi.MonoFamily,
+                    FontFamily = FeedbackUi.MonoFamily,
                     FontSize = 12.5,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextTrimming = TextTrimming.CharacterEllipsis,
@@ -805,8 +805,8 @@ public class ArcJsonViewer : TemplatedControl
     {
         var count = Count(element);
         return element.ValueKind == JsonValueKind.Array
-            ? $"{count} {ArcUi.Plural(count, "item", "items")}"
-            : $"{count} {ArcUi.Plural(count, "field", "fields")}";
+            ? $"{count} {FeedbackUi.Plural(count, "item", "items")}"
+            : $"{count} {FeedbackUi.Plural(count, "field", "fields")}";
     }
 
     private static string ChildKey(JsonElement parent, int index) =>
