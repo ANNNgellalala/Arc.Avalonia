@@ -29,17 +29,17 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
-    <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />    <ProjectReference Include="..\..\Special\Arc.Avalonia.SpecialGlass\Arc.Avalonia.SpecialGlass.csproj" />
-    <ProjectReference Include="..\..\Special\Arc.Avalonia.SpecialMotion\Arc.Avalonia.SpecialMotion.csproj" />
-    <ProjectReference Include="..\..\Special\Arc.Avalonia.SpecialMedia\Arc.Avalonia.SpecialMedia.csproj" />
-    <ProjectReference Include="..\..\Special\Arc.Avalonia.SpecialAIWidgets\Arc.Avalonia.SpecialAIWidgets.csproj" />
-    <ProjectReference Include="..\..\Special\Arc.Avalonia.SpecialAIExplainers\Arc.Avalonia.SpecialAIExplainers.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksMarketing\Arc.Avalonia.BlocksMarketing.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksCommerce\Arc.Avalonia.BlocksCommerce.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksApp\Arc.Avalonia.BlocksApp.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksTeam\Arc.Avalonia.BlocksTeam.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksData\Arc.Avalonia.BlocksData.csproj" />
-    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.BlocksAI\Arc.Avalonia.BlocksAI.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Glass\Arc.Avalonia.Special.Glass.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Motion\Arc.Avalonia.Special.Motion.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Media\Arc.Avalonia.Special.Media.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIWidgets\Arc.Avalonia.Special.AIWidgets.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIExplainers\Arc.Avalonia.Special.AIExplainers.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Marketing\Arc.Avalonia.Blocks.Marketing.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Commerce\Arc.Avalonia.Blocks.Commerce.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.App\Arc.Avalonia.Blocks.App.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Team\Arc.Avalonia.Blocks.Team.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Data\Arc.Avalonia.Blocks.Data.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.AI\Arc.Avalonia.Blocks.AI.csproj" />
   </ItemGroup>
 </Project>
 

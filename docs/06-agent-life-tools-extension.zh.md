@@ -533,7 +533,7 @@ Agent 运行时、持久化、调度、系统通知、托盘/热键、权限执�
 | --- | --- |
 | 新增 block 组 `Daily life` | 22 个生活域 block。建议新建 `Arc.Avalonia.BlocksLife`；扩展目录暂把 `project` 指向现有 `BlocksApp` / `BlocksCommerce` / `BlocksData` 以保证可构建，落地时一次性迁移 |
 | 新增组件分类 `Foundation` | `virtualized-list` 落在基础层 `Arc.Avalonia`，与 `ArcButton` / `ArcCard` 同级，供所有长列表复用 |
-| Agent 新 Special 落位 | `run-control-bar` / `tool-approval-sheet` / `agent-ask-card` / `background-run-dock` 等 4 个 P0 落 `Arc.Avalonia.SpecialAIWidgets`，与现有 11 项并列 |
+| Agent 新 Special 落位 | `run-control-bar` / `tool-approval-sheet` / `agent-ask-card` / `background-run-dock` 等 4 个 P0 落 `Arc.Avalonia.Special.AIWidgets`，与现有 11 项并列 |
 | 不新增其他分类 | 其余扩展全部归入现有 23 类 / 5 组 / 6 组，降低目录复杂度 |
 
 ---

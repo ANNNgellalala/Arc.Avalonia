@@ -261,8 +261,8 @@ Rules for item pages:
 * Special components are mostly self-drawn/animated illustrations. Use `DrawingContext`, `DispatcherTimer`
   and tokens; no external libraries; deterministic frame under `ArcThemeManager.ReducedMotion`.
 
-New projects: `Arc.Avalonia.SpecialGlass`, `.SpecialMotion`, `.SpecialMedia`, `.SpecialAIWidgets`,
-`.SpecialAIExplainers`, `Arc.Avalonia.BlocksMarketing`, `.BlocksCommerce`, `.BlocksApp`, `.BlocksTeam`,
+New projects: `Arc.Avalonia.Special.Glass`, `.SpecialMotion`, `.SpecialMedia`, `.SpecialAIWidgets`,
+`.SpecialAIExplainers`, `Arc.Avalonia.Blocks.Marketing`, `.BlocksCommerce`, `.BlocksApp`, `.BlocksTeam`,
 `.BlocksData`, `.BlocksAI`. They are already referenced by the Gallery and wired into `App.axaml`; each has
 a `Themes/Arc<Name>Theme.axaml` entry and `Controls/`, `Pages/` folders.
 Catalog data is generated from public docs only:

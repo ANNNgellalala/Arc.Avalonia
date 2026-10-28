@@ -614,17 +614,17 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 | `Arc.Avalonia.Effects` | 文字动效/通告/浮层特效 | 14 | 11 | 20 | **9** | 5 | 0 / 2 | 10 | `ArcTextReveal` `ArcInViewTitle` `ArcTextMorph` `ArcTextShimmer` `ArcAnnouncementBar` `ArcCookieConsent` `ArcBottomSheet` |
 | `Arc.Avalonia.Content` | 富文本/排序列表/聊天/清单 | 8 | 6 | 9 | **4** | 4 | 0 / 2 | 5 | `ArcRichTextEditor` `ArcReorderableList` `ArcChatThread` `ArcOnboardingChecklist` |
 | `Arc.Avalonia.Media` | 手势/媒体布局 | 14 | 10 | 25 | **15** | 3 | 0 / 3 | 9 | `ArcHoldToConfirm` `ArcSwipeActions` `ArcReactions` `ArcImageCompare` `ArcCarousel` `ArcCardStack` `ArcScrollArea` `ArcResizablePanels` |
-| `Arc.Avalonia.SpecialGlass` | 玻璃与表面 | 28 | 17 | 35 | **14** | 2 | 11 / 0 | 1 | `ArcGlassMenu` `ArcGlassTabBar` `ArcGlassSegmented` `ArcHoloCard` `ArcWalletStack` `ArcControlCenter` `ArcShareSheet` |
-| `Arc.Avalonia.SpecialMotion` | 动效与交互 | 24 | 12 | 12 | **12** | 2 | 11 / 0 | 1 | `ArcActionMorph` `ArcMorphNav` `ArcDock` `ArcLiquidTabBar` `ArcOrbitMenu` `ArcSlotText` `ArcTypewriterTerminal` |
-| `Arc.Avalonia.SpecialMedia` | 媒体与输入 | 25 | 14 | 12 | **12** | 3 | 11 / 0 | 1 | `ArcProductGallery` `ArcLightboxGallery` `ArcCoverFlow` `ArcVoiceOrb` `ArcVoiceRecorder` `ArcNowPlaying` `ArcPageCurl` |
-| `Arc.Avalonia.SpecialAIWidgets` | AI 运行时组件 | 23 | 12 | 32 | **18** | 9 | 11 / 0 | 1 | `ArcAgentStatus` `ArcToolCall` `ArcAgentPlan` `ArcAgentTimeline` `ArcContextWindow` `ArcActivityRings` `ArcSkeletonMorph` |
-| `Arc.Avalonia.SpecialAIExplainers` | AI 原理示意 | 24 | 13 | 12 | **12** | 1 | 11 / 0 | 1 | `ArcAgentLoop` `ArcDataFlow` `ArcPaymentFlow` `ArcVectorSearch` `ArcReasoningTree` `ArcPromptCache` `ArcDateReel` |
-| `Arc.Avalonia.BlocksMarketing` | 营销/站点区块 | 23 | 5 | 4 | **4** | 1 | 18 / 0 | 1 | `ArcMarquee` `ArcMeshWash` `ArcSpotlightCard` `ArcStatNumber` |
-| `Arc.Avalonia.BlocksCommerce` | 电商/计费区块 | 20 | 2 | 1 | **1** | 2 | 18 / 0 | 1 | `ArcEmptyScene` |
-| `Arc.Avalonia.BlocksApp` | 应用壳层/设置 | 23 | 2 | 0 | **0** | 3 | 21 / 0 | 1 | （无公共控件；`AppKit`/`OtpField` 均为 internal） |
-| `Arc.Avalonia.BlocksTeam` | 团队协作 | 20 | 4 | 3 | **2** | 2 | 16 / 0 | 1 | `ArcCohortChart` `ArcMorphIllustration` |
-| `Arc.Avalonia.BlocksData` | 数据可视化区块 | 38 | 18 | 0 | **0** | 33 | 20 / 0 | 1 | （16 个 internal 图表 stage，如 `ArcCandleChart`/`ArcDotGlobe`/`ArcHorizonChart`） |
-| `Arc.Avalonia.BlocksAI` | AI 产品界面 | 19 | 1 | 0 | **0** | 2 | 18 / 0 | 1 | （无公共控件；`AiKit`/`ModelChip` 为 internal） |
+| `Arc.Avalonia.Special.Glass` | 玻璃与表面 | 28 | 17 | 35 | **14** | 2 | 11 / 0 | 1 | `ArcGlassMenu` `ArcGlassTabBar` `ArcGlassSegmented` `ArcHoloCard` `ArcWalletStack` `ArcControlCenter` `ArcShareSheet` |
+| `Arc.Avalonia.Special.Motion` | 动效与交互 | 24 | 12 | 12 | **12** | 2 | 11 / 0 | 1 | `ArcActionMorph` `ArcMorphNav` `ArcDock` `ArcLiquidTabBar` `ArcOrbitMenu` `ArcSlotText` `ArcTypewriterTerminal` |
+| `Arc.Avalonia.Special.Media` | 媒体与输入 | 25 | 14 | 12 | **12** | 3 | 11 / 0 | 1 | `ArcProductGallery` `ArcLightboxGallery` `ArcCoverFlow` `ArcVoiceOrb` `ArcVoiceRecorder` `ArcNowPlaying` `ArcPageCurl` |
+| `Arc.Avalonia.Special.AIWidgets` | AI 运行时组件 | 23 | 12 | 32 | **18** | 9 | 11 / 0 | 1 | `ArcAgentStatus` `ArcToolCall` `ArcAgentPlan` `ArcAgentTimeline` `ArcContextWindow` `ArcActivityRings` `ArcSkeletonMorph` |
+| `Arc.Avalonia.Special.AIExplainers` | AI 原理示意 | 24 | 13 | 12 | **12** | 1 | 11 / 0 | 1 | `ArcAgentLoop` `ArcDataFlow` `ArcPaymentFlow` `ArcVectorSearch` `ArcReasoningTree` `ArcPromptCache` `ArcDateReel` |
+| `Arc.Avalonia.Blocks.Marketing` | 营销/站点区块 | 23 | 5 | 4 | **4** | 1 | 18 / 0 | 1 | `ArcMarquee` `ArcMeshWash` `ArcSpotlightCard` `ArcStatNumber` |
+| `Arc.Avalonia.Blocks.Commerce` | 电商/计费区块 | 20 | 2 | 1 | **1** | 2 | 18 / 0 | 1 | `ArcEmptyScene` |
+| `Arc.Avalonia.Blocks.App` | 应用壳层/设置 | 23 | 2 | 0 | **0** | 3 | 21 / 0 | 1 | （无公共控件；`AppKit`/`OtpField` 均为 internal） |
+| `Arc.Avalonia.Blocks.Team` | 团队协作 | 20 | 4 | 3 | **2** | 2 | 16 / 0 | 1 | `ArcCohortChart` `ArcMorphIllustration` |
+| `Arc.Avalonia.Blocks.Data` | 数据可视化区块 | 38 | 18 | 0 | **0** | 33 | 20 / 0 | 1 | （16 个 internal 图表 stage，如 `ArcCandleChart`/`ArcDotGlobe`/`ArcHorizonChart`） |
+| `Arc.Avalonia.Blocks.AI` | AI 产品界面 | 19 | 1 | 0 | **0** | 2 | 18 / 0 | 1 | （无公共控件；`AiKit`/`ModelChip` 为 internal） |
 | `Arc.Avalonia.Gallery` | 展示应用 + 截图/审计 | 11 | 0 | 5 | **1** | 1 | 0 / 5 | 1 | `GalleryWindow`（另 `CatalogAudit`/`ShotRunner`/`NavigationSmoke` 为工具类） |
 | **合计** | **24 工程** | **516** | **263** | **411**（407 唯一名） | **236**（234 唯一名） | **100** | **166 / 53 = 219** | **112** | — |
 
@@ -647,7 +647,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 5. **没有的东西同样是统计**：`src` 内 **0 处** `TrayIcon`/`WindowNotificationManager`、**0 处** `HttpClient/WebSocket`、
    `File.*` 写入仅截图与签名导出 2 处（`src/Arc.Avalonia.Gallery/Framework/ShotRunner.cs`、
    `src/Arc.Avalonia.Pickers/Controls/ArcSignaturePad.cs`）；`Schedul/Recurr/Reminder` 命中 30 处全部是
-   `src/Arc.Avalonia.BlocksAI/Pages/AgentRoutinesPage.cs` 等页面的示例文案。这些空白决定了生活工具必须自带"非 UI 能力"。
+   `src/Arc.Avalonia.Blocks.AI/Pages/AgentRoutinesPage.cs` 等页面的示例文案。这些空白决定了生活工具必须自带"非 UI 能力"。
 
 ---
 
@@ -687,7 +687,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.4 `week-calendar` — 周历（BlocksTeam）
 
-- **证据**：`src/Arc.Avalonia.BlocksTeam/Pages/WeekCalendarPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs`。
 - **支持**：7 天 × 8 小时网格、全天行、彩色日历、事件选中与详情、周切换/今天、周视图↔议程视图切换；
   页内 `private sealed record CalEvent(...)` 与 `static readonly IReadOnlyList<CalEvent> Events` 种子数据；
   Implementation notes 明确：**拖拽创建/移动/缩放未复刻**，改用事件选择 + 显式周切换保持键盘可用。
@@ -697,7 +697,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.5 `notification-center` — 通知中心（BlocksApp）
 
-- **证据**：`src/Arc.Avalonia.BlocksApp/Pages/NotificationCenterPage.cs`；相邻能力 `src/Arc.Avalonia.Actions/Controls/ArcToast.cs`、`ArcToastHost.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.App/Pages/NotificationCenterPage.cs`；相邻能力 `src/Arc.Avalonia.Actions/Controls/ArcToast.cs`、`ArcToastHost.cs`。
 - **支持**：铃铛触发器 + 未读徽标（数字滚动）、All/Unread 分段、行展开、`Mark read/unread`、`Dismiss`、
   `Mark all read`、`Clear read`、空态"你已追平"、`ToolTip` 带未读数；页内 `record Update(Id, Title, Description, Time, Tone, Read, Actor)`；
   toast 为窗口内浮层容器（`ArcToastHost.Show`），到期自动消失、hover 不暂停、每个 toast 至多一个 action。
@@ -708,7 +708,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.6 `inbox-triage` — 收件箱分诊（BlocksApp）
 
-- **证据**：`src/Arc.Avalonia.BlocksApp/Pages/InboxTriagePage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.App/Pages/InboxTriagePage.cs`。
 - **支持**：Inbox/Snoozed/Archive 三个文件夹（Tab 列表 + 方向键）、行展开、Archive/Snooze/Restore + 字母快捷键、
   单步撤销、状态区播报；`record Mail(Id, Sender, Subject, Preview, Body, Time, Unread)` 种子数据。
 - **数据形态**：文件夹是页内 `List<Mail>` 字典，动作即本地移除/加入；`Time` 为展示字符串；snooze 时间不可编辑。
@@ -717,7 +717,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.7 `command-palette` — 命令面板（BlocksApp）
 
-- **证据**：`src/Arc.Avalonia.BlocksApp/Pages/CommandPalettePage.cs`；同族 `src/Arc.Avalonia.BlocksApp/Pages/SettingsCommandPage.cs`、`src/Arc.Avalonia.BlocksApp/Pages/SearchResultsPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.App/Pages/CommandPalettePage.cs`；同族 `src/Arc.Avalonia.Blocks.App/Pages/SettingsCommandPage.cs`、`src/Arc.Avalonia.Blocks.App/Pages/SearchResultsPage.cs`。
 - **支持**：全键盘驱动的应用级动作面板：搜索过滤、分组结果、快捷键提示、单一滑动高亮；页内
   `record Command(Id, Label, Description, Group, Shortcut, Icon, Keywords)`；`SettingsCommandPage` 展示"搜索框长成设置面板"的变体。
 - **数据形态**：命令是内存列表，`handler` 仅关闭面板并在状态区播报，**不执行真实路由/动作**。
@@ -727,7 +727,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.8 `agent-status` — Agent 运行状态（SpecialAIWidgets）
 
-- **证据**：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentStatus.cs`；`Pages/AgentStatusPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentStatus.cs`；`Pages/AgentStatusPage.cs`。
 - **支持**：`ArcAgentStatus : Panel`；**状态枚举 `ArcAgentRunStatus` = Idle / Working / NeedsInput / Paused / Done / Failed / Stopped**；
   **步骤枚举 `ArcAgentStepState` = Pending / Active / Waiting / Done / Failed / Skipped**；属性 `AgentName`、`ActivityLabel/Icon/Count`、
   `ElapsedSeconds`、`Steps`、`IsExpanded`；`ArcAgentStep` 含 `Id/Label/Icon/State/DurationSeconds`；
@@ -739,7 +739,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.9 `tool-call` — 工具调用行（SpecialAIWidgets）
 
-- **证据**：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolCall.cs`；`Pages/ToolCallPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolCall.cs`；`Pages/ToolCallPage.cs`。
 - **支持**：`ArcToolCall : Panel`；**状态 `ArcToolCallStatus` = Running / Success / Error / Approval / Denied**；
   `ArcToolCallData` 含 `Id`、`Tool`（默认 `"web"`）、`Title`、`RunningTitle`、`ApprovalTitle`、`Status`、
   `Input`（`ArcToolArgument{Key,Value}` 列表）、`Output`（`ArcToolListItem{Lead,Title,Tag}` 列表）、`Summary`、`Message`、`DurationSeconds`；
@@ -752,7 +752,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.10 `agent-plan` — 计划与清单（SpecialAIWidgets）
 
-- **证据**：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentPlan.cs`；`Pages/AgentPlanPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentPlan.cs`；`Pages/AgentPlanPage.cs`。
 - **支持**：`ArcAgentPlan : Panel`；**计划状态 `ArcAgentPlanStatus` = Draft / Running / Paused / Done**；
   **步骤状态 `ArcAgentPlanStepState` = Pending / Active / Done / Failed / Skipped**；
   `ArcAgentPlanStep{Id,Title,State,SubSteps,Note,Error,DurationSeconds}`；属性 `Steps`、`Status`、`Goal`、`ModelName`、`Summary`；
@@ -763,7 +763,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.11 `agent-timeline` — 多代理时间轴（SpecialAIWidgets）
 
-- **证据**：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentTimeline.cs`；`Pages/AgentTimelinePage.cs`；绘图助手 `Controls` 内 `ArcTimelinePlot`（internal）。
+- **证据**：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentTimeline.cs`；`Pages/AgentTimelinePage.cs`；绘图助手 `Controls` 内 `ArcTimelinePlot`（internal）。
 - **支持**：`ArcAgentTimeline : Panel`；模型 **`ArcTimelineAgent{Id,Name,Model,PricePerMillion}`**、
   **`ArcTimelineSpan{Id,AgentId,Kind,Start,End,Label,Tool,Tokens,Failed,Retry}`**、
   **`ArcTimelineHandoff{From,To,At,Label}`**；属性 `Title`、`Agents`、`Spans`、`Handoffs`、`Duration`、`IsPlaying`；
@@ -774,7 +774,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.12 `context-window` — 上下文占用（SpecialAIWidgets）
 
-- **证据**：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcContextWindow.cs`；`Pages/ContextWindowPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcContextWindow.cs`；`Pages/ContextWindowPage.cs`。
 - **支持**：`ArcContextWindow : Panel`；**分类 `ArcContextCategory` = System / Tools / Files / Summary / Messages**；
   `ArcContextItem{Id,Category,Label,Tokens}`、`ArcContextModel{Id,Name,Window,Reserve}`；属性 `Items`、`Models`、`ModelId`、`Threshold`；
   200 格网格一次绘制，发送消息/附件/压缩时展示"还剩多少"，阈值行标记压缩起点。
@@ -784,7 +784,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.13 `agent-memory` — 助手记忆（BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.BlocksAI/Pages/AgentMemoryPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.AI/Pages/AgentMemoryPage.cs`。
 - **支持**：`record Memory(Id, Text, Group, Source)`；分组 All/About/Preferences/Projects；筛选、搜索、就地编辑、
   `Forget`（立即删除，无 5 秒撤销——Implementation notes）、`Capture` 药丸塞入一条示例记忆、暂停记忆开关；页内状态文案"3 memories, 62% of the budget"。
 - **数据形态**：内存 `List<Memory>`；`Source` 是展示字符串（"From a chat · 4 Oct"）；预算百分比是硬编码文案。
@@ -793,7 +793,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.14 `agent-tasks` — 后台任务队列（BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.BlocksAI/Pages/AgentTasksPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.AI/Pages/AgentTasksPage.cs`。
 - **支持**：`record Task(Title, Repo, Branch, Model, State, Step, Progress, Meta, CanOpen)`；过滤 All/Running/Ready/Merged、
   启动任务插入排队卡、卡片进度与状态色、完成后 `Create pull request`；Implementation notes：任务/diff/check 均为示例，
   Start 插入示例任务，PR 号是编造的。
@@ -803,7 +803,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.15 `agent-approvals` — 审批（BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.BlocksAI/Pages/AgentApprovalsPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.AI/Pages/AgentApprovalsPage.cs`。
 - **支持**：`record Request(Id, Agent, Model, Tool, Action, Title, Summary, Reason, Risk, string[] Args)`；
   一次一个审批焦点：工具标记、Agent 理由、风险等级（High/Medium/Low）、参数行、批准/拒绝/总是允许；
   决策后移出队列并追加到 resolved 日志。Implementation notes：**"nothing reaches an agent"**，参数为只读行，
@@ -815,7 +815,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.16 `agent-routines` — 定时代理（BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.BlocksAI/Pages/AgentRoutinesPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.AI/Pages/AgentRoutinesPage.cs`。
 - **支持**：`class Routine{Name, Instruction, Schedule, Countdown, Sources[], Destination, Model, Enabled, LastRun, Ticks[], Report}`；
   每行"句式化日程"（如 `Weekdays at 09:00`）、下次运行倒计时、连接器、运行 tick 历史、就地展开编辑/立即运行；
   示例含"Morning triage/Weekly digest/Stale PR nudge/Incident summary"。
@@ -826,7 +826,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.17 `agent-orchestrator` / `agent-run` — 编排与单次运行（BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.BlocksAI/Pages/AgentOrchestratorPage.cs`、`AgentRunPage.cs`；相关控件 `agent-timeline`/`agent-plan`/`tool-call`。
+- **证据**：`src/Arc.Avalonia.Blocks.AI/Pages/AgentOrchestratorPage.cs`、`AgentRunPage.cs`；相关控件 `agent-timeline`/`agent-plan`/`tool-call`。
 - **支持**：orchestrator：`record Lane(Model, Subtask, Tool, Output, Tokens, Time, …)`，主代理计划 + 三条并行工作泳道 + 汇总；
   agent-run：步骤流式、工具就地展开、停在双文件 diff 的审批门（Approve/Reject），批准后写入示例改动并打开结果。
 - **数据形态**：静态示例数据；`Tokens` 是字符串；diff 用着色 token 而非语法高亮器；PR 号为编造值。
@@ -835,7 +835,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.18 `kanban-board` / `project-board` — 任务看板（BlocksTeam）
 
-- **证据**：`src/Arc.Avalonia.BlocksTeam/Pages/KanbanBoardPage.cs`、`ProjectBoardPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.Team/Pages/KanbanBoardPage.cs`、`ProjectBoardPage.cs`。
 - **支持**：三列 `To do / Doing / Done` + `Limits = { -1, 2, -1 }`（Doing 限 2）；泳道、实时 WIP 校验（超限有文本+颜色）、
   快速新增、详情条；Implementation notes：**指针拖拽抬卡/倾斜/自动滚动未复刻**，改用带标签的左右箭头移动，保持键盘可用。
 - **数据形态**：页内示例卡与人名（内存）；列/限值均为静态数组。
@@ -844,7 +844,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.19 `chat-thread` / `ai-chat` / `ai-composer` — 对话表面（Content / BlocksAI）
 
-- **证据**：`src/Arc.Avalonia.Content/Controls/ArcChatThread.cs`；`src/Arc.Avalonia.BlocksAI/Pages/AiChatPage.cs`、`AiComposerPage.cs`。
+- **证据**：`src/Arc.Avalonia.Content/Controls/ArcChatThread.cs`；`src/Arc.Avalonia.Blocks.AI/Pages/AiChatPage.cs`、`AiComposerPage.cs`。
 - **支持**：`ArcChatThread : TemplatedControl`；**`ArcChatMessageStatus` = Sending / Sent / Delivered / Read / Failed**；
   `ArcChatParticipant{Name,Avatar}`、`ArcChatAttachment{Name,Size,Url,IsImage}`、
   `ArcChatMessage{Id,AuthorId,Text,CreatedAt,Attachments,Status}`、`ArcChatDraft{Text,Attachments}`；
@@ -857,7 +857,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.20 `settings-page` — 设置页（BlocksApp）
 
-- **证据**：`src/Arc.Avalonia.BlocksApp/Pages/SettingsPage.cs`；相邻 `SettingsCommandPage.cs`、`SecuritySettingsPage.cs`、`src/Arc.Avalonia.BlocksTeam/Pages/EnvVariablesPage.cs`。
+- **证据**：`src/Arc.Avalonia.Blocks.App/Pages/SettingsPage.cs`；相邻 `SettingsCommandPage.cs`、`SecuritySettingsPage.cs`、`src/Arc.Avalonia.Blocks.Team/Pages/EnvVariablesPage.cs`。
 - **支持**：`record Section(Id, Label, Icon, Description)`；滑动分节导航、编辑即出现的保存条（save/discard）、
   账户字段与账单摘要、照片上传；Implementation notes：保存/丢弃/上传只改本地状态，未做服务端校验。
 - **数据形态**：页内示例值 + 局部布尔 dirty 状态；无配置 schema。
@@ -866,7 +866,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.21 `usage-meter` / `usage-billing` — 配额与账单（Feedback / BlocksCommerce）
 
-- **证据**：`src/Arc.Avalonia.Feedback/Controls/ArcUsageMeter.cs`；`src/Arc.Avalonia.BlocksCommerce/Pages/UsageBillingPage.cs`。
+- **证据**：`src/Arc.Avalonia.Feedback/Controls/ArcUsageMeter.cs`；`src/Arc.Avalonia.Blocks.Commerce/Pages/UsageBillingPage.cs`。
 - **支持**：`ArcUsageMeter : TemplatedControl`；`ArcUsageSegment{Id,Label,Value}`；属性 `Label`、`Segments`、`Limit`、`Unit`、
   `Decimals`、`FreeLabel`、`OverLabel`、**`WarnAt`**（视觉告警阈值）；usage-billing 页：期间花费、7 日均值预测线、
   限额计量、告警规则、发票历史、升级确认（示例数据，预测为虚线而非参考实现的阴影锥）。
@@ -877,7 +877,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 ### 4.22 `activity-heatmap` / `activity-rings` / `activity-terrain` — 活动可视化（Charts / SpecialAIWidgets / BlocksData）
 
 - **证据**：`src/Arc.Avalonia.Charts/Controls/ArcActivityHeatmap.cs`（另有同名 `src/Arc.Avalonia.Feedback/Controls/ArcActivityHeatmap.cs`）；
-  `src/Arc.Avalonia.SpecialAIWidgets/Pages/ActivityRingsPage.cs`；`src/Arc.Avalonia.BlocksData/Pages/ActivityTerrainPage.cs`。
+  `src/Arc.Avalonia.Special.AIWidgets/Pages/ActivityRingsPage.cs`；`src/Arc.Avalonia.Blocks.Data/Pages/ActivityTerrainPage.cs`。
 - **支持**：heatmap 属性 `Values`（`IReadOnlyList<int>`）、`StartDate`、`Unit`，一年一日的方格；
   activity-rings：每日目标的 tick 环，超 100% 走第二圈；activity-terrain：周 × 小时 3D 等距地形（`DrawingContext` 绘制、Shift+方向键环绕、可压平成热图）。
 - **数据形态**：纯数值数组 + 起始日期/单位；rings/terrain 为页内种子数据；**没有任何"习惯/目标/打卡"实体**。
@@ -897,7 +897,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.24 `voice-orb` / `voice-recorder` — 语音（SpecialMedia）
 
-- **证据**：`src/Arc.Avalonia.SpecialMedia/Controls/ArcVoiceOrb.cs`、`ArcVoiceRecorder.cs`；`Pages/VoiceOrbPage.cs`、`VoiceRecorderPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.Media/Controls/ArcVoiceOrb.cs`、`ArcVoiceRecorder.cs`；`Pages/VoiceOrbPage.cs`、`VoiceRecorderPage.cs`。
 - **支持**：orb：`ArcVoiceOrbState` = Idle / Listening / Thinking / Speaking，转写文本、通话控制（开始/静音/挂断/时钟），
   键盘 Space/Enter/M/Escape；recorder：录制态实时波形、回听拖动、发送进线程；两者均声明为**模拟**。
 - **数据形态**：orb 的麦克风电平是模拟值；recorder 的峰值来自确定性噪声函数（保证截图稳定），
@@ -907,7 +907,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 ### 4.25 `control-center` — 快捷设置/专注（SpecialGlass）
 
-- **证据**：`src/Arc.Avalonia.SpecialGlass/Controls/ArcControlCenter.cs`；`Pages/ControlCenterPage.cs`。
+- **证据**：`src/Arc.Avalonia.Special.Glass/Controls/ArcControlCenter.cs`；`Pages/ControlCenterPage.cs`。
 - **支持**：`ArcFocusMode{Id,Label,Icon,Description,DefaultMinutes}`、`ArcChannelOption{Id,Label,Description,DefaultOn}`、People 列表、
   `DefaultVolume`、`DefaultTextSize`；磁贴展开详情、时长盘（`ArcDurationDial`）、回弹滑杆（`ArcRubberMeter`）、
   `StateChanged` 事件；键盘可调滑杆与表盘。
@@ -1025,20 +1025,20 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 | 能力域 | 现有资产（可复用） | 证据 |
 | --- | --- | --- |
-| 应用外壳与导航 | `workspace-sidebar`、`sidebar-rail`、`docs-sidebar`、`tabs`、`breadcrumb`、`command-palette`、`settings-command` | `src/Arc.Avalonia.BlocksApp/Pages/`、`src/Arc.Avalonia.Actions/Controls/` |
+| 应用外壳与导航 | `workspace-sidebar`、`sidebar-rail`、`docs-sidebar`、`tabs`、`breadcrumb`、`command-palette`、`settings-command` | `src/Arc.Avalonia.Blocks.App/Pages/`、`src/Arc.Avalonia.Actions/Controls/` |
 | 搜索与命令 | `command-palette`、`search-results`、`expanding-search`、`combobox`、`filter-toolbar` | `CommandPalettePage.cs`、`SearchResultsPage.cs` |
 | 输入与表单 | 18 项 Inputs 目录组件（20 个控件类）+ 11 项 AdvancedInputs（12 个控件类）+ `file-dropzone`、`otp-input`、`multi-step-form`、`signup/sign-in` | `src/Arc.Avalonia.Inputs/Controls/`、`src/Arc.Avalonia.AdvancedInputs/Controls/` |
 | 数据浏览与编辑 | `data-grid`、`sortable-data-table`、`tree-table`、`tree-view`、`json-viewer`、`code-block` | `src/Arc.Avalonia.Feedback/Controls/ArcDataGrid.cs` 等 |
-| 数据可视化 | 14 个 Charts + 7 个 Advanced charts + 20 个 Data blocks（仪表盘/瀑布/预测/地图/回放…） | `src/Arc.Avalonia.Charts/Controls/`、`src/Arc.Avalonia.BlocksData/Pages/` |
+| 数据可视化 | 14 个 Charts + 7 个 Advanced charts + 20 个 Data blocks（仪表盘/瀑布/预测/地图/回放…） | `src/Arc.Avalonia.Charts/Controls/`、`src/Arc.Avalonia.Blocks.Data/Pages/` |
 | 对话与消息 | `chat-thread`、`ai-chat`、`ai-composer`、`comment-thread`、`support-conversation`、`inbox-triage` | `src/Arc.Avalonia.Content/Controls/ArcChatThread.cs`、`BlocksAI/AiChatPage.cs` |
-| Agent 运行时可视化 | `agent-status`、`tool-call`、`agent-plan`、`agent-timeline`、`context-window`、`agent-run`、`agent-orchestrator`、`eval-suite`、`mcp-servers` | `src/Arc.Avalonia.SpecialAIWidgets/Controls/`、`src/Arc.Avalonia.BlocksAI/Pages/` |
-| 计划/任务/看板 | `kanban-board`、`project-board`、`agent-tasks`、`stepper`、`release-readiness`、`onboarding-checklist` | `src/Arc.Avalonia.BlocksTeam/Pages/`、`src/Arc.Avalonia.Feedback/Controls/` |
-| 通知/消息呈现 | `notification-center`、`toast`、`toast-stack`、`alert`、`announcement-bar`、`inbox-sidebar` | `src/Arc.Avalonia.BlocksApp/Pages/NotificationCenterPage.cs`、`src/Arc.Avalonia.Actions/Controls/ArcToast*.cs` |
-| 设置与账户 | `settings-page`、`security-settings`、`env-variables`、`api-keys`、登录三件套 | `src/Arc.Avalonia.BlocksApp/Pages/SettingsPage.cs` 等 |
-| 媒体与上传 | `file-upload`、`avatar-upload`、`photo-grid`、`lightbox-gallery`、`media-player`、`signature-pad`、`voice-recorder`（UI） | `src/Arc.Avalonia.Pickers/Controls/`、`src/Arc.Avalonia.SpecialMedia/Controls/` |
-| 快捷控制/专注 | `control-center`、`switch`、`slider`、`segmented-control`、`hold-to-confirm` | `src/Arc.Avalonia.SpecialGlass/Controls/ArcControlCenter.cs` |
+| Agent 运行时可视化 | `agent-status`、`tool-call`、`agent-plan`、`agent-timeline`、`context-window`、`agent-run`、`agent-orchestrator`、`eval-suite`、`mcp-servers` | `src/Arc.Avalonia.Special.AIWidgets/Controls/`、`src/Arc.Avalonia.Blocks.AI/Pages/` |
+| 计划/任务/看板 | `kanban-board`、`project-board`、`agent-tasks`、`stepper`、`release-readiness`、`onboarding-checklist` | `src/Arc.Avalonia.Blocks.Team/Pages/`、`src/Arc.Avalonia.Feedback/Controls/` |
+| 通知/消息呈现 | `notification-center`、`toast`、`toast-stack`、`alert`、`announcement-bar`、`inbox-sidebar` | `src/Arc.Avalonia.Blocks.App/Pages/NotificationCenterPage.cs`、`src/Arc.Avalonia.Actions/Controls/ArcToast*.cs` |
+| 设置与账户 | `settings-page`、`security-settings`、`env-variables`、`api-keys`、登录三件套 | `src/Arc.Avalonia.Blocks.App/Pages/SettingsPage.cs` 等 |
+| 媒体与上传 | `file-upload`、`avatar-upload`、`photo-grid`、`lightbox-gallery`、`media-player`、`signature-pad`、`voice-recorder`（UI） | `src/Arc.Avalonia.Pickers/Controls/`、`src/Arc.Avalonia.Special.Media/Controls/` |
+| 快捷控制/专注 | `control-center`、`switch`、`slider`、`segmented-control`、`hold-to-confirm` | `src/Arc.Avalonia.Special.Glass/Controls/ArcControlCenter.cs` |
 | 活动/习惯可视化 | `activity-heatmap`、`activity-rings`、`activity-terrain`、`animated-counter`、`metric-card` | `src/Arc.Avalonia.Charts/Controls/ArcActivityHeatmap.cs` 等 |
-| 提醒/例行任务范式 | `agent-routines`（句式日程 + 倒计时 + 运行历史） | `src/Arc.Avalonia.BlocksAI/Pages/AgentRoutinesPage.cs` |
+| 提醒/例行任务范式 | `agent-routines`（句式日程 + 倒计时 + 运行历史） | `src/Arc.Avalonia.Blocks.AI/Pages/AgentRoutinesPage.cs` |
 
 ### 6.3 半覆盖域（有 UI，缺落地能力）
 
@@ -1083,7 +1083,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 2. **UI 基座强、运行时为零**：控件/主题/动效/无障碍成熟（703 处 `AutomationProperties`，见 `docs/04` §0.2），但
    持久化/通知/调度/网络/音频/虚拟化全部缺失——生活工具必须在 UI 之外自带"引擎层"。
 3. **"日程"是最大的半覆盖域**：日历选择器齐全，但**没有事件模型**；`week-calendar` 是最接近的页面范式
-   （`src/Arc.Avalonia.BlocksTeam/Pages/WeekCalendarPage.cs`），可复用其布局与交互约定，但需重写为数据驱动控件。
+   （`src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs`），可复用其布局与交互约定，但需重写为数据驱动控件。
 4. **"提醒"没有触达**：`notification-center`/`toast` 只是窗口内呈现；系统通知、托盘、静默时段为空白，
    这决定了"提醒"类生活工具的核心体验无法用现有组件交付。
 5. **Agent 侧视觉资产异常丰富**：`agent-status/plan/timeline/tool-call/context-window/approvals/routines/run/orchestrator`
@@ -1104,7 +1104,7 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 | 页面归属（标题匹配的 88 项） | 静态解析 `Section("…")` 与 `InputsSections`/`AdvancedInputsSections` 调用得到；运行时 `CatalogAudit` 用的是"全页面 heading 集合"，只在 `Empty state`（同时出现在 Data grid 与 Feedback 页）存在多页同名的歧义，不影响可达性结论。 |
 | `--audit` 实际输出 | 本次盘点未构建/未运行（任务约束）；294/294 是**按同一算法静态复算**的结果，且与 README/`docs/03` 记录的 `missing=0` 一致。补充：Lead 在 2026-10-26 23:09 对现有构建重跑了一次 `--audit`，输出 `pages=219 items=294 itemPages=166 matchedBySection=88 matchedByAlias=40 missing=0 pageFailures=0`（日志 `.recon/audit-2026-10-26.log`），与本表静态复算一致。 |
 | 控件类数 236 | 继承链启发式判定；`ArcGlide`/`ArcAdvancedGlide`/`ArcSpecialCanvas`/`ArcMotionCanvas` 等偏"视觉助手"的类也被计入控件；若按"可直接实例化的业务控件"口径会更少。 |
-| `Internal` 类 100 | 按项目去重统计，`src/Arc.Avalonia`（Core）没有 internal 类；`src/Arc.Avalonia.BlocksData` 的 33 个 internal 中含 16 个图表 stage。 |
+| `Internal` 类 100 | 按项目去重统计，`src/Arc.Avalonia`（Core）没有 internal 类；`src/Arc.Avalonia.Blocks.Data` 的 33 个 internal 中含 16 个图表 stage。 |
 | 跨项目同名类 | `ArcActivityHeatmap`、`ArcAnimatedCounter` 在 Charts 与 Feedback 各一份（不同命名空间）；引用时需确认来源。 |
 | 截图统计 | 按目录文件数（219/219）核对，未逐张打开校验内容。 |
 
@@ -1117,15 +1117,15 @@ catalog 的 294 项并不等于 294 个页面：实际是 **166 个独立条目�
 
 | catalog slug | 页面 Title | 截图文件名中的 slug | 页面文件 |
 | --- | --- | --- | --- |
-| `glass-tabbar` | Glass tab bar | `glass-tab-bar` | `src/Arc.Avalonia.SpecialGlass/Pages/GlassTabBarPage.cs` |
-| `checkout-live` | Live checkout | `live-checkout` | `src/Arc.Avalonia.BlocksCommerce/Pages/CheckoutLivePage.cs` |
-| `signup-form` | Sign up form | `sign-up-form` | `src/Arc.Avalonia.BlocksApp/Pages/SignupFormPage.cs` |
-| `login-centered` | Centered login | `centered-login` | `src/Arc.Avalonia.BlocksApp/Pages/LoginCenteredPage.cs` |
-| `login-immersive` | Immersive login | `immersive-login` | `src/Arc.Avalonia.BlocksApp/Pages/LoginImmersivePage.cs` |
-| `testimonial-stage` | Studio perspectives | `studio-perspectives` | `src/Arc.Avalonia.BlocksTeam/Pages/TestimonialStagePage.cs` |
-| `roles-permissions` | Roles and permissions | `roles-and-permissions` | `src/Arc.Avalonia.BlocksTeam/Pages/RolesPermissionsPage.cs` |
-| `env-variables` | Environment variables | `environment-variables` | `src/Arc.Avalonia.BlocksTeam/Pages/EnvVariablesPage.cs` |
-| `document-extract` | Document extraction | `document-extraction` | `src/Arc.Avalonia.BlocksAI/Pages/DocumentExtractPage.cs` |
+| `glass-tabbar` | Glass tab bar | `glass-tab-bar` | `src/Arc.Avalonia.Special.Glass/Pages/GlassTabBarPage.cs` |
+| `checkout-live` | Live checkout | `live-checkout` | `src/Arc.Avalonia.Blocks.Commerce/Pages/CheckoutLivePage.cs` |
+| `signup-form` | Sign up form | `sign-up-form` | `src/Arc.Avalonia.Blocks.App/Pages/SignupFormPage.cs` |
+| `login-centered` | Centered login | `centered-login` | `src/Arc.Avalonia.Blocks.App/Pages/LoginCenteredPage.cs` |
+| `login-immersive` | Immersive login | `immersive-login` | `src/Arc.Avalonia.Blocks.App/Pages/LoginImmersivePage.cs` |
+| `testimonial-stage` | Studio perspectives | `studio-perspectives` | `src/Arc.Avalonia.Blocks.Team/Pages/TestimonialStagePage.cs` |
+| `roles-permissions` | Roles and permissions | `roles-and-permissions` | `src/Arc.Avalonia.Blocks.Team/Pages/RolesPermissionsPage.cs` |
+| `env-variables` | Environment variables | `environment-variables` | `src/Arc.Avalonia.Blocks.Team/Pages/EnvVariablesPage.cs` |
+| `document-extract` | Document extraction | `document-extraction` | `src/Arc.Avalonia.Blocks.AI/Pages/DocumentExtractPage.cs` |
 
 其余 157 个独立页的页面 slug 与 catalog slug 一致。
 

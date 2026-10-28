@@ -25,7 +25,7 @@
 
 三条最值得带走的判断：
 
-1. **日历与时间控件是最大的“有但不适配”。** `ArcCalendar` 只有日期、区间、`MinDate/MaxDate/DisabledDates`，没有任何事件/标记能力（`src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45`）；`week-calendar` 的事件是源码里写死的 8 条示例（`src/Arc.Avalonia.BlocksTeam/Pages/WeekCalendarPage.cs:35-45`），拖拽新建/移动/缩放明确未复刻（同文件 `:74-77`）。而时间模型是 naive `DateTime`/`TimeSpan` 且固定 `en-US`（`src/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`），跨时区、夏令时、重复规则都无从表达。
+1. **日历与时间控件是最大的“有但不适配”。** `ArcCalendar` 只有日期、区间、`MinDate/MaxDate/DisabledDates`，没有任何事件/标记能力（`src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45`）；`week-calendar` 的事件是源码里写死的 8 条示例（`src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45`），拖拽新建/移动/缩放明确未复刻（同文件 `:74-77`）。而时间模型是 naive `DateTime`/`TimeSpan` 且固定 `en-US`（`src/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`），跨时区、夏令时、重复规则都无从表达。
 2. **111 个 block 是“可看的样例”，不是“可运营的数据层”。** 所有 block 的 `ImplementationNotes` 都写着 sample data / local state；全仓没有 SQLite、没有 HTTP 客户端、没有调度器（`Sqlite` 0 处、`HttpClient` 0 处、`Cron` 0 处、`Recurrence` 相关 9 处全是文案）。生活工具一旦有真实流水（账单、交易、健康记录），`docs/04` 的 R4 结论就会立刻生效：整库几乎零虚拟化（仅 EmojiPicker 行级），DataGrid/TreeTable 选中/排序走整表重建（`docs/04` §0.2、§2.6、§4 R4、G-P0-5）。因此生活域扩展必须同时给出“数据契约 + 虚拟化/持久化路径”，否则只是又一批截图。
 3. **最划算的扩展是“提醒–议程–到期”三件套，而不是再造 20 个卡片。** P0 的 7 项把现有 `calendar`、`notification-center`、`file-dropzone`、`sortable-data-table`、`checkbox`、`badge` 串成可用的日常闭环；其中排期与通知投递复用 Agent 域提案（`routine-schedule-editor`、`notification-routing`、`background-run-dock`），生活域不重复造 RRULE 与托盘。
 
@@ -426,29 +426,29 @@ Agent 的“主动”在生活域不是聊天，而是**在该提醒的时候提
 | # | slug | kind | category | project | P | effort | 设计意图 | 与现有关系 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `reminder-row` | component | Activity | Arc.Avalonia.Feedback | P0 | M | 到期/重复/完成/延后的生活行动行 | 新原子；`timeline` 行/`notification-center` 行都不够 |
-| 2 | `day-agenda` | block | Daily life | Arc.Avalonia.BlocksApp | P0 | L | 事件+提醒+任务+服药的同轴日常视图 | 组合 `week-calendar`/`calendar`/`timeline`/`reminder-row` |
-| 3 | `reminder-center` | block | Daily life | Arc.Avalonia.BlocksApp | P0 | L | 逾期/今天/即将/已延后的行动中心 | 行动队列；与 `notification-center`/`inbox-triage` 分工 |
-| 4 | `document-vault` | block | Daily life | Arc.Avalonia.BlocksApp | P0 | L | 证件/保险/保修/报告/票据的本地库 | 复用 `file-dropzone`/`file-upload`/`sortable-data-table` |
-| 5 | `medication-schedule` | block | Daily life | Arc.Avalonia.BlocksApp | P0 | M | 服药时间表、已服/漏服、续方库存 | 复用 `reminder-row`/`usage-meter`/`progress` |
-| 6 | `bill-due-list` | block | Daily life | Arc.Avalonia.BlocksCommerce | P0 | M | 个人周期账单到期与已付台账 | 不是 `billing-overview`（SaaS） |
-| 7 | `grocery-list` | block | Daily life | Arc.Avalonia.BlocksCommerce | P0 | M | 分区采买清单，勾选/数量/共享 | 不是 `reorderable-list`（无勾选/数量） |
-| 8 | `daily-brief` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | M | 今天一屏：天气/议程/到期/健康/钱 | 聚合；不替代 dashboard |
+| 2 | `day-agenda` | block | Daily life | Arc.Avalonia.Blocks.App | P0 | L | 事件+提醒+任务+服药的同轴日常视图 | 组合 `week-calendar`/`calendar`/`timeline`/`reminder-row` |
+| 3 | `reminder-center` | block | Daily life | Arc.Avalonia.Blocks.App | P0 | L | 逾期/今天/即将/已延后的行动中心 | 行动队列；与 `notification-center`/`inbox-triage` 分工 |
+| 4 | `document-vault` | block | Daily life | Arc.Avalonia.Blocks.App | P0 | L | 证件/保险/保修/报告/票据的本地库 | 复用 `file-dropzone`/`file-upload`/`sortable-data-table` |
+| 5 | `medication-schedule` | block | Daily life | Arc.Avalonia.Blocks.App | P0 | M | 服药时间表、已服/漏服、续方库存 | 复用 `reminder-row`/`usage-meter`/`progress` |
+| 6 | `bill-due-list` | block | Daily life | Arc.Avalonia.Blocks.Commerce | P0 | M | 个人周期账单到期与已付台账 | 不是 `billing-overview`（SaaS） |
+| 7 | `grocery-list` | block | Daily life | Arc.Avalonia.Blocks.Commerce | P0 | M | 分区采买清单，勾选/数量/共享 | 不是 `reorderable-list`（无勾选/数量） |
+| 8 | `daily-brief` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | M | 今天一屏：天气/议程/到期/健康/钱 | 聚合；不替代 dashboard |
 | 9 | `weather-forecast` | component | Cards | Arc.Avalonia.Feedback | P1 | M | 今日 + 5 天天气条 | 全仓无天气 |
 | 10 | `habit-streak-strip` | component | Charts | Arc.Avalonia.Charts | P1 | S | 7/30 天连续条 + 当前连续天数 | `activity-heatmap` 的周/月变体 |
 | 11 | `reference-band-chart` | component | Charts | Arc.Avalonia.Charts | P1 | M | 参考范围/目标线/阈值注释图 | `line-chart` 的扩展，不新绘制引擎 |
-| 12 | `expense-ledger` | block | Daily life | Arc.Avalonia.BlocksCommerce | P1 | L | 个人流水、分类占比、快速记账 | 不是 `wallet-card`/`budget-variance` |
-| 13 | `budget-board` | block | Daily life | Arc.Avalonia.BlocksData | P1 | L | 分类信封预算、结转、月底预测 | 复用 `usage-meter`/`budget-variance` |
-| 14 | `subscription-tracker` | block | Daily life | Arc.Avalonia.BlocksCommerce | P1 | L | 跨服务订阅续费/涨价/取消 | 不是 `billing-overview` |
-| 15 | `meal-planner` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | L | 周三餐计划 + 生成采买 | 复用 `week-calendar`/`grocery-list` |
-| 16 | `trip-itinerary` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | L | 逐日行程、交通/住宿/预约/证件 | 不是 `delivery-tracker` |
-| 17 | `daily-journal` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | M | 心情+标签+文字+照片+回顾 | 复用 `rich-text-editor`/`rating` |
-| 18 | `home-maintenance` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | L | 家庭资产/保修/保养/维修 | 复用 `document-vault`/`calendar` |
-| 19 | `smart-home-panel` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | L | 房间/设备/场景控制面 | 复用 `control-center` 视觉，不复制工作区语义 |
-| 20 | `focus-session` | block | Daily life | Arc.Avalonia.BlocksApp | P1 | M | 目标/计时/环境音/中断/复盘 | 复用 `control-center`/`countdown`/`media-player` |
-| 21 | `pet-care` | block | Daily life | Arc.Avalonia.BlocksApp | P2 | M | 宠物照护时间表与体重/兽医 | 复用 `reminder-row`/`line-chart` |
-| 22 | `chore-board` | block | Daily life | Arc.Avalonia.BlocksApp | P2 | M | 家务轮值与完成公平性 | 复用 `kanban-board`/`project-board` |
-| 23 | `energy-usage` | block | Daily life | Arc.Avalonia.BlocksData | P2 | M | 家庭能耗/费用/异常 | 复用 `bar-chart`/`line-chart`/`reference-band-chart` |
-| 24 | `package-inbox` | block | Daily life | Arc.Avalonia.BlocksCommerce | P2 | M | 多包裹汇总与异常件 | 复用 `delivery-tracker` |
+| 12 | `expense-ledger` | block | Daily life | Arc.Avalonia.Blocks.Commerce | P1 | L | 个人流水、分类占比、快速记账 | 不是 `wallet-card`/`budget-variance` |
+| 13 | `budget-board` | block | Daily life | Arc.Avalonia.Blocks.Data | P1 | L | 分类信封预算、结转、月底预测 | 复用 `usage-meter`/`budget-variance` |
+| 14 | `subscription-tracker` | block | Daily life | Arc.Avalonia.Blocks.Commerce | P1 | L | 跨服务订阅续费/涨价/取消 | 不是 `billing-overview` |
+| 15 | `meal-planner` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | L | 周三餐计划 + 生成采买 | 复用 `week-calendar`/`grocery-list` |
+| 16 | `trip-itinerary` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | L | 逐日行程、交通/住宿/预约/证件 | 不是 `delivery-tracker` |
+| 17 | `daily-journal` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | M | 心情+标签+文字+照片+回顾 | 复用 `rich-text-editor`/`rating` |
+| 18 | `home-maintenance` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | L | 家庭资产/保修/保养/维修 | 复用 `document-vault`/`calendar` |
+| 19 | `smart-home-panel` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | L | 房间/设备/场景控制面 | 复用 `control-center` 视觉，不复制工作区语义 |
+| 20 | `focus-session` | block | Daily life | Arc.Avalonia.Blocks.App | P1 | M | 目标/计时/环境音/中断/复盘 | 复用 `control-center`/`countdown`/`media-player` |
+| 21 | `pet-care` | block | Daily life | Arc.Avalonia.Blocks.App | P2 | M | 宠物照护时间表与体重/兽医 | 复用 `reminder-row`/`line-chart` |
+| 22 | `chore-board` | block | Daily life | Arc.Avalonia.Blocks.App | P2 | M | 家务轮值与完成公平性 | 复用 `kanban-board`/`project-board` |
+| 23 | `energy-usage` | block | Daily life | Arc.Avalonia.Blocks.Data | P2 | M | 家庭能耗/费用/异常 | 复用 `bar-chart`/`line-chart`/`reference-band-chart` |
+| 24 | `package-inbox` | block | Daily life | Arc.Avalonia.Blocks.Commerce | P2 | M | 多包裹汇总与异常件 | 复用 `delivery-tracker` |
 
 > `reference-band-chart` 的 `asset` 设为 `foundation`（图表基础能力，被生活/健康/财务共用）；其余为 `life`。
 
@@ -938,24 +938,24 @@ life composes referencing agent proposals: 0
 - `docs/arc-catalog.json`、`README.md`（294 项、219 页/438 截图）、`docs/01-arc-analysis.zh.md`（设计原则）、`docs/03-implementation.zh.md`（范围与完成定义）、`docs/04-design-and-performance-review.zh.md`（R1/R4/R5/R7、G-P0-3/4/5/6/7）。
 - `src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45,135`（属性与事件）。
 - `src/Arc.Avalonia.Pickers/Controls/ArcCalendarSurface.cs:208-332`（只画日期/区间/今天点）。
-- `src/Arc.Avalonia.BlocksTeam/Pages/WeekCalendarPage.cs:35-45,74-77`（静态事件、拖拽未复刻）。
+- `src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45,74-77`（静态事件、拖拽未复刻）。
 - `src/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`（固定 en-US）。
 - `src/Arc.Avalonia.Pickers/Controls/ArcTimePicker.cs:26`（`TimeSpan?` 时间值）。
 - `src/Arc.Avalonia.Inputs/Controls/ArcMoneyInput.cs:48`（默认 USD）。
-- `src/Arc.Avalonia.BlocksApp/Pages/NotificationCenterPage.cs:29,51,246-259`（只读/忽略、样例）。
-- `src/Arc.Avalonia.BlocksApp/Pages/InboxTriagePage.cs:18,51`（消息级 snooze，时间不可编辑）。
-- `src/Arc.Avalonia.BlocksCommerce/Pages/BillingOverviewPage.cs:18,52`（SaaS 账单）。
-- `src/Arc.Avalonia.BlocksData/Pages/BudgetVariancePage.cs:15,51`（部门预算）。
-- `src/Arc.Avalonia.BlocksCommerce/Pages/UsageBillingPage.cs:53`、`WalletCardPage.cs:52`、`InvoiceStudioPage.cs:53`（样例/无账本）。
-- `src/Arc.Avalonia.SpecialGlass/Pages/ControlCenterPage.cs:44-63`（工作区快捷设置）。
-- `src/Arc.Avalonia.SpecialAIWidgets/Pages/ActivityRingsPage.cs:54-62`（三目标/年热力图建议）。
+- `src/Arc.Avalonia.Blocks.App/Pages/NotificationCenterPage.cs:29,51,246-259`（只读/忽略、样例）。
+- `src/Arc.Avalonia.Blocks.App/Pages/InboxTriagePage.cs:18,51`（消息级 snooze，时间不可编辑）。
+- `src/Arc.Avalonia.Blocks.Commerce/Pages/BillingOverviewPage.cs:18,52`（SaaS 账单）。
+- `src/Arc.Avalonia.Blocks.Data/Pages/BudgetVariancePage.cs:15,51`（部门预算）。
+- `src/Arc.Avalonia.Blocks.Commerce/Pages/UsageBillingPage.cs:53`、`WalletCardPage.cs:52`、`InvoiceStudioPage.cs:53`（样例/无账本）。
+- `src/Arc.Avalonia.Special.Glass/Pages/ControlCenterPage.cs:44-63`（工作区快捷设置）。
+- `src/Arc.Avalonia.Special.AIWidgets/Pages/ActivityRingsPage.cs:54-62`（三目标/年热力图建议）。
 - `src/Arc.Avalonia.Feedback/Pages/DataDemos.cs:302-330`（heatmap 一天一值）。
-- `src/Arc.Avalonia.BlocksCommerce/Pages/DeliveryTrackerPage.cs:16,50`（单订单、无 webhook）。
-- `src/Arc.Avalonia.BlocksApp/Pages/FileUploadPage.cs:58`（从不落盘）。
+- `src/Arc.Avalonia.Blocks.Commerce/Pages/DeliveryTrackerPage.cs:16,50`（单订单、无 webhook）。
+- `src/Arc.Avalonia.Blocks.App/Pages/FileUploadPage.cs:58`（从不落盘）。
 - `src/Arc.Avalonia.Pickers/Controls/ArcFileDropzone.cs:308-317`（文件选择器）。
-- `src/Arc.Avalonia.BlocksApp/Pages/MediaPlayerPage.cs:53`（无音频）。
-- `src/Arc.Avalonia.BlocksAI/Pages/DocumentExtractPage.cs:30`（抽取审阅）。
-- `src/Arc.Avalonia.BlocksTeam/Pages/TeamDirectoryPage.cs:29`、`AvailabilityPickerPage.cs:47`、`KanbanBoardPage.cs:41`、`ProjectBoardPage.cs:39`（团队语义）。
+- `src/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:53`（无音频）。
+- `src/Arc.Avalonia.Blocks.AI/Pages/DocumentExtractPage.cs:30`（抽取审阅）。
+- `src/Arc.Avalonia.Blocks.Team/Pages/TeamDirectoryPage.cs:29`、`AvailabilityPickerPage.cs:47`、`KanbanBoardPage.cs:41`、`ProjectBoardPage.cs:39`（团队语义）。
 - `src/Arc.Avalonia.Content/Pages/ContentFlowsPage.cs:63-101`、`ContentPage.cs:56`、`src/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:24-31`（上手清单/排序列表语义）。
 - `CONVENTIONS.md:55-58`（完成定义）、`README.md:204-209`、`docs/03-implementation.zh.md:180-181`（Pro 处理方式）。
 - 全仓 grep（排除 obj/bin）：`Cron` 0、`DueDate` 0、`Medicat` 0、`Dosage` 0、`Recipe` 0、`Meal` 0、`Grocer` 0、`Itinerar` 0、`Thermostat` 0、`Symptom` 0、`Workout` 0、`Energy` 0、`TrayIcon` 0、`HttpClient` 0、`Sqlite` 0、`Cryptography` 0；`Recurr` 9（均为文案）、`Remind` 2（标签）、`Habit` 1（说明文字）。

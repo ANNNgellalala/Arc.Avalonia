@@ -25,17 +25,17 @@ Avalonia 12.1.4 / .NET 10，纯 C# 与 XAML，不依赖任何第三方 UI 或图
 | `Arc.Avalonia.Effects` | 文字 reveal / in-view / morph / shimmer、announcement bar、cookie consent、hover card、bottom sheet、expandable card |
 | `Arc.Avalonia.Content` | markdown 富文本编辑器、可拖拽排序列表、聊天线程、onboarding checklist |
 | `Arc.Avalonia.Media` | hold to confirm、swipe actions、reactions、image compare、carousel、card stack、scroll area、resizable panels |
-| `Arc.Avalonia.SpecialGlass` | Glass menu / segmented / card / tab bar、holo card、wallet stack、sheet stack、control center、card to article、link unfurl、share sheet |
-| `Arc.Avalonia.SpecialMotion` | Action morph、morph nav、dock、liquid tab bar、orbit menu/logos、booking pill、keycap keyboard、slot text、sand text、typewriter terminal |
-| `Arc.Avalonia.SpecialMedia` | Product gallery、lightbox、photo grid、cover flow、voice orb、now playing、voice recorder、page curl、sticker peel、dot grid、gravity well |
-| `Arc.Avalonia.SpecialAIWidgets` | Agent status、tool call、agent plan/timeline、context window、ink fluid、activity rings、stretch refresh、morph loader、skeleton morph、black hole |
-| `Arc.Avalonia.SpecialAIExplainers` | Data/payment flow、multi-region failover、vector search、agent loop、MoE、speculative decoding、prompt cache、reasoning tree、time dial、date reel |
-| `Arc.Avalonia.BlocksMarketing` | 18 个营销/站点区块（header、hero、FAQ、blog、pricing、bento…） |
-| `Arc.Avalonia.BlocksCommerce` | 18 个电商/计费区块（listing、detail、cart、checkout、wallet、invoice…） |
-| `Arc.Avalonia.BlocksApp` | 21 个应用壳层区块（sidebar、settings、inbox、command palette、OTP、auth…） |
-| `Arc.Avalonia.BlocksTeam` | 16 个团队协作区块（directory、board、calendar、API keys、RBAC、cohort…） |
-| `Arc.Avalonia.BlocksData` | 20 个数据可视化区块（dashboard、revenue、terrain、globe、galaxy、choropleth、candle…） |
-| `Arc.Avalonia.BlocksAI` | 18 个 AI 产品区块（composer、chat、research、arena、agents、MCP、eval…） |
+| `Arc.Avalonia.Special.Glass` | Glass menu / segmented / card / tab bar、holo card、wallet stack、sheet stack、control center、card to article、link unfurl、share sheet |
+| `Arc.Avalonia.Special.Motion` | Action morph、morph nav、dock、liquid tab bar、orbit menu/logos、booking pill、keycap keyboard、slot text、sand text、typewriter terminal |
+| `Arc.Avalonia.Special.Media` | Product gallery、lightbox、photo grid、cover flow、voice orb、now playing、voice recorder、page curl、sticker peel、dot grid、gravity well |
+| `Arc.Avalonia.Special.AIWidgets` | Agent status、tool call、agent plan/timeline、context window、ink fluid、activity rings、stretch refresh、morph loader、skeleton morph、black hole |
+| `Arc.Avalonia.Special.AIExplainers` | Data/payment flow、multi-region failover、vector search、agent loop、MoE、speculative decoding、prompt cache、reasoning tree、time dial、date reel |
+| `Arc.Avalonia.Blocks.Marketing` | 18 个营销/站点区块（header、hero、FAQ、blog、pricing、bento…） |
+| `Arc.Avalonia.Blocks.Commerce` | 18 个电商/计费区块（listing、detail、cart、checkout、wallet、invoice…） |
+| `Arc.Avalonia.Blocks.App` | 21 个应用壳层区块（sidebar、settings、inbox、command palette、OTP、auth…） |
+| `Arc.Avalonia.Blocks.Team` | 16 个团队协作区块（directory、board、calendar、API keys、RBAC、cohort…） |
+| `Arc.Avalonia.Blocks.Data` | 20 个数据可视化区块（dashboard、revenue、terrain、globe、galaxy、choropleth、candle…） |
+| `Arc.Avalonia.Blocks.AI` | 18 个 AI 产品区块（composer、chat、research、arena、agents、MCP、eval…） |
 | `Arc.Avalonia.Gallery` | 展示应用 + 离屏截图工具 + 分类审计（`--audit`） |
 
 Gallery 侧边栏现在由 `ArcCatalog` 驱动（数据来自 `docs/arc-catalog.json`，由公开的 llms-small.txt 与

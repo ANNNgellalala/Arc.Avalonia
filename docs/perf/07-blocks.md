@@ -6,12 +6,12 @@
 
 | 工程 | 非 obj `.cs` | 页面 | 其它（Kit / 自绘控件 / 数据） | Kit 行数 | Kit public helper |
 | --- | --- | --- | --- | --- | --- |
-| `Arc.Avalonia.BlocksMarketing` | 23 | 18 | `MarketingKit` + `ArcMarquee`/`ArcMeshWash`/`ArcSpotlightCard`/`ArcStatNumber` | 528 | 38 |
-| `Arc.Avalonia.BlocksCommerce` | 20 | 18 | `CommerceKit` + `ArcEmptyScene` | 933 | 54 |
-| `Arc.Avalonia.BlocksApp` | 23 | 21 | `AppKit` + `OtpField` | 1035 | 64 |
-| `Arc.Avalonia.BlocksTeam` | 20 | 16 | `TeamKit` + `ArcCohortChart`/`ArcMorphIllustration`/`TeamData` | 743 | 44 |
-| `Arc.Avalonia.BlocksData` | 38 | 20 | `DataKit`/`DataDraw`/`DataSamples` + **15 个 `DataStage` 自绘控件** | 677 | 50 |
-| `Arc.Avalonia.BlocksAI` | 19 | 18 | `AiKit` | 1014 | 50 |
+| `Arc.Avalonia.Blocks.Marketing` | 23 | 18 | `MarketingKit` + `ArcMarquee`/`ArcMeshWash`/`ArcSpotlightCard`/`ArcStatNumber` | 528 | 38 |
+| `Arc.Avalonia.Blocks.Commerce` | 20 | 18 | `CommerceKit` + `ArcEmptyScene` | 933 | 54 |
+| `Arc.Avalonia.Blocks.App` | 23 | 21 | `AppKit` + `OtpField` | 1035 | 64 |
+| `Arc.Avalonia.Blocks.Team` | 20 | 16 | `TeamKit` + `ArcCohortChart`/`ArcMorphIllustration`/`TeamData` | 743 | 44 |
+| `Arc.Avalonia.Blocks.Data` | 38 | 20 | `DataKit`/`DataDraw`/`DataSamples` + **15 个 `DataStage` 自绘控件** | 677 | 50 |
+| `Arc.Avalonia.Blocks.AI` | 19 | 18 | `AiKit` | 1014 | 50 |
 | **合计** | **143** | **111** | 23 个非 Kit 控件文件（20 个含 `Render`） | **4930** | **300** |
 
 **完整精读**：`DataKit.cs`、`DataDraw.cs`、`DataSamples.cs`、`ArcTerrainStage.cs`、`ArcGalaxyStage.cs`、`ArcChoroplethMap.cs`、`ArcLayoutMorph.cs`、`ArcDotGlobe.cs`、`ArcHorizonChart.cs`、`ArcSmallMultiples.cs`（含 Render 段）、`ArcCandleChart.cs`（Render 段）、`ArcWaterfallBars.cs`（Render 段）、`ArcReplayLine.cs`（Render 段）、`ArcOverviewBrush.cs`（Render 段）、`ArcMarquee.cs`、`ArcMeshWash.cs`、`ArcEmptyScene.cs`、`ArcStatNumber.cs`（计时段）、`ArcSpotlightCard.cs`、`InboxSidebarPage.cs`、`MetricsDashboardPage.cs`、`AppKit.cs`/`AiKit.cs`（核心段）、`ArcItemPage.cs`、`ArcDocLayout.cs`、`GalleryWindow.cs`（外壳/换肤段）。
@@ -156,7 +156,7 @@
 
 ### BD-02 银河图：2400 账户 + 指针移动全量重排（P0）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Pages/CustomerGalaxyPage.cs:64`；`src/Arc.Avalonia.BlocksData/Controls/ArcGalaxyStage.cs:98-132,147,264-297`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/CustomerGalaxyPage.cs:64`；`src/Arc.Avalonia.Blocks.Data/Controls/ArcGalaxyStage.cs:98-132,147,264-297`
 - 证据：
   ```csharp
   var accounts = BuildAccounts(2400);                          // CustomerGalaxyPage.cs:64
@@ -171,7 +171,7 @@
 
 ### BD-03 点阵地球：1620 点每点一次资源查找 + 新 brush（P0）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Controls/ArcDotGlobe.cs:206-263`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcDotGlobe.cs:206-263`
 - 证据：
   ```csharp
   for (var lat = -78.0; lat <= 78; lat += 6)          // 27 行
@@ -186,7 +186,7 @@
 
 ### BD-01 地形舞台：168 柱 × 3 几何 + 每柱 Mix（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Controls/ArcTerrainStage.cs:278-319,354-383,385-397`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcTerrainStage.cs:278-319,354-383,385-397`
 - 证据：
   ```csharp
   var fill = Mix(Ink.Alpha(Ink.Series(0), 0.35), Ink.Series(0), t);   // :294 每柱
@@ -200,7 +200,7 @@
 
 ### BD-04 绘制助手无缓存：`Ink.*` 与 `FormattedText`（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Controls/DataDraw.cs:14-46,77-136,207-251`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/DataDraw.cs:14-46,77-136,207-251`
 - 证据：
   ```csharp
   public static IBrush Foreground => ArcResources.Brush(ArcTokens.Foreground);   // :17，每访问一次查一次
@@ -214,7 +214,7 @@
 
 ### BD-05 horizon / small multiples：每 band/panel 重建点列与几何（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Controls/ArcHorizonChart.cs:52-57,73,158-197`；`src/Arc.Avalonia.BlocksData/Controls/ArcSmallMultiples.cs:55-63,89,161-213`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcHorizonChart.cs:52-57,73,158-197`；`src/Arc.Avalonia.Blocks.Data/Controls/ArcSmallMultiples.cs:55-63,89,161-213`
 - 证据：
   ```csharp
   for (var band = 0; band < Bands; band++) {                     // HorizonChart:173
@@ -229,7 +229,7 @@
 
 ### BD-06 蜡烛图 + 行情页：每根 new Pen 与每次指针重建报价（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Controls/ArcCandleChart.cs:160-243`；`src/Arc.Avalonia.BlocksData/Pages/MarketTerminalPage.cs:136-154`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcCandleChart.cs:160-243`；`src/Arc.Avalonia.Blocks.Data/Pages/MarketTerminalPage.cs:136-154`
 - 证据：
   ```csharp
   var brush = up ? Ink.Series(0) : Ink.Series(3);                    // CandleChart:191
@@ -244,7 +244,7 @@
 
 ### BD-07 散点页：指针驱动的 stats + slider 重建（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Pages/ConnectedScatterPage.cs:184-189,75-106,108-127`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/ConnectedScatterPage.cs:184-189,75-106,108-127`
 - 证据：
   ```csharp
   chart.HeadChanged += (_, index) => { head = index; RefreshStats(); RefreshSlider(); };  // :184-189
@@ -257,7 +257,7 @@
 
 ### BP-01 Inbox 侧栏：任何交互都重建三栏全树（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksApp/Pages/InboxSidebarPage.cs:562-568,264-396,244`
+- 位置：`src/Arc.Avalonia.Blocks.App/Pages/InboxSidebarPage.cs:562-568,264-396,244`
 - 证据：
   ```csharp
   void Build() { BuildFolders(); BuildList(); BuildReader();  // :562-568 三个 Host.Content 全替换
@@ -270,7 +270,7 @@
 
 ### BP-02 媒体播放页：构建即启动的 500 ms timer + 拖拽中重建自身（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksApp/Pages/MediaPlayerPage.cs:88,90-167,420-432,483`
+- 位置：`src/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:88,90-167,420-432,483`
 - 证据：
   ```csharp
   var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };   // :88
@@ -284,7 +284,7 @@
 
 ### BP-04 指标仪表盘：`DateLabels(180)` 在 30 元素 Select 内被调 30 次（P1）
 
-- 位置：`src/Arc.Avalonia.BlocksData/Pages/MetricsDashboardPage.cs:165,111-255`
+- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/MetricsDashboardPage.cs:165,111-255`
 - 证据：
   ```csharp
   Labels = window.Select((_, index) => DateLabels(180)[values.Length - rangeDays + index]).ToList(),  // :165

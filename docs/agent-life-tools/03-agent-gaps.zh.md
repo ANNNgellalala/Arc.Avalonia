@@ -13,7 +13,7 @@
 
 ### 0.1 一句话结论
 
-**这套库已经画出了 Agent 产品几乎全部的"界面表情"，但还没有给出任何"运行时接口"。** 40 个 AI 命名资产（11 AI widgets + 11 AI explainers + 18 AI blocks）在视觉、动效、可访问性上都能直接支撑演示；但其中没有一个向外暴露 Agent 生命周期事件（Approve / Deny / Stop / Retry / Ask / Handoff），18 个 AI block 全部是 `ArcItemPage` 页面级样例（`src/Arc.Avalonia.BlocksAI` 只有一个 `Controls/AiKit.cs` 布局助手 + 18 个 `Pages/*.cs`），不能被业务页面当控件嵌入。要把它变成可用的桌面助手，缺的不是"更多漂亮面板"，而是**一条可驱动的事件流、一套可执行的审批/中断契约，以及桌面运行时（托盘、系统通知、调度、离线）的骨架**。
+**这套库已经画出了 Agent 产品几乎全部的"界面表情"，但还没有给出任何"运行时接口"。** 40 个 AI 命名资产（11 AI widgets + 11 AI explainers + 18 AI blocks）在视觉、动效、可访问性上都能直接支撑演示；但其中没有一个向外暴露 Agent 生命周期事件（Approve / Deny / Stop / Retry / Ask / Handoff），18 个 AI block 全部是 `ArcItemPage` 页面级样例（`src/Arc.Avalonia.Blocks.AI` 只有一个 `Controls/AiKit.cs` 布局助手 + 18 个 `Pages/*.cs`），不能被业务页面当控件嵌入。要把它变成可用的桌面助手，缺的不是"更多漂亮面板"，而是**一条可驱动的事件流、一套可执行的审批/中断契约，以及桌面运行时（托盘、系统通知、调度、离线）的骨架**。
 
 ### 0.2 关键数字
 
@@ -22,7 +22,7 @@
 | catalog 总量 | 294（128 components / 55 special / 111 blocks） | `docs/arc-catalog.json`；`README.md:210` |
 | 与 Agent 直接相关的命名资产 | 40（11 AI widgets + 11 AI explainers + 18 AI blocks） | `docs/arc-catalog.json` 的 `specialGroups`/`blockGroups` |
 | 提供 Agent 运行时事件契约（approve / stop / retry / ask / handoff）的 AI 资产 | **0** | 见 §2；40 项中唯一的 `public event` 来自通用氛围件 `ArcBlackHole`（SelectionChanged/Deleted），与 Agent 无关 |
-| AI block 中的可复用控件类 | **0**（仅 `AiKit` 内部静态助手） | `src/Arc.Avalonia.BlocksAI/Controls/AiKit.cs` |
+| AI block 中的可复用控件类 | **0**（仅 `AiKit` 内部静态助手） | `src/Arc.Avalonia.Blocks.AI/Controls/AiKit.cs` |
 | 托盘 / 系统通知 / 全局热键 API 使用 | 各 **0 处** | 全仓 `src/**/*.cs,*.axaml` 精确 grep |
 | 桌面运行时存在性 | `TrayIcon`=0、`WindowNotificationManager`=0、`RegisterHotKey`=0、`NativeMenu`=0 | 同上 |
 | 现有展示页 / 截图 | 219 页 / 438 张 | `README.md:194-195`；`docs/03-implementation.zh.md:74-75` |
@@ -45,7 +45,7 @@
 
 - 目录与元数据：`docs/arc-catalog.json` 全量 294 项（slug/title/kind/category/tier/description）。
 - 实现说明：`README.md`、`docs/03-implementation.zh.md`、`docs/04-design-and-performance-review.zh.md`（重点 R4/R5/G-P0-7）。
-- 源码：`src/Arc.Avalonia.SpecialAIWidgets/Controls`（11 项）、`src/Arc.Avalonia.SpecialAIExplainers/Controls`（11 项）、`src/Arc.Avalonia.BlocksAI`（`Controls/AiKit.cs` + 18 个 Pages）、`src/Arc.Avalonia.Actions`（toast/overlay/dialog）、`src/Arc.Avalonia.Feedback`（timeline/usage-meter/countdown/table）、`src/Arc.Avalonia.Content`（chat-thread）、`src/Arc.Avalonia.SpecialMedia`（voice-orb/voice-recorder）、`src/Arc.Avalonia.BlocksApp`/`BlocksTeam`（notification-center/settings/security/week-calendar）、`src/Arc.Avalonia.Gallery`（页面契约与截图链路）。
+- 源码：`src/Arc.Avalonia.Special.AIWidgets/Controls`（11 项）、`src/Arc.Avalonia.Special.AIExplainers/Controls`（11 项）、`src/Arc.Avalonia.Blocks.AI`（`Controls/AiKit.cs` + 18 个 Pages）、`src/Arc.Avalonia.Actions`（toast/overlay/dialog）、`src/Arc.Avalonia.Feedback`（timeline/usage-meter/countdown/table）、`src/Arc.Avalonia.Content`（chat-thread）、`src/Arc.Avalonia.Special.Media`（voice-orb/voice-recorder）、`src/Arc.Avalonia.Blocks.App`/`BlocksTeam`（notification-center/settings/security/week-calendar）、`src/Arc.Avalonia.Gallery`（页面契约与截图链路）。
 - 交叉校验：对全仓 `src/**/*.cs,*.axaml` 做精确 grep（`TrayIcon`、`WindowNotificationManager`、`RegisterHotKey`、`NativeMenu`、`DiffView`、`public event`），避免只看名字。
 
 ### 1.2 支持度分级（全文统一）
@@ -74,7 +74,7 @@
 | `ai-side-panel` | BlocksAI | 贴着"页面"读选中段、word diff、Apply/Undo | ◐ | `AiSidePanelPage.cs:51-55`（word diff 预计算；Apply/Undo 只改页面文案；固定在页面内） | 只读"页面"而非桌面应用/窗口/剪贴板；无选中捕获真实通路；无跨应用上下文 |
 | `model-picker` | BlocksAI | 模型 pill、推理档位、按 provider 浏览 | ◐ | `ModelPickerPage.cs:51-54`（菜单直接渲染成打开态，价格为例示值） | 无模型能力/成本/离线状态数据；无路由策略 |
 | `voice-orb` | SpecialMedia | Idle/Listening/Thinking/Speaking 四态、转写两行、计时 | ◐ | `ArcVoiceOrb.cs:9-16`、`:50-101`（属性有，事件无；麦克风电平为模拟） | 无事件、无 barge-in、无真实设备/权限、无"说完即发"语义 |
-| `voice-recorder` | SpecialMedia | 波形、回放、发送 take | ◐ | `src/Arc.Avalonia.SpecialMedia/Controls/ArcVoiceRecorder.cs` | 无转写、无 VAD、无语音命令 |
+| `voice-recorder` | SpecialMedia | 波形、回放、发送 take | ◐ | `src/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs` | 无转写、无 VAD、无语音命令 |
 
 **阶段判断**：理解阶段"输入表面"齐全，"输入通道"（结构化追问、桌面上下文、语音事件）全缺。
 
@@ -393,12 +393,12 @@
 | # | slug | 类型 | 分类 | 落地项目 | 工作量 | 补哪个阶段 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `agent-transcript` | component | Activity | Arc.Avalonia.Content | M | 执行/结果/复盘（事件流底座） |
-| 2 | `run-control-bar` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | M | 执行（中断/改向/接管） |
-| 3 | `tool-approval-sheet` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | L | 审批（高风险动作） |
-| 4 | `agent-ask-card` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | M | 理解（结构化追问） |
-| 5 | `agent-attention-inbox` | block | AI | Arc.Avalonia.BlocksAI | M | 审批/复盘（统一注意力） |
+| 2 | `run-control-bar` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | M | 执行（中断/改向/接管） |
+| 3 | `tool-approval-sheet` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | L | 审批（高风险动作） |
+| 4 | `agent-ask-card` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | M | 理解（结构化追问） |
+| 5 | `agent-attention-inbox` | block | AI | Arc.Avalonia.Blocks.AI | M | 审批/复盘（统一注意力） |
 | 6 | `routine-schedule-editor` | component | Pickers | Arc.Avalonia.Pickers | L | 计划（例行排期） |
-| 7 | `background-run-dock` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | L | 执行（后台常驻） |
+| 7 | `background-run-dock` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | L | 执行（后台常驻） |
 
 ### 7.2 P1（16 项，体验与信任）
 
@@ -407,29 +407,29 @@
 | 8 | `permission-scope-picker` | component | Selects | Arc.Avalonia.AdvancedInputs | S | 审批/权限 |
 | 9 | `agent-budget-bar` | component | Progress | Arc.Avalonia.Feedback | S | 成本 |
 | 10 | `diff-review` | component | Editors | Arc.Avalonia.Content | M | 审批/结果 |
-| 11 | `checkpoint-restore` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | M | 失败恢复 |
+| 11 | `checkpoint-restore` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | M | 失败恢复 |
 | 12 | `guardrail-alert` | component | Messages | Arc.Avalonia.Actions | S | 安全 |
-| 13 | `connector-health` | block | AI | Arc.Avalonia.BlocksAI | M | 执行/复盘 |
-| 14 | `memory-review-queue` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | M | 记忆 |
+| 13 | `connector-health` | block | AI | Arc.Avalonia.Blocks.AI | M | 执行/复盘 |
+| 14 | `memory-review-queue` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | M | 记忆 |
 | 15 | `autonomy-dial` | component | Toggles | Arc.Avalonia.Inputs | S | 权限 |
-| 16 | `notification-routing` | block | App shell and settings | Arc.Avalonia.BlocksApp | M | 通知 |
-| 17 | `agent-audit-log` | block | AI | Arc.Avalonia.BlocksAI | M | 复盘/审计 |
-| 18 | `voice-session-bar` | special | Media and input | Arc.Avalonia.SpecialMedia | M | 语音 |
-| 19 | `local-model-status` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | M | 离线/模型 |
+| 16 | `notification-routing` | block | App shell and settings | Arc.Avalonia.Blocks.App | M | 通知 |
+| 17 | `agent-audit-log` | block | AI | Arc.Avalonia.Blocks.AI | M | 复盘/审计 |
+| 18 | `voice-session-bar` | special | Media and input | Arc.Avalonia.Special.Media | M | 语音 |
+| 19 | `local-model-status` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | M | 离线/模型 |
 | 20 | `agent-handoff-banner` | component | Messages | Arc.Avalonia.Actions | S | 执行（人工接管） |
-| 21 | `offline-action-queue` | block | AI | Arc.Avalonia.BlocksAI | M | 离线 |
-| 22 | `trust-rules-manager` | block | AI | Arc.Avalonia.BlocksAI | M | 权限 |
-| 23 | `desktop-agent-settings` | block | App shell and settings | Arc.Avalonia.BlocksApp | M | 后台常驻 |
+| 21 | `offline-action-queue` | block | AI | Arc.Avalonia.Blocks.AI | M | 离线 |
+| 22 | `trust-rules-manager` | block | AI | Arc.Avalonia.Blocks.AI | M | 权限 |
+| 23 | `desktop-agent-settings` | block | App shell and settings | Arc.Avalonia.Blocks.App | M | 后台常驻 |
 
 ### 7.3 P2（5 项，锦上添花）
 
 | # | slug | 类型 | 分类 | 落地项目 | 工作量 |
 | --- | --- | --- | --- | --- | --- |
-| 24 | `run-trace-viewer` | special | AI widgets | Arc.Avalonia.SpecialAIWidgets | L |
-| 25 | `model-routing-policy` | block | AI | Arc.Avalonia.BlocksAI | L |
+| 24 | `run-trace-viewer` | special | AI widgets | Arc.Avalonia.Special.AIWidgets | L |
+| 25 | `model-routing-policy` | block | AI | Arc.Avalonia.Blocks.AI | L |
 | 26 | `global-hotkey-field` | component | Special inputs | Arc.Avalonia.AdvancedInputs | S |
 | 27 | `spoken-confirmation` | component | Gestures | Arc.Avalonia.Media | S |
-| 28 | `run-history-list` | block | AI | Arc.Avalonia.BlocksAI | M |
+| 28 | `run-history-list` | block | AI | Arc.Avalonia.Blocks.AI | M |
 
 **分布**：kind = component 10 / special 9 / block 9；priority = P0 7 / P1 16 / P2 5；effort = S 7 / M 16 / L 5。粗略工作量（S=1、M=3、L=7 人日）≈ **90 人日**，其中 P0 ≈ **33 人日**（不含 foundation 的通知/托盘/调度运行时，非 UI 工作另计）。
 
@@ -481,7 +481,7 @@ AgentTranscript (TemplatedControl)
 
 ---
 
-### 8.2 `run-control-bar`（special · AI widgets · Arc.Avalonia.SpecialAIWidgets · M）
+### 8.2 `run-control-bar`（special · AI widgets · Arc.Avalonia.Special.AIWidgets · M）
 
 **设计意图**：把"停止/暂停/改向/接管"从控件内部状态提升为**运行指令**，让用户随时能控制。
 
@@ -516,7 +516,7 @@ RunControlBar (special / 自绘 + 组合)
 
 ---
 
-### 8.3 `tool-approval-sheet`（special · AI widgets · Arc.Avalonia.SpecialAIWidgets · L）
+### 8.3 `tool-approval-sheet`（special · AI widgets · Arc.Avalonia.Special.AIWidgets · L）
 
 **设计意图**：把"要不要允许这个工具调用"升级为"看清将要发生什么、可改参、可限定范围、可过期"的审批 surface，是生活助手信任的核心。
 
@@ -551,7 +551,7 @@ ToolApprovalSheet (从右侧或底部升起；页内 + 可选窗口级)
 
 ---
 
-### 8.4 `agent-ask-card`（special · AI widgets · Arc.Avalonia.SpecialAIWidgets · M）
+### 8.4 `agent-ask-card`（special · AI widgets · Arc.Avalonia.Special.AIWidgets · M）
 
 **设计意图**：当 Agent 需要用户补充信息（选日期、选卡、上传单据、二选一）时，用结构化卡片替代"再发一条聊天消息"。
 
@@ -584,7 +584,7 @@ AgentAskCard (页内卡片；可由 transcript 内联或独立呈现)
 
 ---
 
-### 8.5 `agent-attention-inbox`（block · AI · Arc.Avalonia.BlocksAI · M）
+### 8.5 `agent-attention-inbox`（block · AI · Arc.Avalonia.Blocks.AI · M）
 
 **设计意图**：一个常驻的"等你处理"队列，将审批、追问、失败、到期 routine、待复核结果统一排序，替代在多个页面之间找红点。
 
@@ -639,7 +639,7 @@ RoutineScheduleEditor (TemplatedControl，可放进 dialog/drawer)
 
 ---
 
-### 8.7 `background-run-dock`（special · AI widgets · Arc.Avalonia.SpecialAIWidgets · L）
+### 8.7 `background-run-dock`（special · AI widgets · Arc.Avalonia.Special.AIWidgets · L）
 
 **设计意图**：让关闭主窗口后的 Agent 仍可被看见、被暂停、被唤回——桌面助手的"存在感"。
 

@@ -200,11 +200,11 @@ P0 新增 `ArcAgentTranscript`；辅助 `ArcMarkdown`、`ArcContentUi`。
 
 | 项目 | 11 个目录项 | 额外控件/辅助 |
 | --- | --- | --- |
-| `Arc.Avalonia.SpecialGlass` | Glass menu / segmented / card / tab bar、Holo card、Wallet stack、Sheet stack、Control center、Card to article、Link unfurl、Share sheet | `ArcGlassBackdrop`、`ArcGlass`、`ArcDurationDial`、`ArcRubberMeter`、`GlassMotion`、`GlassDemo` |
-| `Arc.Avalonia.SpecialMotion` | Action morph、Morph nav、Dock、Liquid tab bar、Orbit menu、Orbit logos、Booking pill、Keycap keyboard、Slot text、Sand text、Typewriter terminal | `SpecialMotionUi` |
-| `Arc.Avalonia.SpecialMedia` | Product gallery、Lightbox gallery、Photo grid、Cover flow、Voice orb、Now playing、Voice recorder、Page curl、Sticker peel、Dot grid、Gravity well | `SampleArt`、`SpecialIcons`、`SpecialUi` |
-| `Arc.Avalonia.SpecialAIWidgets` | Agent status、Tool call、Agent plan、Agent timeline、Context window、Ink fluid、Activity rings、Stretch refresh、Morph loader、Skeleton morph、Black hole | P0：`ArcAgentAskCard`、`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcBackgroundRunDock`；`SpecialVisuals` |
-| `Arc.Avalonia.SpecialAIExplainers` | Data flow、Payment flow、Multi-region failover、Vector search、Agent loop、Mixture of experts、Speculative decoding、Prompt cache、Reasoning tree、Time dial、Date reel | `ExplainInk` |
+| `Arc.Avalonia.Special.Glass` | Glass menu / segmented / card / tab bar、Holo card、Wallet stack、Sheet stack、Control center、Card to article、Link unfurl、Share sheet | `ArcGlassBackdrop`、`ArcGlass`、`ArcDurationDial`、`ArcRubberMeter`、`GlassMotion`、`GlassDemo` |
+| `Arc.Avalonia.Special.Motion` | Action morph、Morph nav、Dock、Liquid tab bar、Orbit menu、Orbit logos、Booking pill、Keycap keyboard、Slot text、Sand text、Typewriter terminal | `SpecialMotionUi` |
+| `Arc.Avalonia.Special.Media` | Product gallery、Lightbox gallery、Photo grid、Cover flow、Voice orb、Now playing、Voice recorder、Page curl、Sticker peel、Dot grid、Gravity well | `SampleArt`、`SpecialIcons`、`SpecialUi` |
+| `Arc.Avalonia.Special.AIWidgets` | Agent status、Tool call、Agent plan、Agent timeline、Context window、Ink fluid、Activity rings、Stretch refresh、Morph loader、Skeleton morph、Black hole | P0：`ArcAgentAskCard`、`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcBackgroundRunDock`；`SpecialVisuals` |
+| `Arc.Avalonia.Special.AIExplainers` | Data flow、Payment flow、Multi-region failover、Vector search、Agent loop、Mixture of experts、Speculative decoding、Prompt cache、Reasoning tree、Time dial、Date reel | `ExplainInk` |
 
 Special 五个项目与 `arc-catalog.json` 的 `specialGroups` **一一对应**（每组 11 项），
 每项都继承 `ArcItemPage`，是当前划分中最整齐的一组。
@@ -213,12 +213,12 @@ Special 五个项目与 `arc-catalog.json` 的 `specialGroups` **一一对应**�
 
 | 项目 | 目录项 | 页面数 | 项目内控件/辅助 |
 | --- | --- | --- | --- |
-| `Arc.Avalonia.BlocksMarketing` | 18（Marketing and site） | 18 | `ArcMarquee`、`ArcMeshWash`、`ArcSpotlightCard`、`ArcStatNumber`、`MarketingKit` |
-| `Arc.Avalonia.BlocksCommerce` | 18（Commerce） | 18 | `ArcEmptyScene`、`CommerceKit` |
-| `Arc.Avalonia.BlocksApp` | 21（App shell and settings） | 25 | `OtpField`、`AppKit`、`LifeTodayKit`（含 `ArcDailyBrief`、`ArcDayAgenda`、`ArcReminderCenter`、`ArcMedicationSchedule` 四个 P0 控件） |
-| `Arc.Avalonia.BlocksTeam` | 16（Team and collaboration） | 16 | `ArcCohortChart`、`ArcMorphIllustration`、`TeamData`、`TeamKit` |
-| `Arc.Avalonia.BlocksData` | 20（Data and charts） | 20 | `ArcCandleChart`、`ArcChoroplethMap`、`ArcConnectedScatter`、`ArcDotGlobe`、`ArcExplodedLayers`、`ArcForecastCone`、`ArcGalaxyStage`、`ArcHorizonChart`、`ArcLayoutMorph`、`ArcOverviewBrush`、`ArcReplayLine`、`ArcSemanticMap`、`ArcSmallMultiples`、`ArcTerrainStage`、`ArcWaterfallBars`、`DataDraw`、`DataKit`、`DataSamples` |
-| `Arc.Avalonia.BlocksAI` | 18（AI） | 19 | `AiKit`、`ArcAgentAttentionInbox`（P0） |
+| `Arc.Avalonia.Blocks.Marketing` | 18（Marketing and site） | 18 | `ArcMarquee`、`ArcMeshWash`、`ArcSpotlightCard`、`ArcStatNumber`、`MarketingKit` |
+| `Arc.Avalonia.Blocks.Commerce` | 18（Commerce） | 18 | `ArcEmptyScene`、`CommerceKit` |
+| `Arc.Avalonia.Blocks.App` | 21（App shell and settings） | 25 | `OtpField`、`AppKit`、`LifeTodayKit`（含 `ArcDailyBrief`、`ArcDayAgenda`、`ArcReminderCenter`、`ArcMedicationSchedule` 四个 P0 控件） |
+| `Arc.Avalonia.Blocks.Team` | 16（Team and collaboration） | 16 | `ArcCohortChart`、`ArcMorphIllustration`、`TeamData`、`TeamKit` |
+| `Arc.Avalonia.Blocks.Data` | 20（Data and charts） | 20 | `ArcCandleChart`、`ArcChoroplethMap`、`ArcConnectedScatter`、`ArcDotGlobe`、`ArcExplodedLayers`、`ArcForecastCone`、`ArcGalaxyStage`、`ArcHorizonChart`、`ArcLayoutMorph`、`ArcOverviewBrush`、`ArcReplayLine`、`ArcSemanticMap`、`ArcSmallMultiples`、`ArcTerrainStage`、`ArcWaterfallBars`、`DataDraw`、`DataKit`、`DataSamples` |
+| `Arc.Avalonia.Blocks.AI` | 18（AI） | 19 | `AiKit`、`ArcAgentAttentionInbox`（P0） |
 
 Blocks 六个项目与 `blockGroups` 的六组一一对应。`BlocksApp` 25 页 = 21 个 catalog 区块 + 4 个 P0 Today 页；
 `BlocksAI` 19 页 = 18 + 1 个 P0 Agent 页。
@@ -368,7 +368,7 @@ showcase”）。当前 README/CONVENTIONS 的定位更接近后者，所以问�
 #### ⑦ 命名与命名空间不一致
 
 * 命名空间：绝大多数是 `<Project>.Controls` / `<Project>.Pages`，但 `Charts` 用单一
-  `Arc.Avalonia.Charts`，`BlocksData` 用 `Arc.Avalonia.BlocksData`（控件）与 `.Pages`（页面）混合；
+  `Arc.Avalonia.Charts`，`BlocksData` 用 `Arc.Avalonia.Blocks.Data`（控件）与 `.Pages`（页面）混合；
 * 项目名：`SpecialAIExplainers`、`BlocksAI` 缺少分隔符，读起来是 `SpecialAIExplainers` 而不是
   `Special.AIExplainers`；
 * 基础层 `Theme/` 与 `Themes/` 并存，只有基础层有这种双目录；

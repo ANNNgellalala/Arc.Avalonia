@@ -21,19 +21,19 @@
     <Project Path="src/Agent/Arc.Avalonia.LifeToday/Arc.Avalonia.LifeToday.csproj" />
   </Folder>
   <Folder Name="/Special/">
-    <Project Path="src/Special/Arc.Avalonia.SpecialGlass/Arc.Avalonia.SpecialGlass.csproj" />
-    <Project Path="src/Special/Arc.Avalonia.SpecialMotion/Arc.Avalonia.SpecialMotion.csproj" />
-    <Project Path="src/Special/Arc.Avalonia.SpecialMedia/Arc.Avalonia.SpecialMedia.csproj" />
-    <Project Path="src/Special/Arc.Avalonia.SpecialAIWidgets/Arc.Avalonia.SpecialAIWidgets.csproj" />
-    <Project Path="src/Special/Arc.Avalonia.SpecialAIExplainers/Arc.Avalonia.SpecialAIExplainers.csproj" />
+    <Project Path="src/Special/Arc.Avalonia.Special.Glass/Arc.Avalonia.Special.Glass.csproj" />
+    <Project Path="src/Special/Arc.Avalonia.Special.Motion/Arc.Avalonia.Special.Motion.csproj" />
+    <Project Path="src/Special/Arc.Avalonia.Special.Media/Arc.Avalonia.Special.Media.csproj" />
+    <Project Path="src/Special/Arc.Avalonia.Special.AIWidgets/Arc.Avalonia.Special.AIWidgets.csproj" />
+    <Project Path="src/Special/Arc.Avalonia.Special.AIExplainers/Arc.Avalonia.Special.AIExplainers.csproj" />
   </Folder>
   <Folder Name="/Blocks/">
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksMarketing/Arc.Avalonia.BlocksMarketing.csproj" />
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksCommerce/Arc.Avalonia.BlocksCommerce.csproj" />
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksApp/Arc.Avalonia.BlocksApp.csproj" />
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksTeam/Arc.Avalonia.BlocksTeam.csproj" />
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksData/Arc.Avalonia.BlocksData.csproj" />
-    <Project Path="src/Blocks/Arc.Avalonia.BlocksAI/Arc.Avalonia.BlocksAI.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.Marketing/Arc.Avalonia.Blocks.Marketing.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.Commerce/Arc.Avalonia.Blocks.Commerce.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.App/Arc.Avalonia.Blocks.App.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.Team/Arc.Avalonia.Blocks.Team.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.Data/Arc.Avalonia.Blocks.Data.csproj" />
+    <Project Path="src/Blocks/Arc.Avalonia.Blocks.AI/Arc.Avalonia.Blocks.AI.csproj" />
   </Folder>
   <Folder Name="/App/">
     <Project Path="src/Apps/Arc.Avalonia.Demo/Arc.Avalonia.Demo.csproj" />

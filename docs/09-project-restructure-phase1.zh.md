@@ -145,6 +145,6 @@ f2fc693 P1: split Feedback into Feedback and DataDisplay
 
 * `src/` 物理分组（`src/Foundation`、`src/Components`、`src/Special`、`src/Blocks`、`src/Apps`）；
 * 项目改名 `Special.*` / `Blocks.*`（需同步 `avares://` URI、命名空间、slnx、文档）；
-* `Charts` / `BlocksData` 的命名空间统一（`Arc.Avalonia.Charts` 与 `Arc.Avalonia.BlocksData` 目前为根命名空间）。
+* `Charts` / `BlocksData` 的命名空间统一（`Arc.Avalonia.Charts` 与 `Arc.Avalonia.Blocks.Data` 目前为根命名空间）。
 
 这些改动价值主要是导航与一致性，但 churn 高、收益低，留到结构稳定后的独立提交。

@@ -3,8 +3,8 @@
 ## 0. 范围与覆盖
 
 - 覆盖两个工程，共 53 个 `.cs`；其中 6 个是 `obj/Debug/net10.0/` 下生成文件（AssemblyInfo / AssemblyAttributes / GlobalUsings），人工源码 **47 个**：
-  - `src/Arc.Avalonia.SpecialAIWidgets`：11 个 Special 控件 + 共享绘制助手 `Controls/SpecialVisuals.cs` + 11 个演示页（`Pages/`）。
-  - `src/Arc.Avalonia.SpecialAIExplainers`：12 个 Special 控件（抽象基类 `ArcExplainer` + 11 幅图解）+ 共享绘制助手 `Controls/ExplainInk.cs` + 11 个演示页。
+  - `src/Arc.Avalonia.Special.AIWidgets`：11 个 Special 控件 + 共享绘制助手 `Controls/SpecialVisuals.cs` + 11 个演示页（`Pages/`）。
+  - `src/Arc.Avalonia.Special.AIExplainers`：12 个 Special 控件（抽象基类 `ArcExplainer` + 11 幅图解）+ 共享绘制助手 `Controls/ExplainInk.cs` + 11 个演示页。
   - 即任务口径的「22 个 AI 主题 Special 控件」（11 widget + 11 explainer），另有 2 个共享视觉助手、22 个页面。
 - 本分片实测（grep 计数，与 BRIEF §2 的区域基线一致）：`DispatcherTimer` 14 / 2，`InvalidateVisual` 45 / 16，`new Pen(` 37 / 48，`override void Render` 12 / 1，`new StreamGeometry` 2 / 3（工厂方法内还有更多，见 AIW-03、AIX-03），`new FormattedText` 字面 0 / 1（但全部文本经 `SvDraw.Text`/`Ink.Text` 工厂每帧新建，见 AIX-02），`CompositionTarget` 0，`EffectiveViewport` 0，`Color.Parse`/`Colors.`/`#"` 硬编码色 0，`BoxShadow`/`BlurEffect` 1/0。
 - 方法：先按文件建立热点矩阵（timer / invalidate / Pen / Geometry / FormattedText / LINQ / 资源查找 / ReducedMotion）；再**完整精读**两个共享助手与 20 个最重文件；其余 6 个图形场景（AgentLoop、MixtureOfExperts、PromptCache、SpeculativeDecoding、MultiRegionFailover 的绘制段）用 grep 定位 + 抽样精读；页面只做实例计数（并发 timer 数）与初始状态核对。
@@ -64,37 +64,37 @@
 
 | ID | 分类 | 严重度 | 位置 | 问题一句话 | 放大因子 |
 | --- | --- | --- | --- | --- | --- |
-| AIW-01 | T1/R1 | P0 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcMorphLoader.cs:121-133` | 16 ms 时钟在 attach 时无条件启动，完成态也不 Stop，每帧 `InvalidateVisual` | × 实例数（演示页 7 个）× 62.5 Hz |
-| AIW-02 | R1/R3/G1 | P0 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcInkFluid.cs:404-431` | 150 个粒子每帧各一次 `PushTransform`+`PushOpacity`+渐变椭圆；每帧新建 2 个 `RadialGradientBrush`（8 个 GradientStop） | × 150 粒子 × 62.5 Hz；× 实例数 |
-| AIW-03 | R1/R3 | P0 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcActivityRings.cs:545-552` | 每环每 tick 新建 `Pen` 并调用 `SvDraw.Arc`（内部 `new StreamGeometry`）→ 168 个几何/帧 | × 环数 × 56 tick × 31 帧（520 ms） |
-| AIW-04 | T1/R1 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentStatus.cs:189-193,696-700` | 一个实例两个 16 ms 时钟（时长文本 + 转环），Working 时永久运行 | × 实例数 × 2 × 62.5 Hz |
-| AIW-05 | R1/S2/R3 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentTimeline.cs:510-661` | 播放期每帧重排全部文本、重建全部 Pen、并对每个 lane 做 LINQ 过滤 | × 60 Hz × 14.4 s × lane/span 数 |
-| AIW-06 | R1/R3 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcContextWindow.cs:598-608,670-705` | Flash 期 200 个格子逐格新建 `ImmutableSolidColorBrush`，部分格子再加 `Pen` | × 200 格 × 26 帧（420 ms） |
-| AIW-07 | L2 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolCall.cs:104-107,166-168` | 展开/审批/每次状态变化都 `Children.Clear()` 重建整棵树 | × 行数 × 交互次数 |
-| AIW-08 | L1/P1 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcStretchRefresh.cs:239-290` | pointer-move 每次 `ApplyPull`：每行 new `TranslateTransform` + 指示器 `InvalidateVisual` | × 行数 × 指针事件频率 |
-| AIW-09 | R2/R1 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentPlan.cs:842-846` | `ArcStepMark.Render` 无条件先取 5 个 token 画刷（多数状态只用 2 个） | × 60 Hz × Active 步数 |
-| AIW-10 | T1/R2 | P1 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcInkFluid.cs:207` | 构造函数里 `WarmUp(80)` 且所有时钟不看 `IsVisible`/有效视口 | × 实例数 × 构造次数 |
-| AIW-11 | T2 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/SpecialVisuals.cs:270,308` | `SvTween`/`SvClock` 每次调用都 new 一个 `DispatcherTimer` | × 交互次数 |
-| AIW-12 | M1 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolCall.cs:616-622,649-658` | 一次性 timer 不随 detach 停止，闭包持有按钮/数据 | × 连续操作次数 |
-| AIW-13 | T1 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcSkeletonMorph.cs:346-353` | 每个骨架块一个一次性 timer（List 管理） | × 块数 |
-| AIW-14 | R1 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcBlackHole.cs:303,327` | 删除动画期每次 Render 做 LINQ 计数，行循环内 `Take(index).Count` 为 O(n²) | × 行数² × 63 Hz |
-| AIW-15 | M2 | P2 | `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcContextWindow.cs:531-547,551` | 只有 Messages 会被压缩，重复 Attach 的 Files 项无限累积 | × 点击次数 |
-| AIX-01 | T1/R3 | P0 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcExplainer.cs:92-106` | 33 ms 时钟令**每个**图解无条件整场景重绘；静态场景（TimeDial/DateReel/MultiRegionFailover）也照重绘 | × 实例数 × 30 Hz × 全场景图元 |
-| AIX-02 | S2/R2/R1 | P0 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ExplainInk.cs:80-117` | 每个文本都新建 `Typeface`+`FormattedText`，且每次先 `TryFindResource` 取字体；`Pen` 也无缓存 | × 每帧文本数（5–55）× 30 Hz |
-| AIX-03 | R1/R3 | P0 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcDataFlow.cs:140,144` | 连线/曲线每帧重建 `StreamGeometry` 与 `Pen`；节点 Rect 每帧重算 | × 边数 × 30 Hz |
-| AIX-04 | R1/S2/L1 | P0 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcReasoningTree.cs:179-182,262` | 静态树每帧重跑 beam-search 排序（4 次 LINQ）+ `Select().ToList()`，并逐节点 `Contains` | × 30 Hz × 节点数² |
-| AIX-05 | R1/P1 | P1 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcVectorSearch.cs:218-242,279` | 每帧 O(18²) 近邻距离 + 每帧 `OrderBy`/`Max` 排序 | × 30 Hz × 节点数² |
-| AIX-06 | P1/R1 | P1 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcTimeDial.cs:213,239-251` | 静态表盘 30 Hz 空转，且 24 个时刻度每帧各建一个 `Pen` | × 30 Hz × 24 + 拖动时 × pointer 事件 |
-| AIX-07 | R1/S2 | P1 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcDateReel.cs:405-444` | 每个可见滚筒行一个 `Label`（带 maxWidth 截断），一帧 40+ 次文本排版；速度衰减按 tick 而非 dt | × 30 Hz × 4 滚筒 × 11 行 |
-| AIX-08 | S2/R1 | P1 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcPromptCache.cs:130-131,170` | 21 个标签/帧全部重新排版，无任何文本缓存 | × 30 Hz × 标签数 |
-| AIX-09 | T1 | P1 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcExplainer.cs:95-105` | 暂停/ReducedMotion 时 33 ms timer 仍空转并调用 `OnTick` | × 实例数 × 30 Hz（空回调） |
-| AIX-10 | R1 | P2 | `src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcPaymentFlow.cs:102-111` | 每帧 new `List<Point>`/数组（lane、rail、presets、rows） | × 30 Hz × 列表数 |
+| AIW-01 | T1/R1 | P0 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcMorphLoader.cs:121-133` | 16 ms 时钟在 attach 时无条件启动，完成态也不 Stop，每帧 `InvalidateVisual` | × 实例数（演示页 7 个）× 62.5 Hz |
+| AIW-02 | R1/R3/G1 | P0 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcInkFluid.cs:404-431` | 150 个粒子每帧各一次 `PushTransform`+`PushOpacity`+渐变椭圆；每帧新建 2 个 `RadialGradientBrush`（8 个 GradientStop） | × 150 粒子 × 62.5 Hz；× 实例数 |
+| AIW-03 | R1/R3 | P0 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcActivityRings.cs:545-552` | 每环每 tick 新建 `Pen` 并调用 `SvDraw.Arc`（内部 `new StreamGeometry`）→ 168 个几何/帧 | × 环数 × 56 tick × 31 帧（520 ms） |
+| AIW-04 | T1/R1 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentStatus.cs:189-193,696-700` | 一个实例两个 16 ms 时钟（时长文本 + 转环），Working 时永久运行 | × 实例数 × 2 × 62.5 Hz |
+| AIW-05 | R1/S2/R3 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentTimeline.cs:510-661` | 播放期每帧重排全部文本、重建全部 Pen、并对每个 lane 做 LINQ 过滤 | × 60 Hz × 14.4 s × lane/span 数 |
+| AIW-06 | R1/R3 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcContextWindow.cs:598-608,670-705` | Flash 期 200 个格子逐格新建 `ImmutableSolidColorBrush`，部分格子再加 `Pen` | × 200 格 × 26 帧（420 ms） |
+| AIW-07 | L2 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolCall.cs:104-107,166-168` | 展开/审批/每次状态变化都 `Children.Clear()` 重建整棵树 | × 行数 × 交互次数 |
+| AIW-08 | L1/P1 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcStretchRefresh.cs:239-290` | pointer-move 每次 `ApplyPull`：每行 new `TranslateTransform` + 指示器 `InvalidateVisual` | × 行数 × 指针事件频率 |
+| AIW-09 | R2/R1 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentPlan.cs:842-846` | `ArcStepMark.Render` 无条件先取 5 个 token 画刷（多数状态只用 2 个） | × 60 Hz × Active 步数 |
+| AIW-10 | T1/R2 | P1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcInkFluid.cs:207` | 构造函数里 `WarmUp(80)` 且所有时钟不看 `IsVisible`/有效视口 | × 实例数 × 构造次数 |
+| AIW-11 | T2 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/SpecialVisuals.cs:270,308` | `SvTween`/`SvClock` 每次调用都 new 一个 `DispatcherTimer` | × 交互次数 |
+| AIW-12 | M1 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolCall.cs:616-622,649-658` | 一次性 timer 不随 detach 停止，闭包持有按钮/数据 | × 连续操作次数 |
+| AIW-13 | T1 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcSkeletonMorph.cs:346-353` | 每个骨架块一个一次性 timer（List 管理） | × 块数 |
+| AIW-14 | R1 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcBlackHole.cs:303,327` | 删除动画期每次 Render 做 LINQ 计数，行循环内 `Take(index).Count` 为 O(n²) | × 行数² × 63 Hz |
+| AIW-15 | M2 | P2 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcContextWindow.cs:531-547,551` | 只有 Messages 会被压缩，重复 Attach 的 Files 项无限累积 | × 点击次数 |
+| AIX-01 | T1/R3 | P0 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcExplainer.cs:92-106` | 33 ms 时钟令**每个**图解无条件整场景重绘；静态场景（TimeDial/DateReel/MultiRegionFailover）也照重绘 | × 实例数 × 30 Hz × 全场景图元 |
+| AIX-02 | S2/R2/R1 | P0 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ExplainInk.cs:80-117` | 每个文本都新建 `Typeface`+`FormattedText`，且每次先 `TryFindResource` 取字体；`Pen` 也无缓存 | × 每帧文本数（5–55）× 30 Hz |
+| AIX-03 | R1/R3 | P0 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcDataFlow.cs:140,144` | 连线/曲线每帧重建 `StreamGeometry` 与 `Pen`；节点 Rect 每帧重算 | × 边数 × 30 Hz |
+| AIX-04 | R1/S2/L1 | P0 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcReasoningTree.cs:179-182,262` | 静态树每帧重跑 beam-search 排序（4 次 LINQ）+ `Select().ToList()`，并逐节点 `Contains` | × 30 Hz × 节点数² |
+| AIX-05 | R1/P1 | P1 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcVectorSearch.cs:218-242,279` | 每帧 O(18²) 近邻距离 + 每帧 `OrderBy`/`Max` 排序 | × 30 Hz × 节点数² |
+| AIX-06 | P1/R1 | P1 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcTimeDial.cs:213,239-251` | 静态表盘 30 Hz 空转，且 24 个时刻度每帧各建一个 `Pen` | × 30 Hz × 24 + 拖动时 × pointer 事件 |
+| AIX-07 | R1/S2 | P1 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcDateReel.cs:405-444` | 每个可见滚筒行一个 `Label`（带 maxWidth 截断），一帧 40+ 次文本排版；速度衰减按 tick 而非 dt | × 30 Hz × 4 滚筒 × 11 行 |
+| AIX-08 | S2/R1 | P1 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcPromptCache.cs:130-131,170` | 21 个标签/帧全部重新排版，无任何文本缓存 | × 30 Hz × 标签数 |
+| AIX-09 | T1 | P1 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcExplainer.cs:95-105` | 暂停/ReducedMotion 时 33 ms timer 仍空转并调用 `OnTick` | × 实例数 × 30 Hz（空回调） |
+| AIX-10 | R1 | P2 | `src/Arc.Avalonia.Special.AIExplainers/Controls/ArcPaymentFlow.cs:102-111` | 每帧 new `List<Point>`/数组（lane、rail、presets、rows） | × 30 Hz × 列表数 |
 
 ## 3. 逐条说明
 
 ### AIW-01 MorphLoader：16 ms 时钟常开，7 个实例并发（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcMorphLoader.cs:121-133`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcMorphLoader.cs:121-133`
 - 证据：
   ```csharp
   _clock.Start(seconds =>
@@ -109,7 +109,7 @@
 
 ### AIW-02 InkFluid：150 个粒子 × `PushOpacity` + 每帧 2 个渐变刷（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcInkFluid.cs:404-431`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcInkFluid.cs:404-431`
 - 证据：
   ```csharp
   var accentBrush = SoftBrush(accentColor);   // new RadialGradientBrush + 4 GradientStop
@@ -125,7 +125,7 @@
 
 ### AIW-03 ActivityRings：168 段弧 = 168 个几何 + 168 个 Pen/帧（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcActivityRings.cs:545-552`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcActivityRings.cs:545-552`
 - 证据：
   ```csharp
   for (var tick = 0; tick < tickCount; tick++)          // tickCount = 56（:519）
@@ -141,7 +141,7 @@
 
 ### AIW-04 AgentStatus：一个控件两个 16 ms 时钟（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentStatus.cs:189-193`、`:696-700`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentStatus.cs:189-193`、`:696-700`
 - 证据：
   ```csharp
   _clock.Start(seconds => { _displaySeconds = ElapsedSeconds + seconds; UpdateTimerText(); }); // 外层
@@ -153,7 +153,7 @@
 
 ### AIW-05 AgentTimeline：播放期 60 fps 全量文本 + LINQ（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentTimeline.cs:510-661`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentTimeline.cs:510-661`
 - 证据：
   ```csharp
   foreach (var span in spans.Where(item => item.AgentId == agents[i].Id))   // :564，每个 lane 一次
@@ -166,7 +166,7 @@
 
 ### AIW-06 ContextWindow：Flash 期 200 个格子逐格建刷（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcContextWindow.cs:598-608`、`:670-705`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcContextWindow.cs:598-608`、`:670-705`
 - 证据：
   ```csharp
   _flash = Sv.Clamp01((DateTime.UtcNow - started).TotalMilliseconds / 420);   // :600
@@ -180,7 +180,7 @@
 
 ### AIW-07 组合控件每次状态变化都重建整树（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolCall.cs:104-107,166-168`；同类：`ArcAgentPlan.cs:89-93,222,225-227`；`ArcAgentStatus.cs:99-106`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolCall.cs:104-107,166-168`；同类：`ArcAgentPlan.cs:89-93,222,225-227`；`ArcAgentStatus.cs:99-106`
 - 证据：
   ```csharp
   IsOpenProperty.Changed.AddClassHandler<ArcToolCall>((call, _) => call.Rebuild());
@@ -194,7 +194,7 @@
 
 ### AIW-08 StretchRefresh：pointer-move 里逐行换 RenderTransform（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcStretchRefresh.cs:239-254,276-291`
+- 位置：`src/Arc.Avalonia.Special.AIWidgets/Controls/ArcStretchRefresh.cs:239-254,276-291`
 - 证据：
   ```csharp
   ApplyPull(Math.Min(150, dy * 0.55));                                  // :254，每次 move
@@ -206,17 +206,17 @@
 
 ### AIW-09/10/11/12/13/14/15（P2 组）
 
-- **AIW-09** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcAgentPlan.cs:842-846`：`Render` 开头无条件取 5 个 token 画刷（`muted/track/accent/success/danger`），Done/Failed 状态各只用 2 个；改为 switch 内按需取。
-- **AIW-10** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcInkFluid.cs:207`：`WarmUp(ArcThemeManager.ReducedMotion ? 150 : 80)` 在构造期跑 80×150=12000 次粒子积分；页面切换/重建即重复。建议惰性化（首次 Render 前一次）或把 warmup 步数降到 20。全区域 16 个 timer 无一检查 `IsVisible`/`EffectiveViewport`（grep 为 0），滚动出视口后照常运行。
-- **AIW-11** `src/Arc.Avalonia.SpecialAIWidgets/Controls/SpecialVisuals.cs:270,308`：`SvTween.Run`/`SvClock.Start` 每次 new `DispatcherTimer`；建议一个共享的 `DispatcherTimer`（单例队列）驱动所有 tween/clock，或直接用 `CompositionTarget.Rendering`。
-- **AIW-12** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcToolCall.cs:616-622,649-658`：一次性 timer 未随 `OnDetachedFromVisualTree` 取消，闭包持有 `ArcButton`/`ArcToolCallData`；控件被移出树后仍会执行 `Rebuild()`。建议存字段并在 detach 时 `Stop()`。
-- **AIW-13** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcSkeletonMorph.cs:346-353`：每个骨架块一个 `DispatcherTimer`（`_timers` 列表管理，detach 时统一停 —— 生命周期是对的），但 N 块即 N 个 timer；建议用一个 timer + 到期索引队列。
-- **AIW-14** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcBlackHole.cs:303,327`：`Render` 里 `_items.Count(item => IsGhostItem(item.Id))`；行循环内 `_items.Take(index).Count(...)` 是 O(n²) + 每行一个迭代器。演示 6 行时无感，行数上百会明显。建议在 `Advance` 里预计算 ghost 计数前缀和。
-- **AIW-15** `src/Arc.Avalonia.SpecialAIWidgets/Controls/ArcContextWindow.cs:531-547,551`：`Attach()` 每次 `_items.Add` 一个 Files 项，而 `Compact` 只折叠 `Messages`（`:551`）→ 无 Messages 时「Attach 到底」会让 `_items` 无限增长（视觉上被 200 格截断，但 legend/自动化文本会变长）。建议对 Files 也做上限/合并。
+- **AIW-09** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcAgentPlan.cs:842-846`：`Render` 开头无条件取 5 个 token 画刷（`muted/track/accent/success/danger`），Done/Failed 状态各只用 2 个；改为 switch 内按需取。
+- **AIW-10** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcInkFluid.cs:207`：`WarmUp(ArcThemeManager.ReducedMotion ? 150 : 80)` 在构造期跑 80×150=12000 次粒子积分；页面切换/重建即重复。建议惰性化（首次 Render 前一次）或把 warmup 步数降到 20。全区域 16 个 timer 无一检查 `IsVisible`/`EffectiveViewport`（grep 为 0），滚动出视口后照常运行。
+- **AIW-11** `src/Arc.Avalonia.Special.AIWidgets/Controls/SpecialVisuals.cs:270,308`：`SvTween.Run`/`SvClock.Start` 每次 new `DispatcherTimer`；建议一个共享的 `DispatcherTimer`（单例队列）驱动所有 tween/clock，或直接用 `CompositionTarget.Rendering`。
+- **AIW-12** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolCall.cs:616-622,649-658`：一次性 timer 未随 `OnDetachedFromVisualTree` 取消，闭包持有 `ArcButton`/`ArcToolCallData`；控件被移出树后仍会执行 `Rebuild()`。建议存字段并在 detach 时 `Stop()`。
+- **AIW-13** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcSkeletonMorph.cs:346-353`：每个骨架块一个 `DispatcherTimer`（`_timers` 列表管理，detach 时统一停 —— 生命周期是对的），但 N 块即 N 个 timer；建议用一个 timer + 到期索引队列。
+- **AIW-14** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcBlackHole.cs:303,327`：`Render` 里 `_items.Count(item => IsGhostItem(item.Id))`；行循环内 `_items.Take(index).Count(...)` 是 O(n²) + 每行一个迭代器。演示 6 行时无感，行数上百会明显。建议在 `Advance` 里预计算 ghost 计数前缀和。
+- **AIW-15** `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcContextWindow.cs:531-547,551`：`Attach()` 每次 `_items.Add` 一个 Files 项，而 `Compact` 只折叠 `Messages`（`:551`）→ 无 Messages 时「Attach 到底」会让 `_items` 无限增长（视觉上被 200 格截断，但 legend/自动化文本会变长）。建议对 Files 也做上限/合并。
 
 ### AIX-01 所有 Explainer 以 33 ms 时钟无条件全场景重绘（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcExplainer.cs:39,92-106,133-151`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcExplainer.cs:39,92-106,133-151`
 - 证据：
   ```csharp
   _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };   // :39
@@ -230,7 +230,7 @@
 
 ### AIX-02 每帧新建 FormattedText/Typeface，且每次都查字体资源（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ExplainInk.cs:80-117`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ExplainInk.cs:80-117`
 - 证据：
   ```csharp
   public static FontFamily Font { get { if (Application.Current is { } app &&
@@ -245,7 +245,7 @@
 
 ### AIX-03 连线/曲线每帧重建几何，节点布局每帧重算（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcDataFlow.cs:140,144`；同类 `ArcPaymentFlow.cs:102-117,133,155`；`ArcReasoningTree.cs:227`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcDataFlow.cs:140,144`；同类 `ArcPaymentFlow.cs:102-117,133,155`；`ArcReasoningTree.cs:227`
 - 证据：
   ```csharp
   context.DrawGeometry(null, Ink.Stroke(sourceBrush, sourceHot ? 2 : 1.2), Ink.Flow(_sources[i].Anchor, coreLeft));      // DataFlow:140
@@ -259,7 +259,7 @@
 
 ### AIX-04 ReasoningTree：静态树每帧重跑 beam-search 排序（P0）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcReasoningTree.cs:179-182,262`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcReasoningTree.cs:179-182,262`
 - 证据：
   ```csharp
   var beam1 = _roots.OrderByDescending(t => t.Score).Take(_beam).ToList();
@@ -273,7 +273,7 @@
 
 ### AIX-05 VectorSearch：每帧 O(n²) 近邻 + 排序（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcVectorSearch.cs:218-242,279`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcVectorSearch.cs:218-242,279`
 - 证据：
   ```csharp
   for (var j = 0; j < _documents.Count; j++)          // 18 个文档 → 18×18
@@ -286,7 +286,7 @@
 
 ### AIX-06 TimeDial：静态表盘 30 Hz 空转 + 24 个 Pen/帧（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcTimeDial.cs:213,239-251`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcTimeDial.cs:213,239-251`
 - 证据：
   ```csharp
   _ = phase;                                                    // :213，明确忽略相位
@@ -302,7 +302,7 @@
 
 ### AIX-07 DateReel：一帧 40+ 次文本排版 + 速度衰减与帧率耦合（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcDateReel.cs:405-444,159-160`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcDateReel.cs:405-444,159-160`
 - 证据：
   ```csharp
   for (var row = -5; row <= 5; row++)                       // 4 滚筒 × 11 行
@@ -318,7 +318,7 @@
 
 ### AIX-08 PromptCache / MoE / SpecDec / AgentLoop：每帧 16–21 条标签，无文本缓存（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcPromptCache.cs:130-131,170`（代表）；`ArcMixtureOfExperts.cs:167` 起 16 条；`ArcSpeculativeDecoding.cs:115` 起 17 条；`ArcAgentLoop.cs:64` 起 14 条
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcPromptCache.cs:130-131,170`（代表）；`ArcMixtureOfExperts.cs:167` 起 16 条；`ArcSpeculativeDecoding.cs:115` 起 17 条；`ArcAgentLoop.cs:64` 起 14 条
 - 证据：
   ```csharp
   Ink.Label(context, $"Request {i + 1}", row.X + 14, row.Y + 16, 11, Ink.B(ArcTokens.TextSecondary), FontWeight.Medium);  // PromptCache:130
@@ -330,7 +330,7 @@
 
 ### AIX-09 暂停/ReducedMotion 下 timer 仍 30 Hz 空转（P1）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcExplainer.cs:95-105`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcExplainer.cs:95-105`
 - 证据：
   ```csharp
   if (!Reduced && _playing) { _time += ...; clockMoved = true; }
@@ -343,7 +343,7 @@
 
 ### AIX-10 每帧 new List/数组（P2）
 
-- 位置：`src/Arc.Avalonia.SpecialAIExplainers/Controls/ArcPaymentFlow.cs:102-117`；`ArcDataFlow.cs:114`；`ArcDateReel.cs:483`
+- 位置：`src/Arc.Avalonia.Special.AIExplainers/Controls/ArcPaymentFlow.cs:102-117`；`ArcDataFlow.cs:114`；`ArcDateReel.cs:483`
 - 证据：
   ```csharp
   var lane = new List<Point> { new(centers[3], rowTop + nodeHeight), ... };   // PaymentFlow:102
