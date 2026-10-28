@@ -9,27 +9,27 @@ type, colour, motion intent) matters more than API-name parity.
 
 | Path | Owner | Contents |
 | --- | --- | --- |
-| `src/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles |
-| `src/Arc.Avalonia.Internal` | Lead | shared internal primitives: menu surface/glide, icon button, feedback composition helpers, action models; `InternalsVisibleTo` the consuming projects |
-| `src/Arc.Avalonia.Demo` | Lead | `ArcPage` contract, `DemoUi` layout helpers, page discovery |
-| `src/Arc.Avalonia.AgentUI` | agent-ui agent | P0 agent transcript / run bar / approval sheet / question card / background dock / attention inbox |
-| `src/Arc.Avalonia.LifeToday` | life-today agent | P0 reminder row/center, daily brief, day agenda, medication schedule, quick capture, routine editor |
-| `src/Arc.Avalonia.Gallery` | Lead | shell window, shot harness, foundations page |
-| `src/Arc.Avalonia.Inputs` | input agent | text fields, selects, toggles, sliders, inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
-| `src/Arc.Avalonia.Actions` | action agent | buttons/menus, disclosure, messages, action button, floating/expanding button groups, icon morph, user menu |
-| `src/Arc.Avalonia.Navigation` | navigation agent | tabs, breadcrumb, pagination, mega menu |
-| `src/Arc.Avalonia.Overlays` | overlay agent | dialog, drawer, popover, tooltip, share access |
-| `src/Arc.Avalonia.Feedback` | feedback agent | feedback/progress, avatars/cards, presence, activity |
-| `src/Arc.Avalonia.DataDisplay` | data agent | sortable table, tree table, tree view, filter toolbar, code block, JSON viewer, data grid |
-| `src/Arc.Avalonia.Charts` | chart agent | data visualisation controls |
-| `src/Arc.Avalonia.Pickers` | picker agent | calendar/date/time/colour, file dropzone, signature |
-| `src/Arc.Avalonia.Effects` | effects agent | text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
-| `src/Arc.Avalonia.Content` | content agent | rich text editor, reorderable list, chat thread, onboarding checklist |
-| `src/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
+| `src/Foundation/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles |
+| `src/Foundation/Arc.Avalonia.Internal` | Lead | shared internal primitives: menu surface/glide, icon button, feedback composition helpers, action models; `InternalsVisibleTo` the consuming projects |
+| `src/Apps/Arc.Avalonia.Demo` | Lead | `ArcPage` contract, `DemoUi` layout helpers, page discovery |
+| `src/Agent/Arc.Avalonia.AgentUI` | agent-ui agent | P0 agent transcript / run bar / approval sheet / question card / background dock / attention inbox |
+| `src/Agent/Arc.Avalonia.LifeToday` | life-today agent | P0 reminder row/center, daily brief, day agenda, medication schedule, quick capture, routine editor |
+| `src/Apps/Arc.Avalonia.Gallery` | Lead | shell window, shot harness, foundations page |
+| `src/Components/Arc.Avalonia.Inputs` | input agent | text fields, selects, toggles, sliders, inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
+| `src/Components/Arc.Avalonia.Actions` | action agent | buttons/menus, disclosure, messages, action button, floating/expanding button groups, icon morph, user menu |
+| `src/Components/Arc.Avalonia.Navigation` | navigation agent | tabs, breadcrumb, pagination, mega menu |
+| `src/Components/Arc.Avalonia.Overlays` | overlay agent | dialog, drawer, popover, tooltip, share access |
+| `src/Components/Arc.Avalonia.Feedback` | feedback agent | feedback/progress, avatars/cards, presence, activity |
+| `src/Components/Arc.Avalonia.DataDisplay` | data agent | sortable table, tree table, tree view, filter toolbar, code block, JSON viewer, data grid |
+| `src/Components/Arc.Avalonia.Charts` | chart agent | data visualisation controls |
+| `src/Components/Arc.Avalonia.Pickers` | picker agent | calendar/date/time/colour, file dropzone, signature |
+| `src/Components/Arc.Avalonia.Effects` | effects agent | text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
+| `src/Components/Arc.Avalonia.Content` | content agent | rich text editor, reorderable list, chat thread, onboarding checklist |
+| `src/Components/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
 
 **Never edit files outside your project** (except adding your `ResourceInclude` lines inside your own
-project theme file). In particular do not touch `Directory.Build.*`, `ArcUI.slnx`, `src/Arc.Avalonia/**`,
-`src/Arc.Avalonia.Demo/**`, `src/Arc.Avalonia.Gallery/**`, `tools/**` or `docs/**`. If a change to the
+project theme file). In particular do not touch `Directory.Build.*`, `ArcUI.slnx`, `src/Foundation/Arc.Avalonia/**`,
+`src/Apps/Arc.Avalonia.Demo/**`, `src/Apps/Arc.Avalonia.Gallery/**`, `tools/**` or `docs/**`. If a change to the
 foundation is genuinely needed, message the Lead with the exact file and reason.
 
 ## 2. Build and verify
@@ -42,7 +42,7 @@ Everything is offline (NuGet packages come from a local global-packages cache). 
 
 ```powershell
 # compile your project (serialised behind a workspace-wide build lock)
-pwsh -NoProfile tools/build.ps1 -Project src/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj
+pwsh -NoProfile tools/build.ps1 -Project src/Components/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj
 
 # render screenshots of every page in light and dark (builds the gallery first)
 pwsh -NoProfile tools/shots.ps1
@@ -261,24 +261,24 @@ Rules for item pages:
 * Special components are mostly self-drawn/animated illustrations. Use `DrawingContext`, `DispatcherTimer`
   and tokens; no external libraries; deterministic frame under `ArcThemeManager.ReducedMotion`.
 
-New projects: `Arc.Avalonia.Special.Glass`, `.SpecialMotion`, `.SpecialMedia`, `.SpecialAIWidgets`,
-`.SpecialAIExplainers`, `Arc.Avalonia.Blocks.Marketing`, `.BlocksCommerce`, `.BlocksApp`, `.BlocksTeam`,
-`.BlocksData`, `.BlocksAI`. They are already referenced by the Gallery and wired into `App.axaml`; each has
+New projects: `Arc.Avalonia.Special.Glass`, `.Special.Motion`, `.Special.Media`, `.Special.AIWidgets`,
+`.Special.AIExplainers`, `Arc.Avalonia.Blocks.Marketing`, `.Blocks.Commerce`, `.Blocks.App`, `.Blocks.Team`,
+`.Blocks.Data`, `.Blocks.AI`. They are already referenced by the Gallery and wired into `App.axaml`; each has
 a `Themes/Arc<Name>Theme.axaml` entry and `Controls/`, `Pages/` folders.
 Catalog data is generated from public docs only:
 
 ```powershell
 pwsh -NoProfile -File tools/build-catalog.ps1     # writes docs/arc-catalog.json and validates 55 specials / 111 blocks
-Copy-Item docs/arc-catalog.json src/Arc.Avalonia.Demo/Catalog/arc-catalog.json -Force
+Copy-Item docs/arc-catalog.json src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json -Force
 ```
 
 The Demo project embeds that JSON (`ArcCatalog`), the gallery sidebar renders it, and
-`dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit` must report
+`dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit` must report
 `missing=0 pageFailures=0`. When adding a page, give it the exact catalog `ItemSlug`; when a component is
 demonstrated on a shared page without its own heading, add it to `ArcCatalogAliases` in
-`src/Arc.Avalonia.Demo/ArcCatalogAliases.cs` so the sidebar still reaches it.
+`src/Apps/Arc.Avalonia.Demo/ArcCatalogAliases.cs` so the sidebar still reaches it.
 
 Note: `tools/shots.ps1` builds the gallery with `-p:BuildProjectReferences=false`, so a freshly built
 component DLL is not copied into the gallery output. Run a normal `tools/build.ps1` / `dotnet build
-ArcUI.slnx` first, or copy the project DLL into `src/Arc.Avalonia.Gallery/bin/Debug/net10.0/`, before
+ArcUI.slnx` first, or copy the project DLL into `src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/`, before
 shooting; otherwise screenshots render the previous assembly.

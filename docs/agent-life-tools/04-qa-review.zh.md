@@ -40,7 +40,7 @@
 | 6 | 场景一致性（24+15=39；提案数；§9.2 五链路） | **PASS** | 39 个场景 id、标题与 §2.3 表逐行一致；每个场景 `proposalSlugs` 长度与表中"提案数"完全相等（生活 98 + Agent 77 = 175，与 items 的 `scenarios` 成员总数 175 相等）；39 个场景全部至少 1 个提案；§9.2 五条链路均能映射到目录项：晨间简报（`daily-brief`/`day-agenda`/`weather-forecast`）、快速捕捉（`quick-capture-bar`）、提醒触达（`reminder-row`/`reminder-center`+`notifications`/`scheduler`）、预算预警（`budget-board`/`expense-ledger`）、计划审批（`tool-approval-sheet`/`agent-attention-inbox`/`run-control-bar`）。 |
 | 7 | 路线图自洽（M0–M4 项数/人日；P0/P1 拆分） | **FAIL** | **逐项加法全部正确**：M0 1 项 8 人日；M1 15 项 50（P0 7+P1 8）；M2 7 项 31（P0 6+P1 1）；M3 17 项 89（P1 17）；M4 17 项 57（P1 8+P2 9）；合计 235；P0 14=M0 1+M1 7+M2 6；P1 34=M1 8+M2 1+M3 17+M4 8；P2 9。**但团队/周期与工作量不可行**：290 人日 vs "2–3 人 × 14–17 周"（容量 140–255 人日），见 P1-1；另有跨里程碑依赖倒置见 P2-8。 |
 | 8 | 文档结构/可读性（摘要/定义/路线图/验收/表格/前后矛盾） | **FAIL** | 结构齐全（§0 摘要、§0.4/§6.1/附录 C 优先级与工作量定义、§6 路线图、§8 风险、§9 验收）；33 张表列数全部一致、4 个代码围栏成对，无渲染问题。但存在前后矛盾：§3.2/§4.1 的"12 项"与 §3.3 的 14 行不符（P2-1）；§1.1 `06:75` "0 处虚拟化"与 §0.2 `06:31` "EmojiPicker 1 处生效"自相矛盾（P2-2）；§6.1 M3/M4 的"行程/日记"归类错误（P2-7）；§1.6 `06:147` 称"本次分析实际运行了审计"与 01 §6.6 "本次未运行"矛盾（P2-12）；附录 A `06:839` 称"双列呈现"但实际未实现（P2-11）。 |
-| 9 | 可执行性（P0 项目/composes/验收/新建项目说明） | **PASS** | 14 个 P0 全部有真实 `project`、非空 `composes`、≥1 场景；§5.2 给出 11 个旗舰项、§5.3 给出其余 3 个的验收要点，14/14 覆盖；Daily life 新建 `Arc.Avalonia.BlocksLife` 在 §4.7 `06:511` 说明，`virtualized-list` 落 Core 在 §4.7 `06:512` 说明，4 个 P0 Special 落 SpecialAIWidgets 在 §4.7 `06:513`，参考应用 `Arc.Avalonia.ReferenceApp` 在 §7.9 `06:748` 说明；不存在"需要新建项目但正文未说明"的情况。 |
+| 9 | 可执行性（P0 项目/composes/验收/新建项目说明） | **PASS** | 14 个 P0 全部有真实 `project`、非空 `composes`、≥1 场景；§5.2 给出 11 个旗舰项、§5.3 给出其余 3 个的验收要点，14/14 覆盖；Daily life 新建 `Arc.Avalonia.BlocksLife` 在 §4.7 `06:511` 说明，`virtualized-list` 落 Core 在 §4.7 `06:512` 说明，4 个 P0 Special 落 Special.AIWidgets 在 §4.7 `06:513`，参考应用 `Arc.Avalonia.ReferenceApp` 在 §7.9 `06:748` 说明；不存在"需要新建项目但正文未说明"的情况。 |
 
 ---
 
@@ -144,11 +144,11 @@
 | P2-7 | `06:652-653` | M3 表写"生活 P1 16 项…（任务/习惯/账单/预算/台账/订阅/文档/购物/餐食/维护/专注/家居/天气）"漏了 `trip-itinerary`、`daily-journal`；M4 括号却写"行程/日记"。按 person-days，这两个 M 级/L 级项在 M3（M3 16 项=86+3=89；M4 57=12+24+21），不在 M4。 | `06:652` 括号改为"（任务/习惯/账单/预算/台账/订阅/文档/购物/餐食/维护/专注/家居/天气/行程/日记）"；`06:653` 删除"行程/日记..."中的这两项（保留语音/记忆/审计/连接器/离线/信任规则/桌面设置）。 |
 | P2-8 | `06:601`、`:651-652`、`:502`、`:653` | 跨里程碑软依赖未在 §6.2 说明：`daily-brief`（M2）复用 `weather-forecast`（M3，P1）；`tool-approval-sheet`（M1）依赖 `trust-rules-manager`（M4，P1）；catalog 中 `tray-menu`（M1）composes `desktop-agent-settings`（M4）。 | 二选一：① 把 `weather-forecast` 挪到 M2（M2 变 34 人日、M3 变 86，总数不变，并同步 §4 的 M 备注）；② 在 §6.2 关键路径加一条"软依赖"说明："daily-brief 无天气数据时降级为无天气卡；tool-approval-sheet 的 trust-rules-manager 先接口预留；tray-menu 的设置入口先跳 settings-page。" |
 | P2-9 | `02-life-gaps.zh.md:736-737`（对照 `arc-extension-catalog.json` 对应项） | 02 §9 明确写 habit-streak-strip"变体优先"、reference-band-chart"扩展优先"，但合并目录仍作为新项，且无 reviewNote/§4.5 行解释（见 P1-2 修复）。 | 已在 P1-2 给出 catalog reviewNote 文本；建议与 §4.5 两行一起补。 |
-| P2-10 | `06:145` | "`ArcCatalog` 读取 `docs/arc-catalog.json`"——运行时实际读取内嵌资源 `src/Arc.Avalonia.Demo/Catalog/arc-catalog.json`（`ArcCatalog.cs:61-67,88-91`，csproj `EmbeddedResource`；两份文件 SHA-256 相同）。 | 改为："`ArcCatalog` 读取内嵌的 catalog 副本（`src/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）"。 |
+| P2-10 | `06:145` | "`ArcCatalog` 读取 `docs/arc-catalog.json`"——运行时实际读取内嵌资源 `src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json`（`ArcCatalog.cs:61-67,88-91`，csproj `EmbeddedResource`；两份文件 SHA-256 相同）。 | 改为："`ArcCatalog` 读取内嵌的 catalog 副本（`src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）"。 |
 | P2-11 | `06:839` | "报告一律以'实测 + 文档快照'双列呈现"——全文没有双列表格；实际做法是正文个别位置加括注、附录 A 标"审查时点"。 | 改为："关键数字在正文/附录标注'审查时点'与'当前实测'；其余数字以 docs/04 快照为准，扩展后重新统计。" |
 | P2-12 | `06:147` 与 `01-inventory.zh.md:1103` | 主报告称"本次分析实际运行了现有构建的审计模式"，但 01 §6.6 明确"本次未构建/未运行（任务约束）"；报告引用的审计输出与 `.recon/audit-final4.log`（2026-10-25 01:59）逐字一致，而最新源码 `GalleryWindow.cs` 修改于 2026-10-25 23:35（晚于该日志）；QA 未发现本轮新的审计日志。 | 二选一：① 本轮确实重跑过 → 把新输出保存为 `.recon/audit-<date>.log` 并在 `06:147` 引用；② 未重跑 → 改为"引用 2026-10-25 的 `--audit` 记录（294/294、missing=0），并按同一算法静态复算一致；本轮未重新构建"。 |
 | P2-13 | `02-life-gaps.zh.md:455,563,629,658`（§7 标题） | 02 §7 仍把 `document-vault`（7.4）、`bill-due-list`（7.6）、`grocery-list`（7.7）列为"P0 设计说明（7 项）"，而合并目录已按 reviewNote 降为 P1（daily-brief 升 P0）。 | 在 02 §7 开头加一行注："合并后优先级以 `arc-extension-catalog.json` 的 `reviewNote` 为准：7.4/7.6/7.7 已降为 P1，daily-brief 升为 P0。" |
-| P2-14 | `arc-extension-catalog.json` → `projectSuggestions[0].recommendation` | 文本重复："BlocksApp/BlocksCommerce/BlocksData/BlocksApp"（BlocksApp 出现两次）。 | 改为："22 个生活域 block 建议新建 `Arc.Avalonia.BlocksLife`；扩展目录暂把 `project` 指向现有 `BlocksApp`/`BlocksCommerce`/`BlocksData`（15/5/2）以保证可构建，落地时一次性迁移。" |
+| P2-14 | `arc-extension-catalog.json` → `projectSuggestions[0].recommendation` | 文本重复："Blocks.App/Blocks.Commerce/Blocks.Data/Blocks.App"（Blocks.App 出现两次）。 | 改为："22 个生活域 block 建议新建 `Arc.Avalonia.BlocksLife`；扩展目录暂把 `project` 指向现有 `Blocks.App`/`Blocks.Commerce`/`Blocks.Data`（15/5/2）以保证可构建，落地时一次性迁移。" |
 
 ### P3（2 项，可选）
 
@@ -264,11 +264,11 @@
 | P2-7 | M3/M4 行程/日记 | **PASS** | `06:663` M3 括号补"行程/日记"；`:664` M4 删除这两项；M3=16 生活 P1+ref-band=89、M4=57 的算术未变。 |
 | P2-8 | 跨里程碑依赖 | **PASS** | `06:678-682` 新增"软依赖（先接口、后实现，不阻塞里程碑）"三条：daily-brief 天气卡降级、tool-approval-sheet 先两个 scope、tray-menu 设置入口先跳 settings-page；未挪项，M2/M3 人日不变。 |
 | P2-9 | 变体/扩展优先项的说明 | **PASS（并随 P1-2）** | catalog 2 条 `dedupeNote` 落地；§4.5 新增 habit-streak-strip / reference-band-chart 两行，分别标注"变体优先/扩展优先"并引用 02 §9。 |
-| P2-10 | ArcCatalog 读取路径 | **PASS** | `06:145` 改为"读取内嵌的 catalog 副本（`src/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）"；`ArcCatalog.cs:61-67,88-91` + csproj `EmbeddedResource` 佐证。 |
+| P2-10 | ArcCatalog 读取路径 | **PASS** | `06:145` 改为"读取内嵌的 catalog 副本（`src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）"；`ArcCatalog.cs:61-67,88-91` + csproj `EmbeddedResource` 佐证。 |
 | P2-11 | "双列呈现" | **PASS** | `06:856` 改为"正文与附录对关键数字标注'审查时点'与'当前实测'；其余数字以 docs/04 快照为准"；全文旧串"双列" 0 命中。 |
 | P2-12 | 审计证据/01 口径 | **PASS** | `06:147` 引用 2026-10-26 重跑日志 `.recon/audit-2026-10-26.log`；日志存在且输出 `pages=219 items=294 itemPages=166 matchedBySection=88 matchedByAlias=40 missing=0 pageFailures=0`；01 §6.6 `:1103` 已补"Lead 于 2026-10-26 23:09 重跑"说明，不再冲突。 |
 | P2-13 | 02 §7 P0/P1 口径 | **PASS** | `02-life-gaps.zh.md:457-458` 新增注："合并后优先级以 catalog `reviewNote` 为准：document-vault/bill-due-list/grocery-list 降 P1；daily-brief 升 P0"，与目录 reviewNote 一致。 |
-| P2-14 | catalog projectSuggestions | **PASS** | 文本改为"BlocksApp/BlocksCommerce/BlocksData（15/5/2）"；脚本核对 Daily life 22 项的项目分布恰为 15/5/2，无重复 BlocksApp。 |
+| P2-14 | catalog projectSuggestions | **PASS** | 文本改为"Blocks.App/Blocks.Commerce/Blocks.Data（15/5/2）"；脚本核对 Daily life 22 项的项目分布恰为 15/5/2，无重复 Blocks.App。 |
 | P3-1 | 03 的 L=7/L=8 口径 | **PASS** | `03:432` 新增注：合并目录统一 L=8（28 项≈95 人日），L=7 仅本文件排序用；与主报告 §0.4 一致。 |
 | P3-2 | 5 个关键服务人日 | **PASS** | `06:694` 改为"72 + 25 = 97 人日（3+3+8+3+8），3 人约 7 周 / 2 人约 10 周"；旧"102/30"已消失。 |
 

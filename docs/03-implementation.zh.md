@@ -202,7 +202,7 @@ SankeyFlow（分层流图 + 悬浮追踪 + 节点拖动）、FunnelChart（漏�
 pwsh -NoProfile -File tools/build.ps1              # 单节点构建（本机并行 MSBuild 不稳定）
 pwsh -NoProfile -File tools/shots.ps1              # 所有页面，明暗两套 -> shots/light、shots/dark
 pwsh -NoProfile -File tools/shots.ps1 -Page inputs -Theme dark
-dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit   # 294/294 可达性审计
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit   # 294/294 可达性审计
 ```
 
 `ShotRunner` 在真实（离屏）窗口中构建每个页面，让样式与资源正常解析，再用 Skia 渲染为自然高度的

@@ -18,7 +18,7 @@
 
 **grep 扫描**：全部 143 个文件的 `new Arc*` / `new (StackPanel|Grid|Border|TextBlock|...)` / `DispatcherTimer` / `InvalidateVisual` / `override void Render` / `ArcResources.` / LINQ / `CornerRadius|Thickness|Width|Height` 字面量 / `AutomationProperties` / `ReducedMotion` / `ScrollViewer`；以及 6 个 Kit 的 helper 签名交叉对比。
 
-**方法**：只读静态分析 + 代码路径推理。**未运行构建、未跑截图、未修改 `src/**`**；凡"每帧/每次"的数字均为"代码路径 × 数据规模 × 事件率"推算，未在 profiler 下验证的标注「推算」。口径说明：简报的 BlocksData「8 处 timer」是按字面量计（每个 timer 2 行：声明 + `new`），实际是 **4 个** timer；「15 Render / 72 InvalidateVisual」已逐一核对成立（另有 1 个页面内嵌自绘控件 `ProgressTrack`，见 §1.1 / BP-08）。
+**方法**：只读静态分析 + 代码路径推理。**未运行构建、未跑截图、未修改 `src/**`**；凡"每帧/每次"的数字均为"代码路径 × 数据规模 × 事件率"推算，未在 profiler 下验证的标注「推算」。口径说明：简报的 Blocks.Data「8 处 timer」是按字面量计（每个 timer 2 行：声明 + `new`），实际是 **4 个** timer；「15 Render / 72 InvalidateVisual」已逐一核对成立（另有 1 个页面内嵌自绘控件 `ProgressTrack`，见 §1.1 / BP-08）。
 
 ## 1. 组件设计特征
 
@@ -28,7 +28,7 @@
 - 页面的组合方式基本是三种：①**容器换内容**（`ContentControl` + 重建某个 `Host`，如 `MetricsDashboardPage.cs:102-107`）；②**整体重建**（任一状态变化把三栏全树重造，`InboxSidebarPage.cs:562-568`）；③**页面内嵌自绘控件**（`FeatureBentoPage.cs:271-298` 的 `ProgressTrack`、Data 的 15 个 stage）。
 - 页面文件的"直接 `new` 控件"数量并不高（每页 20–50 个），因为绝大多数节点由 Kit helper 展开：6 个工程共 **4,886 次 Kit 调用**（App 1309、Commerce 981、AI 791、Data 758、Team 600、Marketing 447），平均每页 24.8（Marketing）到 62.3（App）。按 Kit 展开 + 循环估算，一个代表性块页面构建 **约 120–220 个视觉节点**（见 §1.6 抽样表）。
 - 对 128 个基础组件的复用**不均衡**：`ArcIcon` 157 次、`ArcButton` 47 次、`ArcAvatar/ArcBadge/ArcSwitch/ArcInput/ArcSegmentedControl` 各若干；但 `ArcCard` **0 次**——块用 Kit 的 `Border` 包装器自造卡片（`DataKit.Card:263-273`、`AiKit.Panel:225-236`）。手写结构节点的数量远大于复用控件：`Border` 493、`StackPanel` 709、`Grid` 415、`TextBlock` 256。
-- 23 个非 Kit 控件文件里，**20 个** `override Render`（BlocksData 15、Marketing 2、Team 2、Commerce 1），App/AI 完全没有自绘控件——App 用 `OtpField`（组合控件）、AI 纯 Kit 组合。20 个自绘控件中**只有 `ArcCohortChart` 用了 `AffectsRender`**（`ArcCohortChart.cs:58-61`），其余 19 个（含 15 个 DataStage 子类）都是"普通字段 + 手工 `InvalidateVisual`"。
+- 23 个非 Kit 控件文件里，**20 个** `override Render`（Blocks.Data 15、Marketing 2、Team 2、Commerce 1），App/AI 完全没有自绘控件——App 用 `OtpField`（组合控件）、AI 纯 Kit 组合。20 个自绘控件中**只有 `ArcCohortChart` 用了 `AffectsRender`**（`ArcCohortChart.cs:58-61`），其余 19 个（含 15 个 DataStage 子类）都是"普通字段 + 手工 `InvalidateVisual`"。
 
 ### 1.2 Kit：真正的复用，但复用的是"每个工程自己那一套"
 
@@ -48,21 +48,21 @@
 
 | 位置 | 间隔 | 用途 | 是否随页面构建启动 | reduced-motion |
 | --- | --- | --- | --- | --- |
-| `BlocksMarketing/Controls/ArcMarquee.cs:57` | 16 ms | logo 跑马灯，改 `TranslateTransform.X`（不触发布局） | 附加视觉树时启动（`:60`） | 有（`:82`、`:109`） |
-| `BlocksMarketing/Controls/ArcMeshWash.cs:39` | 48 ms | 网格渐变drift，每 tick `InvalidateVisual` | 仅 `Drift=true` 且附加时（`:80`） | 有（`:42`、`:122`） |
-| `BlocksMarketing/Controls/ArcStatNumber.cs:108` | 16 ms | 数字滚动到目标值，到点自停 | 首次 `Value` 变化（非构建） | 有（`:97`） |
-| `BlocksCommerce/Controls/ArcEmptyScene.cs:110` | 16 ms | 空状态图形形变，17 帧后自停 | 场景属性变化时（非构建） | 有（`:101`） |
-| `BlocksCommerce/Pages`（6 处） | 700–1300 ms | 假异步：加购/支付/保存/客服回复，一次性 `Stop` | 点击回调内 | 不适用 |
-| `BlocksApp/Pages/MediaPlayerPage.cs:88` | 500 ms | 播放进度推进 | **构建时就 `Start()`**（`:432`） | 无（模拟播放，非动效） |
-| `BlocksApp/Pages/FileUploadPage.cs:96` | 160 ms | 上传进度 +8%/tick | Retry / Add 回调 | 不适用 |
-| `BlocksApp/Pages/SignupFormPage.cs:84,177` | `RunOnce` | 焦点/确认延迟 | 提交后 | 不适用 |
-| `BlocksTeam/Controls/ArcMorphIllustration.cs:90` | 15 ms | 场景形变 | 切换场景时（`:123`） | 有（`:114`） |
-| `BlocksData/Controls/ArcLayoutMorph.cs:40` | 16 ms | 6 种布局插值，22 帧后自停 | 布局属性变化时（`:84`） | 有（`:76-80`） |
-| `BlocksData/Pages`（3 处） | 120/700/900 ms | 回放/播放月份/时区 | Play 按钮 | 2/3 有（`ConnectedScatterPage.cs:154`、`LineReplayPage.cs:155`）；`RevenueGlobePage` 的 900 ms 回放**不读该开关** |
+| `Blocks.Marketing/Controls/ArcMarquee.cs:57` | 16 ms | logo 跑马灯，改 `TranslateTransform.X`（不触发布局） | 附加视觉树时启动（`:60`） | 有（`:82`、`:109`） |
+| `Blocks.Marketing/Controls/ArcMeshWash.cs:39` | 48 ms | 网格渐变drift，每 tick `InvalidateVisual` | 仅 `Drift=true` 且附加时（`:80`） | 有（`:42`、`:122`） |
+| `Blocks.Marketing/Controls/ArcStatNumber.cs:108` | 16 ms | 数字滚动到目标值，到点自停 | 首次 `Value` 变化（非构建） | 有（`:97`） |
+| `Blocks.Commerce/Controls/ArcEmptyScene.cs:110` | 16 ms | 空状态图形形变，17 帧后自停 | 场景属性变化时（非构建） | 有（`:101`） |
+| `Blocks.Commerce/Pages`（6 处） | 700–1300 ms | 假异步：加购/支付/保存/客服回复，一次性 `Stop` | 点击回调内 | 不适用 |
+| `Blocks.App/Pages/MediaPlayerPage.cs:88` | 500 ms | 播放进度推进 | **构建时就 `Start()`**（`:432`） | 无（模拟播放，非动效） |
+| `Blocks.App/Pages/FileUploadPage.cs:96` | 160 ms | 上传进度 +8%/tick | Retry / Add 回调 | 不适用 |
+| `Blocks.App/Pages/SignupFormPage.cs:84,177` | `RunOnce` | 焦点/确认延迟 | 提交后 | 不适用 |
+| `Blocks.Team/Controls/ArcMorphIllustration.cs:90` | 15 ms | 场景形变 | 切换场景时（`:123`） | 有（`:114`） |
+| `Blocks.Data/Controls/ArcLayoutMorph.cs:40` | 16 ms | 6 种布局插值，22 帧后自停 | 布局属性变化时（`:84`） | 有（`:76-80`） |
+| `Blocks.Data/Pages`（3 处） | 120/700/900 ms | 回放/播放月份/时区 | Play 按钮 | 2/3 有（`ConnectedScatterPage.cs:154`、`LineReplayPage.cs:155`）；`RevenueGlobePage` 的 900 ms 回放**不读该开关** |
 
 合计：Marketing 3 + Commerce 7（6 页面一次性 + EmptyScene）+ App 2 + Team 1 + Data 4 = **17 个创建点**（另 2 个 `RunOnce`）。
 
-- 回答"8 处 timer"：`BlocksData` 的 8 处 `DispatcherTimer` 字面量 = **4 个 timer**（`ArcLayoutMorph:40`、`ConnectedScatterPage:137`、`LineReplayPage:142`、`RevenueGlobePage:190`），**没有一个在页面构建时启动**——都是用户点 Play 或切布局后才建/启动，且到终态自停或可暂停。这是本区域相对克制的部分。
+- 回答"8 处 timer"：`Blocks.Data` 的 8 处 `DispatcherTimer` 字面量 = **4 个 timer**（`ArcLayoutMorph:40`、`ConnectedScatterPage:137`、`LineReplayPage:142`、`RevenueGlobePage:190`），**没有一个在页面构建时启动**——都是用户点 Play 或切布局后才建/启动，且到终态自停或可暂停。这是本区域相对克制的部分。
 - 真正"随加载即启动"的只有两处：`ArcMarquee`（跑马灯页，附加即跑，但只改 render transform）与 `MediaPlayerPage`（构建即 `timer.Start()`，见 BP-02）。
 - **reduced-motion 覆盖是本区域做得最好的横向能力**：17 个 timer 中属于动画/播放型的 9 个，有 8 个在启动和 tick 里读了 `ArcThemeManager.ReducedMotion`（`ArcMarquee:82,109`、`ArcMeshWash:42,80,122`、`ArcStatNumber:97`、`ArcEmptyScene:101`、`ArcMorphIllustration:114`、`ArcLayoutMorph:76`、`ConnectedScatterPage:154`、`LineReplayPage:155`；缺的一个是 `RevenueGlobePage` 的 900 ms 回放，见 P2），且 `DataStage` 的默认输出就是静态帧（`DataDraw.cs:171-175` 注释）。全 Blocks 只有 2 个页面用 `Transitions`（`NewsletterSignupPage.cs:92`、`StatsBandPage.cs:152`），都带门禁；没有 `Animation`/`KeyFrame`。
 - 但 timer 的**生命周期**处理不均：`ArcMarquee`/`ArcMeshWash`/`ArcStatNumber` 有 detach 停表，`MediaPlayerPage` 有（`:483`）；而 Commerce 的 6 个页面级一次性 timer、`ArcLayoutMorph`、`ArcMeshWash` 的实例化 timer 都没有"离开视觉树就停"的统一保障。
@@ -100,7 +100,7 @@
 - **滚动宿主**：9 个 `ScrollViewer`（8 个页面 + `AiKit.Scroller:264`，后者用固定 `height` 把内容限制住）；`InboxSidebarPage.cs:244` 还把列表滚动条 `Disabled`，与 Gallery 页面级 `ScrollViewer`（`GalleryWindow.cs:86-90`）形成嵌套滚动。块本身不负责页面滚动，这是对的；但"ScrollViewer 里放整棵非虚拟化大内容"的隐患已经在 Inbox / SearchResults / WeekCalendar 三个页面成型。
 - **固定宽度会带来额外测量轮次（suspected）**：块里有 579 处 `Width/Height = 数字`，固定外壳 1000、`ArcCohortChart` 860×316，且常与星号列混用（`MetricsDashboardPage.cs:296` 的 `"*,12,286"`）。固定测量值不受 `availableSize` 影响，首帧/窗口缩放时需要一轮额外的 arrange 才能确定最终列宽；由于 Gallery 初始窗口下内容区 ≤1028 且不横向滚动，这些固定值目前"刚好不炸"，但它们是 BP-06 裁切风险的直接来源。
 
-### 1.8 BlocksData 的 15 个 `Render`：谁在重建什么（直接回答"是否逐点重建"）
+### 1.8 Blocks.Data 的 15 个 `Render`：谁在重建什么（直接回答"是否逐点重建"）
 
 | 控件 | 数据规模 | 每次 Render 重建 | 主要失效来源 |
 | --- | --- | --- | --- |
@@ -127,16 +127,16 @@
 
 | ID | 分类 | 严重度 | 位置 | 问题一句话 | 放大因子 |
 | --- | --- | --- | --- | --- | --- |
-| BD-01 | R1/R2/R3 | P1 | `BlocksData/Controls/ArcTerrainStage.cs:278-319,385-397` | 每次重绘 168 柱 × 3 个 `StreamGeometry`+`Point[]`，每柱 4 个 brush、2 次资源查找 | × 168 格 × 每次失效（hover 换格/键盘/拖拽） |
-| BD-02 | R1/R2/R3/P1 | **P0** | `BlocksData/Controls/ArcGalaxyStage.cs:98-132,147,264-297` + `CustomerGalaxyPage.cs:64` | 2400 账户；每次指针移动都 `Layout()`（2400 次分组 LINQ），拖拽时每次移动整图重绘 2400 个 ellipse（每个 1–2 次 `Ink.*` 资源查找 + 新 brush） | × 2400 点 × 指针事件率（60–120/s） |
-| BD-03 | R1/R2/R3/P1 | **P0** | `BlocksData/Controls/ArcDotGlobe.cs:206-263` | 1620 个点阵点每点 `Ink.Alpha(Ink.Secondary,…)`（=1 次字典查找 + 1 个 `SolidColorBrush`）+ 每城市 1 个 `StreamGeometry`；拖拽时每次移动全量重绘 | × 1620 点 × 拖拽事件率 |
-| BD-04 | R2/S2 | P1 | `BlocksData/Controls/DataDraw.cs:14-46,77-136,207-251` | 绘制助手零缓存：`Ink.*` 每属性一次 `ArcResources.Brush`；`DataText` 每次 `new FormattedText` + `new Typeface` + `TryFindResource(FontBody)` | × 139 处 `Ink.<prop>` / 59 处文本绘制点 × 每次重绘 |
+| BD-01 | R1/R2/R3 | P1 | `Blocks.Data/Controls/ArcTerrainStage.cs:278-319,385-397` | 每次重绘 168 柱 × 3 个 `StreamGeometry`+`Point[]`，每柱 4 个 brush、2 次资源查找 | × 168 格 × 每次失效（hover 换格/键盘/拖拽） |
+| BD-02 | R1/R2/R3/P1 | **P0** | `Blocks.Data/Controls/ArcGalaxyStage.cs:98-132,147,264-297` + `CustomerGalaxyPage.cs:64` | 2400 账户；每次指针移动都 `Layout()`（2400 次分组 LINQ），拖拽时每次移动整图重绘 2400 个 ellipse（每个 1–2 次 `Ink.*` 资源查找 + 新 brush） | × 2400 点 × 指针事件率（60–120/s） |
+| BD-03 | R1/R2/R3/P1 | **P0** | `Blocks.Data/Controls/ArcDotGlobe.cs:206-263` | 1620 个点阵点每点 `Ink.Alpha(Ink.Secondary,…)`（=1 次字典查找 + 1 个 `SolidColorBrush`）+ 每城市 1 个 `StreamGeometry`；拖拽时每次移动全量重绘 | × 1620 点 × 拖拽事件率 |
+| BD-04 | R2/S2 | P1 | `Blocks.Data/Controls/DataDraw.cs:14-46,77-136,207-251` | 绘制助手零缓存：`Ink.*` 每属性一次 `ArcResources.Brush`；`DataText` 每次 `new FormattedText` + `new Typeface` + `TryFindResource(FontBody)` | × 139 处 `Ink.<prop>` / 59 处文本绘制点 × 每次重绘 |
 | BD-05 | R1/R3 | P1 | `ArcHorizonChart.cs:52-57,73,158-197`；`ArcSmallMultiples.cs:55-63,89,161-213` | 每 band/panel 重建 `List<Point>` + 面积/折线几何；`Ordered()/Panels()` 排序在 `OnPointerMoved` 与 `Render` 各跑一次 | × 14 行 × 3 bands；× 12 面板 × 指针事件 |
 | BD-06 | R1/R3/S2 | P1 | `ArcCandleChart.cs:160-243` + `MarketTerminalPage.cs:136-154` | 120 根蜡烛逐根 `new Pen`/新 brush；crosshair 每次变化整图重绘；页面在 `Inspected` 里每次重建 6 个报价控件 | × 120 根 × 指针事件率 |
 | BD-07 | L2/R1 | P1 | `ConnectedScatterPage.cs:184-189,75-106` | `HeadChanged`（指针每移动一次就可能触发）重建 4 个统计 tile（约 25 控件）**并重建整个 `ArcSlider`** | × 指针事件率 × 约 25 控件 |
 | BD-08 | R2/R3 | P2 | `ArcChoroplethMap.cs:86-100,204-228` | `Step()` 每次调用都 `OrderBy+ToList` 排序全部值，每区域调 2–4 次 | × region² ；n≤9，当前量级小 |
 | BD-09 | T1/R1 | P2 | `ArcLayoutMorph.cs:37-56,270-319` | 形变 22 帧内每帧重绘 24 卡，每卡 2 个文本（≈48 `FormattedText`/帧）；timer 每实例新建且不 Dispose | × 24 卡 × 22 帧，reduced-motion 已跳过 |
-| BD-10 | R2/S2 | P2 | `BlocksTeam/Controls/ArcCohortChart.cs:136-201` | 每个单元格循环内做 5+ 次 `ArcResources.*` 查找 + `Contrast/Blend` + 每格 `new Pen`；hover 每次移动重绘 | × 8×8 格 × 指针事件率 |
+| BD-10 | R2/S2 | P2 | `Blocks.Team/Controls/ArcCohortChart.cs:136-201` | 每个单元格循环内做 5+ 次 `ArcResources.*` 查找 + `Contrast/Blend` + 每格 `new Pen`；hover 每次移动重绘 | × 8×8 格 × 指针事件率 |
 | BD-11 | L1 | P2 | `ArcCohortChart.cs:91`；`DataDraw.cs:192-197` | 自绘控件用固定 `MeasureOverride`（860×316）或"无限宽就 320"，不响应可用宽度 | 窗口 <860 时溢出/裁切 |
 | BD-12 | T1 | P2 | `RevenueGlobePage.cs:88,190-206` | 900 ms 回放 timer 不读 `ReducedMotion`，与其他 8 个动画/播放 timer 不一致 | × 播放时长 |
 | BP-01 | L2/R1 | P1 | `InboxSidebarPage.cs:562-568,264-396` | 任一交互（点文件夹/星标/打开/换折叠）都 `Build()` 重造三栏全树（约 150–200 控件），列表是 `StackPanel` 逐行 new（无虚拟化） | × 每次交互 × 全树；邮件数增长时线性 |
@@ -156,7 +156,7 @@
 
 ### BD-02 银河图：2400 账户 + 指针移动全量重排（P0）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/CustomerGalaxyPage.cs:64`；`src/Arc.Avalonia.Blocks.Data/Controls/ArcGalaxyStage.cs:98-132,147,264-297`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Pages/CustomerGalaxyPage.cs:64`；`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcGalaxyStage.cs:98-132,147,264-297`
 - 证据：
   ```csharp
   var accounts = BuildAccounts(2400);                          // CustomerGalaxyPage.cs:64
@@ -171,7 +171,7 @@
 
 ### BD-03 点阵地球：1620 点每点一次资源查找 + 新 brush（P0）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcDotGlobe.cs:206-263`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcDotGlobe.cs:206-263`
 - 证据：
   ```csharp
   for (var lat = -78.0; lat <= 78; lat += 6)          // 27 行
@@ -186,7 +186,7 @@
 
 ### BD-01 地形舞台：168 柱 × 3 几何 + 每柱 Mix（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcTerrainStage.cs:278-319,354-383,385-397`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcTerrainStage.cs:278-319,354-383,385-397`
 - 证据：
   ```csharp
   var fill = Mix(Ink.Alpha(Ink.Series(0), 0.35), Ink.Series(0), t);   // :294 每柱
@@ -200,7 +200,7 @@
 
 ### BD-04 绘制助手无缓存：`Ink.*` 与 `FormattedText`（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/DataDraw.cs:14-46,77-136,207-251`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/DataDraw.cs:14-46,77-136,207-251`
 - 证据：
   ```csharp
   public static IBrush Foreground => ArcResources.Brush(ArcTokens.Foreground);   // :17，每访问一次查一次
@@ -214,7 +214,7 @@
 
 ### BD-05 horizon / small multiples：每 band/panel 重建点列与几何（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcHorizonChart.cs:52-57,73,158-197`；`src/Arc.Avalonia.Blocks.Data/Controls/ArcSmallMultiples.cs:55-63,89,161-213`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcHorizonChart.cs:52-57,73,158-197`；`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcSmallMultiples.cs:55-63,89,161-213`
 - 证据：
   ```csharp
   for (var band = 0; band < Bands; band++) {                     // HorizonChart:173
@@ -224,12 +224,12 @@
   private List<HorizonSeries> Ordered() => ... _series.OrderByDescending(...).ToList(); // :52-57
   ```
 - 触发/放大：每次重绘（crosshair 每变化一次、排序/band 数切换）→ 14 行 × 3 bands × 2 个 `List<Point>`（每 list 60 点）+ 84 个 `AreaGeometry`；`ArcSmallMultiples` 12 面板 × （ghost 24 点 list + 折线 list + 面积几何 + 折线几何）。同时 `Ordered()`（`:73`）与 `Panels()`（`:89`）在 `OnPointerMoved` 里也各排序一次（14/12 项 LINQ）。
-- 影响：中等规模但非常"碎"的分配（每次几百个 list/几何/brush），hover 读取同一天数据时反复分配；两页在 BlocksData 里是"拖动 crosshair"型交互，事件率高。
+- 影响：中等规模但非常"碎"的分配（每次几百个 list/几何/brush），hover 读取同一天数据时反复分配；两页在 Blocks.Data 里是"拖动 crosshair"型交互，事件率高。
 - 修复建议：按 `Bounds`/数据/排序缓存每个 band/panel 的 `Point[]` 与 `StreamGeometry`（`AffectsRender` 上挂排序与 band 数）；crosshair 变化只重画十字与 tooltip，不重建曲线；hover 命中用缓存的 `Ordered()` 列表。
 
 ### BD-06 蜡烛图 + 行情页：每根 new Pen 与每次指针重建报价（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Controls/ArcCandleChart.cs:160-243`；`src/Arc.Avalonia.Blocks.Data/Pages/MarketTerminalPage.cs:136-154`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcCandleChart.cs:160-243`；`src/Blocks/Arc.Avalonia.Blocks.Data/Pages/MarketTerminalPage.cs:136-154`
 - 证据：
   ```csharp
   var brush = up ? Ink.Series(0) : Ink.Series(3);                    // CandleChart:191
@@ -244,7 +244,7 @@
 
 ### BD-07 散点页：指针驱动的 stats + slider 重建（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/ConnectedScatterPage.cs:184-189,75-106,108-127`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Pages/ConnectedScatterPage.cs:184-189,75-106,108-127`
 - 证据：
   ```csharp
   chart.HeadChanged += (_, index) => { head = index; RefreshStats(); RefreshSlider(); };  // :184-189
@@ -257,7 +257,7 @@
 
 ### BP-01 Inbox 侧栏：任何交互都重建三栏全树（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.App/Pages/InboxSidebarPage.cs:562-568,264-396,244`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.App/Pages/InboxSidebarPage.cs:562-568,264-396,244`
 - 证据：
   ```csharp
   void Build() { BuildFolders(); BuildList(); BuildReader();  // :562-568 三个 Host.Content 全替换
@@ -270,7 +270,7 @@
 
 ### BP-02 媒体播放页：构建即启动的 500 ms timer + 拖拽中重建自身（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:88,90-167,420-432,483`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:88,90-167,420-432,483`
 - 证据：
   ```csharp
   var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };   // :88
@@ -284,7 +284,7 @@
 
 ### BP-04 指标仪表盘：`DateLabels(180)` 在 30 元素 Select 内被调 30 次（P1）
 
-- 位置：`src/Arc.Avalonia.Blocks.Data/Pages/MetricsDashboardPage.cs:165,111-255`
+- 位置：`src/Blocks/Arc.Avalonia.Blocks.Data/Pages/MetricsDashboardPage.cs:165,111-255`
 - 证据：
   ```csharp
   Labels = window.Select((_, index) => DateLabels(180)[values.Length - rangeDays + index]).ToList(),  // :165
@@ -296,7 +296,7 @@
 
 ### BK-01 六个 Kit：4930 行近似重复的组合层（P1，结构性）
 
-- 位置：6 个 `*Kit.cs`（`AppKit.cs` 1035 行 / `AiKit.cs` 1014 / `CommerceKit.cs` 933 / `TeamKit.cs` 743 / `DataKit.cs` 677 / `MarketingKit.cs` 528）；对照 `src/Arc.Avalonia.Demo/DemoUi.cs`
+- 位置：6 个 `*Kit.cs`（`AppKit.cs` 1035 行 / `AiKit.cs` 1014 / `CommerceKit.cs` 933 / `TeamKit.cs` 743 / `DataKit.cs` 677 / `MarketingKit.cs` 528）；对照 `src/Apps/Arc.Avalonia.Demo/DemoUi.cs`
 - 证据：
   ```csharp
   public static TextBlock Caption(string text, double maxWidth = 0) => Text(text, "arc-caption", maxWidth);

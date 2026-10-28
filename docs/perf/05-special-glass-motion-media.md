@@ -1,10 +1,10 @@
-# SpecialGlass + SpecialMotion + SpecialMedia：组件设计与性能分析
+# Special.Glass + Special.Motion + Special.Media：组件设计与性能分析
 
 ## 0. 范围与覆盖
 
-- 工程：`src/Arc.Avalonia.Special.Glass`（31 个 `.cs`，10 783 行）、`SpecialMotion`（27 个，6 170 行）、
-  `SpecialMedia`（28 个，6 146 行）。共 **33 个控件**（11 + 11 + 11）、33 个 item 页，其余是共享绘制辅助。
-- 全量精读：两个基类 `SpecialMotionUi.cs` / `SpecialUi.cs`、`ArcGlass.cs`、`GlassMotion.cs`、`ArcGlassBackdrop.cs`，
+- 工程：`src/Special/Arc.Avalonia.Special.Glass`（31 个 `.cs`，10 783 行）、`Special.Motion`（27 个，6 170 行）、
+  `Special.Media`（28 个，6 146 行）。共 **33 个控件**（11 + 11 + 11）、33 个 item 页，其余是共享绘制辅助。
+- 全量精读：两个基类 `Special.MotionUi.cs` / `SpecialUi.cs`、`ArcGlass.cs`、`GlassMotion.cs`、`ArcGlassBackdrop.cs`，
   Motion 的 11 个控件（Dock、OrbitMenu、OrbitLogos、LiquidTabBar、SandText、SlotText、TypewriterTerminal、
   KeycapKeyboard 精读，ActionMorph/MorphNav/BookingPill 略读），Media 的 11 个控件（DotGrid、GravityWell、VoiceOrb、
   PageCurl、PhotoGrid、CoverFlow、ProductGallery、Lightbox、StickerPeel、VoiceRecorder 精读，NowPlaying 略读），
@@ -19,8 +19,8 @@
 
 ### 1.1 控件类型与分层
 
-- **Motion / Media：22 个控件全是裸 `Control` 自绘**，继承 `ArcMotionCanvas`（`SpecialMotionUi.cs:283`）或
-  `ArcSpecialCanvas`（`SpecialUi.cs:366`），`Render` 被 sealed（`SpecialMotionUi.cs:591`、`SpecialUi.cs:483`），
+- **Motion / Media：22 个控件全是裸 `Control` 自绘**，继承 `ArcMotionCanvas`（`Special.MotionUi.cs:283`）或
+  `ArcSpecialCanvas`（`SpecialUi.cs:366`），`Render` 被 sealed（`Special.MotionUi.cs:591`、`SpecialUi.cs:483`），
   每帧子类 `OnRender` 整块重画。符合 `CONVENTIONS.md` 的自绘约定，但**没有子控件级重绘粒度、没有模板部件**。
 - **Glass：11 个控件是组合控件**（Panel/Canvas/Border + `ArcIcon`/`TextBlock`），仅 4 个自绘辅助：
   `ArcGlassBackdrop`（`:91`）、卡片高光（`ArcGlassCard.cs:62`）、全息 foil（`ArcHoloCard.cs:19,94`）、刻度盘
@@ -38,8 +38,8 @@
 ### 1.3 三条动效路径并存
 
 1. **共享帧时钟 + tween/spring（Motion/Media）**：`Animate()` 收集闭包，`EnsureFrame()` 懒建 16 ms `DispatcherTimer`
-   （`SpecialMotionUi.cs:483-547`、`SpecialUi.cs:427-438`），`Frame()` 推进后 `InvalidateVisual()`（`:549-576`），
-   `NeedsFrame` 为假即 `StopFrame`，detach 兜底（`SpecialMotionUi.cs:583-587`、`SpecialUi.cs:471-475`）；Media 另有值积分
+   （`Special.MotionUi.cs:483-547`、`SpecialUi.cs:427-438`），`Frame()` 推进后 `InvalidateVisual()`（`:549-576`），
+   `NeedsFrame` 为假即 `StopFrame`，detach 兜底（`Special.MotionUi.cs:583-587`、`SpecialUi.cs:471-475`）；Media 另有值积分
    临界阻尼 `Spring`（`SpecialUi.cs:315-358`）。
 2. **GlassTween：每个动画 new 一个 16 ms timer + Stopwatch**（`GlassMotion.cs:32,46-48`）；
    **ArcFrameLoop：每个控件一个 16 ms timer**（`:144`）。Glass 的 18 个 timer 主要来自这两类 + 业务 timer。
@@ -48,20 +48,20 @@
 
 ### 1.4 reduced-motion：真降工作量，只有一个漏洞
 
-- Motion/Media：`EnsureFrame` 在 `Reduced` 时直接 return（`SpecialMotionUi.cs:523-528`、`SpecialUi.cs:429-431`），
+- Motion/Media：`EnsureFrame` 在 `Reduced` 时直接 return（`Special.MotionUi.cs:523-528`、`SpecialUi.cs:429-431`），
   `Animate` 直接 apply 终值（`:485-490`），`Spring.Step` 直接 jump（`SpecialUi.cs:339-344`）→ **帧循环根本不启动**，
   不是"冻结状态但仍在 60fps InvalidateVisual"。
 - Glass：`GlassTween.Run` 立即完成（`GlassMotion.cs:38-44`），`ArcFrameLoop.Start` no-op（`:151-153`），
   HoloCard/WalletStack/GlassCard 的 pointer 处理器提前 return（`ArcHoloCard.cs:734-737`、`ArcWalletStack.cs:938-941`、
   `ArcGlassCard.cs:562-567`）。降得最彻底。
-- **漏洞**：`ArcMotionCanvas.OnPointerMoved` 无条件 `InvalidateVisual()`（`SpecialMotionUi.cs:400-411`），既无 reduced 判断，
+- **漏洞**：`ArcMotionCanvas.OnPointerMoved` 无条件 `InvalidateVisual()`（`Special.MotionUi.cs:400-411`），既无 reduced 判断，
   也不判断命中/拖拽是否变化 → reduced 下在 Dock 上移动指针仍每帧重画 306 个背景点（见 MO-06）。Media 基类不在
   pointer-move 里 invalidate（`SpecialUi.cs:477-481`），故只有 Motion 受影响。
 
 ### 1.5 可访问性（优点）
 
 - 每个自绘控件一个 focus stop（`Focusable/IsTabStop`）、`AutomationProperties.Name/HelpText`、2 px 焦点环
-  （`SpecialMotionUi.cs:130-144,293-299`）；键盘语义普遍完整（方向键/Home/End/Enter/Space/Escape，如
+  （`Special.MotionUi.cs:130-144,293-299`）；键盘语义普遍完整（方向键/Home/End/Enter/Space/Escape，如
   `ArcDotGrid.cs:94-127`、`ArcGravityWell.cs:95-136`）；纯装饰项显式 `Focusable=false`（`ArcSandText.cs:57-59`）。
 - 每个 item 页都写 When to use / Keyboard / Motion / Implementation notes，并主动交代 2D 近似
   （如 `GlassSegmentedPage.cs:45-46`）。
@@ -69,10 +69,10 @@
 ### 1.6 一致性：三套弹簧、两套助手、两个孪生基类
 
 - 弹簧三份：`Spring`（`SpecialUi.cs:315-358`）、`GlassSpring`（`GlassMotion.cs:89-131`）、`SmTween+ArcMotion easings`
-  （`SpecialMotionUi.cs:266-275`）；dt 钳制语义不同（`GlassSpring.Update` 钳 1/30，基类 Frame 钳 0.05）。
-- `Sm` 与 `SpecialUi` 大量同构：`Lift`（`SpecialMotionUi.cs:59-69` vs `SpecialUi.cs:105-115`）、`Text`（`:71-100` vs
+  （`Special.MotionUi.cs:266-275`）；dt 钳制语义不同（`GlassSpring.Update` 钳 1/30，基类 Frame 钳 0.05）。
+- `Sm` 与 `SpecialUi` 大量同构：`Lift`（`Special.MotionUi.cs:59-69` vs `SpecialUi.cs:105-115`）、`Text`（`:71-100` vs
   `SpecialUi.cs:50-78`）、`FocusRing`、`Polygon/ArcSegment`、`Noise`、`Time`。两个基类约 95% 相同，差异仅在命中模型、
-  tween 列表、`MeasureOverride`（`SpecialUi.cs:424` 固定尺寸 vs `SpecialMotionUi.cs:350-352` 尊重无限约束）。
+  tween 列表、`MeasureOverride`（`SpecialUi.cs:424` 固定尺寸 vs `Special.MotionUi.cs:350-352` 尊重无限约束）。
 - 结论：高层"分层 + 状态机 + 缓动"是统一的；底层原语重复分叉，同一 bug 要修 3 处。
 
 ### 1.7 逐控件统计
@@ -143,36 +143,36 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 | ID | 分类 | 严重度 | 位置 | 问题一句话 | 放大因子 |
 | --- | --- | --- | --- | --- | --- |
-| GM-01 | R1/R3/G1 | P0 | `src/Arc.Avalonia.Special.Glass/Controls/ArcHoloCard.cs:762-799` | hover 每帧重画 2 个 foil：172 新 brush + conic 渐变 + new TransformGroup | ×2 foil ×60fps |
-| MO-01 | S2/R1 | P0 | `src/Arc.Avalonia.Special.Motion/Controls/ArcTypewriterTerminal.cs:80,150-162,394-418` | 默认 `_playing=true` 且时间回绕，永久 60fps；每帧每字符 1 FormattedText+1 子串 | ×~30 字符 × 永久 |
-| MO-02 | R1/R3 | P0 | `src/Arc.Avalonia.Special.Motion/Controls/ArcSandText.cs:88-89,274-318` | 悬停即持续 60fps；每帧软件重写 53k 像素位图并整帧上传 | ×400×133 像素 ×60fps |
-| MD-01 | R1/R3 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcDotGrid.cs:174-224` | 每个点每帧 new SolidColorBrush + Mix + DrawEllipse | ×756 点 ×60fps |
-| MD-02 | R3/G1 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcGravityWell.cs:187-258` | 36 个 tile 每帧各画一次完整 SampleArt + PushOpacity | ×36 ×60fps ×~30 图元 |
-| MD-03 | R3/G1 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcCoverFlow.cs:243-319` | 每帧 16 次 SampleArt（图+镜像反射）+ 每卡 2 opacity mask | ×8 卡 ×60fps |
-| MD-04 | R3/S2 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcVoiceOrb.cs:26,128,297-314,409-433` | 默认 Listening → 永久 60fps；每帧重建 90 段 blob + radial 渐变 | ×90 段 × 永久 |
-| MD-05 | R3 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcNowPlaying.cs:31,126-140,350` | `_playing=true` 常驻 60fps，每帧重画 SampleArt 与波形 | × 永久 |
-| MD-06 | R3 | P0 | `src/Arc.Avalonia.Special.Media/Controls/ArcPhotoGrid.cs:404-445,455-523` | viewer 动画每帧重画 12 网格图 + 大图 + 12 胶片缩略图 | ×25 SampleArt ×60fps |
-| GM-02 | L1/T2 | P1 | `src/Arc.Avalonia.Special.Glass/Controls/ArcGlassTabBar.cs:617-663` | 每帧改 lens Width/Height/Canvas 定位触发布局；每 tab Parse scale | ×4–5 tab ×60fps |
-| GM-03 | L1/T2 | P1 | `src/Arc.Avalonia.Special.Glass/Controls/ArcGlassSegmented.cs:678-706` | 每帧改 Border 宽高与 Canvas 位置（布局而非 transform） | ×3 实例/页 ×60fps |
+| GM-01 | R1/R3/G1 | P0 | `src/Special/Arc.Avalonia.Special.Glass/Controls/ArcHoloCard.cs:762-799` | hover 每帧重画 2 个 foil：172 新 brush + conic 渐变 + new TransformGroup | ×2 foil ×60fps |
+| MO-01 | S2/R1 | P0 | `src/Special/Arc.Avalonia.Special.Motion/Controls/ArcTypewriterTerminal.cs:80,150-162,394-418` | 默认 `_playing=true` 且时间回绕，永久 60fps；每帧每字符 1 FormattedText+1 子串 | ×~30 字符 × 永久 |
+| MO-02 | R1/R3 | P0 | `src/Special/Arc.Avalonia.Special.Motion/Controls/ArcSandText.cs:88-89,274-318` | 悬停即持续 60fps；每帧软件重写 53k 像素位图并整帧上传 | ×400×133 像素 ×60fps |
+| MD-01 | R1/R3 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcDotGrid.cs:174-224` | 每个点每帧 new SolidColorBrush + Mix + DrawEllipse | ×756 点 ×60fps |
+| MD-02 | R3/G1 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcGravityWell.cs:187-258` | 36 个 tile 每帧各画一次完整 SampleArt + PushOpacity | ×36 ×60fps ×~30 图元 |
+| MD-03 | R3/G1 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcCoverFlow.cs:243-319` | 每帧 16 次 SampleArt（图+镜像反射）+ 每卡 2 opacity mask | ×8 卡 ×60fps |
+| MD-04 | R3/S2 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcVoiceOrb.cs:26,128,297-314,409-433` | 默认 Listening → 永久 60fps；每帧重建 90 段 blob + radial 渐变 | ×90 段 × 永久 |
+| MD-05 | R3 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcNowPlaying.cs:31,126-140,350` | `_playing=true` 常驻 60fps，每帧重画 SampleArt 与波形 | × 永久 |
+| MD-06 | R3 | P0 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcPhotoGrid.cs:404-445,455-523` | viewer 动画每帧重画 12 网格图 + 大图 + 12 胶片缩略图 | ×25 SampleArt ×60fps |
+| GM-02 | L1/T2 | P1 | `src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlassTabBar.cs:617-663` | 每帧改 lens Width/Height/Canvas 定位触发布局；每 tab Parse scale | ×4–5 tab ×60fps |
+| GM-03 | L1/T2 | P1 | `src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlassSegmented.cs:678-706` | 每帧改 Border 宽高与 Canvas 位置（布局而非 transform） | ×3 实例/页 ×60fps |
 | GM-04 | R1/T2 | P1 | `ArcGlassMenu.cs:460-464` / `ArcWalletStack.cs:963-969` / `ArcLinkUnfurl.cs:656-662` | 每帧字符串拼 translate/scale 再 Parse | ×帧数 × 卡片数 |
-| GM-05 | T2 | P1 | `src/Arc.Avalonia.Special.Glass/Controls/GlassMotion.cs:32,46-48` | 每个动画 new timer+Stopwatch，不复用共享时钟 | ×同时动画数（可达 3） |
-| GM-06 | T1/M1 | P1 | `src/Arc.Avalonia.Special.Glass/Controls/ArcLinkUnfurl.cs:634-672` | 自建 16 ms shimmer timer（双 Tick 处理器），文件无 detach 清理 | ×60fps × 加载时长 |
-| GM-07 | G1 | P1 | `src/Arc.Avalonia.Special.Glass/Controls/ArcGlass.cs:78-121` | 每块玻璃=渐变填充+rim 渐变+BoxShadow；一页 6–12 个半透明/阴影层 | ×面板/inset 层数 |
-| MO-03 | S2/T2 | P1 | `src/Arc.Avalonia.Special.Motion/Controls/ArcBookingPill.cs:158-172,285-311` | 步骤过渡同时画 from/to 两面，日期面 21 卡×2 文本 | ×2 面 ×60fps ×320ms |
-| MO-04 | T1/R3 | P1 | `src/Arc.Avalonia.Special.Motion/Controls/ArcKeycapKeyboard.cs:130,260-319` | `IsFocused` 进入 NeedsFrame → 聚焦即永久 60fps，每帧 60 键 | ×60 键 × 永久 |
-| MO-05 | L1/S2 | P1 | `src/Arc.Avalonia.Special.Motion/Controls/ArcLiquidTabBar.cs:77-125` | 每次渲染 3 次 Layout()：分配数组 + 每 tab FormattedText 量宽 | ×3 Layout ×60fps |
-| MO-06 | P1/R2 | P1 | `src/Arc.Avalonia.Special.Motion/Controls/SpecialMotionUi.cs:400-411` + `ArcDock.cs:202-216` | pointer-move 无条件 InvalidateVisual（reduced 也是），Dock 每次重画 306 点 | ×pointer 频率 |
-| MD-07 | R1/R3 | P1 | `src/Arc.Avalonia.Special.Media/Controls/ArcPageCurl.cs:456-536` | 拖动/翻页每帧 2–3 SampleArt + 4 次 Select/ToList + 半平面裁剪 | ×pointer 频率 |
-| MD-08 | R3/S2 | P1 | `src/Arc.Avalonia.Special.Media/Controls/ArcProductGallery.cs:237-248,476-514,613-643` | hover 透镜每帧重画主图+4 缩略图+透镜（7 SampleArt）+~18 文本 | ×pointer 频率 |
-| MD-09 | R1/L1 | P1 | `src/Arc.Avalonia.Special.Media/Controls/ArcStickerPeel.cs:398-400,456-505` | 每次 Render 都 LINQ 排序；每贴纸重复构造多边形 | ×每次重绘 × 贴纸数 |
-| MD-10 | R1 | P1 | `src/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs:416-431,516-524` | 录音时 44 根波形条逐条 new brush；回放每条消息再 34 根 | ×bars ×60fps |
-| MD-11 | R3 | P1 | `src/Arc.Avalonia.Special.Media/Controls/ArcLightboxGallery.cs:345-356,394-433` | viewer 动画每帧重画 12 张静态缩略图 + 大图 | ×13 SampleArt ×60fps |
-| SYS-01 | T1 | P1 | `SpecialMotionUi.cs:522-547` / `SpecialUi.cs:427-438` | 每控件一个 16 ms timer，无可见性/最小化门控，不与合成器对齐 | ×控件数 ×62.5Hz |
-| SYS-02 | R2 | P1 | `SpecialMotionUi.cs:26-31` / `SpecialUi.cs:23-31` / `ArcDock.cs:204,213,253` | Render 路径每次取 token 都 TryFindResource，无缓存 | ×每帧取色次数（数十） |
-| SYS-03 | S2/R1 | P1 | `SpecialMotionUi.cs:71-100` / `SpecialUi.cs:50-78` | 所有文本每帧重建 FormattedText/Typeface，无缓存 | ×每帧文本数 |
+| GM-05 | T2 | P1 | `src/Special/Arc.Avalonia.Special.Glass/Controls/GlassMotion.cs:32,46-48` | 每个动画 new timer+Stopwatch，不复用共享时钟 | ×同时动画数（可达 3） |
+| GM-06 | T1/M1 | P1 | `src/Special/Arc.Avalonia.Special.Glass/Controls/ArcLinkUnfurl.cs:634-672` | 自建 16 ms shimmer timer（双 Tick 处理器），文件无 detach 清理 | ×60fps × 加载时长 |
+| GM-07 | G1 | P1 | `src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlass.cs:78-121` | 每块玻璃=渐变填充+rim 渐变+BoxShadow；一页 6–12 个半透明/阴影层 | ×面板/inset 层数 |
+| MO-03 | S2/T2 | P1 | `src/Special/Arc.Avalonia.Special.Motion/Controls/ArcBookingPill.cs:158-172,285-311` | 步骤过渡同时画 from/to 两面，日期面 21 卡×2 文本 | ×2 面 ×60fps ×320ms |
+| MO-04 | T1/R3 | P1 | `src/Special/Arc.Avalonia.Special.Motion/Controls/ArcKeycapKeyboard.cs:130,260-319` | `IsFocused` 进入 NeedsFrame → 聚焦即永久 60fps，每帧 60 键 | ×60 键 × 永久 |
+| MO-05 | L1/S2 | P1 | `src/Special/Arc.Avalonia.Special.Motion/Controls/ArcLiquidTabBar.cs:77-125` | 每次渲染 3 次 Layout()：分配数组 + 每 tab FormattedText 量宽 | ×3 Layout ×60fps |
+| MO-06 | P1/R2 | P1 | `src/Special/Arc.Avalonia.Special.Motion/Controls/Special.MotionUi.cs:400-411` + `ArcDock.cs:202-216` | pointer-move 无条件 InvalidateVisual（reduced 也是），Dock 每次重画 306 点 | ×pointer 频率 |
+| MD-07 | R1/R3 | P1 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcPageCurl.cs:456-536` | 拖动/翻页每帧 2–3 SampleArt + 4 次 Select/ToList + 半平面裁剪 | ×pointer 频率 |
+| MD-08 | R3/S2 | P1 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcProductGallery.cs:237-248,476-514,613-643` | hover 透镜每帧重画主图+4 缩略图+透镜（7 SampleArt）+~18 文本 | ×pointer 频率 |
+| MD-09 | R1/L1 | P1 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcStickerPeel.cs:398-400,456-505` | 每次 Render 都 LINQ 排序；每贴纸重复构造多边形 | ×每次重绘 × 贴纸数 |
+| MD-10 | R1 | P1 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs:416-431,516-524` | 录音时 44 根波形条逐条 new brush；回放每条消息再 34 根 | ×bars ×60fps |
+| MD-11 | R3 | P1 | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcLightboxGallery.cs:345-356,394-433` | viewer 动画每帧重画 12 张静态缩略图 + 大图 | ×13 SampleArt ×60fps |
+| SYS-01 | T1 | P1 | `Special.MotionUi.cs:522-547` / `SpecialUi.cs:427-438` | 每控件一个 16 ms timer，无可见性/最小化门控，不与合成器对齐 | ×控件数 ×62.5Hz |
+| SYS-02 | R2 | P1 | `Special.MotionUi.cs:26-31` / `SpecialUi.cs:23-31` / `ArcDock.cs:204,213,253` | Render 路径每次取 token 都 TryFindResource，无缓存 | ×每帧取色次数（数十） |
+| SYS-03 | S2/R1 | P1 | `Special.MotionUi.cs:71-100` / `SpecialUi.cs:50-78` | 所有文本每帧重建 FormattedText/Typeface，无缓存 | ×每帧文本数 |
 | SYS-04 | M2 | P2 | `GalleryWindow.cs:28,559-583` | 页面 content 缓存无淘汰，长会话内存线性增长 | ×访问页数 |
 | SYS-05 | M1/正确性 | P2 | `ArcSandText.cs:126-130,474-479` | detach 释放位图，但重挂时 Build 不执行 → 回页可能空白 | 每次切页往返 |
-| SYS-06 | T2 | P2 | `SpecialMotionUi.cs:561,570` | tween 回调再 InvalidateVisual，Frame() 末尾已 invalidate | 每 tween 帧（无害） |
+| SYS-06 | T2 | P2 | `Special.MotionUi.cs:561,570` | tween 回调再 InvalidateVisual，Frame() 末尾已 invalidate | 每 tween 帧（无害） |
 | GM-08 | R2 | P2 | `ArcGlassBackdrop.cs:159-186` | 每次 Render 都 Geometry.Parse(motif)，无缓存 | ×每次失效重绘 |
 | MO-07 | 设计 | P2 | `ArcOrbitLogos.cs:57,65,436-452` | 构造即 `_selected=0` → 环默认不转；`RunLoop` 无人使用 | 每页首次 |
 | MD-12 | L1 | P2 | `SpecialUi.cs:424` | MeasureOverride 固定 900×520 忽略 availableSize，易溢出 | ×每个实例 |
@@ -181,7 +181,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### GM-01 ArcHoloCard 的 foil 每帧全量重绘（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Glass/Controls/ArcHoloCard.cs:762-799`、foil 本体 `:94-183`、86 个闪耀点 `:39-54`。
+- 位置：`src/Special/Arc.Avalonia.Special.Glass/Controls/ArcHoloCard.cs:762-799`、foil 本体 `:94-183`、86 个闪耀点 `:39-54`。
 - 证据：
   ```csharp
   _frontFoil.InvalidateVisual();   // :797
@@ -197,7 +197,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MO-01 TypewriterTerminal 永久播放 + 逐字符排版（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Motion/Controls/ArcTypewriterTerminal.cs:80,142-147,150-162,394-418`。
+- 位置：`src/Special/Arc.Avalonia.Special.Motion/Controls/ArcTypewriterTerminal.cs:80,142-147,150-162,394-418`。
 - 证据：
   ```csharp
   _playing = !Sm.Reduced;                        // :143
@@ -212,7 +212,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MO-02 SandText 悬停常驻 + 全位图重写（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Motion/Controls/ArcSandText.cs:88-89,135-164,274-318`。
+- 位置：`src/Special/Arc.Avalonia.Special.Motion/Controls/ArcSandText.cs:88-89,135-164,274-318`。
 - 证据：
   ```csharp
   base.NeedsFrame || (!Sm.Reduced && (_pour < 1.2 || _grains.Count > 0 || _dugCount > 0 || _pointerInside)); // :88-89
@@ -227,7 +227,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-01 DotGrid 每点新建笔刷（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcDotGrid.cs:174-224`（尤其 `:221-222`）。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcDotGrid.cs:174-224`（尤其 `:221-222`）。
 - 证据：
   ```csharp
   var color = tint <= 0.01 ? baseDot : ArcColor.Mix(baseDot, accent, Math.Clamp(tint, 0, 1)); // :221
@@ -241,7 +241,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-02 GravityWell 每帧 36 次 SampleArt（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcGravityWell.cs:182-258,57-62,177-180`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcGravityWell.cs:182-258,57-62,177-180`。
 - 证据：
   ```csharp
   var layers = new List<(...)>(count);             // :187 每帧分配
@@ -257,7 +257,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-03 CoverFlow 每帧 16 次 SampleArt（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcCoverFlow.cs:243-319`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcCoverFlow.cs:243-319`。
 - 证据：
   ```csharp
   var order = new List<(int Index, Rect Card, double Delta)>(); // :243 每帧
@@ -272,7 +272,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-04 VoiceOrb 默认永久 60fps + 每帧重建 blob（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcVoiceOrb.cs:26,103,128,297-314,409-433`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcVoiceOrb.cs:26,103,128,297-314,409-433`。
 - 证据：
   ```csharp
   private ArcVoiceOrbState _state = ArcVoiceOrbState.Listening;  // :26
@@ -286,7 +286,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-05 NowPlaying 默认播放常驻 60fps（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcNowPlaying.cs:31,120-140,350`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcNowPlaying.cs:31,120-140,350`。
 - 证据：
   ```csharp
   private bool _playing = true;                              // :31
@@ -299,7 +299,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-06 PhotoGrid viewer 动画重画全部静态内容（P0）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcPhotoGrid.cs:404-445,455-523`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcPhotoGrid.cs:404-445,455-523`。
 - 证据：
   ```csharp
   for (var index = 0; index < Photos.Length; index++) { ... SampleArt.Draw(context, rect, ...); } // :404-414
@@ -312,7 +312,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### GM-02 / GM-03 以布局属性做动画（P1）
 
-- 位置：`src/Arc.Avalonia.Special.Glass/Controls/ArcGlassTabBar.cs:617-663`、`ArcGlassSegmented.cs:678-706`。
+- 位置：`src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlassTabBar.cs:617-663`、`ArcGlassSegmented.cs:678-706`。
 - 证据：
   ```csharp
   _lens.Width = _activeLensWidth + stretch; _lens.Height = height;      // TabBar :635-636
@@ -340,7 +340,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### GM-07 Glass 材质的合成层数（P1）
 
-- 位置：`src/Arc.Avalonia.Special.Glass/Controls/ArcGlass.cs:78-121,124-134`；背景 `ArcGlassBackdrop.cs:91-157`。
+- 位置：`src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlass.cs:78-121,124-134`；背景 `ArcGlassBackdrop.cs:91-157`。
 - 证据：
   ```csharp
   Background = GlassFill(tintKey, fillAlpha);   // 135° 双停渐变
@@ -370,7 +370,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MO-06 pointer-move 无条件全量重绘（P1）
 
-- 位置：`src/Arc.Avalonia.Special.Motion/Controls/SpecialMotionUi.cs:400-411`；示例 `ArcDock.cs:202-216`。
+- 位置：`src/Special/Arc.Avalonia.Special.Motion/Controls/Special.MotionUi.cs:400-411`；示例 `ArcDock.cs:202-216`。
 - 证据：
   ```csharp
   base.OnPointerMoved(e); Pointer = e.GetPosition(this); UpdateHover();
@@ -383,7 +383,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-07 / MD-09 折页/贴纸的几何与 LINQ（P1）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcPageCurl.cs:456-536`、`ArcStickerPeel.cs:398-505`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcPageCurl.cs:456-536`、`ArcStickerPeel.cs:398-505`。
 - 证据：
   ```csharp
   var flap = folded.Select(point => SpecialUi.Reflect(point, normal, offset)).ToList();        // PageCurl :486
@@ -408,7 +408,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### MD-10 VoiceRecorder 波形逐条建 brush（P1）
 
-- 位置：`src/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs:416-431,516-524`。
+- 位置：`src/Special/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs:416-431,516-524`。
 - 证据：
   ```csharp
   var value = 0.2 + SpecialUi.Noise((int)(_recorded * 12) * 53 + index * 11) * 0.8;   // :427
@@ -419,7 +419,7 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 
 ### SYS-01 / SYS-02 / SYS-03 平台级：timer、资源查找、文本（P1）
 
-- 位置：`SpecialMotionUi.cs:522-547,26-31,71-100`、`SpecialUi.cs:427-457,23-31,50-78`。
+- 位置：`Special.MotionUi.cs:522-547,26-31,71-100`、`SpecialUi.cs:427-457,23-31,50-78`。
 - 证据：
   ```csharp
   _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(16), DispatcherPriority.Render, (_, _) => Frame()); // :538
@@ -439,12 +439,12 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 - `SYS-05` `ArcSandText` detach 时 dispose 位图（`:474-479`），重挂时 Build 因尺寸/文本未变不执行（`:126-130`）→ 切回该页
   可能空白（正确性问题，非性能）。
 - `SYS-06` `Animate` 回调内再 `InvalidateVisual()`（如 `ArcOrbitMenu.cs:252,260`），而 `Frame()` 末尾已 invalidate
-  （`SpecialMotionUi.cs:570`），多一次无效请求（Avalonia 会合并，无实害）。
+  （`Special.MotionUi.cs:570`），多一次无效请求（Avalonia 会合并，无实害）。
 - `GM-08` `ArcGlassBackdrop` 每次 Render 都 `Geometry.Parse`（`:170`），可按 `ArcIcon` 模式缓存。
 - `MO-07` `ArcOrbitLogos` 构造即 `_selected=0`（`:57`），`UpdateSpeed` 仅在 hover 变化时调用（`:436-452`）→ 初始环不转
-  （与"缓慢旋转"文案不符）；`RunLoop()`（`SpecialMotionUi.cs:511-515`）无人使用。
+  （与"缓慢旋转"文案不符）；`RunLoop()`（`Special.MotionUi.cs:511-515`）无人使用。
 - `MD-12` `ArcSpecialCanvas.MeasureOverride` 固定 900×520 忽略 availableSize（`SpecialUi.cs:424`），与 Motion 版本
-  （`SpecialMotionUi.cs:350-352`）行为不一致，窄容器会溢出。
+  （`Special.MotionUi.cs:350-352`）行为不一致，窄容器会溢出。
 
 ## 4. 该区域设计评价与修复优先级
 
@@ -453,8 +453,8 @@ vignette），并做 6 次 OKLCH 转换（`:28-52`）。以下为静态估算，
 - **统一舞台架构**：22 个 Motion/Media 控件共用一个 canvas 基类，命中模型、focus stop、键盘、Automation、pointer capture、
   reduced-motion 全部收敛在基站；单控件文件只写状态与绘制——这是全仓最成熟的自绘组件范式。
 - **reduced-motion 是真降成本**：帧时钟在 reduced 下根本不启动（不是"冻结状态但仍 60fps"），截图 harness 因此确定性渲染
-  （`SpecialMotionUi.cs:277-281` 的注释与实现一致）。
-- **确定性程序化素材**：`Sm.Noise`/`SpecialUi.Noise`（`SpecialMotionUi.cs:202-209`）让 SampleArt/粒子可重复，零外部资源。
+  （`Special.MotionUi.cs:277-281` 的注释与实现一致）。
+- **确定性程序化素材**：`Sm.Noise`/`SpecialUi.Noise`（`Special.MotionUi.cs:202-209`）让 SampleArt/粒子可重复，零外部资源。
 - **有限循环**：除 3 个默认持续控件外，其余都以 `NeedsFrame` 精确收口；SandText 用 WriteableBitmap + 预光栅化 mask
   （`:173-209`）代替逐字符绘制，是区域里最有性能意识的实现。
 - 可访问性与文档：每控件一个 focus stop、完整键盘路径、Automation 名称随状态更新；每页 Implementation notes 主动交代

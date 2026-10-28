@@ -52,7 +52,7 @@
 
 #### P2-1 `ReminderRowPage` 无状态切换；`docs/07` 对"每页 3 个状态按钮"过度声明
 
-**位置**：`src/Arc.Avalonia.Feedback/Pages/ReminderRowPage.cs:64-71`；`docs/07-p0-ui-implementation.zh.md:25`。
+**位置**：`src/Components/Arc.Avalonia.Feedback/Pages/ReminderRowPage.cs:64-71`；`docs/07-p0-ui-implementation.zh.md:25`。
 **证据**：该页创建三行 `ArcReminderRow`，分别固定为 `Due`/`Overdue`/`Done`，页面没有状态切换按钮（无 `.Click` 状态切换）；`VirtualListDemoPage` 也只有滚动/工具栏按钮。docs/07 声称"每页……带 3 个状态切换按钮"。
 **建议（二选一）**：
 
@@ -86,7 +86,7 @@
 
 | ID | 位置 | 说明 | 建议 |
 | --- | --- | --- | --- |
-| P3-1 | `src/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolApprovalSheet.cs:152-156,312` | `StartCountdown()` 除 `OnAttachedToVisualTree` 外，也在属性变更/Rebuild 中调用；控制尚未 attach 时会短暂启动 timer。虽 `OnDetached` 会停，资源行为仍不够严格。 | 加 `_isAttached` 字段；`OnAttached` 置 true 再 Start，`OnDetached` 置 false 并 Stop；属性变更只在 attached 时 Start。 |
+| P3-1 | `src/Special/Arc.Avalonia.Special.AIWidgets/Controls/ArcToolApprovalSheet.cs:152-156,312` | `StartCountdown()` 除 `OnAttachedToVisualTree` 外，也在属性变更/Rebuild 中调用；控制尚未 attach 时会短暂启动 timer。虽 `OnDetached` 会停，资源行为仍不够严格。 | 加 `_isAttached` 字段；`OnAttached` 置 true 再 Start，`OnDetached` 置 false 并 Stop；属性变更只在 attached 时 Start。 |
 | P3-2 | `README.md:31` | docs/06 条目仍写 "219 pages"；P0 落地后 gallery 是 233 页（docs/06 v2.1 已写 233/466）。 | 改为"219 analysis pages / 233 after P0"，或直接引用 docs/06 v2.1。 |
 | P3-3 | 3 个 Foundation 页面（`VirtualListDemoPage.cs:27`、`QuickCaptureBarPage.cs:22`、`RoutineScheduleEditorPage.cs:24`） | Group 字面量用 C# 转义 `"\u00b7"`；运行时值正确（`P0 · Foundation`），但源码可读性差且容易被 grep 误判。 | 改为字面量 `"P0 · Foundation"`（不影响行为）。 |
 

@@ -2,8 +2,8 @@
 
 ## 0. 范围与覆盖
 
-- 工程：`src/Arc.Avalonia.Pickers`（19 个控件 `.cs`/13 个主题）、`src/Arc.Avalonia.Feedback`
-  （22 个控件 + `Internal/ArcUi.cs`）、`src/Arc.Avalonia.Effects`（11 个文件）。
+- 工程：`src/Components/Arc.Avalonia.Pickers`（19 个控件 `.cs`/13 个主题）、`src/Components/Arc.Avalonia.Feedback`
+  （22 个控件 + `Internal/ArcUi.cs`）、`src/Components/Arc.Avalonia.Effects`（11 个文件）。
 - 逐行精读：Pickers 的 `ArcCalendarSurface`、`ArcCalendar`、`ArcDateMath`、`ArcPickerBase`、`ArcEmojiPicker`(480–1452)、
   `ArcEmojiData`(648–747)、`ArcSignaturePad`(1–400)、`ArcColorSurfaces`(50–410)、`ArcAvatarCropSurface`(120–401)、
   `ArcAvatarRing`(80–165)、`ArcAvatarUpload`(940–987)，主题 `ArcCalendar.axaml`、`ArcEmojiPicker.axaml`(376–456)、
@@ -114,7 +114,7 @@ Pickers 只有 3 处，且 `ArcAvatarRing.cs:104` 把 reduced-motion 实现成�
 
 ### PF-01 SignaturePad 每次 move 重画全部笔画并重建几何（P0）
 
-- 位置：`src/Arc.Avalonia.Pickers/Controls/ArcSignaturePad.cs:346`（触发）、`:225-303`（代价）
+- 位置：`src/Components/Arc.Avalonia.Pickers/Controls/ArcSignaturePad.cs:346`（触发）、`:225-303`（代价）
 - 证据：
   ```csharp
   _drawing.Points.Add(new ArcInkPoint(point.X, point.Y, BaseWidth() * factor));  // :344 采样（阈值 0.6 px，:337）

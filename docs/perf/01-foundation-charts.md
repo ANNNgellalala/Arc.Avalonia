@@ -6,10 +6,10 @@
 
 | 工程 | 非 obj `.cs` | 主题文件 | 构成 |
 | --- | --- | --- | --- |
-| `src/Arc.Avalonia` | 11 | 4（`Theme/ArcTheme.axaml` + 3 个 ControlTheme） | 调色板/主题/动效/图标/5 个控件 |
-| `src/Arc.Avalonia.Charts` | 30 | — | 22 个自绘控件 + `Core/ChartCore.cs` + 7 个页面 |
-| `src/Arc.Avalonia.Demo` | 7 | — | `ArcPage`/Registry/DemoUi/Catalog/ItemPage/DocLayout/Aliases |
-| `src/Arc.Avalonia.Gallery` | 11 | — | shell、ShotRunner、CatalogAudit、NavigationSmoke、5 个页面 |
+| `src/Foundation/Arc.Avalonia` | 11 | 4（`Theme/ArcTheme.axaml` + 3 个 ControlTheme） | 调色板/主题/动效/图标/5 个控件 |
+| `src/Components/Arc.Avalonia.Charts` | 30 | — | 22 个自绘控件 + `Core/ChartCore.cs` + 7 个页面 |
+| `src/Apps/Arc.Avalonia.Demo` | 7 | — | `ArcPage`/Registry/DemoUi/Catalog/ItemPage/DocLayout/Aliases |
+| `src/Apps/Arc.Avalonia.Gallery` | 11 | — | shell、ShotRunner、CatalogAudit、NavigationSmoke、5 个页面 |
 
 **完整精读**：`ArcThemeManager.cs`、`ArcPalette.cs`、`ArcColor.cs`、`ArcSpinner.cs`、`ArcIcon.cs`、`ArcMotion.cs`、`ArcButton.cs`、`ArcCard.cs`、`ArcBadge.cs`、`ArcButton.axaml`、`ChartCore.cs`、`ArcLineChart.cs`、`ArcBarChart.cs`、`ArcTreemap.cs`、`ArcRaceBarChart.cs`、`ArcRealtimeStream.cs`、`ArcAnimatedCounter.cs`、`ArcRadarChart.cs`（Render 段）、`ArcSankeyFlow.cs`（Render 段）、`ArcSunburstChart.cs`（Render 段）、`ArcBrushChart.cs`（Render/Strip 段）、`ArcGauge.cs`、`ArcSparkline.cs`、`ArcActivityHeatmap.cs`、`ArcPage.cs`、`ArcPageRegistry.cs`、`DemoUi.cs`、`IconsPage.cs`、`ShotRunner.cs`、`App.axaml.cs`、`GalleryWindow.cs`、`CatalogAudit.cs`、`ProofPage.cs`（片段）。
 
@@ -83,7 +83,7 @@
 
 #### FO-01 每个 ArcButton 都带一个看不见的 16 ms timer（P0）
 
-- 位置：`src/Arc.Avalonia/Themes/ArcButton.axaml:43-51`、`src/Arc.Avalonia/Controls/ArcSpinner.cs:53-68`、`src/Arc.Avalonia/Controls/ArcButton.cs:84-89`
+- 位置：`src/Foundation/Arc.Avalonia/Themes/ArcButton.axaml:43-51`、`src/Foundation/Arc.Avalonia/Controls/ArcSpinner.cs:53-68`、`src/Foundation/Arc.Avalonia/Controls/ArcButton.cs:84-89`
 - 证据：
   ```xml
   <c:ArcSpinner x:Name="Spinner" ... IsVisible="False" ... />
@@ -99,7 +99,7 @@
 
 #### FO-02 ArcSpinner 每帧重建几何与 Pen（P0）
 
-- 位置：`src/Arc.Avalonia/Controls/ArcSpinner.cs:78-105`
+- 位置：`src/Foundation/Arc.Avalonia/Controls/ArcSpinner.cs:78-105`
 - 证据：
   ```csharp
   var geometry = new StreamGeometry();
@@ -112,7 +112,7 @@
 
 #### FO-03 ArcIcon 每次绘制 new Pen + 资源查找（P1）
 
-- 位置：`src/Arc.Avalonia/Controls/ArcIcon.cs:65-103`
+- 位置：`src/Foundation/Arc.Avalonia/Controls/ArcIcon.cs:65-103`
 - 证据：
   ```csharp
   var brush = Foreground ?? ArcResources.Brush(ArcTokens.TextSecondary);
@@ -124,7 +124,7 @@
 
 #### FO-04 ArcResources.* 无缓存（P1）
 
-- 位置：`src/Arc.Avalonia/Theme/ArcThemeManager.cs:51-70`；代表调用：`ArcIcon.cs:96`、`ArcSpinner.cs:80`、`ChartCore.cs:96-104`、`ChartCore.cs:120-133`
+- 位置：`src/Foundation/Arc.Avalonia/Theme/ArcThemeManager.cs:51-70`；代表调用：`ArcIcon.cs:96`、`ArcSpinner.cs:80`、`ChartCore.cs:96-104`、`ChartCore.cs:120-133`
 - 证据：
   ```csharp
   public static IBrush Brush(string key) =>
@@ -136,7 +136,7 @@
 
 #### FO-05 换肤代价链：81 项重建 + 整树 DynamicResource 重解析（P1）
 
-- 位置：`src/Arc.Avalonia/Theme/ArcThemeManager.cs:24-38`、`src/Arc.Avalonia/Theme/ArcPalette.cs:35-249`、`GalleryWindow.cs:488-494`
+- 位置：`src/Foundation/Arc.Avalonia/Theme/ArcThemeManager.cs:24-38`、`src/Foundation/Arc.Avalonia/Theme/ArcPalette.cs:35-249`、`GalleryWindow.cs:488-494`
 - 证据：
   ```csharp
   var palette = ArcPalette.Build(scheme, accent);
@@ -159,7 +159,7 @@
 
 #### CH-01 ArcRaceBarChart：16 ms timer × 两次布局计算 × 每行文本（P0）
 
-- 位置：`src/Arc.Avalonia.Charts/Controls/ArcRaceBarChart.cs:694-747`、`517-550`、`330-474`
+- 位置：`src/Components/Arc.Avalonia.Charts/Controls/ArcRaceBarChart.cs:694-747`、`517-550`、`330-474`
 - 证据：
   ```csharp
   private void OnTick()
@@ -180,7 +180,7 @@
 
 #### CH-02 ArcRealtimeStream：16 ms timer + 每帧全量重采样（P0）
 
-- 位置：`src/Arc.Avalonia.Charts/Controls/ArcRealtimeStream.cs:623-649`、`263-393`、`580-592`
+- 位置：`src/Components/Arc.Avalonia.Charts/Controls/ArcRealtimeStream.cs:623-649`、`263-393`、`580-592`
 - 证据：
   ```csharp
   for (var series = 0; series < _buffers.Count; series++)
@@ -256,7 +256,7 @@
 
 #### CH-07 ArcSankeyFlow 每帧 LINQ + 循环内 First + 每边几何（P1）
 
-- 位置：`src/Arc.Avalonia.Charts/Controls/ArcSankeyFlow.cs:400-415,424-433,459-463,481-509,551-579,595`
+- 位置：`src/Components/Arc.Avalonia.Charts/Controls/ArcSankeyFlow.cs:400-415,424-433,459-463,481-509,551-579,595`
 - 证据：
   ```csharp
   var stale = _orders.Count == 0
@@ -271,7 +271,7 @@
 
 #### CH-08 ArcSunburstChart 逐层扫描 + 每弧一个几何（P1）
 
-- 位置：`src/Arc.Avalonia.Charts/Controls/ArcSunburstChart.cs:270-403`
+- 位置：`src/Components/Arc.Avalonia.Charts/Controls/ArcSunburstChart.cs:270-403`
 - 证据：
   ```csharp
   foreach (var level in Enumerable.Range(1, Math.Max(1, levels)))
@@ -286,7 +286,7 @@
 
 #### CH-09 ChartText / ChartPalette.Alpha：文本与半透明刷子的固定税（P1）
 
-- 位置：`src/Arc.Avalonia.Charts/Core/ChartCore.cs:84-94,106-200`
+- 位置：`src/Components/Arc.Avalonia.Charts/Core/ChartCore.cs:84-94,106-200`
 - 证据：
   ```csharp
   var formatted = new FormattedText(
@@ -311,7 +311,7 @@
 
 #### DG-01 首次点击 catalog 项可同步构建最多 54 个页面（P1）
 
-- 位置：`src/Arc.Avalonia.Gallery/Framework/GalleryWindow.cs:632-666`
+- 位置：`src/Apps/Arc.Avalonia.Gallery/Framework/GalleryWindow.cs:632-666`
 - 证据：
   ```csharp
   foreach (var page in _pages.Where(page => page is not ArcItemPage))
@@ -347,7 +347,7 @@
 
 #### DG-03 离屏截图与不受 ReducedMotion 约束的 timer（P1，suspected）
 
-- 位置：`src/Arc.Avalonia.Gallery/Framework/ShotRunner.cs:25-28,101-125`；代表不受控 timer：`Arc.Avalonia.Actions/Controls/ArcActionSwap.cs:29-50`（4 个 timer）、`Arc.Avalonia.Inputs/Controls/ArcNumberField.cs:284,431`、`Arc.Avalonia.Actions/Controls/ArcToast.cs:52`
+- 位置：`src/Apps/Arc.Avalonia.Gallery/Framework/ShotRunner.cs:25-28,101-125`；代表不受控 timer：`Arc.Avalonia.Actions/Controls/ArcActionSwap.cs:29-50`（4 个 timer）、`Arc.Avalonia.Inputs/Controls/ArcNumberField.cs:284,431`、`Arc.Avalonia.Actions/Controls/ArcToast.cs:52`
 - 证据：
   ```csharp
   ArcThemeManager.ReducedMotion = true;          // ShotRunner.cs:28

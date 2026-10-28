@@ -2,7 +2,7 @@
 
 ## 0. 范围与覆盖
 
-- 覆盖工程：`src/Arc.Avalonia.AdvancedInputs`、`src/Arc.Avalonia.AdvancedActions`、`src/Arc.Avalonia.Content`、`src/Arc.Avalonia.Media`。
+- 覆盖工程：`src/Foundation/Arc.Avalonia.AdvancedInputs`、`src/Foundation/Arc.Avalonia.AdvancedActions`、`src/Components/Arc.Avalonia.Content`、`src/Components/Arc.Avalonia.Media`。
 - 文件数（不含 `obj/`）：31 + 14 + 13 + 23 = 81 个源文件；其中控件/基础设施 `.cs` 36 个、页面 `.cs` 13 个、主题 `.axaml` 31 个。
 - 精读（逐段 read，含行号核对）：`ArcRichTextEditor.cs`、`ArcMarkdown.cs`、`ArcReorderableList.cs`、`ArcOnboardingChecklist.cs`（BuildShell + Ring 段）、`ArcContentUi.cs`、`ArcChatThread.cs`（BuildShell→RenderMessages→BuildGroup/Bubble/Avatar→Submit 全段）、`ArcImageCompare.cs`、`ArcCarousel.cs`、`ArcCardStack.cs`（Build/Rebuild/Decide/指针段）、`ArcHoldToConfirm.cs`、`ArcResizablePanels.cs`、`ArcScrollArea.cs`、`ArcReactions.cs`、`ArcSwipeActions.cs`、`ArcMediaUi.cs`、`ArcElasticSlider.cs`、`ArcRangeHistogramSlider.cs`、`ArcScrubInput.cs`（模板与值路径段）、`ArcPhoneInput.cs`（输入与选择器段）、`ArcMentionInput.cs`（文本/建议段）、`ArcMorphSelect.cs`（形变/高亮段）、`ArcExpandingSearch.cs`（展开/结果段）、`ArcAdvancedInternals.cs`、`ArcDraw.cs`、`ArcActionButton.cs`、`ArcAdvancedVisuals.cs`（Glide 段）、`ArcExpandingButtonGroup.cs`（展开段）。
 - grep 扫描（未逐行精读，只用于归类/计数）：`ArcInlineEdit.cs`、`ArcShortcutRecorder.cs`、`ArcBillingToggle.cs`、`ArcBillingPrice.cs`、`ArcRadioCards.cs`、`ArcFloatingButtonGroup.cs`、`ArcIconMorph.cs`、`ArcUserMenu.cs`、`ArcMediaModels.cs`、全部 `Pages/*.cs`、全部主题 `.axaml`（抽查 token 用法）。
@@ -54,38 +54,38 @@
 
 | ID | 分类 | 严重度 | 位置 | 问题一句话 | 放大因子 |
 | --- | --- | --- | --- | --- | --- |
-| CT-01 | R2/S2/P1 | P0 | `src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:762-780,819-827` | 每次按键全文 `ToHtml` + 重建整棵预览控件树，Markdown 被解析两次 | ×文档长度 ×按键率 ×预览块数 |
-| CT-02 | S2/R1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcMarkdown.cs:123,132,139,147,596` | 逐行未编译正则匹配；`InlineToHtml` 每个普通字符一次单字符字符串 + HtmlEncode | ×文档字符数 ×每次按键 2 次解析 |
-| CT-03 | L2/M2/R1 | P0 | `src/Arc.Avalonia.Content/Controls/ArcChatThread.cs:135-139,453-536,846-873` | 每条消息/typing 变化全量清空重建消息树；头像位图每次重新解码 | ×消息数 ×头像数 ×重建次数（无虚拟化） |
-| CT-04 | P1/L2 | P1 | `src/Arc.Avalonia.Content/Controls/ArcChatThread.cs:522-535,272-278` | 重建后 `ScrollToEnd`，整棵树被迫重新测量/排列 | ×消息数 ×每次新消息 |
-| CT-05 | L1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:771,819-827` | 预览隐藏时仍每键重建预览（`force: !_previewVisible` 取反） | ×按键率（纯浪费） |
-| CT-06 | L2/P1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:907-931,574-646,970-980` | 每次选区/光标变化重建 7 个工具栏按钮，并用 LINQ 遍历视觉树找 `TextPresenter` | ×选区变化次数（拖选≈每 pointer move） |
-| CT-07 | L2/R1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:1321-1361,688-760` | slash 菜单打开时每个按键重建全部行控件 | ×按键率 ×可见命令数 |
-| CT-08 | R1/P1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:603-604,351-387` | FLIP 拖动对每行每 pointer move 做字符串格式化 + `TransformOperations.Parse` | ×行数 ×pointer move 频率 |
-| CT-09 | L2/T2 | P2 | `src/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:471-498,137-237` | 每次键盘移序重建整个列表 + 每行 `new Transitions` | ×行数 ×按键次数 |
-| CT-10 | L2/T1 | P1 | `src/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:225-374,624,640,667,680` | 任一勾选/展开都全量 `BuildShell`（含新建进度环与所有行） | ×步骤数 ×交互次数 |
-| CT-11 | R1/R2/R3 | P1 | `src/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:779-820`；`ArcContentUi.cs:317` | 进度环每帧 `new Pen`×2、`new StreamGeometry`、`ArcResources`×2 | ×60 fps ×0.4 s 动画 |
-| CT-12 | R1 | P2 | `src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:846-860` | 每次按键 `Split` 全文数词 | ×按键率 ×文档长度 |
-| AI-01 | P1/R1 | P0 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcRangeHistogramSlider.cs:417-426,538-572,611-655,224,266-297` | 拖动每 move 起一个 16 ms 计时器；每帧对全数据集做 Min/Max 并重新分桶重绘 | ×`Data.Count` ×拖动频率 ×存活 timer 数 |
-| AI-02 | R1/R2/S2 | P1 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcElasticSlider.cs:334-350,179-249` | 每次 pointer move 全表面重绘：7 次资源查找 + 2-4 个 `FormattedText` + `new Pen` | ×60 Hz ×实例数 |
-| AI-03 | T1/T2 | P1 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcAdvancedInternals.cs:22-57` | 每次动画新建不可取消的 16 ms `DispatcherTimer` | ×键盘重复率（30/s）×调用点数 |
-| AI-04 | L1/P1 | P1 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcScrubInput.cs:523-546,372-383,454-486` | 拖动每 move 改 `TextBox.Text` + 轨道 `Width` + Automation 文案 | ×pointer move 频率 ×实例数 |
-| AI-05 | L2 | P1 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcPhoneInput.cs:1119-1124,941-990,1022-1090` | 国家选择器每次搜索按键重建全部国家行（每行 3 次 token 查找） | ×国家数（≈200）×按键率 |
-| AI-06 | L2/S2 | P1 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcMentionInput.cs:462-483,500-543,599-635,662-692` | 每按键重建镜像 `Run` 集合与全部建议行，含 LINQ `OrderBy` | ×按键率 ×(提及数 + 候选人数) |
+| CT-01 | R2/S2/P1 | P0 | `src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:762-780,819-827` | 每次按键全文 `ToHtml` + 重建整棵预览控件树，Markdown 被解析两次 | ×文档长度 ×按键率 ×预览块数 |
+| CT-02 | S2/R1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcMarkdown.cs:123,132,139,147,596` | 逐行未编译正则匹配；`InlineToHtml` 每个普通字符一次单字符字符串 + HtmlEncode | ×文档字符数 ×每次按键 2 次解析 |
+| CT-03 | L2/M2/R1 | P0 | `src/Components/Arc.Avalonia.Content/Controls/ArcChatThread.cs:135-139,453-536,846-873` | 每条消息/typing 变化全量清空重建消息树；头像位图每次重新解码 | ×消息数 ×头像数 ×重建次数（无虚拟化） |
+| CT-04 | P1/L2 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcChatThread.cs:522-535,272-278` | 重建后 `ScrollToEnd`，整棵树被迫重新测量/排列 | ×消息数 ×每次新消息 |
+| CT-05 | L1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:771,819-827` | 预览隐藏时仍每键重建预览（`force: !_previewVisible` 取反） | ×按键率（纯浪费） |
+| CT-06 | L2/P1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:907-931,574-646,970-980` | 每次选区/光标变化重建 7 个工具栏按钮，并用 LINQ 遍历视觉树找 `TextPresenter` | ×选区变化次数（拖选≈每 pointer move） |
+| CT-07 | L2/R1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:1321-1361,688-760` | slash 菜单打开时每个按键重建全部行控件 | ×按键率 ×可见命令数 |
+| CT-08 | R1/P1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:603-604,351-387` | FLIP 拖动对每行每 pointer move 做字符串格式化 + `TransformOperations.Parse` | ×行数 ×pointer move 频率 |
+| CT-09 | L2/T2 | P2 | `src/Components/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:471-498,137-237` | 每次键盘移序重建整个列表 + 每行 `new Transitions` | ×行数 ×按键次数 |
+| CT-10 | L2/T1 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:225-374,624,640,667,680` | 任一勾选/展开都全量 `BuildShell`（含新建进度环与所有行） | ×步骤数 ×交互次数 |
+| CT-11 | R1/R2/R3 | P1 | `src/Components/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:779-820`；`ArcContentUi.cs:317` | 进度环每帧 `new Pen`×2、`new StreamGeometry`、`ArcResources`×2 | ×60 fps ×0.4 s 动画 |
+| CT-12 | R1 | P2 | `src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:846-860` | 每次按键 `Split` 全文数词 | ×按键率 ×文档长度 |
+| AI-01 | P1/R1 | P0 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcRangeHistogramSlider.cs:417-426,538-572,611-655,224,266-297` | 拖动每 move 起一个 16 ms 计时器；每帧对全数据集做 Min/Max 并重新分桶重绘 | ×`Data.Count` ×拖动频率 ×存活 timer 数 |
+| AI-02 | R1/R2/S2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcElasticSlider.cs:334-350,179-249` | 每次 pointer move 全表面重绘：7 次资源查找 + 2-4 个 `FormattedText` + `new Pen` | ×60 Hz ×实例数 |
+| AI-03 | T1/T2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcAdvancedInternals.cs:22-57` | 每次动画新建不可取消的 16 ms `DispatcherTimer` | ×键盘重复率（30/s）×调用点数 |
+| AI-04 | L1/P1 | P1 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcScrubInput.cs:523-546,372-383,454-486` | 拖动每 move 改 `TextBox.Text` + 轨道 `Width` + Automation 文案 | ×pointer move 频率 ×实例数 |
+| AI-05 | L2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcPhoneInput.cs:1119-1124,941-990,1022-1090` | 国家选择器每次搜索按键重建全部国家行（每行 3 次 token 查找） | ×国家数（≈200）×按键率 |
+| AI-06 | L2/S2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcMentionInput.cs:462-483,500-543,599-635,662-692` | 每按键重建镜像 `Run` 集合与全部建议行，含 LINQ `OrderBy` | ×按键率 ×(提及数 + 候选人数) |
 | AI-07 | L1/T2 | P1 | `ArcMorphSelect.cs:568-605,912-918`；`ArcExpandingSearch.cs:540-564`；`ArcBillingToggle.cs:391-415`；`ArcRadioCards.cs:478-503` | 用 `Width/Height/Margin` 逐帧做形变/高亮动画 | ×60 Hz ×每帧布局子树 |
 | AI-08 | R2 | P2 | `ArcElasticSlider.cs:186-192`；`ArcRangeHistogramSlider.cs:225-232`；`ArcBillingPrice.cs:100-102` | 自绘控件无主题订阅，`Render` 里的 token 快照换肤后不刷新 | 换肤次数 |
-| AI-09 | R1 | P2 | `src/Arc.Avalonia.AdvancedInputs/Controls/ArcDraw.cs:19,57` | 每次绘制 `new Pen`（几何缓存做得好，Pen 没有） | ×每帧图标/描边数 |
-| MD-01 | L1/P1 | P0 | `src/Arc.Avalonia.Media/Controls/ArcResizablePanels.cs:529,591,235,63-106,110-162,165-232` | 拖动分隔条每 move 全 pane Measure+Arrange（文本重排）并分配尺寸数组 | ×pane 数 ×pane 内容 ×60 Hz |
-| MD-02 | L1/T2 | P1 | `src/Arc.Avalonia.Media/Controls/ArcCarousel.cs:46-58,106-134,606-629` | 拖拽用 `InvalidateArrange` 驱动，每 move 重排全部 slide 并写 Opacity/ZIndex | ×slide 数 ×pointer move 频率 |
-| MD-03 | R1/R2/S2 | P1 | `src/Arc.Avalonia.Media/Controls/ArcImageCompare.cs:618-628,152-181,200-238,281-325` | 拖动每 move 全表面重绘：逐线 hatch、2 个 `FormattedText`、6 个 `new SolidColorBrush` | ×pointer move ×控件尺寸 |
-| MD-04 | L2/T1/R1 | P1 | `src/Arc.Avalonia.Media/Controls/ArcReactions.cs:437,260-312,386-404,41,72-103` | 每次点击重建所有 pill；每个计数各起 16 ms tween；burst 每帧 7 个新 brush | ×反应类型数 ×存活 tween 数 |
-| MD-05 | R1/T1 | P1 | `src/Arc.Avalonia.Media/Controls/ArcScrollArea.cs:301-305,401-446,538-557` | 每个滚动事件新建渐变刷/GradientStops 赋给 OpacityMask，并新建 hide 计时器 | ×scroll 事件频率 |
-| MD-06 | L1/T1 | P1 | `src/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs:338-357,267-268` | 按住进度每帧改 fill/clip 的 `Width` → 每帧布局 | ×60 Hz ×按住时长 |
-| MD-07 | T2 | P2 | `src/Arc.Avalonia.Media/Controls/ArcMediaUi.cs:193-233` | 每次 `Run` new 计时器（有 `Stop`，但无跨 run 取消/合并语义） | 手势频率 |
-| MD-08 | L2/M2 | P2 | `src/Arc.Avalonia.Media/Controls/ArcCardStack.cs:271-335,294-298,526-539` | 每次判定重建 ≤4 张卡（含新 `TransformGroup`）；决策列表无界增长 | ×决策次数 |
+| AI-09 | R1 | P2 | `src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcDraw.cs:19,57` | 每次绘制 `new Pen`（几何缓存做得好，Pen 没有） | ×每帧图标/描边数 |
+| MD-01 | L1/P1 | P0 | `src/Components/Arc.Avalonia.Media/Controls/ArcResizablePanels.cs:529,591,235,63-106,110-162,165-232` | 拖动分隔条每 move 全 pane Measure+Arrange（文本重排）并分配尺寸数组 | ×pane 数 ×pane 内容 ×60 Hz |
+| MD-02 | L1/T2 | P1 | `src/Components/Arc.Avalonia.Media/Controls/ArcCarousel.cs:46-58,106-134,606-629` | 拖拽用 `InvalidateArrange` 驱动，每 move 重排全部 slide 并写 Opacity/ZIndex | ×slide 数 ×pointer move 频率 |
+| MD-03 | R1/R2/S2 | P1 | `src/Components/Arc.Avalonia.Media/Controls/ArcImageCompare.cs:618-628,152-181,200-238,281-325` | 拖动每 move 全表面重绘：逐线 hatch、2 个 `FormattedText`、6 个 `new SolidColorBrush` | ×pointer move ×控件尺寸 |
+| MD-04 | L2/T1/R1 | P1 | `src/Components/Arc.Avalonia.Media/Controls/ArcReactions.cs:437,260-312,386-404,41,72-103` | 每次点击重建所有 pill；每个计数各起 16 ms tween；burst 每帧 7 个新 brush | ×反应类型数 ×存活 tween 数 |
+| MD-05 | R1/T1 | P1 | `src/Components/Arc.Avalonia.Media/Controls/ArcScrollArea.cs:301-305,401-446,538-557` | 每个滚动事件新建渐变刷/GradientStops 赋给 OpacityMask，并新建 hide 计时器 | ×scroll 事件频率 |
+| MD-06 | L1/T1 | P1 | `src/Components/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs:338-357,267-268` | 按住进度每帧改 fill/clip 的 `Width` → 每帧布局 | ×60 Hz ×按住时长 |
+| MD-07 | T2 | P2 | `src/Components/Arc.Avalonia.Media/Controls/ArcMediaUi.cs:193-233` | 每次 `Run` new 计时器（有 `Stop`，但无跨 run 取消/合并语义） | 手势频率 |
+| MD-08 | L2/M2 | P2 | `src/Components/Arc.Avalonia.Media/Controls/ArcCardStack.cs:271-335,294-298,526-539` | 每次判定重建 ≤4 张卡（含新 `TransformGroup`）；决策列表无界增长 | ×决策次数 |
 | MD-09 | R2 | P2 | `ArcScrollArea.cs:59`；`ArcImageCompare.cs:63` | 只订阅 `ActualThemeVariantChanged`，纯 accent 换色不触发重绘 | 换肤次数 |
-| AA-01 | L1/T2 | P1 | `src/Arc.Avalonia.AdvancedActions/Controls/ArcAdvancedVisuals.cs:202-249,280-300` | 共享高亮靠 `Margin/Width/Height` 过渡迁移，每次 `ShowAt` 重建 `Transitions` | ×菜单项数 ×hover 频率 |
-| AA-02 | L1/T2 | P1 | `src/Arc.Avalonia.AdvancedActions/Controls/ArcExpandingButtonGroup.cs:403-453` | 展开用 `Width` 过渡，每次 `ApplySlot` 为每个槽位分配 `Transitions` | ×槽位数 ×展开次数 |
+| AA-01 | L1/T2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedActions/Controls/ArcAdvancedVisuals.cs:202-249,280-300` | 共享高亮靠 `Margin/Width/Height` 过渡迁移，每次 `ShowAt` 重建 `Transitions` | ×菜单项数 ×hover 频率 |
+| AA-02 | L1/T2 | P1 | `src/Foundation/Arc.Avalonia.AdvancedActions/Controls/ArcExpandingButtonGroup.cs:403-453` | 展开用 `Width` 过渡，每次 `ApplySlot` 为每个槽位分配 `Transitions` | ×槽位数 ×展开次数 |
 | AA-03 | T1/R1 | P2 | `ArcActionButton.cs:61,81`；`ArcExpandingButtonGroup.cs:88,109`；`ArcUserMenu.cs:107,156` | 每实例一个计时器 + 每次过渡 `TransformOperations.Parse` 字符串 | 实例数 |
 
 ## 3. 逐条说明
@@ -99,7 +99,7 @@
 - **Media**：Carousel 拖拽用 `InvalidateArrange` 驱动（每 move 全 slide 重排），CardStack 拖拽是 render-only（只有回弹补间，**没有惯性 timer**）；ImageCompare 每 move 重绘整面（两次 `PushClip` + hatch + `FormattedText`）；ResizablePanels 拖动每 move 触发全 pane measure/arrange（文本重排），是 Media 唯一 P0；HoldToConfirm 按住进度每帧改 `Width`（每帧布局）；11 个 `new SolidColorBrush` 里 **10 个在 `Render`/其调用的绘制方法内**（ImageCompare 6、Reactions 2、ScrollArea 2），第 11 个是 `ArcMediaUi.Alpha` 帮助方法本身（MD-01/02/03/04/05/06）。Media 的“9 个 timer”= 4 个 `DispatcherTimer` 创建点 + 5 个 `ArcMediaTween` 字段（每次 `Run` 再建一个 16 ms timer，每个 reaction pill 还有一个）。
 
 ### CT-01 编辑按键触发的双解析 + 预览全量重建（P0）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:762`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:762`
 - 证据：
   ```csharp
   _source = _textBox.Text ?? string.Empty;
@@ -114,7 +114,7 @@
 - 另：本实现**没有语法高亮**（`TextBox` 纯文本），所以问题集中在"全文重新渲染"，不是着色器。
 
 ### CT-02 Markdown 解析的每行正则与逐字符分配（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcMarkdown.cs:123`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcMarkdown.cs:123`
 - 证据：
   ```csharp
   var heading = Regex.Match(trimmed, @"^(#{1,6})\s+(.+)$");   // 123
@@ -127,7 +127,7 @@
 - 修复建议：预编译 `static readonly Regex` 或用 `ReadOnlySpan<char>` 手写前缀判断（`StartsWith('#')` 等）；`InlineToHtml` 改成"连续普通字符一次 `Escape` 一段"。
 
 ### CT-03 ChatThread 每条消息全量重建 + 头像每次解码（P0）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcChatThread.cs:453`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcChatThread.cs:453`
 - 证据：
   ```csharp
   _messageHost.Children.Clear();          // 467，之后按组重建全部气泡
@@ -140,7 +140,7 @@
 - 修复建议：改 `ItemsControl`/`VirtualizingStackPanel`（或至少"只追加新组、只改 typing 行"）；头像 `ImageBrush` 按 source 缓存并用 `static ConcurrentDictionary`，控件销毁时释放 `Bitmap`。
 
 ### CT-04 自动滚动在重建后触发全树测量（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcChatThread.cs:522`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcChatThread.cs:522`
 - 证据：
   ```csharp
   if (scrollToEnd || pinned)
@@ -151,7 +151,7 @@
 - 修复建议：先追加再调用 `BringIntoView` 到末尾哨兵元素；或反转容器（bottom-anchored）避免重新定位；配合虚拟化后此问题自然消失。
 
 ### CT-05 预览隐藏时仍在重建（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:771`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:771`
 - 证据：
   ```csharp
   UpdatePreview(force: !_previewVisible);   // 隐藏时 force=true
@@ -163,7 +163,7 @@
 - 修复建议：改为 `UpdatePreview()`（force 只在显式 `LoadSource`/`UpdatePreviewVisibility` 时用），或表达式 `UpdatePreview(force: false)`。
 
 ### CT-06 选区变化重建工具栏 + 视觉树 LINQ（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:907`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:907`
 - 证据：
   ```csharp
   if (_toolbar.Child is null || _toolbarButtons.Count == 0 && !_linkMode) RebuildToolbar();  // 919
@@ -177,7 +177,7 @@
 - 修复建议：工具栏只建一次，`IsMarkActive` 只更新 7 个按钮的图标 token/class；`TextPresenter` 在 `Loaded` 后缓存字段；位置改 `RenderTransform` 平移并在滚动时复用。
 
 ### CT-07 slash 菜单每按键重建行（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:1321`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcRichTextEditor.cs:1321`
 - 证据：
   ```csharp
   if (shouldOpen) { ... RebuildSlashMenu(); _slashMenu!.IsVisible = true; ... }   // 1344
@@ -189,7 +189,7 @@
 - 修复建议：菜单结构单次构建，过滤只 toggle `IsVisible` 与高亮 `Classes`；过滤逻辑本来就只有 8 项。
 
 ### CT-08 ReorderableList：FLIP 没有 layout thrash，但每行每 move 解析字符串（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:603`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:603`
 - 证据：
   ```csharp
   private static TransformOperations Translate(double y) =>
@@ -202,7 +202,7 @@
 - 修复建议：缓存 `TransformOperations`（每行两个：`translateY(±Step)`、`translateY(0)`）或直接共享 `TranslateTransform` 并只改 `.Y`。
 
 ### CT-10 OnboardingChecklist 每次状态变化全量重建（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:225`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:225`
 - 证据：
   ```csharp
   _host.Children.Clear(); _titleButtons.Clear();
@@ -216,7 +216,7 @@
 - 修复建议：`BuildShell` 只建一次，勾选只改对应行的 class/`ArcIcon.Icon` 与进度环 target；ring 复用实例。
 
 ### CT-11 进度环每帧两次 Pen + 几何重建（P1）
-- 位置：`src/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:779`
+- 位置：`src/Components/Arc.Avalonia.Content/Controls/ArcOnboardingChecklist.cs:779`
 - 证据：
   ```csharp
   var track = new Pen(ArcResources.Brush(ArcTokens.Border), thickness, null, PenLineCap.Round, PenLineJoin.Round);  // 790
@@ -229,7 +229,7 @@
 - 修复建议：track/pen 只在主题变化时重建；进度弧改用 `Arc` 的 `RenderTransform`/`StrokeDashArray` 表达，或缓存两个 `Pen` + 一个可变 `StreamGeometry`。
 
 ### AI-01 RangeHistogramSlider：拖动一帧一次计时器 + 全量重新分桶（P0）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcRangeHistogramSlider.cs:417`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcRangeHistogramSlider.cs:417`
 - 证据：
   ```csharp
   protected override void OnPointerMoved(PointerEventArgs e) { ... MoveThumb(_dragging, e.GetPosition(this).X, animate: false); }  // 417-425
@@ -242,7 +242,7 @@
 - 修复建议：`Data` 变化时才缓存 `dataMin/dataMax/counts`；拖动期间只重算拇指几何；`OnValueChanged→SyncDisplay` 加 `if (_dragging)` 分支（ElasticSlider 已有此分支，可照抄 `ArcElasticSlider.cs:439-451`）；commit 只在 `OnPointerReleased`；`ArcAnim` 提供可取消句柄或复用单计时器。
 
 ### AI-02 ElasticSlider 每 pointer move 重绘完整控件（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcElasticSlider.cs:334`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcElasticSlider.cs:334`
 - 证据：
   ```csharp
   protected override void OnPointerMoved(PointerEventArgs e) { ... SetFromPointer(x); ... InvalidateVisual(); }  // 334-350
@@ -255,7 +255,7 @@
 - 修复建议：`ArcText.Create` 结果按 `(text,size,weight)` 缓存；`Pen`/brushes 静态缓存到主题版本（用 `ActualThemeVariantChanged` 失效）；拖动时只画 track+thumb，标签延迟到停顿/释放再画。
 
 ### AI-03 `ArcAnim.To` 每次动画新建不可取消计时器（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcAdvancedInternals.cs:22`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcAdvancedInternals.cs:22`
 - 证据：
   ```csharp
   var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };   // 37
@@ -269,7 +269,7 @@
 - 修复建议：抽一个 `ArcTween` 句柄（`Cancel()`），每控件复用一个实例；或统一改 `Transitions`/`Animation`；至少把 timer 存字段并在新动画开始时 `Stop()`。
 
 ### AI-04 ScrubInput 拖动每 move 改文本 + 布局宽度（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcScrubInput.cs:523`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcScrubInput.cs:523`
 - 证据：
   ```csharp
   ApplyScrub(raw);                                  // → SetValueInternal → OnValueChanged
@@ -283,7 +283,7 @@
 - 修复建议：拖动期间节流到每帧一次（`Dispatcher.Post` 去重）；轨道进度改 `RenderTransform`（ScaleTransform.X）或自绘；Automation 文本只在 commit 时更新。
 
 ### AI-05 PhoneInput 选择器搜索每按键重建全部国家行（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcPhoneInput.cs:1119`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcPhoneInput.cs:1119`
 - 证据：
   ```csharp
   private void OnSearchTextChanged(...) { BuildRows(_search?.Text ?? string.Empty); _active = 0; Highlight(0, focusSearch: false); }
@@ -294,7 +294,7 @@
 - 修复建议：`BuildRows` 增量（按 `_visible` 差异 add/remove）或 `ItemsControl` + 虚拟化；行模板在 `ControlTheme` 里定义；token 用 `DynamicResource` 而非逐行 `ArcResources` 查找。
 
 ### AI-06 MentionInput 每按键重建镜像与建议（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcMentionInput.cs:462`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcMentionInput.cs:462`
 - 证据：
   ```csharp
   _text = _box.Text ?? string.Empty;
@@ -305,7 +305,7 @@
 - 修复建议：镜像只在 `_mentions`/文本变化时 diff 更新；建议行用固定池 + `IsVisible` 过滤；`Value` 用可变对象或延迟提交；hover 只切两行 `Background`。
 
 ### AI-07 用 Width/Height/Margin 逐帧做形变动画（P1）
-- 位置：`src/Arc.Avalonia.AdvancedInputs/Controls/ArcMorphSelect.cs:568`（其余同类：`ArcExpandingSearch.cs:540`、`ArcBillingToggle.cs:391`、`ArcRadioCards.cs:478`）
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedInputs/Controls/ArcMorphSelect.cs:568`（其余同类：`ArcExpandingSearch.cs:540`、`ArcBillingToggle.cs:391`、`ArcRadioCards.cs:478`）
 - 证据：
   ```csharp
   _surface.Width = fromWidth + (toWidth - fromWidth) * value;      // MorphSelect:600
@@ -318,7 +318,7 @@
 - 修复建议：容器尺寸一次性设置，形变交给 `RenderTransform`（缩放/平移）与 `Clip`；必须改尺寸时用单个 `Animation` 而非手写 timer。
 
 ### MD-01 ResizablePanels 拖动 = 每 move 一次完整布局（P0）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcResizablePanels.cs:558`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcResizablePanels.cs:558`
 - 证据：
   ```csharp
   _slots[index].Share = Math.Max(0, clamped);
@@ -332,7 +332,7 @@
 - 修复建议：拖动期间只移动分隔条的可视位置（`RenderTransform`）并画一个"幽灵"列宽；松手才 `Refresh()` 提交真实布局；`LayoutUpdated` 改为 `SizeChanged`/显式调用，`UpdateDividerState` 去掉 LINQ 与逐 pass 的 Automation 文案。
 
 ### MD-02 Carousel 拖拽把 arrange 当动画（P1）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcCarousel.cs:46`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcCarousel.cs:46`
 - 证据：
   ```csharp
   public double Progress { set { ... _progress = value; InvalidateArrange(); } }   // 46-58
@@ -345,7 +345,7 @@
 - 修复建议：拖动/补间只改 `ArcCarouselPanel` 的 `RenderTransform`（整行平移），slide 的缩放/透明度只在索引落定时更新；把 `Progress` 改成直接改 transform 并 `InvalidateVisual` 而非 `InvalidateArrange`。
 
 ### MD-03 ImageCompare 拖动每 move 重绘整面（P1）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcImageCompare.cs:618`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcImageCompare.cs:618`
 - 证据：
   ```csharp
   protected override void OnPointerMoved(...) { ... SetPosition(PercentFromPoint(...), settle: false); }  // 618-628
@@ -358,7 +358,7 @@
 - 修复建议：图片/占位符分别预渲染到 `RenderTargetBitmap` 缓存，拖动只画裁剪矩形与 divider；笔刷/笔静态化；captions 的 `FormattedText` 缓存（文本只在标签变化时失效）；`Announce` 只在 `settle` 或整百分比变化时写。
 
 ### MD-04 Reactions：每次点击全量重建 + 每计数一个 timer + burst 每帧建刷子（P1）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcReactions.cs:260`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcReactions.cs:260`
 - 证据：
   ```csharp
   _host.Children.Clear(); _views.Clear();           // 270-271
@@ -371,7 +371,7 @@
 - 修复建议：`Sync` 增量（只更新计数变化的 pill 的 `Text` 与 class）；计数动画用单个共享 timer 驱动所有 pill；burst 笔刷按 token 缓存（4 个系列色 + 1 个 ring 笔刷）。
 
 ### MD-05 ScrollArea：每个滚动事件重建渐变遮罩与计时器（P1）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcScrollArea.cs:301`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcScrollArea.cs:301`
 - 证据：
   ```csharp
   _viewport.ScrollChanged += (_, _) => { UpdateEdges(); ShowThumbs(); };   // 301-305
@@ -385,7 +385,7 @@
 - 修复建议：遮罩按 `(top,bottom,length,fade)` 缓存，只在边/尺寸变化时重建；`_hideTimer` 只创建一次并改 `Interval`/`Start`/`Stop`；overlay 笔刷缓存。
 
 ### MD-06 HoldToConfirm 按住进度用 Width 驱动（P1）
-- 位置：`src/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs:338`
+- 位置：`src/Components/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs:338`
 - 证据：
   ```csharp
   var filled = width * _fraction;
@@ -397,7 +397,7 @@
 - 修复建议：fill 用固定尺寸 + `Clip`/`ScaleTransform.X` 的变化表达进度（render-only）；或 `DrawingContext.DrawRectangle` 自绘填充，避免任何布局。
 
 ### AA-01 ArcAdvancedGlide 用 Margin/Width/Height 迁移共享高亮（P1）
-- 位置：`src/Arc.Avalonia.AdvancedActions/Controls/ArcAdvancedVisuals.cs:202`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedActions/Controls/ArcAdvancedVisuals.cs:202`
 - 证据：
   ```csharp
   Transitions = Travel(includeTravel: true);        // 244
@@ -408,7 +408,7 @@
   每次 `ShowAt` 都 `Travel(...)` 新建 `Transitions`（`:280-300`）；`Hide`/首次出现同样重建（`:224,262`）。Travel 是布局属性过渡，等于每个 hover 行都跑一段 layout 动画。放大：×菜单项数 ×hover 频率（快速上下移动菜单）。修复：改为单个 `RenderTransform`（`TranslateTransform` + `ScaleTransform`，尺寸用固定基准 + 缩放近似），`Transitions` 只建一次。
 
 ### AA-02 ExpandingButtonGroup 展开用 Width 过渡 + 每次重新分配 Transitions（P1）
-- 位置：`src/Arc.Avalonia.AdvancedActions/Controls/ArcExpandingButtonGroup.cs:403`
+- 位置：`src/Foundation/Arc.Avalonia.AdvancedActions/Controls/ArcExpandingButtonGroup.cs:403`
 - 证据：
   ```csharp
   var transitions = ArcThemeManager.ReducedMotion ? null : new Transitions { new DoubleTransition { Property = WidthProperty, ... } };

@@ -56,7 +56,7 @@
 
 ### 1.1 方法
 
-* 7 个区域并行审查（Foundation+Charts+Demo/Gallery；Inputs+Actions；Pickers+Feedback+Effects；AdvancedInputs/Actions+Content+Media；SpecialGlass/Motion/Media；SpecialAIWidgets/Explainers；Blocks×6），每人按统一简报输出"设计特征 + 性能问题清单（分类码/严重度/证据/放大因子/修复方向）"。
+* 7 个区域并行审查（Foundation+Charts+Demo/Gallery；Inputs+Actions；Pickers+Feedback+Effects；AdvancedInputs/Actions+Content+Media；Special.Glass/Motion/Media；Special.AIWidgets/Explainers；Blocks×6），每人按统一简报输出"设计特征 + 性能问题清单（分类码/严重度/证据/放大因子/修复方向）"。
 * Lead 横向量化扫描：全仓模式计数、逐工程热点分布、`Render` 方法体级分配统计、定时器/生命周期清单、热点文件指数、依赖图与基类谱系。
 * 抽查复核：对分片中最关键的 20 余条结论逐条回读源码验证行号与语义，纠正了 3 处过度陈述（见 §8.C）。
 
@@ -114,7 +114,7 @@ Arc.Avalonia                    基础层：OKLCH 色彩引擎 / palette / token
 真正的设计不一致出现在**三个"世界"之间**：
 
 1. **模板世界**（Inputs/Actions/Feedback/Pickers）：`ControlTheme` + `PART_*` + `DynamicResource`，主题切换自动生效。
-2. **自绘世界**（Charts/Pickers 的 surface/AdvancedInputs 的部分控件/BlocksData）：代码里 `ArcResources.Brush()` 取快照，
+2. **自绘世界**（Charts/Pickers 的 surface/AdvancedInputs 的部分控件/Blocks.Data）：代码里 `ArcResources.Brush()` 取快照，
    必须每次 `Render` 重新取（否则换肤不刷新），于是绘制期资源查找成为常态。
 3. **Special 世界**：`Panel` 代码搭树 + 舞台基类自绘 + 自有噪声/素材生成器；视觉最复杂，性能模型最"重"（§2.4）。
 
@@ -140,11 +140,11 @@ Arc.Avalonia                    基础层：OKLCH 色彩引擎 / palette / token
 | 4 | `ArcTween`（Effects） | `Effects/…/ArcEffectVisuals.cs:125-184` | 每 tween 一个 timer | 同上；另有 `ArcViewport` 订阅泄漏 |
 | 5 | `ArcMediaTween` | `Media/…/ArcMediaUi.cs:193-233` | 每 tween 一个 timer | 同上 |
 | 6 | `ArcContentTween` | `Content/…/ArcContentUi.cs:284-330` | 每 tween 一个 timer | 同上 |
-| 7 | `SvTween`/`SvClock` | `SpecialAIWidgets/…/SpecialVisuals.cs:261-330` | 每 tween 一个 timer + 循环时钟 | 完成态不停（MorphLoader） |
-| 8 | `GlassTween`/`ArcFrameLoop` | `SpecialGlass/…/GlassMotion.cs:16-175` | 每 tween timer / per-control 帧循环 | 18 个 timer 的直接来源 |
-| 9 | `ArcMotionCanvas` | `SpecialMotion/…/SpecialMotionUi.cs:506-587` | **per-control 帧时钟**（tween 列表 + `NeedsFrame`） | 设计最好的一套；仍无可见性门控 |
-| 10 | `ArcSpecialCanvas` | `SpecialMedia/…/SpecialUi.cs:366-437` | per-control 帧时钟 | 同上 |
-| 11 | `ArcExplainer` | `SpecialAIExplainers/…/ArcExplainer.cs:25-106` | per-control 33 ms 时钟，相位纯函数 | 每幅图解无条件 30 Hz 重绘 |
+| 7 | `SvTween`/`SvClock` | `Special.AIWidgets/…/SpecialVisuals.cs:261-330` | 每 tween 一个 timer + 循环时钟 | 完成态不停（MorphLoader） |
+| 8 | `GlassTween`/`ArcFrameLoop` | `Special.Glass/…/GlassMotion.cs:16-175` | 每 tween timer / per-control 帧循环 | 18 个 timer 的直接来源 |
+| 9 | `ArcMotionCanvas` | `Special.Motion/…/Special.MotionUi.cs:506-587` | **per-control 帧时钟**（tween 列表 + `NeedsFrame`） | 设计最好的一套；仍无可见性门控 |
+| 10 | `ArcSpecialCanvas` | `Special.Media/…/SpecialUi.cs:366-437` | per-control 帧时钟 | 同上 |
+| 11 | `ArcExplainer` | `Special.AIExplainers/…/ArcExplainer.cs:25-106` | per-control 33 ms 时钟，相位纯函数 | 每幅图解无条件 30 Hz 重绘 |
 | — | XAML `Transitions` | 56 处模板 + C# 若干 | 属性过渡 | **14+ 处动的是布局属性**（§3.2 G-P0-8） |
 
 **评价**：
@@ -156,7 +156,7 @@ Arc.Avalonia                    基础层：OKLCH 色彩引擎 / palette / token
 
 ### 2.5 自绘体系：能力很强，但缺少"缓存协议"
 
-77 个文件 override `Render`，规模上相当于一个迷你 2D 绘图框架：图表（20）、Special（33）、BlocksData 内嵌图表（15）、
+77 个文件 override `Render`，规模上相当于一个迷你 2D 绘图框架：图表（20）、Special（33）、Blocks.Data 内嵌图表（15）、
 Pickers surfaces（6）、AdvancedInputs 滑杆/价格（3）。
 
 * **好的部分**：`ChartCore` 把 `Crisp`/`ChartGeometry`/`ChartText`/`ChartFormat`/`ChartPalette` 收敛，22 个图表风格一致；
@@ -236,7 +236,7 @@ C# 代码里 `ItemsControl`/`DataTemplate`/`ItemsRepeater`/`VirtualizingStackPan
 | --- | --- | --- | --- | --- | --- |
 | **G-P0-1** | 每个 `ArcButton` 模板内置**隐藏** `ArcSpinner`，附加即建 16 ms timer（不看 `IsVisible`） | `ArcButton.axaml:43-51`；`ArcSpinner.cs:53-68`；`ArcButton.cs:81-90` | × 按钮数 × 62.5 tick/s | Gallery 侧栏常驻 ≥59 按钮，页面内成百上千；1,000 按钮 ≈ 6.25 万次 tick/s | 懒创建（`Loading=true` 才建/启动）；或共享帧时钟 + 不可见不 tick |
 | **G-P0-2** | **环境动画默认永久 60 fps** 且无可见性门控（打字机/语音球/正在播放/变形 loader/沙画/dot grid/头像环） | `ArcTypewriterTerminal.cs:80,150-162`；`ArcVoiceOrb.cs:26,128`；`ArcNowPlaying.cs:31`；`ArcMorphLoader.cs:121-133`；`ArcSandText.cs:88`；`ArcDotGrid.cs:174-224`；`ArcAvatarRing.cs:101`；`ArcExplainer.cs:92-106` | × 实例数 × 60 fps | 这些控件"进页即播、永久不停"；一页多实例线性叠加 | 默认暂停/可见才播；进程级 60 Hz 帧服务 + `IsEffectivelyVisible` 退订 |
-| **G-P0-3** | **绘制期分配与资源查找**：`Render` 里 `new Pen/Brush/FormattedText/Typeface/TransformGroup` + `ArcResources.*` 每帧 `TryFindResource` | 全仓 77 个 `Render`：`new Pen` 98、画刷 39、文本约 154、资源查找 89；`ChartCore.cs:106-200`；`ArcCalendarSurface.cs:222-232,327`；`ArcElasticSlider.cs:186-192`；`ArcColorSurfaces.cs`（10 次/帧）；`SpecialMotionUi.cs:71-100` | × 图元数 × 帧率 × 控件数 | 自绘控件默认"每次重绘重建一切"；GC 与绘制时间双升 | 主题版本化绘制缓存（Pen/Brush/Text/Typeface）+ `ArcResources` 缓存 |
+| **G-P0-3** | **绘制期分配与资源查找**：`Render` 里 `new Pen/Brush/FormattedText/Typeface/TransformGroup` + `ArcResources.*` 每帧 `TryFindResource` | 全仓 77 个 `Render`：`new Pen` 98、画刷 39、文本约 154、资源查找 89；`ChartCore.cs:106-200`；`ArcCalendarSurface.cs:222-232,327`；`ArcElasticSlider.cs:186-192`；`ArcColorSurfaces.cs`（10 次/帧）；`Special.MotionUi.cs:71-100` | × 图元数 × 帧率 × 控件数 | 自绘控件默认"每次重绘重建一切"；GC 与绘制时间双升 | 主题版本化绘制缓存（Pen/Brush/Text/Typeface）+ `ArcResources` 缓存 |
 | **G-P0-4** | 日历每次 `Render` 重建 **49 份 `FormattedText`** + 7 次资源查找 + 42 次 `PushOpacity`；hover 每跨一格整面重绘 | `ArcCalendarSurface.cs:208-332`（`Text` 工厂 `:327-332`） | × 跨格频率（10–30/s）× 双月 × 日期控件数 | 42 日格 + 7 星期 = 49 文本布局/帧 | 文本/日期格缓存为几何或静态层；hover 只重绘交互层 |
 | **G-P0-5** | DataGrid / TreeTable / SortableDataTable **零虚拟化**，且选中/排序/编辑走 `RebuildContent()` 整表重建 | `ArcDataGrid.cs:1082-1086,1366`；`ArcTreeTable.cs:1258` | × 行×列（100×8≈800 控件/次）；× 每次点击 | 每次选择重建 800 控件；列宽拖动逐 move 全表列定义重排 | 虚拟化行 + 行控件池；选择/排序增量更新（作者已有 `_cellFrames` 增量路径可复用） |
 | **G-P0-6** | RichTextEditor 每次按键**全文解析两遍 + 重建整棵预览控件树**（预览隐藏时仍重建） | `ArcRichTextEditor.cs:762-780,819-827`；`ArcMarkdown.cs:123-147,596` | × 文档长度 × 按键率 × 预览块数 | 预览是多控件 StackPanel，不是单个 TextBlock；工具栏随选区重建 | 解析一次、增量渲染、隐藏跳过；预览块复用 |
@@ -283,8 +283,8 @@ C# 代码里 `ItemsControl`/`DataTemplate`/`ItemsRepeater`/`VirtualizingStackPan
 | Inputs + Actions | 62（+3 axaml） | 3 | 12 | 9 | `docs/perf/02-inputs-actions.md` |
 | Pickers + Feedback + Effects | 78 | 6 | 16 | 10 | `docs/perf/03-pickers-feedback-effects.md` |
 | AdvancedInputs/Actions + Content + Media | 50 | 4 | 21 | 8 | `docs/perf/04-advanced-content-media.md` |
-| SpecialGlass + Motion + Media | 77 | 9 | 18 | 6 | `docs/perf/05-special-glass-motion-media.md` |
-| SpecialAIWidgets + Explainers | 47 | 7 | 12 | 6 | `docs/perf/06-special-ai.md` |
+| Special.Glass + Motion + Media | 77 | 9 | 18 | 6 | `docs/perf/05-special-glass-motion-media.md` |
+| Special.AIWidgets + Explainers | 47 | 7 | 12 | 6 | `docs/perf/06-special-ai.md` |
 | Blocks×6 | 143 | 2 | 9 | 13 | `docs/perf/07-blocks.md` |
 | **合计** | **516** | **36** | **100** | **61** | **197 条** |
 
@@ -463,7 +463,7 @@ Effects 的 reduced-motion 纪律；179 处 Automation。
 **亮点**：token 纪律；reduced-motion 覆盖最完整；手势 render-only 样板；键盘替代路径完整（Carousel/CardStack/ImageCompare/HoldToConfirm）；
 `ArcActionButton` 的异步状态机。
 
-### 5.5 SpecialGlass + SpecialMotion + SpecialMedia（33 条，P0 9）
+### 5.5 Special.Glass + Special.Motion + Special.Media（33 条，P0 9）
 
 **设计特征**：**全仓最成熟的自绘范式**——22 个 Motion/Media 控件共用一个 canvas 基类，命中、焦点、键盘、pointer capture、
 reduced-motion 全部收敛；reduced 时帧时钟**根本不启动**（不是冻结状态）；`Sm.Noise` 提供确定性素材；`NeedsFrame` 精确收口
@@ -480,7 +480,7 @@ reduced-motion 全部收敛；reduced 时帧时钟**根本不启动**（不是�
 **亮点**：统一舞台基类；reduced-motion 真降成本；确定性程序化素材；SandText 用 `WriteableBitmap` + 预光栅化 mask；
 有限循环收口；每页主动标注近似实现。
 
-### 5.6 SpecialAIWidgets + Explainers（25 条，P0 7）
+### 5.6 Special.AIWidgets + Explainers（25 条，P0 7）
 
 **设计特征**：两套共享视觉助手（`SpecialVisuals.Sv`/`ExplainInk.Ink`）统一 token 取色、文本、卡片、弧线、图标、缓动；
 11 幅图解全部 `ArcExplainer`，画面是"归一化相位的纯函数"，reduced 时钉在 poster phase；
@@ -638,12 +638,12 @@ reduced-motion 覆盖 9 个动画/播放 timer 中的 8 个；示例数据确定
 | Feedback | 3 | 7 | 3 | 17 | 53 | Pickers | 6 | 16 | 13 | 6 | 62 |
 | AdvancedInputs | 3 | 26 | 4 | 2 | 45 | AdvancedActions | 0 | 0 | 0 | 6 | 3 |
 | Effects | 0 | 0 | 0 | 14 | 8 | Content | 1 | 2 | 2 | 5 | 14 |
-| Media | 3 | 3 | 7 | 9 | 9 | SpecialGlass | 4 | 10 | 6 | 18 | 4 |
-| SpecialMotion | 2 | 74 | 59 | 2 | 5 | SpecialMedia | 1 | 45 | 59 | 2 | 5 |
-| SpecialAIWidgets | 12 | 45 | 37 | 14 | 9 | SpecialAIExplainers | 1 | 16 | 48 | 2 | 4 |
-| BlocksData | 15 | 72 | 0 | 8 | 16 | BlocksTeam | 2 | 5 | 7 | 2 | 17 |
-| BlocksApp | 0 | 0 | 0 | 4 | 3 | BlocksCommerce | 1 | 2 | 2 | 8 | 14 |
-| BlocksMarketing | 3 | 5 | 1 | 6 | 15 | BlocksAI | 0 | 0 | 0 | 0 | 6 |
+| Media | 3 | 3 | 7 | 9 | 9 | Special.Glass | 4 | 10 | 6 | 18 | 4 |
+| Special.Motion | 2 | 74 | 59 | 2 | 5 | Special.Media | 1 | 45 | 59 | 2 | 5 |
+| Special.AIWidgets | 12 | 45 | 37 | 14 | 9 | Special.AIExplainers | 1 | 16 | 48 | 2 | 4 |
+| Blocks.Data | 15 | 72 | 0 | 8 | 16 | Blocks.Team | 2 | 5 | 7 | 2 | 17 |
+| Blocks.App | 0 | 0 | 0 | 4 | 3 | Blocks.Commerce | 1 | 2 | 2 | 8 | 14 |
+| Blocks.Marketing | 3 | 5 | 1 | 6 | 15 | Blocks.AI | 0 | 0 | 0 | 0 | 6 |
 | Gallery | 0 | 0 | 0 | 0 | 4 | Demo | 0 | 0 | 0 | 0 | 0 |
 
 **静态热点文件 Top 15**（启发式评分：Render×20 + Pen/几何/文本×3 + Invalidate + Timer×5 + 资源/LINQ×0.5，仅用于排序，不等于实测帧耗时）：
@@ -651,23 +651,23 @@ reduced-motion 覆盖 9 个动画/播放 timer 中的 8 个；示例数据确定
 | # | 文件 | 分数 | Render | Pen | Inv | Timer |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `Pickers/Controls/ArcColorSurfaces.cs` | 74 | 2 | 7 | 8 | 0 |
-| 2 | `SpecialAIWidgets/Controls/ArcAgentStatus.cs` | 68 | 2 | 8 | 3 | 0 |
-| 3 | `SpecialAIWidgets/Controls/ArcAgentPlan.cs` | 58 | 2 | 2 | 2 | 1 |
-| 4 | `SpecialAIWidgets/Controls/ArcAgentTimeline.cs` | 57 | 1 | 8 | 9 | 0 |
+| 2 | `Special.AIWidgets/Controls/ArcAgentStatus.cs` | 68 | 2 | 8 | 3 | 0 |
+| 3 | `Special.AIWidgets/Controls/ArcAgentPlan.cs` | 58 | 2 | 2 | 2 | 1 |
+| 4 | `Special.AIWidgets/Controls/ArcAgentTimeline.cs` | 57 | 1 | 8 | 9 | 0 |
 | 5 | `Charts/Controls/ArcRaceBarChart.cs` | 56 | 1 | 3 | 16 | 1 |
-| 6 | `SpecialMotion/Controls/SpecialMotionUi.cs` | 54 | 1 | 2 | 9 | 1 |
+| 6 | `Special.Motion/Controls/Special.MotionUi.cs` | 54 | 1 | 2 | 9 | 1 |
 | 7 | `Charts/Controls/ArcBrushChart.cs` | 52 | 1 | 8 | 5 | 0 |
 | 8 | `Feedback/Controls/ArcActivityHeatmap.cs` | 48 | 1 | 3 | 7 | 0 |
 | 9 | `Charts/Controls/ArcRealtimeStream.cs` | 48 | 1 | 4 | 11 | 1 |
-| 10 | `SpecialMedia/Controls/ArcPageCurl.cs` | 48 | 0 | 14 | 4 | 0 |
+| 10 | `Special.Media/Controls/ArcPageCurl.cs` | 48 | 0 | 14 | 4 | 0 |
 | 11 | `Charts/Controls/ArcSankeyFlow.cs` | 48 | 1 | 2 | 7 | 0 |
-| 12 | `BlocksTeam/Controls/ArcCohortChart.cs` | 48 | 1 | 5 | 2 | 0 |
-| 13 | `SpecialAIWidgets/Controls/ArcContextWindow.cs` | 47 | 1 | 4 | 3 | 1 |
-| 14 | `SpecialAIExplainers/Controls/ArcExplainer.cs` | 44 | 1 | 2 | 12 | 1 |
-| 15 | `SpecialAIWidgets/Controls/ArcStretchRefresh.cs` | 44 | 1 | 3 | 5 | 2 |
+| 12 | `Blocks.Team/Controls/ArcCohortChart.cs` | 48 | 1 | 5 | 2 | 0 |
+| 13 | `Special.AIWidgets/Controls/ArcContextWindow.cs` | 47 | 1 | 4 | 3 | 1 |
+| 14 | `Special.AIExplainers/Controls/ArcExplainer.cs` | 44 | 1 | 2 | 12 | 1 |
+| 15 | `Special.AIWidgets/Controls/ArcStretchRefresh.cs` | 44 | 1 | 3 | 5 | 2 |
 
-> 说明：`BlocksData` 的单文件 Pen 计数为 0 是因为它通过 `DataDraw.Ink` 间接创建；真实绘制量见 §5.7。
-> `SpecialMotionUi.cs`/`ArcExplainer.cs`/`SpecialUi.cs` 是基类，分数代表它们服务的 11 个控件。
+> 说明：`Blocks.Data` 的单文件 Pen 计数为 0 是因为它通过 `DataDraw.Ink` 间接创建；真实绘制量见 §5.7。
+> `Special.MotionUi.cs`/`ArcExplainer.cs`/`SpecialUi.cs` 是基类，分数代表它们服务的 11 个控件。
 
 ### 8.B 分片索引与问题总数
 
@@ -677,8 +677,8 @@ reduced-motion 覆盖 9 个动画/播放 timer 中的 8 个；示例数据确定
 | `docs/perf/02-inputs-actions.md` | Inputs / Actions | 24 | 3 / 12 / 9 |
 | `docs/perf/03-pickers-feedback-effects.md` | Pickers / Feedback / Effects | 32 | 6 / 16 / 10 |
 | `docs/perf/04-advanced-content-media.md` | AdvancedInputs/Actions / Content / Media | 33 | 4 / 21 / 8 |
-| `docs/perf/05-special-glass-motion-media.md` | SpecialGlass / Motion / Media | 33 | 9 / 18 / 6 |
-| `docs/perf/06-special-ai.md` | SpecialAIWidgets / Explainers | 25 | 7 / 12 / 6 |
+| `docs/perf/05-special-glass-motion-media.md` | Special.Glass / Motion / Media | 33 | 9 / 18 / 6 |
+| `docs/perf/06-special-ai.md` | Special.AIWidgets / Explainers | 25 | 7 / 12 / 6 |
 | `docs/perf/07-blocks.md` | Blocks×6 | 24 | 2 / 9 / 13 |
 | **合计** | | **197** | **36 / 100 / 61** |
 
@@ -711,16 +711,16 @@ reduced-motion 覆盖 9 个动画/播放 timer 中的 8 个；示例数据确定
 | ID | 第一动作 | 文件 |
 | --- | --- | --- |
 | G-P0-1 | spinner 懒创建/共享时钟 | `Arc.Avalonia/Themes/ArcButton.axaml`、`Controls/ArcSpinner.cs` |
-| G-P0-2 | 默认暂停 + 可见性门控 | `SpecialMotion/…/ArcTypewriterTerminal.cs`、`ArcVoiceOrb.cs`、`ArcNowPlaying.cs`、`ArcMorphLoader.cs`、`ArcSandText.cs`、`ArcDotGrid.cs`、`Pickers/…/ArcAvatarRing.cs` |
+| G-P0-2 | 默认暂停 + 可见性门控 | `Special.Motion/…/ArcTypewriterTerminal.cs`、`ArcVoiceOrb.cs`、`ArcNowPlaying.cs`、`ArcMorphLoader.cs`、`ArcSandText.cs`、`ArcDotGrid.cs`、`Pickers/…/ArcAvatarRing.cs` |
 | G-P0-3 | `ArcDrawingCache` + `ArcResources` 缓存 | `Theme/ArcThemeManager.cs`、`Charts/Core/ChartCore.cs`、`Pickers/…/ArcCalendarSurface.cs`、`AdvancedInputs/…/ArcElasticSlider.cs` |
 | G-P0-4 | 日历文本/格子缓存、hover 分层 | `Pickers/Controls/ArcCalendarSurface.cs` |
 | G-P0-5 | 行虚拟化 + 增量选择 | `Feedback/Controls/ArcDataGrid.cs`、`ArcTreeTable.cs` |
 | G-P0-6 | 单次解析 + 增量预览 + 隐藏跳过 | `Content/Controls/ArcRichTextEditor.cs`、`ArcMarkdown.cs` |
 | G-P0-7 | 消息项复用/增量/虚拟化 | `Content/Controls/ArcChatThread.cs` |
-| G-P0-8 | 布局动画改 transform | `Actions/Controls/ArcActionVisuals.cs`、`AdvancedActions/…/ArcAdvancedVisuals.cs`、`Inputs/…/ArcSlider.cs`、`SpecialGlass/…/ArcGlassTabBar.cs`、`Media/…/ArcHoldToConfirm.cs` |
+| G-P0-8 | 布局动画改 transform | `Actions/Controls/ArcActionVisuals.cs`、`AdvancedActions/…/ArcAdvancedVisuals.cs`、`Inputs/…/ArcSlider.cs`、`Special.Glass/…/ArcGlassTabBar.cs`、`Media/…/ArcHoldToConfirm.cs` |
 | G-P0-9 | 已完成层缓存 + 拖动层分离 | `Pickers/…/ArcSignaturePad.cs`、`Charts/…/ArcLineChart.cs`、`Pickers/…/ArcColorSurfaces.cs`、`Media/…/ArcImageCompare.cs` |
 | G-P0-10 | 环形缓冲 + 合并渲染 | `Charts/Controls/ArcRaceBarChart.cs`、`ArcRealtimeStream.cs` |
-| G-P0-11 | 静态层位图缓存 | `SpecialMedia/…/ArcGravityWell.cs`、`ArcCoverFlow.cs`、`ArcPhotoGrid.cs`、`SpecialGlass/…/ArcHoloCard.cs`、`SpecialAIWidgets/…/ArcInkFluid.cs`、`ArcActivityRings.cs` |
+| G-P0-11 | 静态层位图缓存 | `Special.Media/…/ArcGravityWell.cs`、`ArcCoverFlow.cs`、`ArcPhotoGrid.cs`、`Special.Glass/…/ArcHoloCard.cs`、`Special.AIWidgets/…/ArcInkFluid.cs`、`ArcActivityRings.cs` |
 | G-P0-12 | 行构建去重 + 复用 | `Inputs/…/ArcCombobox.cs`、`Actions/…/ArcMegaMenu.cs`、`ArcShareAccess.cs`、`Inputs/…/ArcPasswordStrength.cs`、`Content/…/ArcOnboardingChecklist.cs` |
 
 ---

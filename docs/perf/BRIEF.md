@@ -22,11 +22,11 @@
 
 | # | 事实 | 位置 |
 | --- | --- | --- |
-| B1 | `ArcResources.Brush/Color/Double/...` 每次都 `Application.Current.TryFindResource`，无缓存 | `src/Arc.Avalonia/Theme/ArcThemeManager.cs:51-70` |
-| B2 | `ArcSpinner` 每个实例在附加到视觉树时创建一个 16 ms `DispatcherTimer`，每帧重建 `StreamGeometry` 和 `Pen` | `src/Arc.Avalonia/Controls/ArcSpinner.cs:53-105` |
-| B3 | `ArcIcon` 用 `ConcurrentDictionary` 缓存 `Geometry.Parse` 结果（好），但每次 `Render` 都 `new Pen`，且 `Foreground` 为空时每帧调用 `ArcResources.Brush` | `src/Arc.Avalonia/Controls/ArcIcon.cs:17,73-102` |
-| B4 | `ArcThemeManager.Apply` 先 Remove 再 Add 整个 palette 字典 → 全树 DynamicResource 重新解析 | `src/Arc.Avalonia/Theme/ArcThemeManager.cs:24-38` |
-| B5 | `ArcMotion.Smooth(property)` 每次调用都 `new Transitions { new DoubleTransition ... }` | `src/Arc.Avalonia/Motion/ArcMotion.cs:41-42` |
+| B1 | `ArcResources.Brush/Color/Double/...` 每次都 `Application.Current.TryFindResource`，无缓存 | `src/Foundation/Arc.Avalonia/Theme/ArcThemeManager.cs:51-70` |
+| B2 | `ArcSpinner` 每个实例在附加到视觉树时创建一个 16 ms `DispatcherTimer`，每帧重建 `StreamGeometry` 和 `Pen` | `src/Foundation/Arc.Avalonia/Controls/ArcSpinner.cs:53-105` |
+| B3 | `ArcIcon` 用 `ConcurrentDictionary` 缓存 `Geometry.Parse` 结果（好），但每次 `Render` 都 `new Pen`，且 `Foreground` 为空时每帧调用 `ArcResources.Brush` | `src/Foundation/Arc.Avalonia/Controls/ArcIcon.cs:17,73-102` |
+| B4 | `ArcThemeManager.Apply` 先 Remove 再 Add 整个 palette 字典 → 全树 DynamicResource 重新解析 | `src/Foundation/Arc.Avalonia/Theme/ArcThemeManager.cs:24-38` |
+| B5 | `ArcMotion.Smooth(property)` 每次调用都 `new Transitions { new DoubleTransition ... }` | `src/Foundation/Arc.Avalonia/Motion/ArcMotion.cs:41-42` |
 
 全仓模式计数（`rg` 风格字面统计，含注释，量级参考）：
 `InvalidateVisual` 402、`DispatcherTimer` 173、`override void Render` 80、`new Pen(` 80、
@@ -34,11 +34,11 @@
 `new SolidColorBrush` 48、`ArcResources.` 约 420、`PropertyChanged` 69、`Task.Run` 5、`async void` 6。
 
 各工程热点分布（`Timers` / `Invalidate` / `RenderOverrides` / `newPen`）：
-Charts 6/72/20/52；SpecialMotion 2/74/2/59；SpecialMedia 2/45/1/59；
-SpecialAIWidgets 14/45/12/37；SpecialAIExplainers 2/16/1/48；BlocksData 8/72/15/0；
+Charts 6/72/20/52；Special.Motion 2/74/2/59；Special.Media 2/45/1/59；
+Special.AIWidgets 14/45/12/37；Special.AIExplainers 2/16/1/48；Blocks.Data 8/72/15/0；
 Pickers 6/16/6/13；Feedback 17/7/3/3；Actions 34/0/0/0；
 AdvancedInputs 2/26/3/4；AdvancedActions 6/0/0/0；Media 9/3/3/7；Content 5/2/1/2；
-Inputs 6/1/1/1；Effects 14/0/0/0；SpecialGlass 18/10/4/6。
+Inputs 6/1/1/1；Effects 14/0/0/0；Special.Glass 18/10/4/6。
 （Blocks 其它组、Foundation、Gallery/Demo 见各自分片。）
 
 ## 3. 要回答的两个问题
@@ -83,7 +83,7 @@ Inputs 6/1/1/1；Effects 14/0/0/0；SpecialGlass 18/10/4/6。
 
 ## 4. 证据规则（硬性）
 
-1. 每条结论必须给 `相对路径:行号`（如 `src/Arc.Avalonia.Charts/Controls/ArcLineChart.cs:88`），
+1. 每条结论必须给 `相对路径:行号`（如 `src/Components/Arc.Avalonia.Charts/Controls/ArcLineChart.cs:88`），
    行号必须是你用 read/grep 实际看到的当前文件行号。
 2. 引用代码 ≤ 8 行，只引关键行；不要整段粘贴。
 3. 写清三件事：**触发条件**（什么时候执行：每次 Render？每次 pointer move？每次 Tick？）、

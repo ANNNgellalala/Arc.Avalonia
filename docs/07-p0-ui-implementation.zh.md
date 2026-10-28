@@ -20,7 +20,7 @@
 ## 2. 共同实现约定
 
 1. **组合控件**：P0 控件均为 C# 组合控件（`Panel` / `ListBox` 子类），不新增 XAML `ControlTheme`，因此**不修改任何项目主题入口**，也不会与既有 294 项的主题冲突。
-2. **共享辅助**：新增 `src/Arc.Avalonia/Controls/ArcUi.cs`（Lead 提供），统一 `Brush/Text/Stack/HStack/Wrap/Icon/Surface/Divider/Badge/Button/Pill/Dot/Name`；全部颜色/圆角/阴影/字体走 `ArcTokens` / `ArcResources`，无硬编码色值。
+2. **共享辅助**：新增 `src/Foundation/Arc.Avalonia/Controls/ArcUi.cs`（Lead 提供），统一 `Brush/Text/Stack/HStack/Wrap/Icon/Surface/Divider/Badge/Button/Pill/Dot/Name`；全部颜色/圆角/阴影/字体走 `ArcTokens` / `ArcResources`，无硬编码色值。
 3. **纯 UI 契约**：控件只接收展示数据、渲染状态、发出意图事件（如 `StopRequested`、`ApproveRequested`、`CompleteRequested`、`SaveRequested`）；不读写数据、不发起网络/模型调用、不注册系统能力。
 4. **页面**：均继承 `ArcPage`（非 `ArcItemPage`，不占用 294 项目录），Group 分别为 `P0 · Agent UI` / `P0 · Today` / `P0 · Foundation`，Order 20001–20023；每页用 `DemoUi.Section` 组织并展示 2–3 个状态（多数页面用按钮切换；`Reminder row` 为三行并列示例，`Virtualized list` 通过滚动/追加按钮展示滚动状态），页面高度 526–1311 px（均 ≤1400）。
 5. **无障碍**：控件通过 `ArcUi.Name` 设置 Automation 名称；交互走 `ArcButton`（Tab/Enter/Space 可达）；行级操作提供键盘路径与可见焦点。
@@ -68,7 +68,7 @@ Build succeeded. 9 Warning(s) / 0 Error(s)
   SupportWidgetPage、ArcCandleChart、CatalogAudit、GalleryWindow、ShotRunner；
   本次新增的 26 个文件 0 warning、0 error）
 
-dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit
 CATALOG AUDIT: pages=233 items=294 itemPages=166 matchedBySection=88 matchedByAlias=40 missing=0 pageFailures=0
 ```
 
@@ -101,7 +101,7 @@ CATALOG AUDIT: pages=233 items=294 itemPages=166 matchedBySection=88 matchedByAl
 ### 4.3 导航 smoke
 
 ```text
-dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke
 GALLERY SMOKE: clicks=942 pageShows=699 itemShows=588 failures=0
 exit code: 0
 ```
@@ -133,30 +133,30 @@ smoke 会遍历全部 233 个页面（含 14 个新页）并反复切换，验�
 ## 8. 文件索引
 
 ```text
-src/Arc.Avalonia/Controls/ArcUi.cs                         （共享组合辅助，新增）
-src/Arc.Avalonia/Controls/ArcVirtualList.cs
-src/Arc.Avalonia.Gallery/Pages/VirtualListDemoPage.cs
-src/Arc.Avalonia.LifeToday/Controls/ArcQuickCaptureBar.cs
-src/Arc.Avalonia.AdvancedInputs/Pages/QuickCaptureBarPage.cs
-src/Arc.Avalonia.LifeToday/Controls/ArcRoutineScheduleEditor.cs
-src/Arc.Avalonia.Pickers/Pages/RoutineScheduleEditorPage.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcAgentTranscript.cs
-src/Arc.Avalonia.Content/Pages/AgentTranscriptPage.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcRunControlBar.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcToolApprovalSheet.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcAgentAskCard.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcBackgroundRunDock.cs
-src/Arc.Avalonia.Special.AIWidgets/Pages/RunControlBarPage.cs
-src/Arc.Avalonia.Special.AIWidgets/Pages/ToolApprovalSheetPage.cs
-src/Arc.Avalonia.Special.AIWidgets/Pages/AgentAskCardPage.cs
-src/Arc.Avalonia.Special.AIWidgets/Pages/BackgroundRunDockPage.cs
-src/Arc.Avalonia.AgentUI/Controls/ArcAgentAttentionInbox.cs
-src/Arc.Avalonia.Blocks.AI/Pages/AgentAttentionInboxPage.cs
-src/Arc.Avalonia.LifeToday/Controls/ArcReminderRow.cs
-src/Arc.Avalonia.Feedback/Pages/ReminderRowPage.cs
-src/Arc.Avalonia.LifeToday/Controls/LifeTodayKit.cs
-src/Arc.Avalonia.Blocks.App/Pages/DailyBriefPage.cs
-src/Arc.Avalonia.Blocks.App/Pages/DayAgendaPage.cs
-src/Arc.Avalonia.Blocks.App/Pages/ReminderCenterPage.cs
-src/Arc.Avalonia.Blocks.App/Pages/MedicationSchedulePage.cs
+src/Foundation/Arc.Avalonia/Controls/ArcUi.cs                         （共享组合辅助，新增）
+src/Foundation/Arc.Avalonia/Controls/ArcVirtualList.cs
+src/Apps/Arc.Avalonia.Gallery/Pages/VirtualListDemoPage.cs
+src/Agent/Arc.Avalonia.LifeToday/Controls/ArcQuickCaptureBar.cs
+src/Foundation/Arc.Avalonia.AdvancedInputs/Pages/QuickCaptureBarPage.cs
+src/Agent/Arc.Avalonia.LifeToday/Controls/ArcRoutineScheduleEditor.cs
+src/Components/Arc.Avalonia.Pickers/Pages/RoutineScheduleEditorPage.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcAgentTranscript.cs
+src/Components/Arc.Avalonia.Content/Pages/AgentTranscriptPage.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcRunControlBar.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcToolApprovalSheet.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcAgentAskCard.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcBackgroundRunDock.cs
+src/Special/Arc.Avalonia.Special.AIWidgets/Pages/RunControlBarPage.cs
+src/Special/Arc.Avalonia.Special.AIWidgets/Pages/ToolApprovalSheetPage.cs
+src/Special/Arc.Avalonia.Special.AIWidgets/Pages/AgentAskCardPage.cs
+src/Special/Arc.Avalonia.Special.AIWidgets/Pages/BackgroundRunDockPage.cs
+src/Agent/Arc.Avalonia.AgentUI/Controls/ArcAgentAttentionInbox.cs
+src/Blocks/Arc.Avalonia.Blocks.AI/Pages/AgentAttentionInboxPage.cs
+src/Agent/Arc.Avalonia.LifeToday/Controls/ArcReminderRow.cs
+src/Components/Arc.Avalonia.Feedback/Pages/ReminderRowPage.cs
+src/Agent/Arc.Avalonia.LifeToday/Controls/LifeTodayKit.cs
+src/Blocks/Arc.Avalonia.Blocks.App/Pages/DailyBriefPage.cs
+src/Blocks/Arc.Avalonia.Blocks.App/Pages/DayAgendaPage.cs
+src/Blocks/Arc.Avalonia.Blocks.App/Pages/ReminderCenterPage.cs
+src/Blocks/Arc.Avalonia.Blocks.App/Pages/MedicationSchedulePage.cs
 ```

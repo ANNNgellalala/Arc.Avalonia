@@ -25,7 +25,7 @@
 
 三条最值得带走的判断：
 
-1. **日历与时间控件是最大的“有但不适配”。** `ArcCalendar` 只有日期、区间、`MinDate/MaxDate/DisabledDates`，没有任何事件/标记能力（`src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45`）；`week-calendar` 的事件是源码里写死的 8 条示例（`src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45`），拖拽新建/移动/缩放明确未复刻（同文件 `:74-77`）。而时间模型是 naive `DateTime`/`TimeSpan` 且固定 `en-US`（`src/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`），跨时区、夏令时、重复规则都无从表达。
+1. **日历与时间控件是最大的“有但不适配”。** `ArcCalendar` 只有日期、区间、`MinDate/MaxDate/DisabledDates`，没有任何事件/标记能力（`src/Components/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45`）；`week-calendar` 的事件是源码里写死的 8 条示例（`src/Blocks/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45`），拖拽新建/移动/缩放明确未复刻（同文件 `:74-77`）。而时间模型是 naive `DateTime`/`TimeSpan` 且固定 `en-US`（`src/Components/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`），跨时区、夏令时、重复规则都无从表达。
 2. **111 个 block 是“可看的样例”，不是“可运营的数据层”。** 所有 block 的 `ImplementationNotes` 都写着 sample data / local state；全仓没有 SQLite、没有 HTTP 客户端、没有调度器（`Sqlite` 0 处、`HttpClient` 0 处、`Cron` 0 处、`Recurrence` 相关 9 处全是文案）。生活工具一旦有真实流水（账单、交易、健康记录），`docs/04` 的 R4 结论就会立刻生效：整库几乎零虚拟化（仅 EmojiPicker 行级），DataGrid/TreeTable 选中/排序走整表重建（`docs/04` §0.2、§2.6、§4 R4、G-P0-5）。因此生活域扩展必须同时给出“数据契约 + 虚拟化/持久化路径”，否则只是又一批截图。
 3. **最划算的扩展是“提醒–议程–到期”三件套，而不是再造 20 个卡片。** P0 的 7 项把现有 `calendar`、`notification-center`、`file-dropzone`、`sortable-data-table`、`checkbox`、`badge` 串成可用的日常闭环；其中排期与通知投递复用 Agent 域提案（`routine-schedule-editor`、`notification-routing`、`background-run-dock`），生活域不重复造 RRULE 与托盘。
 
@@ -53,7 +53,7 @@
 本文件对 03 号提案的依赖（合并时必须一起看）：
 
 - `routine-schedule-editor`（P0，Pickers）：提供 RRULE/时区/下次运行/错过策略。生活域的提醒、账单、用药、家务、订阅都依赖它；**本文件不重复提排期组件**。
-- `notification-routing`（P1，BlocksApp）：提供事件 × 通道（应用内/系统/托盘/摘要/静默）。生活域的提醒中心依赖它，**本文件不重复提通知策略**。
+- `notification-routing`（P1，Blocks.App）：提供事件 × 通道（应用内/系统/托盘/摘要/静默）。生活域的提醒中心依赖它，**本文件不重复提通知策略**。
 - `background-run-dock` / `desktop-agent-settings`（P0/P1）：托盘、关窗常驻、自启、休眠策略。生活提醒“窗口关了还能响”依赖它们。
 - `agent-attention-inbox`（P0）：Agent 的“等你处理”队列。生活域的 `reminder-center` 只处理生活提醒，**不与审批队列合并**；两者可以互相计数，但不能共用一个对象模型。
 
@@ -390,7 +390,7 @@ Agent 的“主动”在生活域不是聊天，而是**在该提醒的时候提
 
 - 现有 block 组是 6 个（Marketing and site 18 / Commerce 18 / App shell and settings 21 / Team and collaboration 16 / Data and charts 20 / AI 18）。生活域 20 个 block 不适合硬塞进任何一组；
 - 建议新增 **block 组 “Daily life”**，并在 `docs/arc-catalog.json` 的 `blockGroups` 中增加一项；组件分类保持现有 23 类不变；
-- 建议新建 **`Arc.Avalonia.BlocksLife`** 项目承载这 20 个 block（与 6 个 Blocks* 项目平级）。JSON 的 `project` 字段为了“合入后可直接构建”，暂时指向最接近的现有项目（BlocksApp/BlocksCommerce/BlocksData），合并时由 Lead 决定是否拆项目；若拆，需要同步更新 `ArcUI.slnx`、主题入口与 Gallery 引用。
+- 建议新建 **`Arc.Avalonia.BlocksLife`** 项目承载这 20 个 block（与 6 个 Blocks* 项目平级）。JSON 的 `project` 字段为了“合入后可直接构建”，暂时指向最接近的现有项目（Blocks.App/Blocks.Commerce/Blocks.Data），合并时由 Lead 决定是否拆项目；若拆，需要同步更新 `ArcUI.slnx`、主题入口与 Gallery 引用。
 
 ### 5.4 缺非 UI 能力（真正的“隐藏工作量”）
 
@@ -889,7 +889,7 @@ life composes referencing agent proposals: 0
 ### 13.2 待决问题（建议 Lead 拍板）
 
 1. **是否把 `routine-schedule-editor` / `notification-routing` / `background-run-dock` 作为 life 扩展的前置依赖**，还是允许生活目录自带一套简化排期？（建议：共享，不重复造）
-2. **是否新建 `Arc.Avalonia.BlocksLife`**，还是把 20 个 block 分散进现有 6 个 Blocks 项目？（建议：新建，否则 BlocksApp 会膨胀到 41 个页面，且生活域没有独立导航组）
+2. **是否新建 `Arc.Avalonia.BlocksLife`**，还是把 20 个 block 分散进现有 6 个 Blocks 项目？（建议：新建，否则 Blocks.App 会膨胀到 41 个页面，且生活域没有独立导航组）
 3. **`reference-band-chart` 的归属**：foundation 扩展 vs Charts 新条目？（建议：先做 `LineChart.Band` 扩展；只有需要独立页面时再升条目）
 4. **`habit-streak-strip` 是否独立**：先做 `activity-heatmap` 的周/月窗口，还是直接独立组件？（建议：先变体，P1 后看页面需要）
 5. **数据层选型**：SQLite / LiteDB / JSON + 文件？（建议：应用层 SQLite + 迁移；UI 项目不依赖数据库）
@@ -936,27 +936,27 @@ life composes referencing agent proposals: 0
 ## 附录 B：引用文件与行号索引
 
 - `docs/arc-catalog.json`、`README.md`（294 项、219 页/438 截图）、`docs/01-arc-analysis.zh.md`（设计原则）、`docs/03-implementation.zh.md`（范围与完成定义）、`docs/04-design-and-performance-review.zh.md`（R1/R4/R5/R7、G-P0-3/4/5/6/7）。
-- `src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45,135`（属性与事件）。
-- `src/Arc.Avalonia.Pickers/Controls/ArcCalendarSurface.cs:208-332`（只画日期/区间/今天点）。
-- `src/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45,74-77`（静态事件、拖拽未复刻）。
-- `src/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`（固定 en-US）。
-- `src/Arc.Avalonia.Pickers/Controls/ArcTimePicker.cs:26`（`TimeSpan?` 时间值）。
-- `src/Arc.Avalonia.Inputs/Controls/ArcMoneyInput.cs:48`（默认 USD）。
-- `src/Arc.Avalonia.Blocks.App/Pages/NotificationCenterPage.cs:29,51,246-259`（只读/忽略、样例）。
-- `src/Arc.Avalonia.Blocks.App/Pages/InboxTriagePage.cs:18,51`（消息级 snooze，时间不可编辑）。
-- `src/Arc.Avalonia.Blocks.Commerce/Pages/BillingOverviewPage.cs:18,52`（SaaS 账单）。
-- `src/Arc.Avalonia.Blocks.Data/Pages/BudgetVariancePage.cs:15,51`（部门预算）。
-- `src/Arc.Avalonia.Blocks.Commerce/Pages/UsageBillingPage.cs:53`、`WalletCardPage.cs:52`、`InvoiceStudioPage.cs:53`（样例/无账本）。
-- `src/Arc.Avalonia.Special.Glass/Pages/ControlCenterPage.cs:44-63`（工作区快捷设置）。
-- `src/Arc.Avalonia.Special.AIWidgets/Pages/ActivityRingsPage.cs:54-62`（三目标/年热力图建议）。
-- `src/Arc.Avalonia.Feedback/Pages/DataDemos.cs:302-330`（heatmap 一天一值）。
-- `src/Arc.Avalonia.Blocks.Commerce/Pages/DeliveryTrackerPage.cs:16,50`（单订单、无 webhook）。
-- `src/Arc.Avalonia.Blocks.App/Pages/FileUploadPage.cs:58`（从不落盘）。
-- `src/Arc.Avalonia.Pickers/Controls/ArcFileDropzone.cs:308-317`（文件选择器）。
-- `src/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:53`（无音频）。
-- `src/Arc.Avalonia.Blocks.AI/Pages/DocumentExtractPage.cs:30`（抽取审阅）。
-- `src/Arc.Avalonia.Blocks.Team/Pages/TeamDirectoryPage.cs:29`、`AvailabilityPickerPage.cs:47`、`KanbanBoardPage.cs:41`、`ProjectBoardPage.cs:39`（团队语义）。
-- `src/Arc.Avalonia.Content/Pages/ContentFlowsPage.cs:63-101`、`ContentPage.cs:56`、`src/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:24-31`（上手清单/排序列表语义）。
+- `src/Components/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs:20-45,135`（属性与事件）。
+- `src/Components/Arc.Avalonia.Pickers/Controls/ArcCalendarSurface.cs:208-332`（只画日期/区间/今天点）。
+- `src/Blocks/Arc.Avalonia.Blocks.Team/Pages/WeekCalendarPage.cs:35-45,74-77`（静态事件、拖拽未复刻）。
+- `src/Components/Arc.Avalonia.Pickers/Controls/ArcDateMath.cs:3-7`（固定 en-US）。
+- `src/Components/Arc.Avalonia.Pickers/Controls/ArcTimePicker.cs:26`（`TimeSpan?` 时间值）。
+- `src/Components/Arc.Avalonia.Inputs/Controls/ArcMoneyInput.cs:48`（默认 USD）。
+- `src/Blocks/Arc.Avalonia.Blocks.App/Pages/NotificationCenterPage.cs:29,51,246-259`（只读/忽略、样例）。
+- `src/Blocks/Arc.Avalonia.Blocks.App/Pages/InboxTriagePage.cs:18,51`（消息级 snooze，时间不可编辑）。
+- `src/Blocks/Arc.Avalonia.Blocks.Commerce/Pages/BillingOverviewPage.cs:18,52`（SaaS 账单）。
+- `src/Blocks/Arc.Avalonia.Blocks.Data/Pages/BudgetVariancePage.cs:15,51`（部门预算）。
+- `src/Blocks/Arc.Avalonia.Blocks.Commerce/Pages/UsageBillingPage.cs:53`、`WalletCardPage.cs:52`、`InvoiceStudioPage.cs:53`（样例/无账本）。
+- `src/Special/Arc.Avalonia.Special.Glass/Pages/ControlCenterPage.cs:44-63`（工作区快捷设置）。
+- `src/Special/Arc.Avalonia.Special.AIWidgets/Pages/ActivityRingsPage.cs:54-62`（三目标/年热力图建议）。
+- `src/Components/Arc.Avalonia.Feedback/Pages/DataDemos.cs:302-330`（heatmap 一天一值）。
+- `src/Blocks/Arc.Avalonia.Blocks.Commerce/Pages/DeliveryTrackerPage.cs:16,50`（单订单、无 webhook）。
+- `src/Blocks/Arc.Avalonia.Blocks.App/Pages/FileUploadPage.cs:58`（从不落盘）。
+- `src/Components/Arc.Avalonia.Pickers/Controls/ArcFileDropzone.cs:308-317`（文件选择器）。
+- `src/Blocks/Arc.Avalonia.Blocks.App/Pages/MediaPlayerPage.cs:53`（无音频）。
+- `src/Blocks/Arc.Avalonia.Blocks.AI/Pages/DocumentExtractPage.cs:30`（抽取审阅）。
+- `src/Blocks/Arc.Avalonia.Blocks.Team/Pages/TeamDirectoryPage.cs:29`、`AvailabilityPickerPage.cs:47`、`KanbanBoardPage.cs:41`、`ProjectBoardPage.cs:39`（团队语义）。
+- `src/Components/Arc.Avalonia.Content/Pages/ContentFlowsPage.cs:63-101`、`ContentPage.cs:56`、`src/Components/Arc.Avalonia.Content/Controls/ArcReorderableList.cs:24-31`（上手清单/排序列表语义）。
 - `CONVENTIONS.md:55-58`（完成定义）、`README.md:204-209`、`docs/03-implementation.zh.md:180-181`（Pro 处理方式）。
 - 全仓 grep（排除 obj/bin）：`Cron` 0、`DueDate` 0、`Medicat` 0、`Dosage` 0、`Recipe` 0、`Meal` 0、`Grocer` 0、`Itinerar` 0、`Thermostat` 0、`Symptom` 0、`Workout` 0、`Energy` 0、`TrayIcon` 0、`HttpClient` 0、`Sqlite` 0、`Cryptography` 0；`Recurr` 9（均为文案）、`Remind` 2（标签）、`Habit` 1（说明文字）。
 

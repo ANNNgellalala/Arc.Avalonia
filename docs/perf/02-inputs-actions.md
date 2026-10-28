@@ -2,7 +2,7 @@
 
 ## 0. 范围与覆盖
 
-- **工程**：`src/Arc.Avalonia.Inputs`（31 个 `.cs`）与 `src/Arc.Avalonia.Actions`（37 个 `.cs`）。
+- **工程**：`src/Components/Arc.Avalonia.Inputs`（31 个 `.cs`）与 `src/Components/Arc.Avalonia.Actions`（37 个 `.cs`）。
 - **Inputs**：`Controls/` 下 23 个文件全部完整阅读（18 个公开控件 + `ArcFieldBase` / `ArcTextFieldBase` / `ArcMenuHelper` / `CapsLockState`，外加自绘 `ArcStar`）；`Themes/` 中完整读 `ArcSegmentedControl.axaml`、`ArcSlider.axaml`，`ArcSelect.axaml` 读关键段，其余主题用 grep 扫 `Transitions`/`Width`/`Height`。5 个 `Pages/*.cs`（演示组合代码）未逐行读；3 个 `obj/` 生成文件忽略。
 - **Actions**：`Controls/` 下 25 个文件；其中 23 个（含 `ArcActionModels` 的数据类部分）完整或近完整阅读，`ArcMegaMenu.cs`（2454 行）读约 68%、`ArcShareAccess.cs`（2040 行）读约 49%，其余行用 grep 覆盖 `DispatcherTimer`/`LayoutUpdated`/`Children.Clear`/`Measure(`/`PointerMoved`/`Split(`。9 个 `Pages/*.cs` 未读；`obj/` 忽略。
 - **方法**：先 `grep` 定位热点再精读关键窗口；所有行号均为当前文件的真实行号。构建/截图未执行（按 BRIEF §6）。严重度按 BRIEF §3 定义，P0 仅给"必然发生在高频路径、且按实例/数据/帧数线性放大"的三条。
@@ -54,7 +54,7 @@
 
 ### 1.6 "34 处 DispatcherTimer" 全量清点（逐个回答）
 
-先纠正量级：`grep DispatcherTimer src/Arc.Avalonia.Actions` 的 **34 条命中 = 17 个 timer 对象**（每个对象同时有"字段声明 + 构造函数 `new`"两条）。Inputs 侧 6 条命中 = 3 个对象。**合计 20 个 timer 对象，其中 0 个是 16 ms / 逐帧 timer**，全部是一次性延迟或低频重复；`ArcSpinner`（B2）那种"每实例 16 ms 逐帧"在本区域**不存在**。
+先纠正量级：`grep DispatcherTimer src/Components/Arc.Avalonia.Actions` 的 **34 条命中 = 17 个 timer 对象**（每个对象同时有"字段声明 + 构造函数 `new`"两条）。Inputs 侧 6 条命中 = 3 个对象。**合计 20 个 timer 对象，其中 0 个是 16 ms / 逐帧 timer**，全部是一次性延迟或低频重复；`ArcSpinner`（B2）那种"每实例 16 ms 逐帧"在本区域**不存在**。
 
 | # | 位置 | 用途 | 间隔 | 生命周期 | Detach 时 Stop | Tick 里做什么 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -83,11 +83,11 @@
 
 最危险的 5 个 timer：
 
-1. `src/Arc.Avalonia.Actions/Controls/ArcConfirmMorph.cs:134` + `:619-630` —— 每秒重建整个 face + 强制 Measure + 新建 `Transitions`。
-2. `src/Arc.Avalonia.Inputs/Controls/ArcNumberField.cs:284-294` —— 按住时每 80 ms 写 `TextBox.Text`（文本布局）+ `Classes.Set` + 事件。
-3. `src/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:290-300` —— 与 panel 的 Width/Height 动画同帧叠加，出栈时移除子树。
-4. `src/Arc.Avalonia.Actions/Controls/ArcShareAccess.cs:256-264` —— 520 ms 后把所有角色按钮 `Width` 重置，触发布局。
-5. `src/Arc.Avalonia.Actions/Controls/ArcActionSwap.cs:44-55` / `ArcCopyButton.cs:59-64` —— 无 Detach stop，且 Tick 内重建 face 控件。
+1. `src/Components/Arc.Avalonia.Actions/Controls/ArcConfirmMorph.cs:134` + `:619-630` —— 每秒重建整个 face + 强制 Measure + 新建 `Transitions`。
+2. `src/Components/Arc.Avalonia.Inputs/Controls/ArcNumberField.cs:284-294` —— 按住时每 80 ms 写 `TextBox.Text`（文本布局）+ `Classes.Set` + 事件。
+3. `src/Components/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:290-300` —— 与 panel 的 Width/Height 动画同帧叠加，出栈时移除子树。
+4. `src/Components/Arc.Avalonia.Actions/Controls/ArcShareAccess.cs:256-264` —— 520 ms 后把所有角色按钮 `Width` 重置，触发布局。
+5. `src/Components/Arc.Avalonia.Actions/Controls/ArcActionSwap.cs:44-55` / `ArcCopyButton.cs:59-64` —— 无 Detach stop，且 Tick 内重建 face 控件。
 
 ### 1.7 四类弹出层实现与代价
 
@@ -131,7 +131,7 @@
 
 ### AC-01 ArcGlide 用布局属性做滑动高亮（P0）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcActionVisuals.cs:282-290`（`ShowAt`），`:302-336`（`Motion()`）；使用点 `ArcTabs.cs:302`、`ArcMenuSurface.cs:260`、`ArcButtonGroup.cs:344`、`ArcMegaMenu.cs:1706,1745`。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcActionVisuals.cs:282-290`（`ShowAt`），`:302-336`（`Motion()`）；使用点 `ArcTabs.cs:302`、`ArcMenuSurface.cs:260`、`ArcButtonGroup.cs:344`、`ArcMegaMenu.cs:1706,1745`。
 - 证据（`ArcActionVisuals.cs:282-290`，`:309-320`）：
 
   ```csharp
@@ -149,7 +149,7 @@
 
 ### AC-02 MegaMenu 面板动画跑在 Width/Height 上，阴影每帧重栅格（P0）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:1187-1227`（`ApplyPanelMotion`），`:1285-1352`（`BuildBody`）；阴影 `src/Arc.Avalonia.Actions/Themes/ArcActionsTheme.axaml:372-377`（`Border.mm-panel` → `ArcShadowFloating`）。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:1187-1227`（`ApplyPanelMotion`），`:1285-1352`（`BuildBody`）；阴影 `src/Components/Arc.Avalonia.Actions/Themes/ArcActionsTheme.axaml:372-377`（`Border.mm-panel` → `ArcShadowFloating`）。
 - 证据：
 
   ```csharp
@@ -166,7 +166,7 @@
 
 ### IN-01 Slider 拖动在 pointer-move 里写 Width（P0）
 
-- 位置：`src/Arc.Avalonia.Inputs/Controls/ArcSlider.cs:254-260`（`OnTrackMoved`），`:276-288`（`SetFromPointer`），`:321-348`（`UpdateVisuals`）。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Controls/ArcSlider.cs:254-260`（`OnTrackMoved`），`:276-288`（`SetFromPointer`），`:321-348`（`UpdateVisuals`）。
 - 证据：
 
   ```csharp
@@ -183,7 +183,7 @@
 
 ### AC-03 弹出层每次打开重建视觉树，且行集合被构建两次（P1）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcActionVisuals.cs:187-198`（`ArcMenuPresenter.Open`）；`src/Arc.Avalonia.Actions/Controls/ArcMenuSurface.cs:96-100`（`Open`）与 `:114-141`（`BuildRows`）、`:143-168`（`BuildRow`）。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcActionVisuals.cs:187-198`（`ArcMenuPresenter.Open`）；`src/Components/Arc.Avalonia.Actions/Controls/ArcMenuSurface.cs:96-100`（`Open`）与 `:114-141`（`BuildRows`）、`:143-168`（`BuildRow`）。
 - 证据：
 
   ```csharp
@@ -214,7 +214,7 @@
 
 ### AC-05 Accordion 展开动画跑在 Height 上（P1）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcAccordion.cs:194-221`（`body.Transitions`）、`:237-269`（`ApplyOpen`）。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcAccordion.cs:194-221`（`body.Transitions`）、`:237-269`（`ApplyOpen`）。
 - 证据：
 
   ```csharp
@@ -231,7 +231,7 @@
 
 ### AC-06 ShareAccess 邮箱输入每键重建建议列表（P1）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcShareAccess.cs:736-757`（`OnFieldTextChanged`）、`:1050-1140`（`UpdateSuggestions`）。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcShareAccess.cs:736-757`（`OnFieldTextChanged`）、`:1050-1140`（`UpdateSuggestions`）。
 - 证据：
 
   ```csharp
@@ -250,7 +250,7 @@
 
 ### AC-07 MegaMenu 每次切换 section 全量重建面板 body（P1）
 
-- 位置：`src/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:1032-1107`（`OpenPanel`）、`:1285-1352`（`BuildBody`）、`:1370-1434`（`BuildSectionBody`）。
+- 位置：`src/Components/Arc.Avalonia.Actions/Controls/ArcMegaMenu.cs:1032-1107`（`OpenPanel`）、`:1285-1352`（`BuildBody`）、`:1370-1434`（`BuildSectionBody`）。
 - 证据：
 
   ```csharp
@@ -267,7 +267,7 @@
 
 ### IN-02 SegmentedControl 的 pill 用 Width 过渡（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Themes/ArcSegmentedControl.axaml:22-28`；代码 `src/Arc.Avalonia.Inputs/Controls/ArcSegmentedControl.cs:205-237`。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Themes/ArcSegmentedControl.axaml:22-28`；代码 `src/Components/Arc.Avalonia.Inputs/Controls/ArcSegmentedControl.cs:205-237`。
 - 证据：
 
   ```xml
@@ -283,14 +283,14 @@
 
 ### IN-03 Select 高亮用 Height 过渡（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Themes/ArcSelect.axaml:88-105`；代码 `src/Arc.Avalonia.Inputs/Controls/ArcSelect.cs:322-344`。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Themes/ArcSelect.axaml:88-105`；代码 `src/Components/Arc.Avalonia.Inputs/Controls/ArcSelect.cs:322-344`。
 - 证据：`DoubleTransition Property="Height"` 0.42 s（`:90-92`）+ `TranslateTransform.Y`（`:99-102`）；代码每次选中写 `_highlight.Height = container.Bounds.Height; _highlightTransform.Y = point.Value.Y;`（`:341-343`）。
 - 触发/放大：每次 `SelectionChanged`（`ArcSelect.cs:148`），包括按住方向键连续移动 → 动画反复重启 → 连续布局动画；放大因子 = 导航步数 × 25 帧。同型问题在 `ArcMultiSelect`（复用 `ArcSelectMenuItemTheme`）也会遇到。
 - 修复建议：高亮高度改为固定行高（行高一致时 Height 不需要动画），只动 Y；或把高亮做成 `RenderTransform` 缩放的固定高度条。
 
 ### IN-04 PasswordStrength 每次按键重建规则行与规则对象（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Controls/ArcPasswordStrength.cs:224-268`（`UpdateStrength`）、`:270-309`（`UpdateRuleRows`）、`:311-317`（`BuildDefaultRules`）。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Controls/ArcPasswordStrength.cs:224-268`（`UpdateStrength`）、`:270-309`（`UpdateRuleRows`）、`:311-317`（`BuildDefaultRules`）。
 - 证据：
 
   ```csharp
@@ -306,7 +306,7 @@
 
 ### IN-05 Textarea AutoGrow 每键 FormattedText + 写 Height（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Controls/ArcTextarea.cs:84-88`（`OnInputChanged`）、`:127-163`（`UpdateAutoGrow`）、`:77`（`InputBox.SizeChanged += (_, _) => UpdateAutoGrow();`）。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Controls/ArcTextarea.cs:84-88`（`OnInputChanged`）、`:127-163`（`UpdateAutoGrow`）、`:77`（`InputBox.SizeChanged += (_, _) => UpdateAutoGrow();`）。
 - 证据：
 
   ```csharp
@@ -320,7 +320,7 @@
 
 ### IN-06 MoneyInput 每键 LINQ 解析 + 两次写 Text（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Controls/ArcMoneyInput.cs:201-234`（`OnTextChanged`）、`:236-277`（`ParseDraft`）、`:279-292`（`SyncInput`）。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Controls/ArcMoneyInput.cs:201-234`（`OnTextChanged`）、`:236-277`（`ParseDraft`）、`:279-292`（`SyncInput`）。
 - 证据：
 
   ```csharp
@@ -335,7 +335,7 @@
 
 ### IN-07 Combobox 每次过滤重建整个菜单（P1）
 
-- 位置：`src/Arc.Avalonia.Inputs/Controls/ArcCombobox.cs:231-271`（`ApplyFilter`）。
+- 位置：`src/Components/Arc.Avalonia.Inputs/Controls/ArcCombobox.cs:231-271`（`ApplyFilter`）。
 - 证据：
 
   ```csharp

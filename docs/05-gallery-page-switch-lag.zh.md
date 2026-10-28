@@ -235,7 +235,7 @@ dotnet .recon\NavPerf\bin\Debug\net10.0\NavPerf.dll 5    # 侧栏 build vs layou
 
 ## 5. P0 修复实施与实测结果
 
-> 已实施（2026-10-25）。只改了一个文件：`src/Arc.Avalonia.Gallery/Framework/GalleryWindow.cs`；`src/**` 其余部分未动。
+> 已实施（2026-10-25）。只改了一个文件：`src/Apps/Arc.Avalonia.Gallery/Framework/GalleryWindow.cs`；`src/**` 其余部分未动。
 
 ### 5.1 改动内容
 
@@ -273,7 +273,7 @@ dotnet .recon\NavPerf\bin\Debug\net10.0\NavPerf.dll 5    # 侧栏 build vs layou
 
 ### 5.3 回归验证
 
-* `pwsh -NoProfile -File tools/build.ps1 -Project src/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj`：0 error（仅原有 warning）。
+* `pwsh -NoProfile -File tools/build.ps1 -Project src/Apps/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj`：0 error（仅原有 warning）。
 * `dotnet .../Arc.Avalonia.Gallery.dll --smoke`：`GALLERY SMOKE: clicks=836 pageShows=657 itemShows=588 failures=0`，26.3 s（覆盖页面按钮、分类展开、tier 过滤、全部目录项、换肤/换 accent、搜索过滤 + 结果点击）。
 * 探针复跑（`.recon/NavPerf`）：`SUMMARY_ITEM`、`SUMMARY_COLD/WARM`、`EXPAND_FIRST`、`ITEM_SWEEP` 均按上表变化，`errors=0`。
 

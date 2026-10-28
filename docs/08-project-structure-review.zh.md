@@ -1,9 +1,8 @@
 # Arc for Avalonia 目录结构与项目划分分析
 
-> **执行状态（2026-10-29）：** 本报告的 P0 与 P1 已全部实施（含 `Arc.Avalonia.Internal`、AgentUI/LifeToday、
-> Advanced 合并、Actions→Navigation/Overlays、Feedback→DataDisplay），见
-> [`09-project-restructure-phase1.zh.md`](09-project-restructure-phase1.zh.md)。仅 P2（物理目录分组 / 项目改名 /
-> 命名空间统一）按计划暂缓。
+> **执行状态（2026-10-29）：** 本报告的 P0、P1、P2 已全部实施（含 `Arc.Avalonia.Internal`、AgentUI/LifeToday、
+> Advanced 合并、Actions→Navigation/Overlays、Feedback→DataDisplay、物理分组、`Special.*`/`Blocks.*` 改名、
+> Charts/Blocks.Data 命名空间统一），见 [`09-project-restructure-phase1.zh.md`](09-project-restructure-phase1.zh.md)。
 >
 > 分析基线：2026-10-28，工作区 `D:\Code\VibeCoding\Arc.Avalonia`。
 > 范围：根目录 5 个文件夹、`src/` 下全部 24 个 .NET 项目（约 172k 行 C#/XAML、235 个页面类、233 个 Gallery 页面）、
@@ -72,7 +71,7 @@ Arc.Avalonia/
 * 10 个组件项目与 5 个 Special 项目之间**没有任何互相引用**（每个只引用 `Arc.Avalonia` + `Arc.Avalonia.Demo`），
   并行开发时不会互相编译污染，这是当前划分最健康的部分。
 * Blocks 项目按需引用 4–10 个组件项目，Gallery 引用全部 23 个；因此任何新增项目都必须同时改
-  `ArcUI.slnx` 与 `src/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj`（以及 `App.axaml` 的 `StyleInclude`）。
+  `ArcUI.slnx` 与 `src/Apps/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj`（以及 `App.axaml` 的 `StyleInclude`）。
 * 每个组件/Special/Blocks 项目都自带 `Controls/`、`Pages/`、`Themes/` 三件套，页面由
   `Arc.Avalonia.Demo.ArcPageRegistry` 反射发现，不需要中央注册表。这套“项目即插件”的模式是
   `CONVENTIONS.md` 里“一个 agent 一个项目”的所有权模型的直接产物。
@@ -83,7 +82,7 @@ Arc.Avalonia/
 
 ### 3.1 基础与展示层（3 个项目）
 
-#### `src/Arc.Avalonia` — 基础层（13 个 .cs、4 个 .axaml，约 2.0k 行）
+#### `src/Foundation/Arc.Avalonia` — 基础层（13 个 .cs、4 个 .axaml，约 2.0k 行）
 
 | 子目录 | 内容 |
 | --- | --- |
@@ -96,7 +95,7 @@ Arc.Avalonia/
 注意基础层有两个近义目录：`Theme/`（token、调色板、主题管理器）与 `Themes/`（控件 ControlTheme）。
 其他 23 个项目只有一个 `Themes/`，命名上容易混淆。
 
-#### `src/Arc.Avalonia.Demo` — 页面契约（7 个 .cs + 1 个 JSON，约 0.6k 行）
+#### `src/Apps/Arc.Avalonia.Demo` — 页面契约（7 个 .cs + 1 个 JSON，约 0.6k 行）
 
 | 文件 | 作用 |
 | --- | --- |
@@ -112,7 +111,7 @@ Arc.Avalonia/
 `Arc.Avalonia.Inputs.csproj:9-10` 即典型：引用基础层 + Demo。Demo 的定位因此同时是“页面契约”
 和“每个库的展示层依赖”。
 
-#### `src/Arc.Avalonia.Gallery` — 展示与验收应用（13 个 .cs/.axaml，约 2.0k 行）
+#### `src/Apps/Arc.Avalonia.Gallery` — 展示与验收应用（13 个 .cs/.axaml，约 2.0k 行）
 
 | 部分 | 内容 |
 | --- | --- |
@@ -201,7 +200,7 @@ P0 新增 `ArcAgentTranscript`；辅助 `ArcMarkdown`、`ArcContentUi`。
 | 项目 | 11 个目录项 | 额外控件/辅助 |
 | --- | --- | --- |
 | `Arc.Avalonia.Special.Glass` | Glass menu / segmented / card / tab bar、Holo card、Wallet stack、Sheet stack、Control center、Card to article、Link unfurl、Share sheet | `ArcGlassBackdrop`、`ArcGlass`、`ArcDurationDial`、`ArcRubberMeter`、`GlassMotion`、`GlassDemo` |
-| `Arc.Avalonia.Special.Motion` | Action morph、Morph nav、Dock、Liquid tab bar、Orbit menu、Orbit logos、Booking pill、Keycap keyboard、Slot text、Sand text、Typewriter terminal | `SpecialMotionUi` |
+| `Arc.Avalonia.Special.Motion` | Action morph、Morph nav、Dock、Liquid tab bar、Orbit menu、Orbit logos、Booking pill、Keycap keyboard、Slot text、Sand text、Typewriter terminal | `Special.MotionUi` |
 | `Arc.Avalonia.Special.Media` | Product gallery、Lightbox gallery、Photo grid、Cover flow、Voice orb、Now playing、Voice recorder、Page curl、Sticker peel、Dot grid、Gravity well | `SampleArt`、`SpecialIcons`、`SpecialUi` |
 | `Arc.Avalonia.Special.AIWidgets` | Agent status、Tool call、Agent plan、Agent timeline、Context window、Ink fluid、Activity rings、Stretch refresh、Morph loader、Skeleton morph、Black hole | P0：`ArcAgentAskCard`、`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcBackgroundRunDock`；`SpecialVisuals` |
 | `Arc.Avalonia.Special.AIExplainers` | Data flow、Payment flow、Multi-region failover、Vector search、Agent loop、Mixture of experts、Speculative decoding、Prompt cache、Reasoning tree、Time dial、Date reel | `ExplainInk` |
@@ -220,8 +219,8 @@ Special 五个项目与 `arc-catalog.json` 的 `specialGroups` **一一对应**�
 | `Arc.Avalonia.Blocks.Data` | 20（Data and charts） | 20 | `ArcCandleChart`、`ArcChoroplethMap`、`ArcConnectedScatter`、`ArcDotGlobe`、`ArcExplodedLayers`、`ArcForecastCone`、`ArcGalaxyStage`、`ArcHorizonChart`、`ArcLayoutMorph`、`ArcOverviewBrush`、`ArcReplayLine`、`ArcSemanticMap`、`ArcSmallMultiples`、`ArcTerrainStage`、`ArcWaterfallBars`、`DataDraw`、`DataKit`、`DataSamples` |
 | `Arc.Avalonia.Blocks.AI` | 18（AI） | 19 | `AiKit`、`ArcAgentAttentionInbox`（P0） |
 
-Blocks 六个项目与 `blockGroups` 的六组一一对应。`BlocksApp` 25 页 = 21 个 catalog 区块 + 4 个 P0 Today 页；
-`BlocksAI` 19 页 = 18 + 1 个 P0 Agent 页。
+Blocks 六个项目与 `blockGroups` 的六组一一对应。`Blocks.App` 25 页 = 21 个 catalog 区块 + 4 个 P0 Today 页；
+`Blocks.AI` 19 页 = 18 + 1 个 P0 Agent 页。
 
 ### 3.5 文档、工具与产物
 
@@ -293,7 +292,7 @@ Blocks 六个项目与 `blockGroups` 的六组一一对应。`BlocksApp` 25 页 
    6 个 Blocks 项目对应 `blockGroups` 的 18/18/21/16/20/18，页面数可直接核对，迁移和审计都简单。
 3. **组件项目之间零耦合。** 10 个组件项目互不引用，可以独立编译、独立截图、独立分配 owner，
    这是 `CONVENTIONS.md` “一个 agent 一个项目”能成立的前提。
-4. **物理目录与命名空间基本一致。** `src/Arc.Avalonia.Inputs` → `Arc.Avalonia.Inputs.Controls/.Pages`，
+4. **物理目录与命名空间基本一致。** `src/Components/Arc.Avalonia.Inputs` → `Arc.Avalonia.Inputs.Controls/.Pages`，
    按项目名就能定位类型。
 5. **页面与控件同项目、反射发现。** 不需要中央注册表，新增项目只改 slnx/Gallery 引用/`App.axaml` 三处，
    适合大量并行提交。
@@ -324,7 +323,7 @@ Blocks 六个项目与 `blockGroups` 的六组一一对应。`BlocksApp` 25 页 
 
 每个组件项目都自带一份 `*Visuals` / `*Ui` / `*Kit` / `*Internals` 辅助文件：
 `ArcActionVisuals`、`ArcAdvancedVisuals`、`ArcAdvancedInternals`、`ArcEffectVisuals`、`ArcMediaUi`、
-`ArcContentUi`、`ArcMenuHelper`、`SpecialVisuals`、`SpecialUi`、`SpecialMotionUi`、`GlassDemo` 等。
+`ArcContentUi`、`ArcMenuHelper`、`SpecialVisuals`、`SpecialUi`、`Special.MotionUi`、`GlassDemo` 等。
 后果已经出现——**三个同名类型**：
 
 * `ArcAnimatedCounter`：`Charts/Controls/ArcAnimatedCounter.cs`（204 行）与
@@ -348,10 +347,10 @@ showcase”）。当前 README/CONVENTIONS 的定位更接近后者，所以问�
 | P0 控件 | 被放进 |
 | --- | --- |
 | `ArcAgentTranscript` | `Content` |
-| `ArcRunControlBar` / `ArcToolApprovalSheet` / `ArcAgentAskCard` / `ArcBackgroundRunDock` | `SpecialAIWidgets` |
-| `ArcAgentAttentionInbox` | `BlocksAI` |
+| `ArcRunControlBar` / `ArcToolApprovalSheet` / `ArcAgentAskCard` / `ArcBackgroundRunDock` | `Special.AIWidgets` |
+| `ArcAgentAttentionInbox` | `Blocks.AI` |
 | `ArcReminderRow` | `Feedback` |
-| `ArcDailyBrief` / `ArcDayAgenda` / `ArcReminderCenter` / `ArcMedicationSchedule` | `BlocksApp/LifeTodayKit` |
+| `ArcDailyBrief` / `ArcDayAgenda` / `ArcReminderCenter` / `ArcMedicationSchedule` | `Blocks.App/LifeTodayKit` |
 | `ArcVirtualList` / `ArcUi` | `Arc.Avalonia`（基础层） |
 | `ArcQuickCaptureBar` | `AdvancedInputs` |
 | `ArcRoutineScheduleEditor` | `Pickers` |
@@ -368,8 +367,8 @@ showcase”）。当前 README/CONVENTIONS 的定位更接近后者，所以问�
 #### ⑦ 命名与命名空间不一致
 
 * 命名空间：绝大多数是 `<Project>.Controls` / `<Project>.Pages`，但 `Charts` 用单一
-  `Arc.Avalonia.Charts`，`BlocksData` 用 `Arc.Avalonia.Blocks.Data`（控件）与 `.Pages`（页面）混合；
-* 项目名：`SpecialAIExplainers`、`BlocksAI` 缺少分隔符，读起来是 `SpecialAIExplainers` 而不是
+  `Arc.Avalonia.Charts`，`Blocks.Data` 用 `Arc.Avalonia.Blocks.Data`（控件）与 `.Pages`（页面）混合；
+* 项目名：`Special.AIExplainers`、`Blocks.AI` 缺少分隔符，读起来是 `Special.AIExplainers` 而不是
   `Special.AIExplainers`；
 * 基础层 `Theme/` 与 `Themes/` 并存，只有基础层有这种双目录；
 * `Arc.Avalonia.Feedback.Internal.ArcUi` 与基础层 `ArcUi` 同名，检索时会产生歧义。
@@ -391,17 +390,17 @@ showcase”）。当前 README/CONVENTIONS 的定位更接近后者，所以问�
 1. `.gitignore` 增加 `bin-alt/`，清理 12 个残留构建目录；`.recon/` 保持忽略。
 2. 去重 `ArcAnimatedCounter` / `ArcActivityHeatmap`：保留一份（建议放 `Charts` 或新的共享 `DataDisplay`），
    另一个项目改为引用；`ArcUi` 二选一改名（如 Feedback 的改为 `FeedbackUi`）。
-3. 统一命名空间后缀（`Charts` 补 `.Controls`/`.Pages`，`BlocksData` 统一），统一 `Theme/` 与 `Themes/`。
+3. 统一命名空间后缀（`Charts` 补 `.Controls`/`.Pages`，`Blocks.Data` 统一），统一 `Theme/` 与 `Themes/`。
 4. `ArcUI.slnx` 用解决方案文件夹分组：`/Foundation`、`/Components`、`/Special`、`/Blocks`、`/App`，
    不动文件路径，只提升导航。
 5. 增加一个最小测试工程（token 转换、`ArcSpringEasing`、catalog 计数校验），把 `--audit` 的断言搬进 `dotnet test`。
 
 ### P1：下一轮功能开发前完成
 
-6. **把 P0/Agent 能力收拢成独立项目**：`src/Arc.Avalonia.AgentUI`（Agent transcript / run bar / approval /
-   ask card / attention inbox / background dock）与 `src/Arc.Avalonia.LifeToday`（reminder / brief / agenda /
-   medication / routine editor / quick capture），从 `Content`、`Feedback`、`SpecialAIWidgets`、`BlocksAI`、
-   `BlocksApp`、`Pickers`、`AdvancedInputs` 中迁出。这样“按类型”和“按产品”两个轴分离，后续 57 项扩展有处可放。
+6. **把 P0/Agent 能力收拢成独立项目**：`src/Agent/Arc.Avalonia.AgentUI`（Agent transcript / run bar / approval /
+   ask card / attention inbox / background dock）与 `src/Agent/Arc.Avalonia.LifeToday`（reminder / brief / agenda /
+   medication / routine editor / quick capture），从 `Content`、`Feedback`、`Special.AIWidgets`、`Blocks.AI`、
+   `Blocks.App`、`Pickers`、`AdvancedInputs` 中迁出。这样“按类型”和“按产品”两个轴分离，后续 57 项扩展有处可放。
 7. **抽共享内部原语**：把 `ArcUi`、`ArcDraw`、`*Visuals`、布局/文字/画笔辅助合并到一个内部项目
    （如 `Arc.Avalonia.Internal`，`internal` 可见性或 `InternalsVisibleTo`），结束每个项目各造一份 `*Kit` 的局面。
 8. **拆分两个大杂烩**（按 catalog 类别，而不是按难度）：

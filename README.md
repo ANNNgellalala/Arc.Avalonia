@@ -43,8 +43,8 @@ Read the analysis first:
   boundaries need to change.
 * [`docs/09-project-restructure-phase1.zh.md`](docs/09-project-restructure-phase1.zh.md) — the restructure
   record: P0 hygiene, Arc.Avalonia.Internal, AgentUI/LifeToday extraction, AdvancedInputs/AdvancedActions
-  merge, Actions → Actions/Navigation/Overlays, Feedback → Feedback/DataDisplay, verification, and the
-  deferred P2 list.
+  merge, Actions → Actions/Navigation/Overlays, Feedback → Feedback/DataDisplay, physical grouping,
+  `Special.*` / `Blocks.*` renames, namespace unification, and verification.
 
 ## Gallery
 
@@ -112,25 +112,25 @@ More: [components](docs/images/components-light.png), [icons](docs/images/icons-
 
 | Project | Contents |
 | --- | --- |
-| `src/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList` |
-| `src/Arc.Avalonia.Internal` | Shared internal primitives: menu surface and glide, icon button, feedback composition helpers and tweens (not part of the public component layer) |
-| `src/Arc.Avalonia.Demo` | `ArcPage` contract, `DemoUi` layout helpers, reflection page discovery |
-| `src/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
-| `src/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
-| `src/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
-| `src/Arc.Avalonia.Actions` | Buttons, menus, disclosure, messages, plus action button, floating/expanding button groups, icon morph, user menu |
-| `src/Arc.Avalonia.Navigation` | Tabs, breadcrumb, pagination, mega menu |
-| `src/Arc.Avalonia.Overlays` | Dialog, drawer, popover, tooltip, share access |
-| `src/Arc.Avalonia.Feedback` | Progress, skeleton, avatars, cards, presence, timeline, comment thread, counters, activity heatmap |
-| `src/Arc.Avalonia.DataDisplay` | Sortable table, tree table, tree view, filter toolbar, code block, JSON viewer, data grid |
-| `src/Arc.Avalonia.Charts` | Custom-drawn data visualisation on the Arc series palette |
-| `src/Arc.Avalonia.Pickers` | Calendar, date/time range, colour, file dropzone, signature |
-| `src/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
-| `src/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, chat thread, onboarding checklist |
-| `src/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
-| `src/Arc.Avalonia.Special*` | 55 Special components in five projects: glass and surfaces, motion and interaction, media and input, AI widgets, AI explainers |
-| `src/Arc.Avalonia.Blocks*` | 111 page-level blocks in six projects: marketing, commerce, app shell, team and collaboration, data and charts, AI |
-| `src/Arc.Avalonia.Gallery` | The showcase application and offscreen screenshot harness |
+| `src/Foundation/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList` |
+| `src/Foundation/Arc.Avalonia.Internal` | Shared internal primitives: menu surface and glide, icon button, feedback composition helpers and tweens (not part of the public component layer) |
+| `src/Apps/Arc.Avalonia.Demo` | `ArcPage` contract, `DemoUi` layout helpers, reflection page discovery |
+| `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
+| `src/Agent/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
+| `src/Components/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
+| `src/Components/Arc.Avalonia.Actions` | Buttons, menus, disclosure, messages, plus action button, floating/expanding button groups, icon morph, user menu |
+| `src/Components/Arc.Avalonia.Navigation` | Tabs, breadcrumb, pagination, mega menu |
+| `src/Components/Arc.Avalonia.Overlays` | Dialog, drawer, popover, tooltip, share access |
+| `src/Components/Arc.Avalonia.Feedback` | Progress, skeleton, avatars, cards, presence, timeline, comment thread, counters, activity heatmap |
+| `src/Components/Arc.Avalonia.DataDisplay` | Sortable table, tree table, tree view, filter toolbar, code block, JSON viewer, data grid |
+| `src/Components/Arc.Avalonia.Charts` | Custom-drawn data visualisation on the Arc series palette |
+| `src/Components/Arc.Avalonia.Pickers` | Calendar, date/time range, colour, file dropzone, signature |
+| `src/Components/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
+| `src/Components/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, chat thread, onboarding checklist |
+| `src/Components/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
+| `src/Special/Arc.Avalonia.Special.*` | 55 Special components in five projects: glass and surfaces, motion and interaction, media and input, AI widgets, AI explainers |
+| `src/Blocks/Arc.Avalonia.Blocks.*` | 111 page-level blocks in six projects: marketing, commerce, app shell, team and collaboration, data and charts, AI |
+| `src/Apps/Arc.Avalonia.Gallery` | The showcase application and offscreen screenshot harness |
 
 The gallery discovers every `ArcPage` in the referenced assemblies, so each project ships its own showcase
 pages without a central registry.
@@ -138,8 +138,8 @@ pages without a central registry.
 ## Design tokens
 
 Every token from Arc's `foundation.css` is defined in OKLCH in
-[`ArcPalette.cs`](src/Arc.Avalonia/Theme/ArcPalette.cs) and converted to sRGB by the small
-[`ArcColor.cs`](src/Arc.Avalonia/Theme/ArcColor.cs) engine (OKLab maths, CSS `color-mix(in oklab)`).
+[`ArcPalette.cs`](src/Foundation/Arc.Avalonia/Theme/ArcPalette.cs) and converted to sRGB by the small
+[`ArcColor.cs`](src/Foundation/Arc.Avalonia/Theme/ArcColor.cs) engine (OKLab maths, CSS `color-mix(in oklab)`).
 
 * Light and dark palettes, neutral plus eight accents (neutral, violet, blue, green, amber, orange, coral,
   rose), accent-tuned control colours.
@@ -195,10 +195,10 @@ Highlights:
 pwsh -NoProfile tools/build.ps1
 
 # launch the interactive gallery (use the dotnet host: direct .exe launch is blocked in this sandbox)
-dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll
 
 # navigation regression check: clicks the real sidebar and shows every page, exits non-zero on failure
-dotnet src/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke
 ```
 
 ## Screenshot harness

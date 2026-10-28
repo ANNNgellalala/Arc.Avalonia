@@ -13,7 +13,7 @@
 
 ### 0.1 一句话结论
 
-**这套库已经画出了 Agent 产品几乎全部的"界面表情"，但还没有给出任何"运行时接口"。** 40 个 AI 命名资产（11 AI widgets + 11 AI explainers + 18 AI blocks）在视觉、动效、可访问性上都能直接支撑演示；但其中没有一个向外暴露 Agent 生命周期事件（Approve / Deny / Stop / Retry / Ask / Handoff），18 个 AI block 全部是 `ArcItemPage` 页面级样例（`src/Arc.Avalonia.Blocks.AI` 只有一个 `Controls/AiKit.cs` 布局助手 + 18 个 `Pages/*.cs`），不能被业务页面当控件嵌入。要把它变成可用的桌面助手，缺的不是"更多漂亮面板"，而是**一条可驱动的事件流、一套可执行的审批/中断契约，以及桌面运行时（托盘、系统通知、调度、离线）的骨架**。
+**这套库已经画出了 Agent 产品几乎全部的"界面表情"，但还没有给出任何"运行时接口"。** 40 个 AI 命名资产（11 AI widgets + 11 AI explainers + 18 AI blocks）在视觉、动效、可访问性上都能直接支撑演示；但其中没有一个向外暴露 Agent 生命周期事件（Approve / Deny / Stop / Retry / Ask / Handoff），18 个 AI block 全部是 `ArcItemPage` 页面级样例（`src/Blocks/Arc.Avalonia.Blocks.AI` 只有一个 `Controls/AiKit.cs` 布局助手 + 18 个 `Pages/*.cs`），不能被业务页面当控件嵌入。要把它变成可用的桌面助手，缺的不是"更多漂亮面板"，而是**一条可驱动的事件流、一套可执行的审批/中断契约，以及桌面运行时（托盘、系统通知、调度、离线）的骨架**。
 
 ### 0.2 关键数字
 
@@ -22,7 +22,7 @@
 | catalog 总量 | 294（128 components / 55 special / 111 blocks） | `docs/arc-catalog.json`；`README.md:210` |
 | 与 Agent 直接相关的命名资产 | 40（11 AI widgets + 11 AI explainers + 18 AI blocks） | `docs/arc-catalog.json` 的 `specialGroups`/`blockGroups` |
 | 提供 Agent 运行时事件契约（approve / stop / retry / ask / handoff）的 AI 资产 | **0** | 见 §2；40 项中唯一的 `public event` 来自通用氛围件 `ArcBlackHole`（SelectionChanged/Deleted），与 Agent 无关 |
-| AI block 中的可复用控件类 | **0**（仅 `AiKit` 内部静态助手） | `src/Arc.Avalonia.Blocks.AI/Controls/AiKit.cs` |
+| AI block 中的可复用控件类 | **0**（仅 `AiKit` 内部静态助手） | `src/Blocks/Arc.Avalonia.Blocks.AI/Controls/AiKit.cs` |
 | 托盘 / 系统通知 / 全局热键 API 使用 | 各 **0 处** | 全仓 `src/**/*.cs,*.axaml` 精确 grep |
 | 桌面运行时存在性 | `TrayIcon`=0、`WindowNotificationManager`=0、`RegisterHotKey`=0、`NativeMenu`=0 | 同上 |
 | 现有展示页 / 截图 | 219 页 / 438 张 | `README.md:194-195`；`docs/03-implementation.zh.md:74-75` |
@@ -45,7 +45,7 @@
 
 - 目录与元数据：`docs/arc-catalog.json` 全量 294 项（slug/title/kind/category/tier/description）。
 - 实现说明：`README.md`、`docs/03-implementation.zh.md`、`docs/04-design-and-performance-review.zh.md`（重点 R4/R5/G-P0-7）。
-- 源码：`src/Arc.Avalonia.Special.AIWidgets/Controls`（11 项）、`src/Arc.Avalonia.Special.AIExplainers/Controls`（11 项）、`src/Arc.Avalonia.Blocks.AI`（`Controls/AiKit.cs` + 18 个 Pages）、`src/Arc.Avalonia.Actions`（toast/overlay/dialog）、`src/Arc.Avalonia.Feedback`（timeline/usage-meter/countdown/table）、`src/Arc.Avalonia.Content`（chat-thread）、`src/Arc.Avalonia.Special.Media`（voice-orb/voice-recorder）、`src/Arc.Avalonia.Blocks.App`/`BlocksTeam`（notification-center/settings/security/week-calendar）、`src/Arc.Avalonia.Gallery`（页面契约与截图链路）。
+- 源码：`src/Special/Arc.Avalonia.Special.AIWidgets/Controls`（11 项）、`src/Special/Arc.Avalonia.Special.AIExplainers/Controls`（11 项）、`src/Blocks/Arc.Avalonia.Blocks.AI`（`Controls/AiKit.cs` + 18 个 Pages）、`src/Components/Arc.Avalonia.Actions`（toast/overlay/dialog）、`src/Components/Arc.Avalonia.Feedback`（timeline/usage-meter/countdown/table）、`src/Components/Arc.Avalonia.Content`（chat-thread）、`src/Special/Arc.Avalonia.Special.Media`（voice-orb/voice-recorder）、`src/Blocks/Arc.Avalonia.Blocks.App`/`Blocks.Team`（notification-center/settings/security/week-calendar）、`src/Apps/Arc.Avalonia.Gallery`（页面契约与截图链路）。
 - 交叉校验：对全仓 `src/**/*.cs,*.axaml` 做精确 grep（`TrayIcon`、`WindowNotificationManager`、`RegisterHotKey`、`NativeMenu`、`DiffView`、`public event`），避免只看名字。
 
 ### 1.2 支持度分级（全文统一）
@@ -69,12 +69,12 @@
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `ai-composer` | BlocksAI | 附件 chip、模型 chip、斜杠与 @ 的**视觉**占位、发送/停止按钮外观 | ◐ | `AiComposerPage.cs:54-57`（"/ 命令列表、@ 提及、听写与上传都是 chip 表示；Stop 与进度环只有文档，没有动画"） | 无输入事件/命令菜单数据契约；无语音、无中断语义、无"上下文来源"选择 |
-| `ai-chat` | BlocksAI | 整页会话：markdown 子集、折叠推理、工具 chip、引用；**成品态** | ◐ | `AiChatPage.cs:53-57`（"编辑成版本、停止流、hover 操作只写在 notes，样例是稳定会话"） | 无流式追加、无消息版本、无中断、无多轮工具事件、无虚拟化 |
-| `ai-side-panel` | BlocksAI | 贴着"页面"读选中段、word diff、Apply/Undo | ◐ | `AiSidePanelPage.cs:51-55`（word diff 预计算；Apply/Undo 只改页面文案；固定在页面内） | 只读"页面"而非桌面应用/窗口/剪贴板；无选中捕获真实通路；无跨应用上下文 |
-| `model-picker` | BlocksAI | 模型 pill、推理档位、按 provider 浏览 | ◐ | `ModelPickerPage.cs:51-54`（菜单直接渲染成打开态，价格为例示值） | 无模型能力/成本/离线状态数据；无路由策略 |
-| `voice-orb` | SpecialMedia | Idle/Listening/Thinking/Speaking 四态、转写两行、计时 | ◐ | `ArcVoiceOrb.cs:9-16`、`:50-101`（属性有，事件无；麦克风电平为模拟） | 无事件、无 barge-in、无真实设备/权限、无"说完即发"语义 |
-| `voice-recorder` | SpecialMedia | 波形、回放、发送 take | ◐ | `src/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs` | 无转写、无 VAD、无语音命令 |
+| `ai-composer` | Blocks.AI | 附件 chip、模型 chip、斜杠与 @ 的**视觉**占位、发送/停止按钮外观 | ◐ | `AiComposerPage.cs:54-57`（"/ 命令列表、@ 提及、听写与上传都是 chip 表示；Stop 与进度环只有文档，没有动画"） | 无输入事件/命令菜单数据契约；无语音、无中断语义、无"上下文来源"选择 |
+| `ai-chat` | Blocks.AI | 整页会话：markdown 子集、折叠推理、工具 chip、引用；**成品态** | ◐ | `AiChatPage.cs:53-57`（"编辑成版本、停止流、hover 操作只写在 notes，样例是稳定会话"） | 无流式追加、无消息版本、无中断、无多轮工具事件、无虚拟化 |
+| `ai-side-panel` | Blocks.AI | 贴着"页面"读选中段、word diff、Apply/Undo | ◐ | `AiSidePanelPage.cs:51-55`（word diff 预计算；Apply/Undo 只改页面文案；固定在页面内） | 只读"页面"而非桌面应用/窗口/剪贴板；无选中捕获真实通路；无跨应用上下文 |
+| `model-picker` | Blocks.AI | 模型 pill、推理档位、按 provider 浏览 | ◐ | `ModelPickerPage.cs:51-54`（菜单直接渲染成打开态，价格为例示值） | 无模型能力/成本/离线状态数据；无路由策略 |
+| `voice-orb` | Special.Media | Idle/Listening/Thinking/Speaking 四态、转写两行、计时 | ◐ | `ArcVoiceOrb.cs:9-16`、`:50-101`（属性有，事件无；麦克风电平为模拟） | 无事件、无 barge-in、无真实设备/权限、无"说完即发"语义 |
+| `voice-recorder` | Special.Media | 波形、回放、发送 take | ◐ | `src/Special/Arc.Avalonia.Special.Media/Controls/ArcVoiceRecorder.cs` | 无转写、无 VAD、无语音命令 |
 
 **阶段判断**：理解阶段"输入表面"齐全，"输入通道"（结构化追问、桌面上下文、语音事件）全缺。
 
@@ -82,10 +82,10 @@
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-plan` | SpecialAIWidgets | Draft 状态可改名/拖动排序/增删步骤/Keep planning；Approve plan 后进入 Running 清单；失败步 Retry/Skip | ◐ | `ArcAgentPlan.cs:17-33`（状态枚举）、`:395-412`、`:675-690`；`:62-63`（"Keep planning 追加固定建议；运行按固定时钟推进，而不是你的 agent 事件"） | 无 Approve/Edit/Retry 事件；无预计耗时/成本/风险；无与日历的可行性校验；无"批准后计划被 Agent 改写"的版本 diff |
-| `agent-orchestrator` | BlocksAI | lead 拆解 + 并行 lane + 结果合并的**快照** | ◐ | `AgentOrchestratorPage.cs:53-56`（"run 是快照；lane 已返回；lead 与 lane 的连线因静态区块不画；并发只改标签与队列顺序"） | 无运行中拓扑、无 lane 间依赖/取消、无重试分支、无交互式编排 |
-| `reasoning-tree` | SpecialAIExplainers | 思维树/beam 的**插图**（beam 1–3 是真实控件） | ○ | `ArcReasoningTree.cs:14-27`（固定样例分数） | 不承载真实检索/推理状态 |
-| `agent-loop` | SpecialAIExplainers | 三段循环的**插图**（固定 3 次样例） | ○ | `ArcAgentLoop.cs:19-27` | 同上 |
+| `agent-plan` | Special.AIWidgets | Draft 状态可改名/拖动排序/增删步骤/Keep planning；Approve plan 后进入 Running 清单；失败步 Retry/Skip | ◐ | `ArcAgentPlan.cs:17-33`（状态枚举）、`:395-412`、`:675-690`；`:62-63`（"Keep planning 追加固定建议；运行按固定时钟推进，而不是你的 agent 事件"） | 无 Approve/Edit/Retry 事件；无预计耗时/成本/风险；无与日历的可行性校验；无"批准后计划被 Agent 改写"的版本 diff |
+| `agent-orchestrator` | Blocks.AI | lead 拆解 + 并行 lane + 结果合并的**快照** | ◐ | `AgentOrchestratorPage.cs:53-56`（"run 是快照；lane 已返回；lead 与 lane 的连线因静态区块不画；并发只改标签与队列顺序"） | 无运行中拓扑、无 lane 间依赖/取消、无重试分支、无交互式编排 |
+| `reasoning-tree` | Special.AIExplainers | 思维树/beam 的**插图**（beam 1–3 是真实控件） | ○ | `ArcReasoningTree.cs:14-27`（固定样例分数） | 不承载真实检索/推理状态 |
+| `agent-loop` | Special.AIExplainers | 三段循环的**插图**（固定 3 次样例） | ○ | `ArcAgentLoop.cs:19-27` | 同上 |
 
 **阶段判断**：计划"画得完整、批不了、改不动、估不出"。
 
@@ -93,14 +93,14 @@
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-status` | SpecialAIWidgets | 胶囊态：运行环、当前活动、计数、计时；展开步骤、进度线；Pause/Stop/Open run | ◐ | `ArcAgentStatus.cs:18-27`（7 态）、`:454-466`（NeedsInput 的 Approve/Deny/Retry 只改自身状态）、`:500-534`（Pause/Stop 只改属性）、`:486-488`（Open run 无处理器） | **无事件**；状态由控件自持；无"停止范围"；无转交/接管；无多 run 队列 |
-| `tool-call` | SpecialAIWidgets | 一行工具调用：状态、输入/输出展开、Allow/Deny、Retry | ◐ | `ArcToolCall.cs:17-24`、`:303-324`、`:637-678`（批准后直接把数据改成 Running→Success） | 无事件；参数只读；无 dry-run；无副作用/diff；无审批过期；无工具结果的结构化查看器 |
-| `agent-timeline` | SpecialAIWidgets | 多 agent lane、thinking/tool/waiting span、handoff、playhead 回放、tokens/cost 头 | ◐ | `ArcAgentTimeline.cs:78-95`、`:198-208`、`:235-295`（内部时钟驱动回放） | 只读回放；无事件；不能从 span 触发重试/取消；无真实 trace 导入 |
-| `context-window` | SpecialAIWidgets | 200 格上下文预算、分类图例、阈值线、Send/Attach/Compact | ◐ | `ArcContextWindow.cs:64-75`、`:508-583` | 演示型操作；无真实 tokenizer/压缩事件；无"哪些内容可被丢弃"选择 |
-| `agent-run` | BlocksAI | 单次运行的步骤流 + 停在两文件 diff 上等人批准 | ◐ | `AgentRunPage.cs:51-54`（"snapshot at its approval gate；Approve 只写样例变更"） | 无事件、无真实 diff 组件、无重跑/分支 |
-| `agent-tasks` | BlocksAI | 后台任务卡（queued/running/review）+ 打开 PR | ◐ | `AgentTasksPage.cs:53-55`（"全部样例数据"） | 无并发队列、无优先级/取消、无资源占用 |
-| `ai-chat` / `chat-thread` | BlocksAI / Content | 流式外观 / 消息分组、typing、附件、自动滚动 | ◐ | `docs/04:243`（G-P0-7 整树重建）；`ArcChatThread.cs:467`（`_messageHost.Children.Clear()`） | 无增量 append 契约；无工具/审批事件类型；无虚拟化 |
-| `morph-loader` / `ink-fluid` 等 | SpecialAIWidgets | 运行中的氛围动画 | ○ | `SpecialAIWidgets/Controls/*` | 与运行状态无绑定 |
+| `agent-status` | Special.AIWidgets | 胶囊态：运行环、当前活动、计数、计时；展开步骤、进度线；Pause/Stop/Open run | ◐ | `ArcAgentStatus.cs:18-27`（7 态）、`:454-466`（NeedsInput 的 Approve/Deny/Retry 只改自身状态）、`:500-534`（Pause/Stop 只改属性）、`:486-488`（Open run 无处理器） | **无事件**；状态由控件自持；无"停止范围"；无转交/接管；无多 run 队列 |
+| `tool-call` | Special.AIWidgets | 一行工具调用：状态、输入/输出展开、Allow/Deny、Retry | ◐ | `ArcToolCall.cs:17-24`、`:303-324`、`:637-678`（批准后直接把数据改成 Running→Success） | 无事件；参数只读；无 dry-run；无副作用/diff；无审批过期；无工具结果的结构化查看器 |
+| `agent-timeline` | Special.AIWidgets | 多 agent lane、thinking/tool/waiting span、handoff、playhead 回放、tokens/cost 头 | ◐ | `ArcAgentTimeline.cs:78-95`、`:198-208`、`:235-295`（内部时钟驱动回放） | 只读回放；无事件；不能从 span 触发重试/取消；无真实 trace 导入 |
+| `context-window` | Special.AIWidgets | 200 格上下文预算、分类图例、阈值线、Send/Attach/Compact | ◐ | `ArcContextWindow.cs:64-75`、`:508-583` | 演示型操作；无真实 tokenizer/压缩事件；无"哪些内容可被丢弃"选择 |
+| `agent-run` | Blocks.AI | 单次运行的步骤流 + 停在两文件 diff 上等人批准 | ◐ | `AgentRunPage.cs:51-54`（"snapshot at its approval gate；Approve 只写样例变更"） | 无事件、无真实 diff 组件、无重跑/分支 |
+| `agent-tasks` | Blocks.AI | 后台任务卡（queued/running/review）+ 打开 PR | ◐ | `AgentTasksPage.cs:53-55`（"全部样例数据"） | 无并发队列、无优先级/取消、无资源占用 |
+| `ai-chat` / `chat-thread` | Blocks.AI / Content | 流式外观 / 消息分组、typing、附件、自动滚动 | ◐ | `docs/04:243`（G-P0-7 整树重建）；`ArcChatThread.cs:467`（`_messageHost.Children.Clear()`） | 无增量 append 契约；无工具/审批事件类型；无虚拟化 |
+| `morph-loader` / `ink-fluid` 等 | Special.AIWidgets | 运行中的氛围动画 | ○ | `Special.AIWidgets/Controls/*` | 与运行状态无绑定 |
 
 **阶段判断**：执行阶段"可视化最丰富、可控性最弱"——所有按钮都在改自己的数据，而不是告诉宿主"用户想停"。
 
@@ -108,18 +108,18 @@
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-approvals` | BlocksAI | 审批卡：工具、理由、参数只读行、Approve/Deny/Always allow、已解决日志、j/k/a 快捷键 | ◐ | `AgentApprovalsPage.cs:52-55`（"nothing reaches an agent；参数是只读行而不是内联字段；Always allow 只加规则 chip 不匹配旧请求；快捷键只文档化"）；`:182-220` | 无事件、无队列/批量、无过期、无改参、无预览、无范围/约束、无审计写入 |
-| `tool-call`（Approval 态） | SpecialAIWidgets | 行内 Allow/Deny | ◐ | `ArcToolCall.cs:303-324` | 同上（粒度太粗，只适合低风险） |
-| `hold-to-confirm` / `confirm-morph` | Media / Actions | 按住确认、确认形变（**可复用交互**） | ● | `src/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs`；`src/Arc.Avalonia.Actions/Controls/ArcConfirmMorph.cs:138-146`（有 StateChanged/Cancelled） | 不懂审批语义：无风险说明、无范围、无过期、无审计 |
+| `agent-approvals` | Blocks.AI | 审批卡：工具、理由、参数只读行、Approve/Deny/Always allow、已解决日志、j/k/a 快捷键 | ◐ | `AgentApprovalsPage.cs:52-55`（"nothing reaches an agent；参数是只读行而不是内联字段；Always allow 只加规则 chip 不匹配旧请求；快捷键只文档化"）；`:182-220` | 无事件、无队列/批量、无过期、无改参、无预览、无范围/约束、无审计写入 |
+| `tool-call`（Approval 态） | Special.AIWidgets | 行内 Allow/Deny | ◐ | `ArcToolCall.cs:303-324` | 同上（粒度太粗，只适合低风险） |
+| `hold-to-confirm` / `confirm-morph` | Media / Actions | 按住确认、确认形变（**可复用交互**） | ● | `src/Components/Arc.Avalonia.Media/Controls/ArcHoldToConfirm.cs`；`src/Components/Arc.Avalonia.Actions/Controls/ArcConfirmMorph.cs:138-146`（有 StateChanged/Cancelled） | 不懂审批语义：无风险说明、无范围、无过期、无审计 |
 | `dialog` / `drawer` | Actions | 页内模态与抽屉，Esc/外点关闭 | ● | `ArcDialog.cs:25-27`、`:65`；`ArcDrawer.cs:28-30` | 页内宿主，不是窗口级/系统级；无"审批专用"结构 |
 
 ### 2.5 结果（把答案/产物交回用户）
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `ai-answer` | BlocksAI | 成品答案 + 来源卡 + 引用点亮 | ◐ | `AiAnswerPage.cs`（Implementation notes：样例数据；引用只点亮段落与来源卡） | 无"结果对象"（文件/事件/订单）打开与保存；无未读/已读结果流 |
-| `research-run` | BlocksAI | 深研究步骤、来源 mark、引用答案 | ◐ | `ResearchRunPage.cs:53-55`（"答案预先写好、阅读百分比静态"） | 无真实流式、无取消、无结果导出 |
-| `ai-side-panel` | BlocksAI | Apply/Undo 的**局部**撤销 | ◐ | `AiSidePanelPage.cs:51-55` | 撤销只覆盖当前页面文案，不覆盖外部工具副作用 |
+| `ai-answer` | Blocks.AI | 成品答案 + 来源卡 + 引用点亮 | ◐ | `AiAnswerPage.cs`（Implementation notes：样例数据；引用只点亮段落与来源卡） | 无"结果对象"（文件/事件/订单）打开与保存；无未读/已读结果流 |
+| `research-run` | Blocks.AI | 深研究步骤、来源 mark、引用答案 | ◐ | `ResearchRunPage.cs:53-55`（"答案预先写好、阅读百分比静态"） | 无真实流式、无取消、无结果导出 |
+| `ai-side-panel` | Blocks.AI | Apply/Undo 的**局部**撤销 | ◐ | `AiSidePanelPage.cs:51-55` | 撤销只覆盖当前页面文案，不覆盖外部工具副作用 |
 | `toast` / `toast-stack` | Actions | 短确认、动作按钮、自动消失 | ● | `ArcToast.cs`、`ArcToastHost.cs:43-92` | 只能页内；无行动型通知/持久通知/通知中心投递 |
 | `diff-review` | — | **不存在** | — | 全仓 grep 无 diff 控件；`AiSidePanelPage` 的 word diff 预计算，`AgentRunPage` 的 diff 用 token | 结果批准缺最核心的"改动预览" |
 | `empty-state` | Feedback | 空态引导 | ● | `ArcEmptyState.cs` | 无"Agent 无事可做/等待授权"的专用空态语义 |
@@ -128,19 +128,19 @@
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-memory` | BlocksAI | 记忆列表、筛选搜索、就地编辑、忘记、保存记忆/聊天历史开关 | ◐ | `AgentMemoryPage.cs:53-55`（"Forget 立即删除，没有 5 秒撤销；capture pill 只存一条样例"） | 无来源/置信度/作用域；无批量治理；无冲突合并；无导出/全删审计；无加密本地库契约 |
-| `context-window` | SpecialAIWidgets | 上下文中 memory 占比的**可视化** | ◐ | `ArcContextWindow.cs:17-27` | 只展示，不管理 |
-| `knowledge-base` | BlocksAI | 文档摄取/切块/检索排序样例 | ◐ | `KnowledgeBasePage.cs`（ingestion 快照、检索返回固定 chunk） | 生活助手更需要"个人记忆"而非文档库；两者未打通 |
+| `agent-memory` | Blocks.AI | 记忆列表、筛选搜索、就地编辑、忘记、保存记忆/聊天历史开关 | ◐ | `AgentMemoryPage.cs:53-55`（"Forget 立即删除，没有 5 秒撤销；capture pill 只存一条样例"） | 无来源/置信度/作用域；无批量治理；无冲突合并；无导出/全删审计；无加密本地库契约 |
+| `context-window` | Special.AIWidgets | 上下文中 memory 占比的**可视化** | ◐ | `ArcContextWindow.cs:17-27` | 只展示，不管理 |
+| `knowledge-base` | Blocks.AI | 文档摄取/切块/检索排序样例 | ◐ | `KnowledgeBasePage.cs`（ingestion 快照、检索返回固定 chunk） | 生活助手更需要"个人记忆"而非文档库；两者未打通 |
 | `json-viewer` / `tree-view` | Feedback | 结构化数据浏览 | ● | `ArcJsonViewer.cs`、`ArcTreeView.cs` | 可作为记忆来源/证据的查看器，但无领域模型 |
 
 ### 2.7 复盘（回看、评估、改进）
 
 | 项 | 位置 | 实际支持 | 支持度 | 关键证据 | 缺口 |
 | --- | --- | --- | --- | --- | --- |
-| `agent-timeline` | SpecialAIWidgets | playhead 回放与 tokens/cost 头 | ◐ | `ArcAgentTimeline.cs:78-95` | 只有一条 run 的回放；无历史检索、无对比 |
-| `eval-suite` | BlocksAI | 版本 vs 基线的用例结果、回归标注 | ◐ | `EvalSuitePage.cs:53-55`（"结果样例；Run 重置回同一完成态并标注 simulated；triage 只改行"） | 无"把一次真实失败变成 eval 用例"的通路 |
+| `agent-timeline` | Special.AIWidgets | playhead 回放与 tokens/cost 头 | ◐ | `ArcAgentTimeline.cs:78-95` | 只有一条 run 的回放；无历史检索、无对比 |
+| `eval-suite` | Blocks.AI | 版本 vs 基线的用例结果、回归标注 | ◐ | `EvalSuitePage.cs:53-55`（"结果样例；Run 重置回同一完成态并标注 simulated；triage 只改行"） | 无"把一次真实失败变成 eval 用例"的通路 |
 | `usage-meter` | Feedback | 用量条（分类/上限/阈值） | ● | `ArcUsageMeter.cs:31-54` | 不懂"单次 run 预算"与"硬停" |
-| `usage-billing` / `usage-forecast` | BlocksCommerce/Data | 账单投影、预算拖拽 | ◐ | `usage-billing`、`usage-forecast` catalog 项 | 账单视角，不是运行中护栏 |
+| `usage-billing` / `usage-forecast` | Blocks.Commerce/Data | 账单投影、预算拖拽 | ◐ | `usage-billing`、`usage-forecast` catalog 项 | 账单视角，不是运行中护栏 |
 | `activity-heatmap` | Feedback | 全年活动热图 | ● | `ArcActivityHeatmap.cs` | 可复用为"Agent 每周活动/失败"汇总，但无 Agent 语义 |
 | `agent-audit-log` / `run-history-list` | — | **不存在** | — | — | 复盘缺台账与历史入口 |
 
@@ -257,7 +257,7 @@
 
 ### 4.10 图标与资源依赖
 
-`ArcIconData` 目前 161 个 Lucide 名（`src/Arc.Avalonia/Icons/ArcIconData.cs:10-11`）。本次 28 项提案需要但**当前缺失**的图标（按语义需要）：`bot`、`brain`、`history`、`rotate-ccw`、`timer`、`gauge`、`wallet`、`coins`、`git-branch`、`git-merge`、`workflow`、`stop-circle`、`circle-pause`、`calendar-clock`、`hard-drive`、`wifi-off`、`cloud-off`、`shield-alert`、`list-checks`、`hand`、`user-check`、`volume-2`、`file-text`、`ghost` 等。建议作为 foundation 附属任务（S，≤1 人日）补齐，并纳入 icon 审计，避免实现阶段才卡住。
+`ArcIconData` 目前 161 个 Lucide 名（`src/Foundation/Arc.Avalonia/Icons/ArcIconData.cs:10-11`）。本次 28 项提案需要但**当前缺失**的图标（按语义需要）：`bot`、`brain`、`history`、`rotate-ccw`、`timer`、`gauge`、`wallet`、`coins`、`git-branch`、`git-merge`、`workflow`、`stop-circle`、`circle-pause`、`calendar-clock`、`hard-drive`、`wifi-off`、`cloud-off`、`shield-alert`、`list-checks`、`hand`、`user-check`、`volume-2`、`file-text`、`ghost` 等。建议作为 foundation 附属任务（S，≤1 人日）补齐，并纳入 icon 审计，避免实现阶段才卡住。
 
 ---
 
@@ -643,7 +643,7 @@ RoutineScheduleEditor (TemplatedControl，可放进 dialog/drawer)
 
 **设计意图**：让关闭主窗口后的 Agent 仍可被看见、被暂停、被唤回——桌面助手的"存在感"。
 
-**为什么现成组件不够**：全仓没有 `TrayIcon`（grep=0）；`agent-status` 只活在页面里；`control-center` 是页内快捷设置（SpecialGlass），不能跨窗口常驻。
+**为什么现成组件不够**：全仓没有 `TrayIcon`（grep=0）；`agent-status` 只活在页面里；`control-center` 是页内快捷设置（Special.Glass），不能跨窗口常驻。
 
 **Anatomy**
 
@@ -752,37 +752,37 @@ BackgroundRunDock
 
 | catalog slug | 实现位置 | 证据锚点 |
 | --- | --- | --- |
-| agent-status | `SpecialAIWidgets/Controls/ArcAgentStatus.cs` | 枚举 `:18-38`；按钮 `:454-534` |
-| tool-call | `SpecialAIWidgets/Controls/ArcToolCall.cs` | 枚举 `:17-24`；审批 `:303-324`；改数据 `:637-678` |
-| agent-plan | `SpecialAIWidgets/Controls/ArcAgentPlan.cs` | 枚举 `:17-33`；编辑/批准 `:395-412`、`:675-690`；固定时钟说明 `:62-63` |
-| agent-timeline | `SpecialAIWidgets/Controls/ArcAgentTimeline.cs` | 属性 `:78-95`；回放 `:198-208`、`:235-295` |
-| context-window | `SpecialAIWidgets/Controls/ArcContextWindow.cs` | 属性 `:64-75`；演示操作 `:508-583` |
-| agent-loop | `SpecialAIExplainers/Controls/ArcAgentLoop.cs` | remarks `:19-27`（固定 3 次样例） |
-| reasoning-tree | `SpecialAIExplainers/Controls/ArcReasoningTree.cs` | remarks `:19-27`（固定分数） |
-| prompt-cache | `SpecialAIExplainers/Controls/ArcPromptCache.cs` | remarks `:18-25`（固定价格/压缩时钟） |
-| ai-composer | `BlocksAI/Pages/AiComposerPage.cs` | 实现说明 `:54-57` |
-| ai-chat | `BlocksAI/Pages/AiChatPage.cs` | 实现说明 `:53-57` |
-| ai-side-panel | `BlocksAI/Pages/AiSidePanelPage.cs` | 实现说明 `:51-55` |
-| research-run | `BlocksAI/Pages/ResearchRunPage.cs` | 实现说明 `:53-55` |
-| ai-answer | `BlocksAI/Pages/AiAnswerPage.cs` | 实现说明（样例/引用点亮） |
-| agent-memory | `BlocksAI/Pages/AgentMemoryPage.cs` | 实现说明 `:53-55` |
-| agent-tasks | `BlocksAI/Pages/AgentTasksPage.cs` | 实现说明 `:53-55` |
-| agent-approvals | `BlocksAI/Pages/AgentApprovalsPage.cs` | 实现说明 `:52-55`；决策 `:182-220` |
-| agent-routines | `BlocksAI/Pages/AgentRoutinesPage.cs` | 实现说明 `:52-54`；排期 `:195-211` |
-| agent-orchestrator | `BlocksAI/Pages/AgentOrchestratorPage.cs` | 实现说明 `:53-56` |
-| mcp-servers | `BlocksAI/Pages/McpServersPage.cs` | 实现说明 `:53-55` |
-| eval-suite | `BlocksAI/Pages/EvalSuitePage.cs` | 实现说明 `:53-55` |
-| agent-run | `BlocksAI/Pages/AgentRunPage.cs` | 实现说明 `:51-54` |
-| model-picker | `BlocksAI/Pages/ModelPickerPage.cs` | 实现说明 `:51-54` |
-| model-arena / prompt-studio / document-extract / knowledge-base | `BlocksAI/Pages/…` | 各自实现说明（样例数据） |
-| voice-orb | `SpecialMedia/Controls/ArcVoiceOrb.cs` | 枚举 `:9-16`；属性 `:50-101`；模拟说明 `:18-23` |
-| voice-recorder | `SpecialMedia/Controls/ArcVoiceRecorder.cs` | 无转写/无事件 |
+| agent-status | `Special.AIWidgets/Controls/ArcAgentStatus.cs` | 枚举 `:18-38`；按钮 `:454-534` |
+| tool-call | `Special.AIWidgets/Controls/ArcToolCall.cs` | 枚举 `:17-24`；审批 `:303-324`；改数据 `:637-678` |
+| agent-plan | `Special.AIWidgets/Controls/ArcAgentPlan.cs` | 枚举 `:17-33`；编辑/批准 `:395-412`、`:675-690`；固定时钟说明 `:62-63` |
+| agent-timeline | `Special.AIWidgets/Controls/ArcAgentTimeline.cs` | 属性 `:78-95`；回放 `:198-208`、`:235-295` |
+| context-window | `Special.AIWidgets/Controls/ArcContextWindow.cs` | 属性 `:64-75`；演示操作 `:508-583` |
+| agent-loop | `Special.AIExplainers/Controls/ArcAgentLoop.cs` | remarks `:19-27`（固定 3 次样例） |
+| reasoning-tree | `Special.AIExplainers/Controls/ArcReasoningTree.cs` | remarks `:19-27`（固定分数） |
+| prompt-cache | `Special.AIExplainers/Controls/ArcPromptCache.cs` | remarks `:18-25`（固定价格/压缩时钟） |
+| ai-composer | `Blocks.AI/Pages/AiComposerPage.cs` | 实现说明 `:54-57` |
+| ai-chat | `Blocks.AI/Pages/AiChatPage.cs` | 实现说明 `:53-57` |
+| ai-side-panel | `Blocks.AI/Pages/AiSidePanelPage.cs` | 实现说明 `:51-55` |
+| research-run | `Blocks.AI/Pages/ResearchRunPage.cs` | 实现说明 `:53-55` |
+| ai-answer | `Blocks.AI/Pages/AiAnswerPage.cs` | 实现说明（样例/引用点亮） |
+| agent-memory | `Blocks.AI/Pages/AgentMemoryPage.cs` | 实现说明 `:53-55` |
+| agent-tasks | `Blocks.AI/Pages/AgentTasksPage.cs` | 实现说明 `:53-55` |
+| agent-approvals | `Blocks.AI/Pages/AgentApprovalsPage.cs` | 实现说明 `:52-55`；决策 `:182-220` |
+| agent-routines | `Blocks.AI/Pages/AgentRoutinesPage.cs` | 实现说明 `:52-54`；排期 `:195-211` |
+| agent-orchestrator | `Blocks.AI/Pages/AgentOrchestratorPage.cs` | 实现说明 `:53-56` |
+| mcp-servers | `Blocks.AI/Pages/McpServersPage.cs` | 实现说明 `:53-55` |
+| eval-suite | `Blocks.AI/Pages/EvalSuitePage.cs` | 实现说明 `:53-55` |
+| agent-run | `Blocks.AI/Pages/AgentRunPage.cs` | 实现说明 `:51-54` |
+| model-picker | `Blocks.AI/Pages/ModelPickerPage.cs` | 实现说明 `:51-54` |
+| model-arena / prompt-studio / document-extract / knowledge-base | `Blocks.AI/Pages/…` | 各自实现说明（样例数据） |
+| voice-orb | `Special.Media/Controls/ArcVoiceOrb.cs` | 枚举 `:9-16`；属性 `:50-101`；模拟说明 `:18-23` |
+| voice-recorder | `Special.Media/Controls/ArcVoiceRecorder.cs` | 无转写/无事件 |
 | toast / toast-stack | `Actions/Controls/ArcToast.cs`、`ArcToastHost.cs` | Host 说明 `:15-19`；Show `:43-92` |
-| notification-center | `BlocksApp/Pages/NotificationCenterPage.cs` | 实现说明 `:50-51` |
-| security-settings | `BlocksApp/Pages/SecuritySettingsPage.cs` | 实现说明 `:52-54` |
-| env-variables | `BlocksTeam/Pages/EnvVariablesPage.cs` | 实现说明 `:64-66` |
-| week-calendar | `BlocksTeam/Pages/WeekCalendarPage.cs` | 实现说明 `:74-76`（拖拽未复刻） |
-| inbox-triage | `BlocksApp/Pages/InboxTriagePage.cs` | 实现说明 `:50-52`（snooze 不可编辑） |
+| notification-center | `Blocks.App/Pages/NotificationCenterPage.cs` | 实现说明 `:50-51` |
+| security-settings | `Blocks.App/Pages/SecuritySettingsPage.cs` | 实现说明 `:52-54` |
+| env-variables | `Blocks.Team/Pages/EnvVariablesPage.cs` | 实现说明 `:64-66` |
+| week-calendar | `Blocks.Team/Pages/WeekCalendarPage.cs` | 实现说明 `:74-76`（拖拽未复刻） |
+| inbox-triage | `Blocks.App/Pages/InboxTriagePage.cs` | 实现说明 `:50-52`（snooze 不可编辑） |
 | chat-thread | `Content/Controls/ArcChatThread.cs` | 模型 `:26-111`；重建 `:467`；docs/04 `:243` |
 | timeline | `Feedback/Controls/ArcTimeline.cs` | 事件模型 `:25-45`；属性 `:52-63` |
 | usage-meter | `Feedback/Controls/ArcUsageMeter.cs` | 属性 `:31-54` |

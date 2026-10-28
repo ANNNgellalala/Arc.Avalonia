@@ -145,7 +145,7 @@ Agent 运行时、持久化、调度、系统通知、托盘/热键、权限执�
 
 ### 1.6 工程与验收基础设施（扩展工作的放大器）
 
-- **目录驱动导航**：`ArcCatalog` 读取内嵌的 catalog 副本（`src/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）；`ArcItemPage` 自动从 catalog 推导标题、分类、层级、排序；新增项只需加页面类，无需注册。
+- **目录驱动导航**：`ArcCatalog` 读取内嵌的 catalog 副本（`src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json`，与 `docs/arc-catalog.json` 字节级一致）；`ArcItemPage` 自动从 catalog 推导标题、分类、层级、排序；新增项只需加页面类，无需注册。
 - **统一文档页**：`ArcDocLayout` 固定输出 breadcrumb / 标题 / tier / 描述 / When to use / Preview / 键盘与可访问性 / Motion / Implementation notes，扩展组件的文档形态可以直接继承。
 - **审计与截图**：`--audit` 校验 294 项目录可达性（当前 294/294、missing=0），`--smoke` 做导航回归，`tools/shots.ps1` 产出明暗两套 PNG；新组件验收标准可以完全复用。按 `CatalogAudit` 同一算法静态复算：166 个独立条目页 + 88 个章节标题 + 40 个别名 = 294；截图文件实测 219×2 = 438。本次分析在 2026-10-26 对现有构建重新运行了审计模式（日志：`.recon/audit-2026-10-26.log`），输出为：
 
@@ -335,7 +335,7 @@ Agent 运行时、持久化、调度、系统通知、托盘/热键、权限执�
 ### 3.4 空白域的判定依据（UI 层）
 
 - **餐食、出行、专注、天气**：`docs/arc-catalog.json` 的 294 个 slug 与 description 中没有任何对应条目；现有 block 也没有"餐食 / 行程 / 专注 / 天气"语义（系统集成类能力属于宿主，不在 UI 缺口之列）。
-- **日历无事件模型**：`src/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs` 的公开属性包括 `SelectedDate/RangeStart/RangeEnd/DisplayMonth/MinDate/MaxDate/ShowToday/WeekStartsOn/DisabledDates`，没有事件集合或事件模板。
+- **日历无事件模型**：`src/Components/Arc.Avalonia.Pickers/Controls/ArcCalendar.cs` 的公开属性包括 `SelectedDate/RangeStart/RangeEnd/DisplayMonth/MinDate/MaxDate/ShowToday/WeekStartsOn/DisabledDates`，没有事件集合或事件模板。
 - **零虚拟化**：`docs/04` §2.6 实测 **C# 代码里** `ItemsControl/DataTemplate/ItemsRepeater/VirtualizingStackPanel` 使用次数为 0；XAML 侧仅 7 处 `ListBox`（其中 EmojiPicker 行级虚拟化生效）。而生活工具的聊天、日志、交易、收件箱都是长列表。
 - **无流式/工具消息的展示模型**：`chat-thread`/`ai-chat` 为静态消息列表；`tool-call`/`agent-timeline` 是自绘演示，不接收"事件流"这类展示数据。
 
@@ -372,7 +372,7 @@ Agent 运行时、持久化、调度、系统通知、托盘/热键、权限执�
 | 资产域 | life **25** / agent **28** / foundation **4** |
 | 工作量 | S **8** / M **33** / L **16** = **235 人日**（P0 72 / P1 130 / P2 33） |
 | 新增分类 | block 组 `Daily life`（22 项）；component 分类 `Foundation`（1 项）；其余全部复用现有 23 类 / 5 组 / 6 组 |
-| 主要落地项目 | BlocksApp 18、SpecialAIWidgets 8、BlocksAI 7、BlocksCommerce 5、AdvancedInputs 3、Feedback 3、Actions 2、Charts 2、Content 2、BlocksData 2，其余各 1 |
+| 主要落地项目 | Blocks.App 18、Special.AIWidgets 8、Blocks.AI 7、Blocks.Commerce 5、AdvancedInputs 3、Feedback 3、Actions 2、Charts 2、Content 2、Blocks.Data 2，其余各 1 |
 | 复用关系 | 每一项都声明 `composes`（引用现有 294 项或目录内新项），确保"组合现有积木"而非从零画控件 |
 
 **扩展的三种形态**（与 §3.2 对应，均为 UI 层）：
@@ -531,7 +531,7 @@ Agent 运行时、持久化、调度、系统通知、托盘/热键、权限执�
 
 | 建议 | 说明 |
 | --- | --- |
-| 新增 block 组 `Daily life` | 22 个生活域 block。建议新建 `Arc.Avalonia.BlocksLife`；扩展目录暂把 `project` 指向现有 `BlocksApp` / `BlocksCommerce` / `BlocksData` 以保证可构建，落地时一次性迁移 |
+| 新增 block 组 `Daily life` | 22 个生活域 block。建议新建 `Arc.Avalonia.BlocksLife`；扩展目录暂把 `project` 指向现有 `Blocks.App` / `Blocks.Commerce` / `Blocks.Data` 以保证可构建，落地时一次性迁移 |
 | 新增组件分类 `Foundation` | `virtualized-list` 落在基础层 `Arc.Avalonia`，与 `ArcButton` / `ArcCard` 同级，供所有长列表复用 |
 | Agent 新 Special 落位 | `run-control-bar` / `tool-approval-sheet` / `agent-ask-card` / `background-run-dock` 等 4 个 P0 落 `Arc.Avalonia.Special.AIWidgets`，与现有 11 项并列 |
 | 不新增其他分类 | 其余扩展全部归入现有 23 类 / 5 组 / 6 组，降低目录复杂度 |
@@ -821,7 +821,7 @@ quick-capture-bar ──> task-board / capture 相关页面
 
 | 数据 | 来源 | 口径 |
 | --- | --- | --- |
-| 294 项目录 | `docs/arc-catalog.json` | `componentCategories` 128 + `specialGroups` 55 + `blockGroups` 111；与 `src/Arc.Avalonia.Demo/Catalog/arc-catalog.json` 同源 |
+| 294 项目录 | `docs/arc-catalog.json` | `componentCategories` 128 + `specialGroups` 55 + `blockGroups` 111；与 `src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json` 同源 |
 | 294 项路由 | `agent-life-tools/01-inventory.zh.md` §2/附录 B | 166 个独立条目页 + 88 个章节标题匹配 + 40 个别名 = 294（按 `CatalogAudit` 同一算法静态复算，未运行构建） |
 | 24 个项目 | `src/` 目录 | 基础层 1 + Demo 1 + Gallery 1 + 特性项目 10 + Special 5 + Blocks 6 |
 | 219 页 / 438 图 | `shots/light`、`shots/dark` 实测文件数；`README.md`、`docs/03` §4 | 分析基线：166 个独立条目页 + 53 个共享页 = 219；P0 落地后实测 233 页 / 466 图（见 `07-p0-ui-implementation.zh.md` §4），294 项目录审计不受影响 |
