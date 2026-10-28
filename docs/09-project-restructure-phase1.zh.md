@@ -68,7 +68,7 @@ tests/Arc.Avalonia.Tests                 无头验证工程
 
 ### P2a：物理分组
 
-* 24 个项目目录移入 6 个分组目录；`ArcUI.slnx` 路径同步重写。
+* 28 个项目目录移入 6 个分组目录；`ArcUI.slnx` 路径同步重写。
 * 所有 `.csproj` 的 `ProjectReference` 按新相对路径重写；`tools/shots.ps1` 的 Gallery 路径同步更新。
 * 解决方案文件夹保持 `/Foundation`、`/Components`、`/Agent`、`/Special`、`/Blocks`、`/App`、`/Tests`。
 
