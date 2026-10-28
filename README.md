@@ -41,9 +41,10 @@ Read the analysis first:
 * [`docs/08-project-structure-review.zh.md`](docs/08-project-structure-review.zh.md) — directory and project
   division review: what lives where, how the 23 catalog categories map onto the projects, and which
   boundaries need to change.
-* [`docs/09-project-restructure-phase1.zh.md`](docs/09-project-restructure-phase1.zh.md) — the Phase 1
-  restructure record: P0 hygiene, AgentUI/LifeToday extraction, AdvancedInputs/AdvancedActions merge,
-  verification, and the explicitly deferred Phase 2 plan.
+* [`docs/09-project-restructure-phase1.zh.md`](docs/09-project-restructure-phase1.zh.md) — the restructure
+  record: P0 hygiene, Arc.Avalonia.Internal, AgentUI/LifeToday extraction, AdvancedInputs/AdvancedActions
+  merge, Actions → Actions/Navigation/Overlays, Feedback → Feedback/DataDisplay, verification, and the
+  deferred P2 list.
 
 ## Gallery
 
@@ -112,12 +113,16 @@ More: [components](docs/images/components-light.png), [icons](docs/images/icons-
 | Project | Contents |
 | --- | --- |
 | `src/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList` |
+| `src/Arc.Avalonia.Internal` | Shared internal primitives: menu surface and glide, icon button, feedback composition helpers and tweens (not part of the public component layer) |
 | `src/Arc.Avalonia.Demo` | `ArcPage` contract, `DemoUi` layout helpers, reflection page discovery |
 | `src/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
 | `src/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
 | `src/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
-| `src/Arc.Avalonia.Actions` | Buttons, menus, navigation, disclosure, overlays, messages, plus action button, floating/expanding button groups, icon morph, user menu |
-| `src/Arc.Avalonia.Feedback` | Feedback, progress, avatars, cards, tables, activity |
+| `src/Arc.Avalonia.Actions` | Buttons, menus, disclosure, messages, plus action button, floating/expanding button groups, icon morph, user menu |
+| `src/Arc.Avalonia.Navigation` | Tabs, breadcrumb, pagination, mega menu |
+| `src/Arc.Avalonia.Overlays` | Dialog, drawer, popover, tooltip, share access |
+| `src/Arc.Avalonia.Feedback` | Progress, skeleton, avatars, cards, presence, timeline, comment thread, counters, activity heatmap |
+| `src/Arc.Avalonia.DataDisplay` | Sortable table, tree table, tree view, filter toolbar, code block, JSON viewer, data grid |
 | `src/Arc.Avalonia.Charts` | Custom-drawn data visualisation on the Arc series palette |
 | `src/Arc.Avalonia.Pickers` | Calendar, date/time range, colour, file dropzone, signature |
 | `src/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |

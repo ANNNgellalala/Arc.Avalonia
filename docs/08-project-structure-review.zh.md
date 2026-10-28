@@ -1,8 +1,9 @@
 # Arc for Avalonia 目录结构与项目划分分析
 
-> **执行状态（2026-10-29）：** 本报告的 P0 与低风险 P1 已实施，见
-> [`09-project-restructure-phase1.zh.md`](09-project-restructure-phase1.zh.md)。Phase 2（Internal 共享原语、
-> Actions/Feedback 类别重切、P2 物理分组）按本报告结论暂缓，待下一轮决策。
+> **执行状态（2026-10-29）：** 本报告的 P0 与 P1 已全部实施（含 `Arc.Avalonia.Internal`、AgentUI/LifeToday、
+> Advanced 合并、Actions→Navigation/Overlays、Feedback→DataDisplay），见
+> [`09-project-restructure-phase1.zh.md`](09-project-restructure-phase1.zh.md)。仅 P2（物理目录分组 / 项目改名 /
+> 命名空间统一）按计划暂缓。
 >
 > 分析基线：2026-10-28，工作区 `D:\Code\VibeCoding\Arc.Avalonia`。
 > 范围：根目录 5 个文件夹、`src/` 下全部 24 个 .NET 项目（约 172k 行 C#/XAML、235 个页面类、233 个 Gallery 页面）、
