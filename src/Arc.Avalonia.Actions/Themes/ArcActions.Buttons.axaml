@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:i="using:Arc.Avalonia.Internal"
                     xmlns:c="using:Arc.Avalonia.Controls">
 
   <!-- ============================ Button group ============================ -->
@@ -23,7 +24,7 @@
                   Padding="{TemplateBinding Padding}">
             <Panel ClipToBounds="False">
               <Panel x:Name="HighlightLayer" IsHitTestVisible="False">
-                <a:ArcGlide x:Name="Highlight" CornerRadius="16" />
+                <i:ArcGlide x:Name="Highlight" CornerRadius="16" />
               </Panel>
               <StackPanel x:Name="Segments" Orientation="Horizontal" />
             </Panel>

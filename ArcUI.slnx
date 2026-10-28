@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Foundation/">
     <Project Path="src/Arc.Avalonia/Arc.Avalonia.csproj" />
+    <Project Path="src/Arc.Avalonia.Internal/Arc.Avalonia.Internal.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="src/Arc.Avalonia.Actions/Arc.Avalonia.Actions.csproj" />

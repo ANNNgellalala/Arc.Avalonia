@@ -15,7 +15,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.Internal;
 
 /// <summary>
 /// Small shared helpers for the feedback components: token-bound brushes, typography, and the

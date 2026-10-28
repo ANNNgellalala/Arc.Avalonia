@@ -11,7 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Internal;
 
 /// <summary>
 /// The floating action list shared by the dropdown menu, the context menu, the split button and the

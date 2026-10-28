@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:i="using:Arc.Avalonia.Internal"
                     xmlns:c="using:Arc.Avalonia.Controls">
 
   <!-- ============================ Mega menu morph ============================ -->
@@ -22,8 +23,8 @@
                      Grid.Column="1"
                      Margin="12,0,0,0"
                      VerticalAlignment="Center">
-                <a:ArcGlide x:Name="BarHighlight" Classes="mm-highlight" CornerRadius="12" />
-                <a:ArcGlide x:Name="Caret" Classes="mm-caret" CornerRadius="1" />
+                <i:ArcGlide x:Name="BarHighlight" Classes="mm-highlight" CornerRadius="12" />
+                <i:ArcGlide x:Name="Caret" Classes="mm-caret" CornerRadius="1" />
                 <StackPanel x:Name="Triggers"
                             Orientation="Horizontal"
                             VerticalAlignment="Center" />

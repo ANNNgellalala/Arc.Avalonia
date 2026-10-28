@@ -3,33 +3,6 @@
                     xmlns:a="using:Arc.Avalonia.Actions.Controls"
                     xmlns:c="using:Arc.Avalonia.Controls">
 
-  <ControlTheme x:Key="{x:Type a:ArcMenuSurface}" TargetType="a:ArcMenuSurface">
-    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
-    <Setter Property="Padding" Value="6" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="VerticalAlignment" Value="Top" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding CornerRadius}"
-                BoxShadow="{DynamicResource ArcShadowFloating}"
-                Padding="{TemplateBinding Padding}"
-                MinWidth="{TemplateBinding MinWidth}"
-                MaxWidth="{TemplateBinding MaxWidth}">
-          <Panel x:Name="MenuHost">
-            <a:ArcGlide x:Name="Highlight" CornerRadius="{DynamicResource ArcRadiusControl}" />
-            <StackPanel x:Name="Items" Spacing="2" />
-          </Panel>
-        </Border>
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
-
   <!-- ============================ Dropdown menu ============================ -->
   <ControlTheme x:Key="{x:Type a:ArcDropdownMenu}" TargetType="a:ArcDropdownMenu">
     <Setter Property="HorizontalAlignment" Value="Left" />

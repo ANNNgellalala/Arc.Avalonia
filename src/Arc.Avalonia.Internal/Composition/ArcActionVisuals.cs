@@ -14,7 +14,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Internal;
 
 /// <summary>
 /// Small helpers shared by the action components: token lookups, concentric radii, the floating scrim,

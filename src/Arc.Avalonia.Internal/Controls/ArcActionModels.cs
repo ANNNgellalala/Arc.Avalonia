@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Internal;
 
 /// <summary>
 /// One row in an Arc menu. Mirrors Arc's documented item shape:

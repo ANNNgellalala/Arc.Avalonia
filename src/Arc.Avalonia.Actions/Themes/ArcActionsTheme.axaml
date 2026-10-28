@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:a="using:Arc.Avalonia.Actions.Controls"
+        xmlns:i="using:Arc.Avalonia.Internal"
         xmlns:c="using:Arc.Avalonia.Controls">
 
   <Styles.Resources>
@@ -23,13 +24,13 @@
   </Styles.Resources>
 
   <!-- ============================ Shared highlight ============================ -->
-  <Style Selector="a|ArcGlide.arc-glide">
+  <Style Selector="i|ArcGlide.arc-glide">
     <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
   </Style>
-  <Style Selector="a|ArcGlide.arc-glide.danger">
+  <Style Selector="i|ArcGlide.arc-glide.danger">
     <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
   </Style>
-  <Style Selector="a|ArcGlide.arc-glide.pill">
+  <Style Selector="i|ArcGlide.arc-glide.pill">
     <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -334,7 +335,7 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
   </Style>
-  <Style Selector="a|ArcGlide.mm-caret">
+  <Style Selector="i|ArcGlide.mm-caret">
     <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
   </Style>
   <Style Selector="c|ArcButton.mm-brand">

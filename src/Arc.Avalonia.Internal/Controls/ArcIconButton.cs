@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.Internal;
 
 /// <summary>
 /// A quiet icon-only button used inside composite controls (row actions, chevrons, remove buttons).
