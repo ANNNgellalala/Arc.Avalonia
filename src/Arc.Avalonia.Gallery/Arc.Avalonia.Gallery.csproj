@@ -25,7 +25,9 @@
     <ProjectReference Include="..\Arc.Avalonia.AdvancedActions\Arc.Avalonia.AdvancedActions.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
-    <ProjectReference Include="..\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />    <ProjectReference Include="..\Arc.Avalonia.SpecialGlass\Arc.Avalonia.SpecialGlass.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />    <ProjectReference Include="..\Arc.Avalonia.SpecialGlass\Arc.Avalonia.SpecialGlass.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.SpecialMotion\Arc.Avalonia.SpecialMotion.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.SpecialMedia\Arc.Avalonia.SpecialMedia.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.SpecialAIWidgets\Arc.Avalonia.SpecialAIWidgets.csproj" />

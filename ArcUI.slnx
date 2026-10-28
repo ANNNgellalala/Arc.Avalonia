@@ -21,6 +21,10 @@
     <Project Path="src/Arc.Avalonia.SpecialMedia/Arc.Avalonia.SpecialMedia.csproj" />
     <Project Path="src/Arc.Avalonia.SpecialMotion/Arc.Avalonia.SpecialMotion.csproj" />
   </Folder>
+  <Folder Name="/Agent/">
+    <Project Path="src/Arc.Avalonia.AgentUI/Arc.Avalonia.AgentUI.csproj" />
+    <Project Path="src/Arc.Avalonia.LifeToday/Arc.Avalonia.LifeToday.csproj" />
+  </Folder>
   <Folder Name="/Blocks/">
     <Project Path="src/Arc.Avalonia.BlocksAI/Arc.Avalonia.BlocksAI.csproj" />
     <Project Path="src/Arc.Avalonia.BlocksApp/Arc.Avalonia.BlocksApp.csproj" />

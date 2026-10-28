@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Layout;
-using Arc.Avalonia.BlocksAI.Controls;
+using Arc.Avalonia.AgentUI.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.BlocksAI.Pages;
+namespace Arc.Avalonia.AgentUI.Pages;
 
 /// <summary>
 /// Gallery page for the attention inbox. The state buttons show the full queue, an approvals-only view and the

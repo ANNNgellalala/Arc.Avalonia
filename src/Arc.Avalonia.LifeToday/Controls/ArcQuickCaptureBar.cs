@@ -9,7 +9,7 @@ using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.AdvancedInputs.Controls;
+namespace Arc.Avalonia.LifeToday.Controls;
 
 /// <summary>What the host found inside the captured sentence.</summary>
 public enum ArcQuickCaptureState

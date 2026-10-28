@@ -3,9 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.SpecialAIWidgets.Controls;
+using Arc.Avalonia.AgentUI.Controls;
 
-namespace Arc.Avalonia.SpecialAIWidgets.Pages;
+namespace Arc.Avalonia.AgentUI.Pages;
 
 /// <summary>
 /// Gallery page for the tool approval sheet. Three requests show a high-risk payment, a low-risk calendar

@@ -3,10 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.SpecialAIWidgets.Controls;
+using Arc.Avalonia.AgentUI.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.SpecialAIWidgets.Pages;
+namespace Arc.Avalonia.AgentUI.Pages;
 
 /// <summary>
 /// Gallery page for the background run dock. The state buttons move one dock through running, needs attention

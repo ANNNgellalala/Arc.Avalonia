@@ -3,13 +3,13 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.Feedback.Controls;
+using Arc.Avalonia.LifeToday.Controls;
 
 // The Feedback assembly contains an internal FeedbackUi helper too, so the shared foundation helpers are
 // aliased explicitly in this assembly.
 using Ui = Arc.Avalonia.Controls.ArcUi;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.LifeToday.Pages;
 
 /// <summary>
 /// Showcase for <see cref="ArcReminderRow"/>: the atomic life action row used by the reminder center,

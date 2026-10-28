@@ -9,7 +9,7 @@ using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.BlocksAI.Controls;
+namespace Arc.Avalonia.AgentUI.Controls;
 
 /// <summary>Why an item is waiting in the attention inbox.</summary>
 public enum ArcAttentionKind

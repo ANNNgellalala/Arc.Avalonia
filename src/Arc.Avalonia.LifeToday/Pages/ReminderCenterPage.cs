@@ -1,8 +1,8 @@
 using Avalonia.Controls;
-using Arc.Avalonia.BlocksApp.Controls;
+using Arc.Avalonia.LifeToday.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.BlocksApp.Pages;
+namespace Arc.Avalonia.LifeToday.Pages;
 
 /// <summary>
 /// Showcase for <see cref="ArcReminderCenter"/>. Normal, empty and error states are switchable; every

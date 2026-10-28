@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.SpecialAIWidgets.Controls;
+using Arc.Avalonia.AgentUI.Controls;
 
-namespace Arc.Avalonia.SpecialAIWidgets.Pages;
+namespace Arc.Avalonia.AgentUI.Pages;
 
 /// <summary>
 /// Gallery page for the run control bar. The state buttons move the bar through running, paused and taken

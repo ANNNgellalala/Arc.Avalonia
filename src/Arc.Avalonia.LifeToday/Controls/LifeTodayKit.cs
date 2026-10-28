@@ -9,12 +9,13 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Feedback.Controls;
+using Arc.Avalonia.LifeToday.Controls;
 using Arc.Avalonia.Theme;
 
 // Short alias for the shared composition helpers; the "today" surfaces are built almost entirely from them.
 using Ui = Arc.Avalonia.Controls.ArcUi;
 
-namespace Arc.Avalonia.BlocksApp.Controls;
+namespace Arc.Avalonia.LifeToday.Controls;
 
 #region Shared models and state enums
 

@@ -11,7 +11,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.SpecialAIWidgets.Controls;
+namespace Arc.Avalonia.AgentUI.Controls;
 
 /// <summary>How much damage an approved tool call can do.</summary>
 public enum ArcApprovalRisk

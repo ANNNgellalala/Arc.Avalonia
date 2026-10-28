@@ -8,10 +8,10 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.Pickers.Controls;
+using Arc.Avalonia.LifeToday.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Pickers.Pages;
+namespace Arc.Avalonia.LifeToday.Pages;
 
 /// <summary>
 /// The routine schedule editor. The page plays the host: the state row drives the badge, and Save raises the

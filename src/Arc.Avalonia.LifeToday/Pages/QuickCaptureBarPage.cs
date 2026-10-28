@@ -5,11 +5,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Arc.Avalonia.AdvancedInputs.Controls;
+using Arc.Avalonia.LifeToday.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.AdvancedInputs.Pages;
+namespace Arc.Avalonia.LifeToday.Pages;
 
 /// <summary>
 /// The quick capture bar in its five host-supplied parse states. The page plays the host: a state button

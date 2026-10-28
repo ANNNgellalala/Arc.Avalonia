@@ -10,7 +10,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.SpecialAIWidgets.Controls;
+namespace Arc.Avalonia.AgentUI.Controls;
 
 /// <summary>The visual stage of a structured question; the host owns every transition.</summary>
 public enum ArcAgentAskState

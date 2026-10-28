@@ -12,7 +12,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Content.Controls;
+namespace Arc.Avalonia.AgentUI.Controls;
 
 /// <summary>Overall state of the run whose events an <see cref="ArcAgentTranscript"/> shows.</summary>
 public enum ArcAgentTranscriptStatus

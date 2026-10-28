@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using Arc.Avalonia.Content.Controls;
+using Arc.Avalonia.AgentUI.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Content.Pages;
+namespace Arc.Avalonia.AgentUI.Pages;
 
 /// <summary>
 /// Gallery page for the agent transcript. One instance switches between a streaming run, a run waiting on

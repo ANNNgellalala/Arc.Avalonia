@@ -12,7 +12,7 @@ using Arc.Avalonia.Theme;
 // composition helpers from the foundation are aliased explicitly.
 using Ui = Arc.Avalonia.Controls.ArcUi;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.LifeToday.Controls;
 
 /// <summary>
 /// The due state of a reminder row. The words are always rendered beside the due time, so colour is

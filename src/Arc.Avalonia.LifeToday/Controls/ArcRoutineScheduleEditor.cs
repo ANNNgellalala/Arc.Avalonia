@@ -8,9 +8,10 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Pickers.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Pickers.Controls;
+namespace Arc.Avalonia.LifeToday.Controls;
 
 /// <summary>How often a routine runs. Custom is a weekday set the host extends with its own interval.</summary>
 public enum ArcRoutineRepeat
