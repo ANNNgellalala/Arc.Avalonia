@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:a="using:Arc.Avalonia.Overlays.Controls"
                     xmlns:c="using:Arc.Avalonia.Controls">
 
   <!-- ============================ Dialog ============================ -->

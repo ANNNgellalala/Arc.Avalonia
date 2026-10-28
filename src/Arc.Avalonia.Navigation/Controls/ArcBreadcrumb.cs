@@ -8,7 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Navigation.Controls;
 
 /// <summary>
 /// A path of links where the last item is the current page. Chevron separators are decorative; the

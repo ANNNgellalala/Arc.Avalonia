@@ -4,10 +4,12 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Actions.Controls;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Overlays.Controls;
+using Arc.Avalonia.Actions.Pages;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Pages;
+namespace Arc.Avalonia.Overlays.Pages;
 
 /// <summary>Dialogs, drawers and tooltips, shown inside a muted stage so the overlay layers are visible.</summary>
 public sealed class OverlaysPage : ArcPage

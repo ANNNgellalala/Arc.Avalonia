@@ -10,7 +10,7 @@ using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Navigation.Controls;
 
 /// <summary>
 /// Previous and next arrows around a five page window, with the current page in the accent and ellipses

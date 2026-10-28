@@ -15,7 +15,7 @@ using Avalonia.VisualTree;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Overlays.Controls;
 
 /// <summary>
 /// A focused surface over a dimmed backdrop for decisions that need attention: title, description, body

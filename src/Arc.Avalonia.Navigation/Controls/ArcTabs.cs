@@ -15,7 +15,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Navigation.Controls;
 
 /// <summary>
 /// Peer views of the same object: a muted tab strip with one selection pill that glides between triggers,

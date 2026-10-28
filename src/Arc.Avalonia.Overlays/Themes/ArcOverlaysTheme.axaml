@@ -1,0 +1,196 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a="using:Arc.Avalonia.Overlays.Controls"
+        xmlns:c="using:Arc.Avalonia.Controls"
+        xmlns:i="using:Arc.Avalonia.Internal">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Overlays/Themes/ArcOverlays.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Overlays/Themes/ArcShareAccess.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+<!-- ============================ Popover and tooltip ============================ -->
+  <Style Selector="Border.popover-surface">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="MinWidth" Value="192" />
+    <Setter Property="MaxWidth" Value="352" />
+  </Style>
+  <Style Selector="Border.tooltip-surface">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="MaxWidth" Value="240" />
+  </Style>
+
+  <!-- ============================ Pro: share access ============================ -->
+  <Style Selector="Border.sa-panel">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+  </Style>
+  <Style Selector="Border.sa-field">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="Border.sa-field:pointerover">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="Border.sa-field.focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="Border.sa-field.invalid">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="Border.sa-field-ring">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcFocusOutline}" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+  <Style Selector="TextBlock.sa-placeholder">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="Border.sa-chip">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Border.sa-chip.marked">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+  </Style>
+  <Style Selector="Border.sa-chip.invalid">
+    <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="TextBlock.sa-chip-label">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="Border.sa-chip.invalid TextBlock.sa-chip-label">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="c|ArcIcon.sa-error-icon">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="TextBlock.sa-error-text">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-chip-remove">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-chip-remove:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcBorder}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-chip-remove:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="Border.sa-undo">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="TextBlock.sa-undo-text">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="Border.sa-divider">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderSubtle}" />
+  </Style>
+  <Style Selector="Border.sa-icon-box">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="Border.sa-icon-box.anyone">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+  </Style>
+  <Style Selector="Border.sa-link">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="TextBlock.sa-link-text">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-role">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-role:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-role:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcIcon.sa-chevron">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-remove">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-remove:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-remove:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
+  </Style>
+  <Style Selector="Border.sa-row">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="Padding" Value="6,0" />
+  </Style>
+  <Style Selector="Border.sa-row.hover">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.sa-avatar">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="TextBlock.sa-avatar-text">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="Border.sa-suggest">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    <Setter Property="Padding" Value="4" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-suggest-row">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-suggest-row.active /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-suggest-row.active">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.sa-suggest-row:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcIcon.sa-copy-icon">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="c|ArcIcon.sa-copy-icon.copied">
+    <Setter Property="Foreground" Value="{DynamicResource ArcSuccess}" />
+  </Style>
+  <Style Selector="c|ArcIcon.sa-copy-icon.failed">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+
+</Styles>

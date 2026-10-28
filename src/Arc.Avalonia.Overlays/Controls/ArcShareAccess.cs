@@ -20,7 +20,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Overlays.Controls;
 
 /// <summary>One role a person can hold. Owner rows cannot be changed or removed.</summary>
 public sealed class ArcShareRoleOption

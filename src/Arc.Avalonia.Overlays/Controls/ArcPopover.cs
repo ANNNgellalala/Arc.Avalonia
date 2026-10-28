@@ -11,7 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Overlays.Controls;
 
 /// <summary>
 /// A small anchored surface for contextual content. It opens on a click on the trigger and closes on an

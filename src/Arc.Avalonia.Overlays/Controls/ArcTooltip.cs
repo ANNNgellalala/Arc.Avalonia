@@ -12,7 +12,7 @@ using Avalonia.Layout;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Overlays.Controls;
 
 public enum ArcTooltipSide
 {

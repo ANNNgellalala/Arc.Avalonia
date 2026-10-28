@@ -5,10 +5,12 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Actions.Controls;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Navigation.Controls;
+using Arc.Avalonia.Actions.Pages;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Pages;
+namespace Arc.Avalonia.Navigation.Pages;
 
 /// <summary>
 /// The mega menu morph: a site header whose sections share one floating menu, plus the folded accordion

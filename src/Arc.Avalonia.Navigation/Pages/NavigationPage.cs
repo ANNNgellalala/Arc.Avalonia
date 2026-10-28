@@ -2,10 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Actions.Controls;
+using Arc.Avalonia.Navigation.Controls;
+using Arc.Avalonia.Actions.Pages;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Pages;
+namespace Arc.Avalonia.Navigation.Pages;
 
 /// <summary>Tabs, breadcrumb, pagination and the accordion: moving through views and content.</summary>
 public sealed class NavigationPage : ArcPage

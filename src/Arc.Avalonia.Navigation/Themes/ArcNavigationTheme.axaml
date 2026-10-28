@@ -1,0 +1,223 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a="using:Arc.Avalonia.Navigation.Controls"
+        xmlns:c="using:Arc.Avalonia.Controls"
+        xmlns:i="using:Arc.Avalonia.Internal">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Navigation/Themes/ArcNavigation.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Navigation/Themes/ArcMegaMenu.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+<!-- ============================ Tabs ============================ -->
+  <Style Selector="c|ArcButton.tab-trigger">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="c|ArcButton.tab-trigger:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.tab-trigger:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.tab-trigger.selected">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.tab-trigger /template/ Border#Ring">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- ============================ Breadcrumb ============================ -->
+  <Style Selector="c|ArcButton.crumb-link">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.crumb-link:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.crumb-link:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.crumb-link /template/ Border#Ring">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="c|ArcIcon.crumb-separator">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+
+  <!-- ============================ Pagination ============================ -->
+  <Style Selector="c|ArcButton.page-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button.current">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button.current:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button.current:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-button /template/ Border#Ring">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="c|ArcButton.page-arrow">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.page-arrow:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.page-arrow /template/ Border#Ring">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- ============================ Pro: mega menu morph ============================ -->
+  <Style Selector="Border.mm-bar">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="i|ArcGlide.mm-caret">
+    <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-brand">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-brand:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-brand:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.mm-brand-mark">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+  </Style>
+  <Style Selector="c|ArcIcon.mm-brand-mark-icon">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-trigger">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-trigger:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-trigger:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-trigger.open">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-trigger.current">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcIcon.mm-chevron">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+  <Style Selector="Border.mm-panel">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-link:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-link:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.mm-icon-box">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcIcon.mm-link-icon">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="Border.mm-group-divider">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderSubtle}" />
+  </Style>
+  <Style Selector="Border.mm-band">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.mm-status-dot">
+    <Setter Property="Background" Value="{DynamicResource ArcSuccess}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-feature-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-feature-button:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Border.mm-feature">
+    <Setter Property="Background" Value="{DynamicResource ArcGradientSoft}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-feature-button:pointerover Border.mm-feature">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+  </Style>
+  <Style Selector="c|ArcIcon.mm-feature-icon">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="TextBlock.mm-feature-cta">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcIcon.mm-feature-cta">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-action.quiet">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="Border.mm-sheet">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-sheet-header">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-sheet-header:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.mm-sheet-divider">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderSubtle}" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-sheet-action">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style Selector="c|ArcButton.mm-sheet-action:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+
+  
+</Styles>

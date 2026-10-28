@@ -5,9 +5,11 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Actions.Controls;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Overlays.Controls;
+using Arc.Avalonia.Actions.Pages;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Actions.Pages;
+namespace Arc.Avalonia.Overlays.Pages;
 
 /// <summary>Popovers, toasts and alerts: the small surfaces and the messages that follow an action.</summary>
 public sealed class OverlaysPartTwoPage : ArcPage

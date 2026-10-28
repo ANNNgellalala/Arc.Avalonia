@@ -5,10 +5,12 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Actions.Controls;
+using Arc.Avalonia.Overlays.Controls;
+using Arc.Avalonia.Actions.Pages;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Pages;
+namespace Arc.Avalonia.Overlays.Pages;
 
 /// <summary>
 /// Share access: email chips with an error state, people rows with a role menu, the undo bar after a

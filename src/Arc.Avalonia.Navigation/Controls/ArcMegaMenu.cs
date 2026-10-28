@@ -17,7 +17,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Actions.Controls;
+namespace Arc.Avalonia.Navigation.Controls;
 
 /// <summary>One destination inside a mega menu group.</summary>
 public sealed class ArcMegaMenuLink

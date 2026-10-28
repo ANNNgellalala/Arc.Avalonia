@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:a="using:Arc.Avalonia.Navigation.Controls"
                     xmlns:i="using:Arc.Avalonia.Internal"
                     xmlns:c="using:Arc.Avalonia.Controls">
 
@@ -47,48 +47,5 @@
       </ControlTemplate>
     </Setter>
   </ControlTheme>
-
-  <!-- ============================ Accordion ============================ -->
-  <ControlTheme x:Key="{x:Type a:ArcAccordion}" TargetType="a:ArcAccordion">
-    <Setter Property="HorizontalAlignment" Value="Stretch" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <StackPanel x:Name="Rows" HorizontalAlignment="Stretch" />
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
-
-  <!-- ============================ Expandable text ============================ -->
-  <ControlTheme x:Key="{x:Type a:ArcExpandableText}" TargetType="a:ArcExpandableText">
-    <Setter Property="Background" Value="{DynamicResource ArcBackground}" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="MaxWidth" Value="640" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <StackPanel Spacing="6" HorizontalAlignment="Stretch">
-          <Border x:Name="Clip"
-                  HorizontalAlignment="Stretch"
-                  ClipToBounds="True">
-            <Panel>
-              <TextBlock x:Name="Body"
-                         TextWrapping="Wrap"
-                         LineHeight="20"
-                         Classes="arc-body-sm" />
-              <Border x:Name="Fade"
-                      Height="26"
-                      VerticalAlignment="Bottom"
-                      IsHitTestVisible="False" />
-            </Panel>
-          </Border>
-          <c:ArcButton x:Name="Toggle"
-                     Variant="Ghost"
-                     Size="Sm"
-                     MinHeight="28"
-                     Padding="0"
-                     HorizontalAlignment="Left"
-                     HorizontalContentAlignment="Left" />
-        </StackPanel>
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
 </ResourceDictionary>
+

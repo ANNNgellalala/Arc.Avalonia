@@ -11,7 +11,7 @@ namespace Arc.Avalonia.Actions.Pages;
 /// Layout helpers for the action pages. Floating surfaces are hosted inside the page, so a demo that
 /// shows a menu or a dialog open reserves the room it needs instead of overlapping its neighbours.
 /// </summary>
-internal static class ActionDemos
+public static class ActionDemos
 {
     public static Control Section(string title, string description, Control content) =>
         DemoUi.Section(title, description, content);
