@@ -11,7 +11,7 @@ using Avalonia.Media;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 /// <summary>One node in an <see cref="ArcTreeView"/>.</summary>
 public sealed class ArcTreeNode

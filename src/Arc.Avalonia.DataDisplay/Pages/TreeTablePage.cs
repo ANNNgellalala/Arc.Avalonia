@@ -7,10 +7,11 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Demo;
+using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.DataDisplay.Pages;
 
 /// <summary>
 /// A project budget hierarchy: three levels, tri-state checks, sorting that stays inside each level,

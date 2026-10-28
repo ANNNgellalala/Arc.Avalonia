@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.DataDisplay</RootNamespace>
+    <AssemblyName>Arc.Avalonia.DataDisplay</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+  </ItemGroup>
+</Project>

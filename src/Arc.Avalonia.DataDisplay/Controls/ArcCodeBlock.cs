@@ -14,7 +14,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 /// <summary>
 /// A source surface with filename, language label, line numbers, a lightweight syntax tint, copy,

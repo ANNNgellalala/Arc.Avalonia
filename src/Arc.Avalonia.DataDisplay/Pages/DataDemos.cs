@@ -6,9 +6,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Feedback.Controls;
+using Arc.Avalonia.Feedback.Pages;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.DataDisplay.Pages;
 
 /// <summary>Demo compositions for the data gallery pages.</summary>
 internal static class DataDemos

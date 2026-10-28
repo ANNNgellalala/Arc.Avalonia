@@ -1,8 +1,8 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:c="using:Arc.Avalonia.Feedback.Controls">
+                    xmlns:c="using:Arc.Avalonia.DataDisplay.Controls">
 
-  <ControlTheme x:Key="{x:Type c:ArcDataGrid}" TargetType="c:ArcDataGrid">
+  <ControlTheme x:Key="{x:Type c:ArcTreeTable}" TargetType="c:ArcTreeTable">
     <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
     <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
     <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
@@ -33,7 +33,7 @@
                       Background="{DynamicResource ArcSurface}"
                       BorderThickness="0,1,0,1"
                       BorderBrush="{DynamicResource ArcBorderSubtle}"
-                      ClipToBounds="True" />
+                      ClipToBounds="False" />
               <ScrollViewer x:Name="PART_Scroll"
                             Grid.Row="2"
                             Background="Transparent"
@@ -50,13 +50,14 @@
                       ClipToBounds="True" />
             </Grid>
           </Border>
-          <Popup x:Name="PART_ColumnsPopup"
-                 Placement="BottomEdgeAlignedRight"
-                 IsLightDismissEnabled="True" />
+          <TextBlock x:Name="PART_Live"
+                     Width="1"
+                     Height="1"
+                     Opacity="0"
+                     IsHitTestVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
-
     <Style Selector="^:focus-visible /template/ Border#Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>

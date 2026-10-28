@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.DataDisplay.Pages;
 
 /// <summary>Nested hierarchies and a year of activity.</summary>
 public sealed class ExplorerPage : ArcPage

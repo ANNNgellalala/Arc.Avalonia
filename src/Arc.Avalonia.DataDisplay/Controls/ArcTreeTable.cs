@@ -17,7 +17,7 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 /// <summary>Horizontal alignment of an <see cref="ArcTreeTableColumn"/>'s cells.</summary>
 public enum ArcTreeTableAlign

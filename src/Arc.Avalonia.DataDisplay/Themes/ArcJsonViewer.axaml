@@ -1,8 +1,8 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:c="using:Arc.Avalonia.Feedback.Controls">
+                    xmlns:c="using:Arc.Avalonia.DataDisplay.Controls">
 
-  <ControlTheme x:Key="{x:Type c:ArcTreeView}" TargetType="c:ArcTreeView">
+  <ControlTheme x:Key="{x:Type c:ArcJsonViewer}" TargetType="c:ArcJsonViewer">
     <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
     <Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
@@ -10,7 +10,7 @@
         <Panel>
           <Border x:Name="Ring"
                   Margin="-6"
-                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  CornerRadius="{DynamicResource ArcRadiusControl}"
                   BorderThickness="2"
                   BorderBrush="{DynamicResource ArcFocusOutline}"
                   IsVisible="False"

@@ -15,7 +15,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 public enum ArcJsonValueType
 {

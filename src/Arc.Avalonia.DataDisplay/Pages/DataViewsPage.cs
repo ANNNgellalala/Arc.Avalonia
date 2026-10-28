@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.DataDisplay.Pages;
 
 /// <summary>Source and payload inspection.</summary>
 public sealed class DataViewsPage : ArcPage

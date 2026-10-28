@@ -11,6 +11,7 @@
     <Project Path="src/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
     <Project Path="src/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
     <Project Path="src/Arc.Avalonia.Feedback/Arc.Avalonia.Feedback.csproj" />
+    <Project Path="src/Arc.Avalonia.DataDisplay/Arc.Avalonia.DataDisplay.csproj" />
     <Project Path="src/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj" />
     <Project Path="src/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
     <Project Path="src/Arc.Avalonia.Pickers/Arc.Avalonia.Pickers.csproj" />

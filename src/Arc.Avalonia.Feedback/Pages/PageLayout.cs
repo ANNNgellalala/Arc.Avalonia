@@ -8,7 +8,7 @@ using Arc.Avalonia.Theme;
 namespace Arc.Avalonia.Feedback.Pages;
 
 /// <summary>Small layout helpers for the feedback gallery pages: equal columns and fixed slots.</summary>
-internal static class PageLayout
+public static class PageLayout
 {
     /// <summary>Equal-width columns with a shared 24 px gutter, matching the page rhythm.</summary>
     public static Control EqualRow(params Control[] children)

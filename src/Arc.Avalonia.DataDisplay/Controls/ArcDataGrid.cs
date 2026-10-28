@@ -14,7 +14,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 /// <summary>Horizontal alignment of an <see cref="ArcGridColumn"/>'s cells.</summary>
 public enum ArcGridAlign

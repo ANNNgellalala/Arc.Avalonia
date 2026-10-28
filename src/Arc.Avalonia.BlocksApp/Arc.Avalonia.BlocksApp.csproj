@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="..\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />

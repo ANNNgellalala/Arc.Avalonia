@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Feedback.Pages;
+namespace Arc.Avalonia.DataDisplay.Pages;
 
 /// <summary>An editable, sortable, resizable data grid with checked rows and totals.</summary>
 public sealed class DataGridPage : ArcPage
@@ -22,11 +22,11 @@ public sealed class DataGridPage : ArcPage
             DemoUi.Section(
                 "Budget grid",
                 "Use when people edit many values in place, like a budget, price list, or inventory, not for one record at a time.",
-                ProDemos.DataGrid()),
+                DataGridDemos.DataGrid()),
             DemoUi.Section(
                 "Empty state",
                 "Use when a filter or a new workspace leaves the grid with nothing to show, and offer the way back.",
-                ProDemos.EmptyGrid())
+                DataGridDemos.EmptyGrid())
         }
     };
 }

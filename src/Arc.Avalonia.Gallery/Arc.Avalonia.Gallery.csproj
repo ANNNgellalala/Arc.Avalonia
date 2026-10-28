@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />

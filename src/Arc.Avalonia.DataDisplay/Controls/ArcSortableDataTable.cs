@@ -13,7 +13,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Feedback.Controls;
+namespace Arc.Avalonia.DataDisplay.Controls;
 
 public enum ArcSortDirection
 {
