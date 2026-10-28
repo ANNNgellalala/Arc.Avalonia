@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Demo</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Demo</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Catalog\arc-catalog.json" LogicalName="Arc.Avalonia.Demo.Catalog.arc-catalog.json" />
+  </ItemGroup>
+</Project>

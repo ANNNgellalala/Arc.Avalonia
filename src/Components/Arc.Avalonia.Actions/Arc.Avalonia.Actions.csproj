@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Actions</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Actions</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
+    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+  </ItemGroup>
+</Project>

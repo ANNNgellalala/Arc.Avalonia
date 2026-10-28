@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.LifeToday</RootNamespace>
+    <AssemblyName>Arc.Avalonia.LifeToday</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+  </ItemGroup>
+</Project>

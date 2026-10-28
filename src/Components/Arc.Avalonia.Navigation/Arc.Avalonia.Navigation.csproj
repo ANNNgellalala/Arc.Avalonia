@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Navigation</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Navigation</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+  </ItemGroup>
+</Project>

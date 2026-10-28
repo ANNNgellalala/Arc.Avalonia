@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Media</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Media</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+  </ItemGroup>
+</Project>

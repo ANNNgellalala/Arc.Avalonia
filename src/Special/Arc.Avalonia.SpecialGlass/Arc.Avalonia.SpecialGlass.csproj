@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.SpecialGlass</RootNamespace>
+    <AssemblyName>Arc.Avalonia.SpecialGlass</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+  </ItemGroup>
+</Project>
