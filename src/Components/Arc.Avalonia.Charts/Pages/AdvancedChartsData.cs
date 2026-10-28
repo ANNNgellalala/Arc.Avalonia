@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>Deterministic sample data for the two advanced chart pages.</summary>
 internal static class AdvancedChartsData

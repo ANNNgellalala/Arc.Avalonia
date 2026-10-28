@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A compact line or area trend with a last-point dot, optional headline value, and optional

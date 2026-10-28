@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A hierarchy in concentric rings: each node is an arc sized by its value, and its children share the

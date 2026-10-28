@@ -6,7 +6,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>
 /// A 24 card gallery that reflows between grid, masonry, list, fan, carousel and helix. Layouts are

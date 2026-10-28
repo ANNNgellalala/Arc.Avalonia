@@ -5,13 +5,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Arc.Avalonia.Charts;
+using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Theme;
 using Ck = Arc.Avalonia.Blocks.Commerce.CommerceKit;
-using ChartTone = Arc.Avalonia.Charts.ChartTone;
+using ChartTone = Arc.Avalonia.Charts.Controls.ChartTone;
 
 namespace Arc.Avalonia.Blocks.Commerce.Pages;
 

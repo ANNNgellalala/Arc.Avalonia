@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>One panel of the small-multiples trellis.</summary>
 internal sealed class MultipleSeries

@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>
 /// A stylised 3D terrain of a 7 by 24 activity grid. Every column is drawn as an isometric block, the

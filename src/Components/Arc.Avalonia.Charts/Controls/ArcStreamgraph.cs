@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// Stacked stream layers on a softly varying baseline. Hovering a layer quiets the others and

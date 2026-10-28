@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>An event drawn against the time series, such as a launch or an incident.</summary>
 /// <param name="Index">Point index in <see cref="ArcBrushChart.Series"/>, the event's place in time.</param>

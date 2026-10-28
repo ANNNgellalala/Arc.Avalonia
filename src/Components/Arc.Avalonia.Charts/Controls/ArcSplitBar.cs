@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A single hundred-percent bar split into shares. The readout above names the total at rest or

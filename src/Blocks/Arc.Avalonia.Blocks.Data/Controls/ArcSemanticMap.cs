@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>One node of the company map: a team, a project, a task or a person.</summary>
 internal sealed class MapNode

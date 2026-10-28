@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>One candlestick with volume.</summary>
 internal sealed class Candle

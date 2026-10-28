@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>One payment origin on the globe.</summary>
 internal sealed class GlobeCity

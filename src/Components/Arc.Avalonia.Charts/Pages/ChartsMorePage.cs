@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>Unit, hierarchy, rhythm, density, flow, and share demos.</summary>
 public sealed class ChartsMorePage : ArcPage

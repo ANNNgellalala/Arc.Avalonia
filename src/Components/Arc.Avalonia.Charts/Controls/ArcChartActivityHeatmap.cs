@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A contribution-style calendar: seven rows and one column per week, five tint steps derived

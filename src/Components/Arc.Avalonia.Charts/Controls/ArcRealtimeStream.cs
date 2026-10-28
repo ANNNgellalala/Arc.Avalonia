@@ -9,7 +9,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A rolling live stream: a fixed time window of one or more series that slides as samples arrive, a live

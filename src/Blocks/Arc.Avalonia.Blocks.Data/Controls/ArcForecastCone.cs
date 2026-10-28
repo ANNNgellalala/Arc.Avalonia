@@ -6,7 +6,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>
 /// A billing-period usage chart with a forecast cone and a draggable budget line. The solid line is the

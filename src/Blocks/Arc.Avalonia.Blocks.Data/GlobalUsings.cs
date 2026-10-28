@@ -5,3 +5,5 @@ global using Arc.Avalonia.Overlays.Controls;
 
 global using Arc.Avalonia.DataDisplay.Controls;
 
+global using Arc.Avalonia.Blocks.Data.Controls;
+

@@ -8,13 +8,13 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Actions.Controls;
-using Arc.Avalonia.Charts;
+using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Inputs.Controls;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>
 /// Composition helpers shared by the data blocks. A block is a page level product surface, so these stay

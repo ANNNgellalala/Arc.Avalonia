@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>Trend, comparison, and meter charts at card size.</summary>
 public sealed class ChartsPage : ArcPage

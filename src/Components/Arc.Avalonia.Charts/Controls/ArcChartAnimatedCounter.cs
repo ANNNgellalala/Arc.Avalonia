@@ -5,7 +5,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// An odometer-style number with tabular figures, a small label, prefix and suffix. It settles

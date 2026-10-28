@@ -8,7 +8,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A ranking over time: bars overtake each other as the periods play, values count between frames, the

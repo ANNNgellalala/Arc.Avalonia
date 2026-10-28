@@ -4,7 +4,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A compact chart surface: title, optional subtitle, the chart, and one caption line.

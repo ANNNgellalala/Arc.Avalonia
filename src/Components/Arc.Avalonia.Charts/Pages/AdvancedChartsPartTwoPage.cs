@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>
 /// Profiles, live readings, and a ranking over time: the moving half of the advanced Arc charts.

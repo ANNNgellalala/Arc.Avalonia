@@ -3,7 +3,7 @@ using System.Globalization;
 using Avalonia.Controls;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>A dense time series with an overview strip and a draggable window.</summary>
 public sealed class ChartsBrushPage : ArcPage

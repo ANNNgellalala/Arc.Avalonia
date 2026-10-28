@@ -9,7 +9,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Arc.Avalonia.Charts;
+using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Inputs.Controls;

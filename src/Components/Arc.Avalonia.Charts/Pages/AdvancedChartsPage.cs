@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Pages;
 
 /// <summary>
 /// Hierarchy, flow, and drop-off: the advanced Arc charts drawn entirely with Avalonia's own rendering.

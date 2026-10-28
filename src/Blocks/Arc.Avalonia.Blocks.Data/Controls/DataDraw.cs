@@ -6,7 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>Resolves semantic ink for the custom drawn stages. Every colour is a token.</summary>
 internal static class Ink

@@ -5,7 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
-using Arc.Avalonia.Charts;
+using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;

@@ -7,7 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>One line, stream, ridge, or sparkline series.</summary>
 /// <param name="Name">Series name, shown in tooltips and legends.</param>

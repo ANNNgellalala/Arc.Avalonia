@@ -5,7 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// A 270 degree gauge for one value against a known range. Thresholds change the ring tone and

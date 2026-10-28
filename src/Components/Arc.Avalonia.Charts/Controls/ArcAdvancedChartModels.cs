@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Charts;
+namespace Arc.Avalonia.Charts.Controls;
 
 /// <summary>
 /// One node of the hierarchy drawn by <see cref="ArcSunburstChart"/>. A branch's value is the sum of

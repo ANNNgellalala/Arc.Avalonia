@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Arc.Avalonia.Blocks.Data;
+namespace Arc.Avalonia.Blocks.Data.Controls;
 
 /// <summary>One account in the galaxy, kept deliberately small so 1,200 of them stay cheap.</summary>
 internal sealed class GalaxyAccount
