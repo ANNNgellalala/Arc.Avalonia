@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Arc.Avalonia.Verify</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Verify</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\src\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+  </ItemGroup>
+</Project>

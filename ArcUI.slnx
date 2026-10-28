@@ -33,4 +33,7 @@
     <Project Path="src/Arc.Avalonia.Demo/Arc.Avalonia.Demo.csproj" />
     <Project Path="src/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/Arc.Avalonia.Tests/Arc.Avalonia.Tests.csproj" />
+  </Folder>
 </Solution>
