@@ -1,0 +1,93 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ai="using:Arc.Avalonia.AdvancedInputs.Controls">
+
+  <!-- Mention input: a transparent text field over a tinted mirror, with a suggestion list beneath. -->
+  <ControlTheme x:Key="{x:Type ai:ArcMentionInput}" TargetType="ai:ArcMentionInput">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{TemplateBinding Label}" Classes="arc-label" />
+            <Border x:Name="Shell"
+                    MinHeight="0"
+                    Padding="14,12"
+                    Background="{DynamicResource ArcSurface}"
+                    BorderBrush="{DynamicResource ArcBorderStrong}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource ArcRadiusControl}">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                </Transitions>
+              </Border.Transitions>
+              <Grid>
+                <TextBlock x:Name="Mirror"
+                           FontFamily="{TemplateBinding FontFamily}"
+                           FontSize="{TemplateBinding FontSize}"
+                           Foreground="{DynamicResource ArcForeground}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Top"
+                           IsHitTestVisible="False" />
+                <TextBox x:Name="PART_Input"
+                         Classes="arc-bare"
+                         FocusAdorner="{x:Null}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="0"
+                         MinHeight="24"
+                         FontFamily="{TemplateBinding FontFamily}"
+                         FontSize="{TemplateBinding FontSize}"
+                         Foreground="Transparent"
+                         CaretBrush="{DynamicResource ArcAccentStrong}"
+                         SelectionBrush="{DynamicResource ArcAccentSubtle}"
+                         PlaceholderForeground="{DynamicResource ArcTextMuted}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalContentAlignment="Top" />
+              </Grid>
+            </Border>
+            <TextBlock x:Name="Message"
+                       Classes="arc-caption"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+          </StackPanel>
+
+          <Border x:Name="Panel"
+                  IsVisible="False"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Left"
+                  Width="280"
+                  ZIndex="20"
+                  ClipToBounds="False"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BoxShadow="{DynamicResource ArcShadowFloating}"
+                  Padding="6">
+            <ScrollViewer x:Name="Scroller"
+                          MaxHeight="264"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+              <StackPanel x:Name="Rows" Spacing="1" />
+            </ScrollViewer>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.focus /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

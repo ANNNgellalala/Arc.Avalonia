@@ -1,0 +1,168 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Arc.Avalonia.Controls">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcTextReveal.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcInViewTitle.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcTextMorph.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcTextShimmer.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcAnnouncementBar.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcCookieConsent.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcBottomSheet.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcHoverCard.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcExpandableCard.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- ============================ Announcement bar ============================ -->
+  <Style Selector="Border.announcement-bar">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+  </Style>
+  <Style Selector="Border.announcement-bar.inverted">
+    <Setter Property="Background" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="c|ArcButton.bar-icon">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-icon:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-icon:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderSubtle}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-icon.on-inverted">
+    <Setter Property="Foreground" Value="{DynamicResource ArcBackground}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-icon.on-inverted:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcBackground}" />
+    <Setter Property="Opacity" Value="0.72" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-icon.on-inverted:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="c|ArcButton.bar-action">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-action:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-action.on-inverted">
+    <Setter Property="Foreground" Value="{DynamicResource ArcBackground}" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-action.on-inverted:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcBackground}" />
+    <Setter Property="Opacity" Value="0.72" />
+  </Style>
+  <Style Selector="c|ArcButton.bar-action.on-inverted:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="TextBlock.on-inverted">
+    <Setter Property="Foreground" Value="{DynamicResource ArcBackground}" />
+  </Style>
+
+  <!-- ============================ Cookie consent ============================ -->
+  <Style Selector="c|ArcButton.pref-row">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Padding" Value="10,8" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+  </Style>
+  <Style Selector="c|ArcButton.pref-row:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.pref-row:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.pref-row /template/ ContentPresenter#Content">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="c|ArcButton.consent-reopen">
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPill}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.consent-reopen:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+
+  <Style Selector="Border.pref-check">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.pref-check.on">
+    <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+  </Style>
+
+  <!-- ============================ Bottom sheet ============================ -->
+  <Style Selector="c|ArcButton.sheet-grabber">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPill}" />
+  </Style>
+  <Style Selector="c|ArcButton.sheet-grabber:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderSubtle}" />
+  </Style>
+
+  <!-- ============================ Hover card ============================ -->
+  <Style Selector="Border.hover-card-surface">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="Width" Value="296" />
+    <Setter Property="MaxWidth" Value="320" />
+  </Style>
+  <Style Selector="Border.hover-card-avatar">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="Border.hover-card-meta">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+    <Setter Property="Padding" Value="0,10,0,0" />
+  </Style>
+
+  <!-- ============================ Expandable card ============================ -->
+  <Style Selector="Border.expandable-card">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+  </Style>
+  <Style Selector="c|ArcButton.expandable-header">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+  </Style>
+  <Style Selector="c|ArcButton.expandable-header:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+  <Style Selector="c|ArcButton.expandable-header /template/ ContentPresenter#Content">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+  </Style>
+</Styles>

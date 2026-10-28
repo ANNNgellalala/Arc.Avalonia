@@ -1,0 +1,139 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcButton}" TargetType="c:ArcButton">
+    <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentForeground}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightMd}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusControl}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}"
+                  RenderTransformOrigin="0.5,0.5">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.16" />
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.26" />
+              </Transitions>
+            </Border.Transitions>
+            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" ColumnDefinitions="Auto,Auto">
+              <c:ArcSpinner x:Name="Spinner"
+                            Grid.Column="0"
+                            Width="16"
+                            Height="16"
+                            StrokeWidth="2"
+                            Margin="0,0,8,0"
+                            IsVisible="False"
+                            VerticalAlignment="Center"
+                            Stroke="{TemplateBinding Foreground}" />
+              <ContentPresenter x:Name="Content"
+                                Grid.Column="1"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+            </Grid>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Variants -->
+    <Style Selector="^.secondary">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.ghost">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    </Style>
+    <Style Selector="^.danger">
+      <Setter Property="Background" Value="{DynamicResource ArcDanger}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Sizes -->
+    <Style Selector="^.sm">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="^.lg">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
+      <Setter Property="Padding" Value="20,0" />
+      <Setter Property="FontSize" Value="15" />
+    </Style>
+    <Style Selector="^.compact">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Width" Value="44" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="^.compact.sm">
+      <Setter Property="Width" Value="36" />
+    </Style>
+    <Style Selector="^.compact.lg">
+      <Setter Property="Width" Value="50" />
+    </Style>
+
+    <!-- Pointer and press feedback -->
+    <Style Selector="^.primary:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcAccentStrong}" />
+    </Style>
+    <Style Selector="^.secondary:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcBorder}" />
+    </Style>
+    <Style Selector="^.ghost:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    </Style>
+    <Style Selector="^.ghost:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.danger:pointerover /template/ Border#Root">
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Root">
+      <Setter Property="RenderTransform" Value="scale(0.97)" />
+    </Style>
+
+    <!-- Keyboard focus gets the ring; pointer focus never draws one. -->
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Loading: the spinner itself is toggled from ArcButton.OnApplyTemplate. -->
+    <Style Selector="^.loading /template/ ContentPresenter#Content">
+      <Setter Property="Opacity" Value="0.7" />
+    </Style>
+
+    <!-- Disabled -->
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.45" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>
+

@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:e="using:Arc.Avalonia.Effects.Controls">
+
+  <ControlTheme x:Key="{x:Type e:ArcExpandableCard}" TargetType="e:ArcExpandableCard">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Frame" Classes="expandable-card" ClipToBounds="True">
+          <Grid RowDefinitions="Auto,Auto">
+            <c:ArcButton x:Name="Header"
+                         Classes="expandable-header"
+                         Variant="Ghost"
+                         HorizontalAlignment="Stretch"
+                         HorizontalContentAlignment="Stretch"
+                         Padding="16"
+                         MinHeight="64">
+              <c:ArcButton.Content>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                  <StackPanel Spacing="2" VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleBlock" Classes="arc-label" TextWrapping="Wrap" />
+                    <TextBlock x:Name="DescriptionBlock"
+                               Classes="arc-caption"
+                               TextWrapping="Wrap"
+                               IsVisible="False" />
+                  </StackPanel>
+                  <c:ArcIcon x:Name="Chevron"
+                             Grid.Column="1"
+                             Icon="chevron-down"
+                             Size="18"
+                             VerticalAlignment="Center"
+                             RenderTransformOrigin="0.5,0.5" />
+                </Grid>
+              </c:ArcButton.Content>
+            </c:ArcButton>
+
+            <Border x:Name="PanelClip"
+                    Grid.Row="1"
+                    Height="0"
+                    IsVisible="False"
+                    ClipToBounds="True">
+              <ContentPresenter x:Name="Body"
+                                Margin="16,0,16,16"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

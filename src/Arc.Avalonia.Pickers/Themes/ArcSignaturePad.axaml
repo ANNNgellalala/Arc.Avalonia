@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="{x:Type p:ArcSignaturePad}" TargetType="p:ArcSignaturePad">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource ArcSurface}"
+                BorderBrush="{DynamicResource ArcBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusPanel}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="Auto,Auto,Auto">
+            <p:ArcSignatureSurface x:Name="PART_Surface"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top" />
+            <Border Grid.Row="1" Classes="picker-separator" />
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+                  Margin="16,10">
+              <StackPanel x:Name="PART_Colors"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          VerticalAlignment="Center" />
+              <Border Grid.Column="1"
+                      Width="1"
+                      Height="18"
+                      Margin="12,0"
+                      Background="{DynamicResource ArcBorder}" />
+              <StackPanel x:Name="PART_Widths"
+                          Grid.Column="2"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Center" />
+              <Button x:Name="PART_Undo"
+                      Grid.Column="3"
+                      Margin="0,0,2,0"
+                      Theme="{StaticResource ArcPickerIconTheme}">
+                <c:ArcIcon Icon="undo-2" Size="16" />
+              </Button>
+              <Button x:Name="PART_Clear"
+                      Grid.Column="4"
+                      Theme="{StaticResource ArcPickerIconTheme}">
+                <c:ArcIcon Icon="trash-2" Size="16" />
+              </Button>
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

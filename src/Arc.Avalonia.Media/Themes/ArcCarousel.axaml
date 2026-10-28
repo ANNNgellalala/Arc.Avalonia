@@ -1,0 +1,109 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls"
+                    xmlns:ac="using:Arc.Avalonia.Controls">
+
+  <!-- The indicator: a small dot that stretches into a short pill when its slide is active. -->
+  <ControlTheme x:Key="{x:Type c:ArcCarouselDot}" TargetType="c:ArcCarouselDot">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Dot"
+                  Width="8"
+                  Height="8"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  Background="{TemplateBinding Background}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.active">
+      <Setter Property="Background" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.active /template/ Border#Dot">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="6" />
+    </Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ArcTextSecondary}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcCarousel}" TargetType="c:ArcCarousel">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Grid RowDefinitions="Auto,Auto">
+            <Panel x:Name="StageHost" ClipToBounds="True">
+              <c:ArcCarouselPanel x:Name="PART_Stage" />
+            </Panel>
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto,*,Auto"
+                  Margin="0,14,0,0">
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <ac:ArcButton x:Name="PART_Prev"
+                              Variant="Ghost"
+                              Size="Sm"
+                              Compact="True" />
+                <ac:ArcButton x:Name="PART_Play"
+                              Variant="Ghost"
+                              Size="Sm"
+                              Compact="True"
+                              IsVisible="False" />
+              </StackPanel>
+              <StackPanel x:Name="PART_Dots"
+                          Grid.Column="1"
+                          Orientation="Horizontal"
+                          Spacing="4"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+              <ac:ArcButton x:Name="PART_Next"
+                            Grid.Column="2"
+                            Variant="Ghost"
+                            Size="Sm"
+                            Compact="True" />
+            </Grid>
+          </Grid>
+          <TextBlock x:Name="Status"
+                     Height="0"
+                     Opacity="0"
+                     IsHitTestVisible="False"
+                     AutomationProperties.LiveSetting="Polite" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

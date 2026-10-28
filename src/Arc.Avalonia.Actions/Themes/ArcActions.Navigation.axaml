@@ -1,0 +1,93 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- ============================ Tabs ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcTabs}" TargetType="a:ArcTabs">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="16">
+          <Border x:Name="Track"
+                  HorizontalAlignment="Left"
+                  Background="{DynamicResource ArcSurfaceMuted}"
+                  CornerRadius="{DynamicResource ArcRadiusControl}"
+                  Padding="3">
+            <Panel>
+              <Panel x:Name="GlideLayer" IsHitTestVisible="False">
+                <a:ArcGlide x:Name="Glide" CornerRadius="16" />
+              </Panel>
+              <StackPanel x:Name="Triggers" Orientation="Horizontal" Spacing="2" />
+            </Panel>
+          </Border>
+          <ContentControl x:Name="PanelHost" HorizontalContentAlignment="Left" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Breadcrumb ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcBreadcrumb}" TargetType="a:ArcBreadcrumb">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <WrapPanel x:Name="Crumbs" Orientation="Horizontal" VerticalAlignment="Center" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Pagination ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcPagination}" TargetType="a:ArcPagination">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel x:Name="Buttons" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Accordion ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcAccordion}" TargetType="a:ArcAccordion">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel x:Name="Rows" HorizontalAlignment="Stretch" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Expandable text ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcExpandableText}" TargetType="a:ArcExpandableText">
+    <Setter Property="Background" Value="{DynamicResource ArcBackground}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="MaxWidth" Value="640" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6" HorizontalAlignment="Stretch">
+          <Border x:Name="Clip"
+                  HorizontalAlignment="Stretch"
+                  ClipToBounds="True">
+            <Panel>
+              <TextBlock x:Name="Body"
+                         TextWrapping="Wrap"
+                         LineHeight="20"
+                         Classes="arc-body-sm" />
+              <Border x:Name="Fade"
+                      Height="26"
+                      VerticalAlignment="Bottom"
+                      IsHitTestVisible="False" />
+            </Panel>
+          </Border>
+          <c:ArcButton x:Name="Toggle"
+                     Variant="Ghost"
+                     Size="Sm"
+                     MinHeight="28"
+                     Padding="0"
+                     HorizontalAlignment="Left"
+                     HorizontalContentAlignment="Left" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

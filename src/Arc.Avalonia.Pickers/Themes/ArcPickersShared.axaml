@@ -1,0 +1,160 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- A field trigger: the closed state every picker shows. -->
+  <ControlTheme x:Key="ArcPickerFieldTheme" TargetType="Button">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightMd}" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusControl}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.16" />
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    </Style>
+    <Style Selector="^.open /template/ Border#Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- A quiet icon action: month arrows, clear, remove, add swatch. -->
+  <ControlTheme x:Key="ArcPickerIconTheme" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="13"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcBorder}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.35" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- A saved colour swatch. Background carries the colour. -->
+  <ControlTheme x:Key="ArcPickerSwatchTheme" TargetType="Button">
+    <Setter Property="Width" Value="26" />
+    <Setter Property="Height" Value="26" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="12"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="8"
+                  BorderThickness="1"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  ClipToBounds="True">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    </Style>
+    <Style Selector="^.selected /template/ Border#Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

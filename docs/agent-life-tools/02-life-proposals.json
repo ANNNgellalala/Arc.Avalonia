@@ -1,0 +1,753 @@
+{
+  "schema": "arc-extension-proposals/v1",
+  "domain": "life",
+  "scenarios": [
+    {
+      "id": "morning-brief",
+      "title": "晨间简报",
+      "summary": "起床后五分钟内看到今天的日程、到期提醒、健康与预算概览，以及一条可以立即执行的建议；用户确认后由 Agent 完成排程与通知。"
+    },
+    {
+      "id": "medication-plan",
+      "title": "服药计划",
+      "summary": "慢病或短期用药每天多次服药，记录剂量与已服/漏服，续方与库存不足提前提醒，家属可以代为确认。"
+    },
+    {
+      "id": "bill-due",
+      "title": "账单到期",
+      "summary": "房租、水电、信用卡、保险等周期性账单在到期前分层提醒，标记已付，查看本期与未来三十天的支出。"
+    },
+    {
+      "id": "weekly-meal-plan",
+      "title": "每周备餐",
+      "summary": "周末规划一周三餐，复用常做菜谱，按人数调整份量，自动汇总成按货架分区的采买清单。"
+    },
+    {
+      "id": "trip-itinerary",
+      "title": "旅行行程",
+      "summary": "出行前把交通、住宿、预约与证件集中在一处；行程中按天查看下一步，天气变化时由 Agent 提出调整。"
+    },
+    {
+      "id": "home-repair",
+      "title": "家庭维修",
+      "summary": "家电或房屋报修：记录故障、预约上门、核对保修到期、归档维修单据与费用。"
+    },
+    {
+      "id": "mood-journal",
+      "title": "情绪日记",
+      "summary": "每天用一分钟记录心情、事件与一句话总结，按月回看情绪与睡眠、社交的关联。"
+    },
+    {
+      "id": "focus-block",
+      "title": "专注时段",
+      "summary": "进入五十分钟专注：声明本次目标、压掉非紧急打扰、记录中断，结束时给出完成情况与下一步。"
+    },
+    {
+      "id": "parcel-tracking",
+      "title": "包裹快递",
+      "summary": "多个包裹的物流状态与预计到达集中查看，代收与改约提前处理，异常件主动提示。"
+    },
+    {
+      "id": "subscription-audit",
+      "title": "订阅管理",
+      "summary": "按月检查所有订阅的续费日、涨价与闲置情况，计算月度与年度总成本，逐项决定保留或取消。"
+    },
+    {
+      "id": "id-expiry",
+      "title": "证件到期",
+      "summary": "身份证、护照、驾照、保险与签证的到期日前置提醒，附续办材料清单与办理入口。"
+    },
+    {
+      "id": "report-archive",
+      "title": "体检报告归档",
+      "summary": "把体检、化验与影像报告归档，抽取指标做趋势与参考范围对照，异常值单独提示。"
+    },
+    {
+      "id": "relationship-upkeep",
+      "title": "生日与关系维护",
+      "summary": "记住家人朋友的生日与纪念日、上次联系时间与对方近况，按合适节奏提醒问候，避免群发式打扰。"
+    },
+    {
+      "id": "home-energy",
+      "title": "家庭能耗",
+      "summary": "结合账单、天气与设备使用解释本月电水气费用，发现异常用量并给出可执行的节省建议。"
+    },
+    {
+      "id": "pet-care",
+      "title": "宠物照护",
+      "summary": "喂食、遛弯、驱虫、疫苗与兽医预约的时间表，记录体重与用药，出门时给照看人一份交接说明。"
+    },
+    {
+      "id": "grocery-run",
+      "title": "采买清单",
+      "summary": "按货架分区排列的家庭采买清单，边买边勾选，缺货可替换，多人可同时补充。"
+    },
+    {
+      "id": "chore-rota",
+      "title": "家务轮值",
+      "summary": "把重复家务分配到家庭成员并轮换，到期提醒、完成确认与本月分担是否公平的简单回顾。"
+    },
+    {
+      "id": "sleep-trend",
+      "title": "睡眠与健康趋势",
+      "summary": "睡眠时长、入睡时间与日间精力放在同一时间轴上看趋势，和参考范围对照，异常时建议就诊。"
+    },
+    {
+      "id": "expense-split",
+      "title": "聚餐分摊",
+      "summary": "朋友聚餐或合租费用按人/按项分摊，记录谁先垫付、谁还欠谁，结算后归档。"
+    },
+    {
+      "id": "smart-home-scene",
+      "title": "回家场景",
+      "summary": "回家、离家、睡眠三个场景一键调整灯光、空调与安防，设备离线时给出降级操作。"
+    },
+    {
+      "id": "spend-capture",
+      "title": "随手记账",
+      "summary": "花完钱顺手记一笔：金额、分类、备注与收据照片，月底看分类占比与超支项。"
+    },
+    {
+      "id": "appointment-prep",
+      "title": "就诊准备",
+      "summary": "就诊前汇总症状、用药、近期报告与要问医生的问题；就诊后记录结论、处方与下次复查时间。"
+    },
+    {
+      "id": "outdoor-plan",
+      "title": "周末户外",
+      "summary": "根据天气窗口、同行人与装备约束安排周末户外活动，出发前确认集合时间与地点。"
+    },
+    {
+      "id": "family-logistics",
+      "title": "家庭日程协同",
+      "summary": "家庭成员的接送、聚会、家务与外出安排放在同一视图里，冲突提前暴露并给出替代方案。"
+    }
+  ],
+  "items": [
+    {
+      "slug": "reminder-row",
+      "title": "Reminder row",
+      "kind": "component",
+      "category": "Activity",
+      "project": "Arc.Avalonia.Feedback",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "现有列表行没有一个能同时表达「到期时间 + 重复标记 + 完成/延后动作」，提醒只能散落在 notification-center 的只读行和 inbox-triage 的消息行里。",
+      "scenarios": [
+        "morning-brief",
+        "medication-plan",
+        "bill-due",
+        "chore-rota",
+        "id-expiry",
+        "subscription-audit"
+      ],
+      "composes": [
+        "badge",
+        "checkbox",
+        "swipe-actions",
+        "dropdown-menu",
+        "toast"
+      ],
+      "notes": "单一原子行：前导完成控件、标题、到期 chip（今天/2 小时后/逾期 1 天）、重复与来源标记、右侧动作菜单（延后 10 分钟/1 小时/明天、改期、完成、跳过）。状态枚举 Pending/Due/Snoozed/Done/Missed/Paused；延后走本地时间并用 RelativeTime 文案，不自己写定时器逐帧刷新。重复规则不内建，依赖 03 号 Agent 提案 routine-schedule-editor 或简单预设；桌面端系统通知与托盘属应用层，不能只在页面内提示。"
+    },
+    {
+      "slug": "day-agenda",
+      "title": "Day agenda",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "L",
+      "why": "calendar 无任何事件标记（仅日期/区间/min/max/DisabledDates），week-calendar 是硬编码示例且不支持新建/移动，没有把事件、提醒、任务、服药放在同一时间轴的日常视图。",
+      "scenarios": [
+        "morning-brief",
+        "family-logistics",
+        "focus-block",
+        "appointment-prep",
+        "outdoor-plan"
+      ],
+      "composes": [
+        "week-calendar",
+        "calendar",
+        "timeline",
+        "reminder-row",
+        "segmented-control",
+        "empty-state",
+        "badge"
+      ],
+      "notes": "三段式：日期头（前一天/今天/日历跳转）、全天条、小时网格；条目按类型着色但只用 token 语义色，当前时间线用一条细线而不是动画。状态：Loading/Empty/Populated/Conflict/Error；冲突只标记不自动重排。时区与 DST 必须由数据层提供 DateTimeOffset 与 IANA 时区，现有 pickers 只存 naive DateTime/TimeSpan。列表少于 50 条可手工构建，超过后必须走虚拟化方案（docs/04 R4）。"
+    },
+    {
+      "slug": "reminder-center",
+      "title": "Reminder center",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "L",
+      "why": "notification-center 只有已读/忽略，inbox-triage 的 snooze 是消息语义且时间不可编辑（ImplementationNotes），缺一个按「逾期/今天/即将/已延后」分组、可批量延后与改期的行动中心。",
+      "scenarios": [
+        "morning-brief",
+        "bill-due",
+        "medication-plan",
+        "chore-rota",
+        "id-expiry",
+        "parcel-tracking"
+      ],
+      "composes": [
+        "reminder-row",
+        "inbox-triage",
+        "notification-center",
+        "segmented-control",
+        "filter-toolbar",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "顶部显示逾期与今天计数，分段为「待处理/即将/已延后/已完成」；支持多选批量延后、改期与完成，单条展开就地编辑。与 notification-center 的分工：后者是知会历史，本项是必须处理的行动队列；与 03 号 Agent 提案 agent-attention-inbox 的分工：本项只处理生活提醒，不接管审批。桌面约束：无浏览器通知，窗口未打开时只能靠系统通知或托盘红点，应用未常驻则不可能触发；休眠唤醒后要重算逾期而不是静默补发。"
+    },
+    {
+      "slug": "document-vault",
+      "title": "Document vault",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "L",
+      "why": "file-upload/file-dropzone 只记录文件名与大小且从不落盘（ImplementationNotes），document-extract 只做抽取审阅，缺一个带类型、归属人、到期/续办、可搜索的本地证件与报告归档。",
+      "scenarios": [
+        "id-expiry",
+        "report-archive",
+        "home-repair",
+        "trip-itinerary",
+        "appointment-prep"
+      ],
+      "composes": [
+        "file-dropzone",
+        "file-upload",
+        "filter-toolbar",
+        "sortable-data-table",
+        "drawer",
+        "empty-state",
+        "document-extract"
+      ],
+      "notes": "文档行含类型（证件/保险/保修/体检/票据）、归属人、到期日、标签与缩略图；到期排序与「30/7/1 天」提醒入口；预览用 drawer，不内嵌 PDF 渲染器。文件要复制到应用数据目录而不是只记路径，需处理 Windows/macOS/Linux 权限、路径长度、移动盘失效与备份；敏感数据静态加密与访问审计是应用层前置，UI 只负责明示。document-extract 可用于回填字段，但不得在本项重复实现抽取。"
+    },
+    {
+      "slug": "medication-schedule",
+      "title": "Medication schedule",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "健康域只有 activity-rings、gauge 和图表，没有药物/剂量/服药记录/续方库存这些真实健康场景需要的结构与安全确认。",
+      "scenarios": [
+        "medication-plan",
+        "report-archive",
+        "appointment-prep"
+      ],
+      "composes": [
+        "reminder-row",
+        "usage-meter",
+        "progress",
+        "timeline",
+        "badge",
+        "empty-state"
+      ],
+      "notes": "今日卡片按时间列剂量（药名、剂量、餐前/餐后），可「已服/跳过/稍后」；课程进度与续方库存用进度/用量形态；历史用 timeline。状态 Due/Taken/Skipped/Missed/Paused/LowStock。健康数据属高敏感：默认本地、可一键导出与删除、不进入普通搜索索引；漏服补记必须写清时间避免误服。提醒投递与静默时段依赖 agent 域 notification-routing 与托盘方案，不在本项内重复实现。"
+    },
+    {
+      "slug": "bill-due-list",
+      "title": "Bill due list",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "billing-overview/usage-billing/invoice-studio 全部是 SaaS 账单或开票流程，budget-variance 是部门预算，没有个人/家庭「周期性账单到期 + 已付 + 未来三十天」的台账。",
+      "scenarios": [
+        "bill-due",
+        "subscription-audit",
+        "spend-capture"
+      ],
+      "composes": [
+        "sortable-data-table",
+        "filter-toolbar",
+        "countdown",
+        "money-input",
+        "badge",
+        "toast"
+      ],
+      "notes": "按到期日分组，行含账单名/金额/到期/自动扣款/状态；顶部本期合计与未来 30 天合计，可切月视图；标记已付就地确认并可撤销。状态 Upcoming/Due/Paid/Overdue/AutoPay。重复规则复用 agent 域排期提案，不重复造 RRULE；金额用 money-input 的 minor units，多币种必须存币种而不是只存符号。无银行接口时只支持手工/CSV 导入，文案不得暗示已自动扣款。"
+    },
+    {
+      "slug": "grocery-list",
+      "title": "Grocery list",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "饮食域现有组件为 0（recipe/meal/grocery/nutrition 全仓 grep 无匹配），reorderable-list 只有标题/详情/禁用，没有勾选、数量单位与分区，无法承载最日常的采买清单。",
+      "scenarios": [
+        "grocery-run",
+        "weekly-meal-plan",
+        "family-logistics"
+      ],
+      "composes": [
+        "checkbox",
+        "input",
+        "number-field",
+        "chip-group",
+        "swipe-actions",
+        "progress",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "按货架/品类分区的清单，行含勾选、名称、数量+单位、备注、添加人；顶部已购/总数进度；支持把菜谱食材一键加入与缺货替换。状态 Empty/Active/Shopping/Completed/Archived。共享给家人需要同步能力，不能只做本地状态；离线勾选要能合并冲突。数量单位不做自由文本拼接，保存 quantity + unit 结构化值。"
+    },
+    {
+      "slug": "daily-brief",
+      "title": "Daily brief",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "现有 dashboard 类 block 都是工作/营收视角，没有一个把天气、日程、到期提醒、健康环与预算拼成「今天」的简报卡并给出一个可执行建议。",
+      "scenarios": [
+        "morning-brief",
+        "home-energy",
+        "bill-due",
+        "parcel-tracking"
+      ],
+      "composes": [
+        "day-agenda",
+        "weather-forecast",
+        "reminder-row",
+        "activity-rings",
+        "metric-card",
+        "card",
+        "sparkline",
+        "empty-state"
+      ],
+      "notes": "分节可折叠：今天、天气、到期、健康、钱、包裹；顶部只放一条「下一步」而不是罗列所有建议。数据只在被请求时刷新，不要进页即启动多个 60fps 动画（docs/04 G-P0-2/R5）；截图用固定 now 保证确定性。空数据必须给下一步而不是空白卡片；Agent 生成的建议要标注来源与可拒绝。"
+    },
+    {
+      "slug": "weather-forecast",
+      "title": "Weather forecast",
+      "kind": "component",
+      "category": "Cards",
+      "project": "Arc.Avalonia.Feedback",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "全仓没有任何天气展示（grep 仅 emoji 数据里出现 weather 字样），而晨间简报、出行与户外场景都依赖「今天/未来几天」的天气窗口。",
+      "scenarios": [
+        "morning-brief",
+        "trip-itinerary",
+        "outdoor-plan",
+        "home-energy"
+      ],
+      "composes": [
+        "card",
+        "sparkline",
+        "badge",
+        "tooltip"
+      ],
+      "notes": "今日主态（图标/温度/体感/降水概率/风）加 5 天条；温度单位、时区与数据时间戳都是属性，不在控件内部读系统时钟。天气数据源属非 UI 能力，组件只接收已归一化的数据并为「过期/不可用」提供状态；不要内置任何第三方服务或密钥。图标只能用现有 Lucide 子集，缺的天气图标需先在 foundation 补，不在本组件内嵌 SVG。"
+    },
+    {
+      "slug": "habit-streak-strip",
+      "title": "Habit streak strip",
+      "kind": "component",
+      "category": "Charts",
+      "project": "Arc.Avalonia.Charts",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "S",
+      "why": "activity-heatmap 是整年一格一天的节奏视图、activity-rings 是一次三目标的环形，缺一个 7/30 天可点击勾选的紧凑连续条与当前连续天数。",
+      "scenarios": [
+        "medication-plan",
+        "focus-block",
+        "mood-journal",
+        "chore-rota"
+      ],
+      "composes": [
+        "activity-heatmap",
+        "sparkline",
+        "progress",
+        "badge"
+      ],
+      "notes": "建议先作为 activity-heatmap 的 window=week/month 变体实现，确实需要独立标题与点击回填时再升为独立条目；本项按「变体优先」估算为 S。状态：Future/Today/Done/Missed/Partial；颜色只用成功/强调/边框 token，不用红绿表达好坏。当天格可点击补记，键盘可用方向键移动。"
+    },
+    {
+      "slug": "reference-band-chart",
+      "title": "Reference band chart",
+      "kind": "component",
+      "category": "Charts",
+      "project": "Arc.Avalonia.Charts",
+      "asset": "foundation",
+      "priority": "P1",
+      "effort": "M",
+      "why": "line-chart 没有参考范围带/目标线/阈值注释，gauge 只能表达单值；体检指标的正常范围、预算线和能耗基线都缺一个可读的「值 vs 范围」图形。",
+      "scenarios": [
+        "report-archive",
+        "sleep-trend",
+        "home-energy",
+        "bill-due"
+      ],
+      "composes": [
+        "line-chart",
+        "gauge",
+        "badge"
+      ],
+      "notes": "作为 ArcLineChart 的扩展（Band/Target/Annotation 属性）而不是新的绘制引擎；复用 ChartCore 的测量、文本与像素对齐；与 docs/04 G-P0-3/G-P0-4 的绘制缓存一致，禁止在 Render 内新建 Pen/FormattedText。行为：悬停读出值与范围关系，范围外点用状态色+文字；不做医学建议，只做数据呈现。"
+    },
+    {
+      "slug": "expense-ledger",
+      "title": "Expense ledger",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "wallet-card 只有示例余额与活动、budget-variance 是部门预算，缺个人流水的按月列表、分类占比、搜索筛选与快速记一笔。",
+      "scenarios": [
+        "spend-capture",
+        "expense-split",
+        "subscription-audit",
+        "bill-due"
+      ],
+      "composes": [
+        "sortable-data-table",
+        "filter-toolbar",
+        "donut-chart",
+        "money-input",
+        "drawer",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "月份切换、分类筛选、搜索、行展开编辑、右侧 drawer 记一笔（金额/分类/日期/备注/收据）；顶部本月合计与分类 donut。docs/04 R4 明确整库几乎零虚拟化、DataGrid 选中/排序整表重建（G-P0-5），真实流水必须先接共享虚拟列表（docs/04 阶段 1-3）或改用分页，不能把 demo 的 20 行直接放大到 2000 行。金额存 minor units + 币种，不做汇率换算除非显式提供。"
+    },
+    {
+      "slug": "budget-board",
+      "title": "Budget board",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksData",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "usage-meter 是配额进度、budget-variance 是部门预算对比，缺家庭「分类信封预算 + 结转 + 月底预测 + 超支预警」的日常预算板。",
+      "scenarios": [
+        "spend-capture",
+        "bill-due",
+        "home-energy",
+        "family-logistics"
+      ],
+      "composes": [
+        "usage-meter",
+        "budget-variance",
+        "reference-band-chart",
+        "range-histogram-slider",
+        "progress",
+        "empty-state"
+      ],
+      "notes": "每个分类一张信封卡：已用/预算/剩余、结转规则、月底预测；顶部总预算与超支分类数。状态 Healthy/Warning/Over/Unbudgeted。预测必须标注为估算并给依据（近 N 天），不能伪装成确定值；金额与周期可切换。复用 usage-meter 的 WarnAt 语义，不重画进度条。"
+    },
+    {
+      "slug": "subscription-tracker",
+      "title": "Subscription tracker",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "billing-overview 是单个 SaaS 账户的套餐与发票，cancel-flow 只是取消文案流；缺一个跨服务的个人订阅清单（续费日、周期、月度/年度总成本、涨价与取消）。",
+      "scenarios": [
+        "subscription-audit",
+        "bill-due",
+        "spend-capture"
+      ],
+      "composes": [
+        "countdown",
+        "sortable-data-table",
+        "cancel-flow",
+        "confirm-morph",
+        "money-input",
+        "filter-toolbar",
+        "badge"
+      ],
+      "notes": "按续费日排序，行含服务、周期（月/年）、折算月成本、下次续费、支付方式、状态；顶部月度/年度总成本与「本月将扣」。取消流程复用 cancel-flow 的挽留结构但文案必须诚实，不得伪造保留优惠；无银行接口时手工维护，涨价检测靠用户输入或邮件导入（非 UI 能力）。"
+    },
+    {
+      "slug": "meal-planner",
+      "title": "Meal planner",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "全仓没有菜谱/备餐/营养结构，week-calendar 是日程语义且不能放「早餐/午餐/晚餐」槽位与一键生成采买清单。",
+      "scenarios": [
+        "weekly-meal-plan",
+        "grocery-run",
+        "family-logistics"
+      ],
+      "composes": [
+        "week-calendar",
+        "calendar",
+        "grocery-list",
+        "chip-group",
+        "card",
+        "donut-chart",
+        "empty-state"
+      ],
+      "notes": "周网格按早餐/午餐/晚餐三行、七天列；每格放菜谱卡（时间、份数、标签），可从「常做」拖入或选择；下方营养概览与「生成采买清单」动作。状态 Empty/Planned/Generated。不做食材库存推断，生成清单前明确列出将加入的条目；份数按家庭人数缩放，单位保持结构化。"
+    },
+    {
+      "slug": "trip-itinerary",
+      "title": "Trip itinerary",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "delivery-tracker 只跟单个订单、choropleth 只是分析地图，缺出行的日期范围头、逐日行程、交通/住宿/预约与证件清单的组合。",
+      "scenarios": [
+        "trip-itinerary",
+        "outdoor-plan",
+        "family-logistics"
+      ],
+      "composes": [
+        "date-range-picker",
+        "timeline",
+        "stepper",
+        "booking-pill",
+        "weather-forecast",
+        "document-vault",
+        "empty-state"
+      ],
+      "notes": "顶部：目的地、日期范围、倒计时、同行人；按天 timeline，条目区分交通/住宿/预约/活动；右侧证件与预订参考号来自 document-vault。跨时区必须显示「当地时间」与出发地时间，现有 pickers 的 naive DateTime 不能直接用。地图能力不做承诺：离线无瓦片，地点用地址文本+外部打开链接，不画假地图。"
+    },
+    {
+      "slug": "daily-journal",
+      "title": "Daily journal",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "rich-text-editor 是通用写作、card-to-article/page-curl 只是展示形态，缺「心情 + 标签 + 当天事件 + 照片 + 可回看」的日记结构。",
+      "scenarios": [
+        "mood-journal",
+        "sleep-trend",
+        "relationship-upkeep"
+      ],
+      "composes": [
+        "rich-text-editor",
+        "rating",
+        "tag-input",
+        "carousel",
+        "activity-heatmap",
+        "card-to-article",
+        "date-picker"
+      ],
+      "notes": "正文用 rich-text-editor 的 Markdown 输出，心情用 rating 的 5 档但必须配文字标签（不能只有星星），标签、照片、当天事件作为附件区；历史用 calendar/heatmap 进入。隐私：默认本地加密、可导出、可删除，明确不用于训练或自动分享；富文本每次按键全量重建（G-P0-6），长日记要等增量解析修复后再上线。"
+    },
+    {
+      "slug": "home-maintenance",
+      "title": "Home maintenance",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "家庭维修/保修/服务记录没有任何承载：project-board 是软件任务、document-extract 只抽单据，缺「资产 + 保修到期 + 保养周期 + 服务商」的家庭维护台账。",
+      "scenarios": [
+        "home-repair",
+        "home-energy",
+        "family-logistics"
+      ],
+      "composes": [
+        "document-vault",
+        "calendar",
+        "timeline",
+        "sortable-data-table",
+        "badge",
+        "reminder-row",
+        "empty-state"
+      ],
+      "notes": "资产行（设备/房屋部位、购买日、保修到期、服务商、上次/下次保养）；保修到期与保养周期复用生活域排期依赖；维修记录用 timeline，单据进 document-vault。状态 Active/DueSoon/Expired/Retired。费用与记录本地保存，不上传；服务商联系方式属个人数据，需明示用途。"
+    },
+    {
+      "slug": "smart-home-panel",
+      "title": "Smart home panel",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "control-center 是工作区快捷设置（专注模式/频道/音量/字号），没有房间、设备、场景与离线状态的智能家居控制面。",
+      "scenarios": [
+        "smart-home-scene",
+        "home-energy",
+        "focus-block"
+      ],
+      "composes": [
+        "control-center",
+        "switch",
+        "slider",
+        "segmented-control",
+        "dialog",
+        "badge",
+        "card"
+      ],
+      "notes": "按房间分组的设备卡（灯/空调/插座/门锁），每卡含开关、亮度/温度滑杆与在线状态；场景为回家/离家/睡眠三档，危险设备（门锁、灶具）需二次确认。桌面无统一智能家居协议，本项只定义 UI 适配契约（ID/能力/状态/命令），真实连接由应用层插件实现；离线/超时要显示最后已知状态而不是假装成功，命令失败要有可撤销反馈。"
+    },
+    {
+      "slug": "focus-session",
+      "title": "Focus session",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "control-center 只有一个专注时长拨盘与频道开关，缺「本次目标 + 计时 + 环境音 + 中断记录 + 结束复盘」的完整专注会话。",
+      "scenarios": [
+        "focus-block",
+        "morning-brief",
+        "mood-journal"
+      ],
+      "composes": [
+        "control-center",
+        "countdown",
+        "media-player",
+        "now-playing",
+        "switch",
+        "timeline",
+        "progress"
+      ],
+      "notes": "开始前选目标与时长，进行中显示剩余时间、当前任务、环境音与「允许打扰的人」；结束后记录中断次数与完成度。状态 Idle/Running/Paused/Break/Completed/Abandoned。计时器必须单帧时钟+可见性门控（docs/04 R1/R5/G-P0-2），不要为倒计时造新的逐帧 timer；桌面端无法真屏蔽系统通知，只能请求应用内静默并在文案中诚实说明。"
+    },
+    {
+      "slug": "pet-care",
+      "title": "Pet care",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "宠物照护完全空白（pet 相关代码只出现在示例文案），喂食/遛弯/驱虫/疫苗/体重与兽医预约需要一套轻量日常面板。",
+      "scenarios": [
+        "pet-care",
+        "chore-rota",
+        "family-logistics"
+      ],
+      "composes": [
+        "reminder-row",
+        "line-chart",
+        "document-vault",
+        "usage-meter",
+        "timeline",
+        "avatar",
+        "empty-state"
+      ],
+      "notes": "宠物档案（头像/品种/体重/过敏）、今日任务、疫苗与驱虫周期、体重曲线、兽医联系与就诊记录。状态 Normal/DueSoon/Overdue。宠物体重和用药属于健康数据，默认本地；出门交接说明支持只读导出。周期规则同样复用排期能力，不内建重复算法。"
+    },
+    {
+      "slug": "chore-board",
+      "title": "Chore board",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "kanban-board/project-board 是团队任务语义（阶段、WIP、负责人），缺家庭场景的重复家务、轮换规则、完成确认与本月公平性回顾。",
+      "scenarios": [
+        "chore-rota",
+        "family-logistics",
+        "grocery-run"
+      ],
+      "composes": [
+        "kanban-board",
+        "project-board",
+        "reminder-row",
+        "avatar-group",
+        "calendar",
+        "empty-state"
+      ],
+      "notes": "按人或按周组织，卡片含家务、频率、轮值人、下次到期、完成历史；顶部本月每人完成数用于公平性回顾。状态 Todo/Due/Done/Skipped/Reassigned。轮值算法可简单轮转，不宣称智能均衡；成员用头像组而非邀请流程，避免与 team-members 的团队语义混淆。"
+    },
+    {
+      "slug": "energy-usage",
+      "title": "Energy usage",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksData",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "没有家庭能耗视图：activity-terrain/globe 是分析装饰，缺按日/月/设备的用电用气用水趋势、费用对照与异常提示。",
+      "scenarios": [
+        "home-energy",
+        "bill-due",
+        "smart-home-scene"
+      ],
+      "composes": [
+        "bar-chart",
+        "line-chart",
+        "reference-band-chart",
+        "usage-meter",
+        "metric-card",
+        "filter-toolbar",
+        "empty-state"
+      ],
+      "notes": "日/月切换、按设备或全屋、费用与用量双轴（避免双轴误导时改用两张图），参考带为本月预算或去年同期；异常日用 badge 标记并给解释入口。数据来自手工账单或智能电表导入，无内置协议；与天气关联时必须标注相关不等于因果。"
+    },
+    {
+      "slug": "package-inbox",
+      "title": "Package inbox",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "delivery-tracker 只展示单个包裹、且明示没有承运商 webhook，缺多包裹汇总、异常件与代收/改约的统一收件箱。",
+      "scenarios": [
+        "parcel-tracking",
+        "trip-itinerary",
+        "home-repair"
+      ],
+      "composes": [
+        "delivery-tracker",
+        "timeline",
+        "badge",
+        "filter-toolbar",
+        "empty-state"
+      ],
+      "notes": "列表汇总运单号、承运商、当前状态、预计到达与代收点；点开进入 delivery-tracker。状态 PreTransit/InTransit/OutForDelivery/Delivered/Exception/Returned。没有物流 API 时靠手工单号，文案不能暗示自动刷新；预计时间要显示数据更新时刻，避免「明天到」的假承诺。"
+    }
+  ]
+}
+

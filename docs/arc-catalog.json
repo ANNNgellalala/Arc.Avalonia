@@ -1,0 +1,3125 @@
+{
+  "generatedFrom": "https://uiarc.dev/llms-small.txt + https://uiarc.dev/docs/introduction (public docs, 2026-10-24)",
+  "componentCategories": [
+    {
+      "name": "Buttons",
+      "items": [
+        "button",
+        "action-button",
+        "split-button",
+        "button-group",
+        "floating-button-group",
+        "expanding-button-group",
+        "copy-button",
+        "action-swap",
+        "icon-morph",
+        "confirm-morph",
+        "theme-switch"
+      ]
+    },
+    {
+      "name": "Gestures",
+      "items": [
+        "hold-to-confirm",
+        "swipe-actions",
+        "reactions"
+      ]
+    },
+    {
+      "name": "Menus",
+      "items": [
+        "dropdown-menu",
+        "context-menu",
+        "user-menu"
+      ]
+    },
+    {
+      "name": "Text fields",
+      "items": [
+        "input",
+        "textarea",
+        "password-field",
+        "password-strength",
+        "search-field",
+        "expanding-search",
+        "inline-edit"
+      ]
+    },
+    {
+      "name": "Special inputs",
+      "items": [
+        "number-field",
+        "money-input",
+        "phone-input",
+        "scrub-input",
+        "tag-input",
+        "mention-input",
+        "shortcut-recorder"
+      ]
+    },
+    {
+      "name": "Selects",
+      "items": [
+        "select",
+        "combobox",
+        "multi-select",
+        "morph-select",
+        "chip-group"
+      ]
+    },
+    {
+      "name": "Toggles",
+      "items": [
+        "radio-cards",
+        "billing-toggle",
+        "checkbox",
+        "radio-group",
+        "switch",
+        "segmented-control",
+        "rating"
+      ]
+    },
+    {
+      "name": "Sliders",
+      "items": [
+        "slider",
+        "elastic-slider",
+        "range-histogram-slider"
+      ]
+    },
+    {
+      "name": "Pickers",
+      "items": [
+        "calendar",
+        "date-picker",
+        "date-range-picker",
+        "time-picker",
+        "color-picker",
+        "emoji-picker"
+      ]
+    },
+    {
+      "name": "Editors",
+      "items": [
+        "rich-text-editor",
+        "signature-pad",
+        "file-dropzone",
+        "avatar-upload"
+      ]
+    },
+    {
+      "name": "Navigation",
+      "items": [
+        "tabs",
+        "breadcrumb",
+        "pagination",
+        "mega-menu-morph"
+      ]
+    },
+    {
+      "name": "Expand",
+      "items": [
+        "scroll-area",
+        "accordion",
+        "expandable-card",
+        "resizable-panels",
+        "expandable-text"
+      ]
+    },
+    {
+      "name": "Overlays",
+      "items": [
+        "dialog",
+        "drawer",
+        "bottom-sheet",
+        "popover",
+        "hover-card",
+        "tooltip",
+        "share-access"
+      ]
+    },
+    {
+      "name": "Messages",
+      "items": [
+        "alert",
+        "toast",
+        "toast-stack",
+        "announcement-bar",
+        "cookie-consent"
+      ]
+    },
+    {
+      "name": "Progress",
+      "items": [
+        "progress",
+        "skeleton",
+        "stepper",
+        "countdown",
+        "usage-meter",
+        "onboarding-checklist"
+      ]
+    },
+    {
+      "name": "Avatars",
+      "items": [
+        "avatar",
+        "avatar-group",
+        "badge",
+        "presence-stack"
+      ]
+    },
+    {
+      "name": "Cards",
+      "items": [
+        "card",
+        "metric-card",
+        "empty-state"
+      ]
+    },
+    {
+      "name": "Charts",
+      "items": [
+        "line-chart",
+        "bar-chart",
+        "donut-chart",
+        "streamgraph",
+        "brush-chart",
+        "waffle-chart",
+        "slope-chart",
+        "sparkline",
+        "gauge",
+        "activity-heatmap",
+        "animated-counter",
+        "ridgeline",
+        "treemap",
+        "split-bar"
+      ]
+    },
+    {
+      "name": "Advanced charts",
+      "items": [
+        "sunburst",
+        "sankey-flow",
+        "funnel-chart",
+        "radar-chart",
+        "realtime-stream",
+        "race-bar-chart",
+        "data-grid"
+      ]
+    },
+    {
+      "name": "Tables",
+      "items": [
+        "sortable-data-table",
+        "tree-table",
+        "tree-view",
+        "reorderable-list",
+        "filter-toolbar",
+        "code-block",
+        "json-viewer"
+      ]
+    },
+    {
+      "name": "Activity",
+      "items": [
+        "timeline",
+        "comment-thread",
+        "chat-thread"
+      ]
+    },
+    {
+      "name": "Media",
+      "items": [
+        "image-compare",
+        "carousel",
+        "card-stack"
+      ]
+    },
+    {
+      "name": "Text effects",
+      "items": [
+        "text-reveal",
+        "in-view-title",
+        "text-morph",
+        "text-shimmer"
+      ]
+    }
+  ],
+  "specialGroups": [
+    {
+      "name": "Glass and surfaces",
+      "items": [
+        "glass-menu",
+        "glass-segmented",
+        "glass-card",
+        "glass-tabbar",
+        "holo-card",
+        "wallet-stack",
+        "sheet-stack",
+        "control-center",
+        "card-to-article",
+        "link-unfurl",
+        "share-sheet"
+      ]
+    },
+    {
+      "name": "Motion and interaction",
+      "items": [
+        "action-morph",
+        "morph-nav",
+        "dock",
+        "liquid-tab-bar",
+        "orbit-menu",
+        "orbit-logos",
+        "booking-pill",
+        "keycap-keyboard",
+        "slot-text",
+        "sand-text",
+        "typewriter-terminal"
+      ]
+    },
+    {
+      "name": "Media and input",
+      "items": [
+        "product-gallery",
+        "lightbox-gallery",
+        "photo-grid",
+        "cover-flow",
+        "voice-orb",
+        "now-playing",
+        "voice-recorder",
+        "page-curl",
+        "sticker-peel",
+        "dot-grid",
+        "gravity-well"
+      ]
+    },
+    {
+      "name": "AI widgets",
+      "items": [
+        "agent-status",
+        "tool-call",
+        "agent-plan",
+        "agent-timeline",
+        "context-window",
+        "ink-fluid",
+        "activity-rings",
+        "stretch-refresh",
+        "morph-loader",
+        "skeleton-morph",
+        "black-hole"
+      ]
+    },
+    {
+      "name": "AI explainers",
+      "items": [
+        "data-flow",
+        "payment-flow",
+        "multi-region-failover",
+        "vector-search",
+        "agent-loop",
+        "mixture-of-experts",
+        "speculative-decoding",
+        "prompt-cache",
+        "reasoning-tree",
+        "time-dial",
+        "date-reel"
+      ]
+    }
+  ],
+  "blockGroups": [
+    {
+      "name": "Marketing and site",
+      "items": [
+        "site-header",
+        "site-footer",
+        "hero-section",
+        "faq-section",
+        "contact-section",
+        "blog-grid",
+        "comparison-table",
+        "stats-band",
+        "cta-section",
+        "newsletter-signup",
+        "logo-marquee",
+        "page-header",
+        "hero-signup",
+        "spotlight-grid",
+        "scroll-story",
+        "feature-bento",
+        "plan-comparison",
+        "pricing-calculator"
+      ]
+    },
+    {
+      "name": "Commerce",
+      "items": [
+        "product-listing",
+        "product-detail",
+        "cart-drawer",
+        "checkout-summary",
+        "usage-pricing",
+        "usage-billing",
+        "wallet-card",
+        "invoice-studio",
+        "delivery-tracker",
+        "cancel-flow",
+        "integrations",
+        "help-center",
+        "support-widget",
+        "support-conversation",
+        "changelog-feed",
+        "empty-states",
+        "billing-overview",
+        "checkout-live"
+      ]
+    },
+    {
+      "name": "App shell and settings",
+      "items": [
+        "workspace-sidebar",
+        "sidebar-rail",
+        "settings-page",
+        "settings-command",
+        "docs-sidebar",
+        "inbox-sidebar",
+        "inbox-triage",
+        "command-palette",
+        "notification-center",
+        "selection-toolbar",
+        "file-upload",
+        "otp-input",
+        "multi-step-form",
+        "signup-form",
+        "sign-in",
+        "login-centered",
+        "login-immersive",
+        "login-split",
+        "security-settings",
+        "search-results",
+        "media-player"
+      ]
+    },
+    {
+      "name": "Team and collaboration",
+      "items": [
+        "team-directory",
+        "team-showcase",
+        "testimonial-stage",
+        "team-members",
+        "invite-people",
+        "availability-picker",
+        "project-board",
+        "kanban-board",
+        "week-calendar",
+        "api-keys",
+        "webhooks",
+        "roles-permissions",
+        "env-variables",
+        "release-readiness",
+        "onboarding-illustration",
+        "cohort-retention"
+      ]
+    },
+    {
+      "name": "Data and charts",
+      "items": [
+        "metrics-dashboard",
+        "revenue-explorer",
+        "journey-flow",
+        "usage-forecast",
+        "mrr-waterfall",
+        "metric-explorer",
+        "activity-terrain",
+        "revenue-globe",
+        "customer-galaxy",
+        "semantic-zoom",
+        "layout-morph",
+        "budget-variance",
+        "choropleth-explorer",
+        "small-multiples",
+        "connected-scatter",
+        "horizon-chart",
+        "line-replay",
+        "exploded-view",
+        "kpi-drilldown",
+        "market-terminal"
+      ]
+    },
+    {
+      "name": "AI",
+      "items": [
+        "ai-composer",
+        "ai-chat",
+        "ai-side-panel",
+        "research-run",
+        "ai-answer",
+        "model-picker",
+        "model-arena",
+        "prompt-studio",
+        "document-extract",
+        "agent-memory",
+        "agent-tasks",
+        "agent-approvals",
+        "agent-routines",
+        "agent-orchestrator",
+        "mcp-servers",
+        "knowledge-base",
+        "eval-suite",
+        "agent-run"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "slug": "button",
+      "title": "Button",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "A clear, responsive action with quiet secondary states.",
+      "docs": "https://uiarc.dev/components/button"
+    },
+    {
+      "slug": "action-button",
+      "title": "Action button",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "A compact button for frequent toolbar actions.",
+      "docs": "https://uiarc.dev/components/action-button"
+    },
+    {
+      "slug": "split-button",
+      "title": "Split button",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "A primary action with a menu of nearby alternatives.",
+      "docs": "https://uiarc.dev/components/split-button"
+    },
+    {
+      "slug": "button-group",
+      "title": "Button group",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Related actions joined into one surface with hairline dividers: a hover highlight glides between segments, the pressed one answers in place, and an attached menu can close the row.",
+      "docs": "https://uiarc.dev/components/button-group"
+    },
+    {
+      "slug": "floating-button-group",
+      "title": "Floating button group",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Separate soft buttons in a quiet tray, with one shared highlight that morphs from button to button as you move, and a pressed state that settles in place.",
+      "docs": "https://uiarc.dev/components/floating-button-group"
+    },
+    {
+      "slug": "expanding-button-group",
+      "title": "Expanding button group",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Icon buttons in a compact group: the one you point at or focus grows to reveal its label while its neighbours slide aside, and an action confirms in place.",
+      "docs": "https://uiarc.dev/components/expanding-button-group"
+    },
+    {
+      "slug": "copy-button",
+      "title": "Copy button",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Copy a value with immediate confirmation.",
+      "docs": "https://uiarc.dev/components/copy-button"
+    },
+    {
+      "slug": "action-swap",
+      "title": "Action swap",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Swap an action label while preserving its place and intent.",
+      "docs": "https://uiarc.dev/components/action-swap"
+    },
+    {
+      "slug": "icon-morph",
+      "title": "Icon morph",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Icons that morph between states: menu to close, play to pause, copy to check, and more.",
+      "docs": "https://uiarc.dev/components/icon-morph"
+    },
+    {
+      "slug": "confirm-morph",
+      "title": "Confirm morph",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "A destructive button that morphs into an inline confirmation, a spinner, and a result with undo.",
+      "docs": "https://uiarc.dev/components/confirm-morph"
+    },
+    {
+      "slug": "theme-switch",
+      "title": "Theme switcher",
+      "kind": "component",
+      "category": "Buttons",
+      "tier": "free",
+      "description": "Four smooth ways to move between light and dark appearance.",
+      "docs": "https://uiarc.dev/components/theme-switch"
+    },
+    {
+      "slug": "hold-to-confirm",
+      "title": "Hold to confirm",
+      "kind": "component",
+      "category": "Gestures",
+      "tier": "free",
+      "description": "Confirm a destructive action by holding, not tapping.",
+      "docs": "https://uiarc.dev/components/hold-to-confirm"
+    },
+    {
+      "slug": "swipe-actions",
+      "title": "Swipe actions",
+      "kind": "component",
+      "category": "Gestures",
+      "tier": "free",
+      "description": "Reveal row actions with a swipe, or from the same actions in a menu.",
+      "docs": "https://uiarc.dev/components/swipe-actions"
+    },
+    {
+      "slug": "reactions",
+      "title": "Reactions",
+      "kind": "component",
+      "category": "Gestures",
+      "tier": "free",
+      "description": "Acknowledge a post in one tap, with counts that roll.",
+      "docs": "https://uiarc.dev/components/reactions"
+    },
+    {
+      "slug": "dropdown-menu",
+      "title": "Dropdown menu",
+      "kind": "component",
+      "category": "Menus",
+      "tier": "free",
+      "description": "A focused list of actions anchored to a trigger.",
+      "docs": "https://uiarc.dev/components/dropdown-menu"
+    },
+    {
+      "slug": "context-menu",
+      "title": "Context menu",
+      "kind": "component",
+      "category": "Menus",
+      "tier": "free",
+      "description": "Secondary actions kept close to the selected object.",
+      "docs": "https://uiarc.dev/components/context-menu"
+    },
+    {
+      "slug": "user-menu",
+      "title": "User menu",
+      "kind": "component",
+      "category": "Menus",
+      "tier": "free",
+      "description": "Your account, settings, theme, and sign out behind the avatar.",
+      "docs": "https://uiarc.dev/components/user-menu"
+    },
+    {
+      "slug": "input",
+      "title": "Input",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "A single line field with clear labels and useful states.",
+      "docs": "https://uiarc.dev/components/input"
+    },
+    {
+      "slug": "textarea",
+      "title": "Textarea",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "A multiline field for notes, descriptions, and longer text.",
+      "docs": "https://uiarc.dev/components/textarea"
+    },
+    {
+      "slug": "password-field",
+      "title": "Password field",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "Capture sensitive text with a visible reveal control.",
+      "docs": "https://uiarc.dev/components/password-field"
+    },
+    {
+      "slug": "password-strength",
+      "title": "Password strength",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "Show how strong a new password is while it is typed.",
+      "docs": "https://uiarc.dev/components/password-strength"
+    },
+    {
+      "slug": "search-field",
+      "title": "Search field",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "A recognizable search entry point with clear affordances.",
+      "docs": "https://uiarc.dev/components/search-field"
+    },
+    {
+      "slug": "expanding-search",
+      "title": "Expanding search",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "An icon that morphs into a search field with results beneath it.",
+      "docs": "https://uiarc.dev/components/expanding-search"
+    },
+    {
+      "slug": "inline-edit",
+      "title": "Inline edit",
+      "kind": "component",
+      "category": "Text fields",
+      "tier": "free",
+      "description": "Rename in place: the text becomes a field without moving.",
+      "docs": "https://uiarc.dev/components/inline-edit"
+    },
+    {
+      "slug": "number-field",
+      "title": "Number field",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "Enter a bounded number with clear increment controls.",
+      "docs": "https://uiarc.dev/components/number-field"
+    },
+    {
+      "slug": "money-input",
+      "title": "Money input",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "A currency field with live grouping, stable width, rolling digits, and minor-unit output.",
+      "docs": "https://uiarc.dev/components/money-input"
+    },
+    {
+      "slug": "phone-input",
+      "title": "Phone input",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "A phone field with a country picker, formatting as you type, and E.164 output.",
+      "docs": "https://uiarc.dev/components/phone-input"
+    },
+    {
+      "slug": "scrub-input",
+      "title": "Scrub input",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "A Figma-style number field: drag the label to scrub, or type values, units, and arithmetic.",
+      "docs": "https://uiarc.dev/components/scrub-input"
+    },
+    {
+      "slug": "tag-input",
+      "title": "Tag input",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "Turn short text values into removable tags.",
+      "docs": "https://uiarc.dev/components/tag-input"
+    },
+    {
+      "slug": "mention-input",
+      "title": "Mention input",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "A textarea with @people and #channel mentions that act as single tokens, with suggestions at the caret.",
+      "docs": "https://uiarc.dev/components/mention-input"
+    },
+    {
+      "slug": "shortcut-recorder",
+      "title": "Shortcut recorder",
+      "kind": "component",
+      "category": "Special inputs",
+      "tier": "free",
+      "description": "Record key combinations into key caps, with conflict warnings, Kbd, and a searchable cheatsheet.",
+      "docs": "https://uiarc.dev/components/shortcut-recorder"
+    },
+    {
+      "slug": "select",
+      "title": "Select",
+      "kind": "component",
+      "category": "Selects",
+      "tier": "free",
+      "description": "A compact choice field with a keyboard friendly menu.",
+      "docs": "https://uiarc.dev/components/select"
+    },
+    {
+      "slug": "combobox",
+      "title": "Combobox",
+      "kind": "component",
+      "category": "Selects",
+      "tier": "free",
+      "description": "Search and select from a list without leaving the field.",
+      "docs": "https://uiarc.dev/components/combobox"
+    },
+    {
+      "slug": "multi-select",
+      "title": "Multi-select",
+      "kind": "component",
+      "category": "Selects",
+      "tier": "free",
+      "description": "Select several values while keeping the field readable.",
+      "docs": "https://uiarc.dev/components/multi-select"
+    },
+    {
+      "slug": "morph-select",
+      "title": "Morph select",
+      "kind": "component",
+      "category": "Selects",
+      "tier": "free",
+      "description": "A select whose trigger grows into the list, with a gliding highlight and type-ahead.",
+      "docs": "https://uiarc.dev/components/morph-select"
+    },
+    {
+      "slug": "chip-group",
+      "title": "Chip group",
+      "kind": "component",
+      "category": "Selects",
+      "tier": "free",
+      "description": "Filter by a few facets with chips that morph as you pick them.",
+      "docs": "https://uiarc.dev/components/chip-group"
+    },
+    {
+      "slug": "radio-cards",
+      "title": "Radio cards",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "Selectable option cards with a sliding selection ring, price and description slots, and radio keyboard behavior.",
+      "docs": "https://uiarc.dev/components/radio-cards"
+    },
+    {
+      "slug": "billing-toggle",
+      "title": "Billing toggle",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "A monthly and yearly switch with a savings badge and prices that roll to the new amount.",
+      "docs": "https://uiarc.dev/components/billing-toggle"
+    },
+    {
+      "slug": "checkbox",
+      "title": "Checkbox",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "A binary choice with a precise, legible state.",
+      "docs": "https://uiarc.dev/components/checkbox"
+    },
+    {
+      "slug": "radio-group",
+      "title": "Radio group",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "Choose one option from a visible set.",
+      "docs": "https://uiarc.dev/components/radio-group"
+    },
+    {
+      "slug": "switch",
+      "title": "Switch",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "A tactile toggle for settings that take effect immediately.",
+      "docs": "https://uiarc.dev/components/switch"
+    },
+    {
+      "slug": "segmented-control",
+      "title": "Segmented control",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "Switch between a small set of related views.",
+      "docs": "https://uiarc.dev/components/segmented-control"
+    },
+    {
+      "slug": "rating",
+      "title": "Rating",
+      "kind": "component",
+      "category": "Toggles",
+      "tier": "free",
+      "description": "A simple, accessible way to capture a numeric opinion.",
+      "docs": "https://uiarc.dev/components/rating"
+    },
+    {
+      "slug": "slider",
+      "title": "Slider",
+      "kind": "component",
+      "category": "Sliders",
+      "tier": "free",
+      "description": "Pick a value or a range on a track that follows your finger.",
+      "docs": "https://uiarc.dev/components/slider"
+    },
+    {
+      "slug": "elastic-slider",
+      "title": "Elastic slider",
+      "kind": "component",
+      "category": "Sliders",
+      "tier": "free",
+      "description": "A slider that stretches like rubber past its ends, with a swaying value tag and detents the thumb clicks into.",
+      "docs": "https://uiarc.dev/components/elastic-slider"
+    },
+    {
+      "slug": "range-histogram-slider",
+      "title": "Range histogram slider",
+      "kind": "component",
+      "category": "Sliders",
+      "tier": "free",
+      "description": "A price range over a live histogram of the data, lighting the bars inside the range and settling on bar edges.",
+      "docs": "https://uiarc.dev/components/range-histogram-slider"
+    },
+    {
+      "slug": "calendar",
+      "title": "Calendar",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "free",
+      "description": "Browse dates in a clear, compact month view.",
+      "docs": "https://uiarc.dev/components/calendar"
+    },
+    {
+      "slug": "date-picker",
+      "title": "Date picker",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "free",
+      "description": "Choose a date without losing context.",
+      "docs": "https://uiarc.dev/components/date-picker"
+    },
+    {
+      "slug": "date-range-picker",
+      "title": "Date range picker",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "free",
+      "description": "A range picker that grows from its trigger into two months with presets and a stretching range highlight.",
+      "docs": "https://uiarc.dev/components/date-range-picker"
+    },
+    {
+      "slug": "time-picker",
+      "title": "Time picker",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "free",
+      "description": "Choose a time with sensible keyboard behavior.",
+      "docs": "https://uiarc.dev/components/time-picker"
+    },
+    {
+      "slug": "color-picker",
+      "title": "Color picker",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "free",
+      "description": "A swatch that grows into a picker with format morphing, eyedropper, saved swatches, and contrast readout.",
+      "docs": "https://uiarc.dev/components/color-picker"
+    },
+    {
+      "slug": "emoji-picker",
+      "title": "Emoji picker",
+      "kind": "component",
+      "category": "Pickers",
+      "tier": "pro",
+      "description": "A full emoji picker with instant search, scroll-synced categories, skin tones, recently used emoji, and a virtualized, keyboard-navigable grid.",
+      "docs": "https://uiarc.dev/components/emoji-picker"
+    },
+    {
+      "slug": "rich-text-editor",
+      "title": "Rich text editor",
+      "kind": "component",
+      "category": "Editors",
+      "tier": "free",
+      "description": "A lightweight editor with markdown shortcuts, a floating toolbar, a slash menu, and HTML and markdown output.",
+      "docs": "https://uiarc.dev/components/rich-text-editor"
+    },
+    {
+      "slug": "signature-pad",
+      "title": "Signature pad",
+      "kind": "component",
+      "category": "Editors",
+      "tier": "free",
+      "description": "Smooth ink that thins with speed, with undo, replay, and PNG or SVG export.",
+      "docs": "https://uiarc.dev/components/signature-pad"
+    },
+    {
+      "slug": "file-dropzone",
+      "title": "File dropzone",
+      "kind": "component",
+      "category": "Editors",
+      "tier": "free",
+      "description": "A generous target for dropping one or more files.",
+      "docs": "https://uiarc.dev/components/file-dropzone"
+    },
+    {
+      "slug": "avatar-upload",
+      "title": "Avatar upload",
+      "kind": "component",
+      "category": "Editors",
+      "tier": "pro",
+      "description": "Click or drop a photo onto the avatar to crop it in place with drag, pinch and zoom.",
+      "docs": "https://uiarc.dev/components/avatar-upload"
+    },
+    {
+      "slug": "tabs",
+      "title": "Tabs",
+      "kind": "component",
+      "category": "Navigation",
+      "tier": "free",
+      "description": "Switch between related content in the same context.",
+      "docs": "https://uiarc.dev/components/tabs"
+    },
+    {
+      "slug": "breadcrumb",
+      "title": "Breadcrumb",
+      "kind": "component",
+      "category": "Navigation",
+      "tier": "free",
+      "description": "Show where a page sits in a hierarchy.",
+      "docs": "https://uiarc.dev/components/breadcrumb"
+    },
+    {
+      "slug": "pagination",
+      "title": "Pagination",
+      "kind": "component",
+      "category": "Navigation",
+      "tier": "free",
+      "description": "Move through a long collection with clear bounds.",
+      "docs": "https://uiarc.dev/components/pagination"
+    },
+    {
+      "slug": "mega-menu-morph",
+      "title": "Mega menu morph",
+      "kind": "component",
+      "category": "Navigation",
+      "tier": "pro",
+      "description": "A site header whose menus share one floating panel.",
+      "docs": "https://uiarc.dev/components/mega-menu-morph"
+    },
+    {
+      "slug": "scroll-area",
+      "title": "Scroll area",
+      "kind": "component",
+      "category": "Expand",
+      "tier": "free",
+      "description": "A native scroll container with thin overlay scrollbars and edge fades that appear only when content overflows.",
+      "docs": "https://uiarc.dev/components/scroll-area"
+    },
+    {
+      "slug": "accordion",
+      "title": "Accordion",
+      "kind": "component",
+      "category": "Expand",
+      "tier": "free",
+      "description": "Progressively reveal supporting information in place.",
+      "docs": "https://uiarc.dev/components/accordion"
+    },
+    {
+      "slug": "expandable-card",
+      "title": "Expandable card",
+      "kind": "component",
+      "category": "Expand",
+      "tier": "free",
+      "description": "Give a dense card more room when requested.",
+      "docs": "https://uiarc.dev/components/expandable-card"
+    },
+    {
+      "slug": "resizable-panels",
+      "title": "Resizable panels",
+      "kind": "component",
+      "category": "Expand",
+      "tier": "free",
+      "description": "Trade space between panes by dragging the divider between them.",
+      "docs": "https://uiarc.dev/components/resizable-panels"
+    },
+    {
+      "slug": "expandable-text",
+      "title": "Expandable text",
+      "kind": "component",
+      "category": "Expand",
+      "tier": "free",
+      "description": "Long text clamped to a few lines with a soft fade that glides open with Read more and closes with Show less, shown only when the text overflows.",
+      "docs": "https://uiarc.dev/components/expandable-text"
+    },
+    {
+      "slug": "dialog",
+      "title": "Dialog",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "A focused surface for decisions that need attention.",
+      "docs": "https://uiarc.dev/components/dialog"
+    },
+    {
+      "slug": "drawer",
+      "title": "Drawer",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "A temporary side surface for focused work.",
+      "docs": "https://uiarc.dev/components/drawer"
+    },
+    {
+      "slug": "bottom-sheet",
+      "title": "Bottom sheet",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "A sheet that rests at a peek or full height and follows your finger.",
+      "docs": "https://uiarc.dev/components/bottom-sheet"
+    },
+    {
+      "slug": "popover",
+      "title": "Popover",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "A small anchored surface for contextual information.",
+      "docs": "https://uiarc.dev/components/popover"
+    },
+    {
+      "slug": "hover-card",
+      "title": "Hover card",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "Preview a person or link on hover or focus without leaving the page.",
+      "docs": "https://uiarc.dev/components/hover-card"
+    },
+    {
+      "slug": "tooltip",
+      "title": "Tooltip",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "free",
+      "description": "Short supporting text for unfamiliar controls.",
+      "docs": "https://uiarc.dev/components/tooltip"
+    },
+    {
+      "slug": "share-access",
+      "title": "Share access",
+      "kind": "component",
+      "category": "Overlays",
+      "tier": "pro",
+      "description": "A share panel: invite people as validated email chips with suggestions, change roles from a compact menu, remove with undo, switch link access and copy the link, with every change landing in place.",
+      "docs": "https://uiarc.dev/components/share-access"
+    },
+    {
+      "slug": "alert",
+      "title": "Alert",
+      "kind": "component",
+      "category": "Messages",
+      "tier": "free",
+      "description": "A persistent message that helps people recover or continue.",
+      "docs": "https://uiarc.dev/components/alert"
+    },
+    {
+      "slug": "toast",
+      "title": "Toast",
+      "kind": "component",
+      "category": "Messages",
+      "tier": "free",
+      "description": "Brief confirmation for a completed background action.",
+      "docs": "https://uiarc.dev/components/toast"
+    },
+    {
+      "slug": "toast-stack",
+      "title": "Toast stack",
+      "kind": "component",
+      "category": "Messages",
+      "tier": "free",
+      "description": "Stack short results at the edge until you reach for them.",
+      "docs": "https://uiarc.dev/components/toast-stack"
+    },
+    {
+      "slug": "announcement-bar",
+      "title": "Announcement bar",
+      "kind": "component",
+      "category": "Messages",
+      "tier": "free",
+      "description": "A top banner that rotates messages, counts down, and collapses smoothly when dismissed.",
+      "docs": "https://uiarc.dev/components/announcement-bar"
+    },
+    {
+      "slug": "cookie-consent",
+      "title": "Cookie consent",
+      "kind": "component",
+      "category": "Messages",
+      "tier": "free",
+      "description": "A consent bar that morphs into preferences and folds into a reopen button.",
+      "docs": "https://uiarc.dev/components/cookie-consent"
+    },
+    {
+      "slug": "progress",
+      "title": "Progress",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "Show how much of a known task is complete.",
+      "docs": "https://uiarc.dev/components/progress"
+    },
+    {
+      "slug": "skeleton",
+      "title": "Skeleton",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "Reserve space while content is still loading.",
+      "docs": "https://uiarc.dev/components/skeleton"
+    },
+    {
+      "slug": "stepper",
+      "title": "Stepper",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "Show where a person is in a multi-step flow and what is done.",
+      "docs": "https://uiarc.dev/components/stepper"
+    },
+    {
+      "slug": "countdown",
+      "title": "Countdown",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "A launch countdown with rolling digits that morphs into a live state at zero.",
+      "docs": "https://uiarc.dev/components/countdown"
+    },
+    {
+      "slug": "usage-meter",
+      "title": "Usage meter",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "Show what fills an allowance and how close it is to the limit.",
+      "docs": "https://uiarc.dev/components/usage-meter"
+    },
+    {
+      "slug": "onboarding-checklist",
+      "title": "Onboarding checklist",
+      "kind": "component",
+      "category": "Progress",
+      "tier": "free",
+      "description": "Guide a new workspace through setup, one step at a time.",
+      "docs": "https://uiarc.dev/components/onboarding-checklist"
+    },
+    {
+      "slug": "avatar",
+      "title": "Avatar",
+      "kind": "component",
+      "category": "Avatars",
+      "tier": "free",
+      "description": "A compact identity marker for people and accounts.",
+      "docs": "https://uiarc.dev/components/avatar"
+    },
+    {
+      "slug": "avatar-group",
+      "title": "Avatar group",
+      "kind": "component",
+      "category": "Avatars",
+      "tier": "free",
+      "description": "Show a team or set of contributors in a small space.",
+      "docs": "https://uiarc.dev/components/avatar-group"
+    },
+    {
+      "slug": "badge",
+      "title": "Badge",
+      "kind": "component",
+      "category": "Avatars",
+      "tier": "free",
+      "description": "A small label for status, category, or metadata.",
+      "docs": "https://uiarc.dev/components/badge"
+    },
+    {
+      "slug": "presence-stack",
+      "title": "Presence stack",
+      "kind": "component",
+      "category": "Avatars",
+      "tier": "pro",
+      "description": "Avatars of the people here now: joins pop in as the stack reflows, a counter rolls past the limit, dots show typing and idle, and hover fans it out with a gliding name label.",
+      "docs": "https://uiarc.dev/components/presence-stack"
+    },
+    {
+      "slug": "card",
+      "title": "Card",
+      "kind": "component",
+      "category": "Cards",
+      "tier": "free",
+      "description": "A contained group of related content and actions.",
+      "docs": "https://uiarc.dev/components/card"
+    },
+    {
+      "slug": "metric-card",
+      "title": "Metric card",
+      "kind": "component",
+      "category": "Cards",
+      "tier": "free",
+      "description": "A compact summary for a number that needs context.",
+      "docs": "https://uiarc.dev/components/metric-card"
+    },
+    {
+      "slug": "empty-state",
+      "title": "Empty state",
+      "kind": "component",
+      "category": "Cards",
+      "tier": "free",
+      "description": "A useful next step when there is nothing to show yet.",
+      "docs": "https://uiarc.dev/components/empty-state"
+    },
+    {
+      "slug": "line-chart",
+      "title": "Line chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "A multi-series line chart with a gliding crosshair, legend toggles, and paths that morph between ranges.",
+      "docs": "https://uiarc.dev/components/line-chart"
+    },
+    {
+      "slug": "bar-chart",
+      "title": "Bar chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Compare one measure across days and scrub any bar for its value.",
+      "docs": "https://uiarc.dev/components/bar-chart"
+    },
+    {
+      "slug": "donut-chart",
+      "title": "Donut chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "A donut whose arcs morph between datasets, with the active value rolling into the center.",
+      "docs": "https://uiarc.dev/components/donut-chart"
+    },
+    {
+      "slug": "streamgraph",
+      "title": "Streamgraph",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Layered streams on a wiggle baseline that morph between ranges, with a layer you can isolate and read week by week.",
+      "docs": "https://uiarc.dev/components/streamgraph"
+    },
+    {
+      "slug": "brush-chart",
+      "title": "Brush chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "A dense time series with an overview strip: drag a window to zoom, resize it by its handles, and read events in place.",
+      "docs": "https://uiarc.dev/components/brush-chart"
+    },
+    {
+      "slug": "waffle-chart",
+      "title": "Waffle chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "A ten by ten unit chart where every cell is one percent, and cells fly to their new group when the data changes.",
+      "docs": "https://uiarc.dev/components/waffle-chart"
+    },
+    {
+      "slug": "slope-chart",
+      "title": "Slope chart",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Before and after on two axes: lines draw in, rank moves sit beside each value, and switching datasets slides every line to its new slope.",
+      "docs": "https://uiarc.dev/components/slope-chart"
+    },
+    {
+      "slug": "sparkline",
+      "title": "Sparkline",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Show a compact trend beside a value.",
+      "docs": "https://uiarc.dev/components/sparkline"
+    },
+    {
+      "slug": "gauge",
+      "title": "Gauge",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Show a value against a known range.",
+      "docs": "https://uiarc.dev/components/gauge"
+    },
+    {
+      "slug": "activity-heatmap",
+      "title": "Activity heatmap",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "See a year of activity at a glance, one square per day.",
+      "docs": "https://uiarc.dev/components/activity-heatmap"
+    },
+    {
+      "slug": "animated-counter",
+      "title": "Animated counter",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Give changing totals a clear sense of movement.",
+      "docs": "https://uiarc.dev/components/animated-counter"
+    },
+    {
+      "slug": "ridgeline",
+      "title": "Ridgeline",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "Overlapping distributions, one ridge per group: hover to lift a ridge and read its quartiles, switch datasets and every curve morphs.",
+      "docs": "https://uiarc.dev/components/ridgeline"
+    },
+    {
+      "slug": "treemap",
+      "title": "Treemap",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "free",
+      "description": "A squarified treemap: click to drill and the tiles grow to fill the view, with a breadcrumb back and metrics that morph every tile.",
+      "docs": "https://uiarc.dev/components/treemap"
+    },
+    {
+      "slug": "split-bar",
+      "title": "Split bar",
+      "kind": "component",
+      "category": "Charts",
+      "tier": "pro",
+      "description": "A single 100% bar split into shares: rest on a segment to widen it and read its exact figures, toggle segments from the legend and the rest reflow, with labels inside when they fit and on leader lines when they don't.",
+      "docs": "https://uiarc.dev/components/split-bar"
+    },
+    {
+      "slug": "sunburst",
+      "title": "Sunburst",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "A hierarchy in rings: click a segment and every arc swings around it as the new centre, with a breadcrumb back and a rolling total.",
+      "docs": "https://uiarc.dev/components/sunburst"
+    },
+    {
+      "slug": "sankey-flow",
+      "title": "Sankey flow",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "Flows between stages as ribbons with drifting particles; hover any node or ribbon to pour its share through the whole journey.",
+      "docs": "https://uiarc.dev/components/sankey-flow"
+    },
+    {
+      "slug": "funnel-chart",
+      "title": "Funnel chart",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "A tapered conversion funnel with drop-off at every step, a device split that morphs the band, and dots that stream through it.",
+      "docs": "https://uiarc.dev/components/funnel-chart"
+    },
+    {
+      "slug": "radar-chart",
+      "title": "Radar chart",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "Two or three profiles on one web: shapes morph when you swap a profile, and a sweep across the axes compares values in place.",
+      "docs": "https://uiarc.dev/components/radar-chart"
+    },
+    {
+      "slug": "realtime-stream",
+      "title": "Realtime stream",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "A live line that scrolls at 60fps as readings arrive, holds still on hover to read, and pops a marker on every anomaly.",
+      "docs": "https://uiarc.dev/components/realtime-stream"
+    },
+    {
+      "slug": "race-bar-chart",
+      "title": "Race bar chart",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "A ranking over time: bars overtake each other on springs, values count up, and a timeline you can play or scrub.",
+      "docs": "https://uiarc.dev/components/race-bar-chart"
+    },
+    {
+      "slug": "data-grid",
+      "title": "Data grid",
+      "kind": "component",
+      "category": "Advanced charts",
+      "tier": "pro",
+      "description": "A spreadsheet grid with range selection, inline editing, a fill handle, and animated sorting.",
+      "docs": "https://uiarc.dev/components/data-grid"
+    },
+    {
+      "slug": "sortable-data-table",
+      "title": "Sortable data table",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "Compare structured records with sortable columns.",
+      "docs": "https://uiarc.dev/components/sortable-data-table"
+    },
+    {
+      "slug": "tree-table",
+      "title": "Tree table",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "A table with nested rows, tri-state selection, hierarchy-preserving sort, and lazy-loaded children.",
+      "docs": "https://uiarc.dev/components/tree-table"
+    },
+    {
+      "slug": "tree-view",
+      "title": "Tree view",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "Navigate nested folders and structured content.",
+      "docs": "https://uiarc.dev/components/tree-view"
+    },
+    {
+      "slug": "reorderable-list",
+      "title": "Reorderable list",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "Organize items with direct drag and drop.",
+      "docs": "https://uiarc.dev/components/reorderable-list"
+    },
+    {
+      "slug": "filter-toolbar",
+      "title": "Filter toolbar",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "Keep collection filters close and easy to reset.",
+      "docs": "https://uiarc.dev/components/filter-toolbar"
+    },
+    {
+      "slug": "code-block",
+      "title": "Code block",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "Present code with legible hierarchy and copy access.",
+      "docs": "https://uiarc.dev/components/code-block"
+    },
+    {
+      "slug": "json-viewer",
+      "title": "JSON viewer",
+      "kind": "component",
+      "category": "Tables",
+      "tier": "free",
+      "description": "A collapsible JSON tree with search, paging for long arrays, and copy value or path.",
+      "docs": "https://uiarc.dev/components/json-viewer"
+    },
+    {
+      "slug": "timeline",
+      "title": "Timeline",
+      "kind": "component",
+      "category": "Activity",
+      "tier": "free",
+      "description": "Follow what happened, newest first, grouped by day.",
+      "docs": "https://uiarc.dev/components/timeline"
+    },
+    {
+      "slug": "comment-thread",
+      "title": "Comment thread",
+      "kind": "component",
+      "category": "Activity",
+      "tier": "free",
+      "description": "Threaded comments with replies, reactions, mentions, inline edit, and resolve.",
+      "docs": "https://uiarc.dev/components/comment-thread"
+    },
+    {
+      "slug": "chat-thread",
+      "title": "Chat thread",
+      "kind": "component",
+      "category": "Activity",
+      "tier": "free",
+      "description": "A chat thread with grouped messages, reactions, read receipts, typing, and a composer with attachments.",
+      "docs": "https://uiarc.dev/components/chat-thread"
+    },
+    {
+      "slug": "image-compare",
+      "title": "Image compare",
+      "kind": "component",
+      "category": "Media",
+      "tier": "free",
+      "description": "Drag a divider across two images to see what changed.",
+      "docs": "https://uiarc.dev/components/image-compare"
+    },
+    {
+      "slug": "carousel",
+      "title": "Carousel",
+      "kind": "component",
+      "category": "Media",
+      "tier": "free",
+      "description": "Browse a row of slides by dragging, flicking, or arrowing through them.",
+      "docs": "https://uiarc.dev/components/carousel"
+    },
+    {
+      "slug": "card-stack",
+      "title": "Card stack",
+      "kind": "component",
+      "category": "Media",
+      "tier": "free",
+      "description": "Review a deck one card at a time, with a throw and an undo.",
+      "docs": "https://uiarc.dev/components/card-stack"
+    },
+    {
+      "slug": "text-reveal",
+      "title": "Text reveal",
+      "kind": "component",
+      "category": "Text effects",
+      "tier": "free",
+      "description": "Reveal a short piece of content with restrained motion.",
+      "docs": "https://uiarc.dev/components/text-reveal"
+    },
+    {
+      "slug": "in-view-title",
+      "title": "In-view title",
+      "kind": "component",
+      "category": "Text effects",
+      "tier": "free",
+      "description": "Bring a section title in as it scrolls into view.",
+      "docs": "https://uiarc.dev/components/in-view-title"
+    },
+    {
+      "slug": "text-morph",
+      "title": "Text morph",
+      "kind": "component",
+      "category": "Text effects",
+      "tier": "free",
+      "description": "Morph a label into its next state, letter by letter.",
+      "docs": "https://uiarc.dev/components/text-morph"
+    },
+    {
+      "slug": "text-shimmer",
+      "title": "Text shimmer",
+      "kind": "component",
+      "category": "Text effects",
+      "tier": "free",
+      "description": "Show ongoing work with a calm light across the words.",
+      "docs": "https://uiarc.dev/components/text-shimmer"
+    }
+  ],
+  "specialItems": [
+    {
+      "slug": "glass-menu",
+      "title": "Glass menu",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A glass action menu whose trigger morphs into the panel, with a highlight pill that glides between rows, one in-place submenu, and full keyboard support.",
+      "docs": "https://uiarc.dev/components/glass-menu"
+    },
+    {
+      "slug": "glass-segmented",
+      "title": "Glass segmented",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A glass segmented control whose liquid indicator stretches between segments and can be dragged and flung.",
+      "docs": "https://uiarc.dev/components/glass-segmented"
+    },
+    {
+      "slug": "glass-card",
+      "title": "Glass card",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A glass info panel over a photo whose rim catches a pointer-following highlight while the card tilts; tap to morph it into a detail sheet.",
+      "docs": "https://uiarc.dev/components/glass-card"
+    },
+    {
+      "slug": "glass-tabbar",
+      "title": "Glass tab bar",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A floating Liquid Glass tab bar that refracts what scrolls beneath it, with a glass lens that glides, magnifies and can be dragged between tabs, and an optional search bubble; it compacts on scroll down.",
+      "docs": "https://uiarc.dev/components/glass-tabbar"
+    },
+    {
+      "slug": "holo-card",
+      "title": "Holo card",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A member card that tilts toward you with a holographic foil and flips to its back.",
+      "docs": "https://uiarc.dev/components/holo-card"
+    },
+    {
+      "slug": "wallet-stack",
+      "title": "Wallet stack",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "Fan a stack of cards and lift one out to see its activity.",
+      "docs": "https://uiarc.dev/components/wallet-stack"
+    },
+    {
+      "slug": "sheet-stack",
+      "title": "Sheet stack",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "Nested sheets that stack with depth, drag to dismiss, and become stacked dialogs on wide screens.",
+      "docs": "https://uiarc.dev/components/sheet-stack"
+    },
+    {
+      "slug": "control-center",
+      "title": "Control center",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "Workspace quick settings: tiles that morph into detail, a duration dial, and rubber-banded meters.",
+      "docs": "https://uiarc.dev/components/control-center"
+    },
+    {
+      "slug": "card-to-article",
+      "title": "Card to article",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "Story cards that open into full articles with one seamless morph and shrink back into their exact slot when dragged down.",
+      "docs": "https://uiarc.dev/components/card-to-article"
+    },
+    {
+      "slug": "link-unfurl",
+      "title": "Link unfurl",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A composer where pasting a URL shows a loading shimmer on the link, then unfurls it into a rich preview card with title, image and favicon in one morph, which can be collapsed back to the inline link or removed.",
+      "docs": "https://uiarc.dev/components/link-unfurl"
+    },
+    {
+      "slug": "share-sheet",
+      "title": "Share sheet",
+      "kind": "special",
+      "category": "Glass and surfaces",
+      "tier": "pro",
+      "description": "A Share button that opens into a panel with copy link, access level, channels, and people to send to.",
+      "docs": "https://uiarc.dev/components/share-sheet"
+    },
+    {
+      "slug": "action-morph",
+      "title": "Action morph",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "A floating button that morphs into a quick-action menu, then an inline form, then back with a check.",
+      "docs": "https://uiarc.dev/components/action-morph"
+    },
+    {
+      "slug": "morph-nav",
+      "title": "Morph nav",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "A navigation bar that morphs into rich menus, search, and a compact state as one surface.",
+      "docs": "https://uiarc.dev/components/morph-nav"
+    },
+    {
+      "slug": "dock",
+      "title": "Dock",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "A floating tool dock with a gliding label, a springy selection, and trays that grow out of it.",
+      "docs": "https://uiarc.dev/components/dock"
+    },
+    {
+      "slug": "liquid-tab-bar",
+      "title": "Liquid tab bar",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "Tabs with a lens selection that slides between them, swaps labels cleanly, and fills in icons as it passes.",
+      "docs": "https://uiarc.dev/components/liquid-tab-bar"
+    },
+    {
+      "slug": "orbit-menu",
+      "title": "Orbit menu",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "Hold a button and its actions orbit out, ready to pick with a drag.",
+      "docs": "https://uiarc.dev/components/orbit-menu"
+    },
+    {
+      "slug": "orbit-logos",
+      "title": "Orbit logos",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "An integrations showcase with brand logos orbiting your product mark on tilted rings.",
+      "docs": "https://uiarc.dev/components/orbit-logos"
+    },
+    {
+      "slug": "booking-pill",
+      "title": "Booking pill",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "One pill that reshapes through party size, date, time, and a ticket.",
+      "docs": "https://uiarc.dev/components/booking-pill"
+    },
+    {
+      "slug": "keycap-keyboard",
+      "title": "Keycap keyboard",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "Mechanical keycaps that sink and light up as you type, with the text above the board.",
+      "docs": "https://uiarc.dev/components/keycap-keyboard"
+    },
+    {
+      "slug": "slot-text",
+      "title": "Slot text",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "free",
+      "description": "Text and numbers that spin into their new value on staggered slot machine reels.",
+      "docs": "https://uiarc.dev/components/slot-text"
+    },
+    {
+      "slug": "sand-text",
+      "title": "Sand text",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "A headline made of sand that pours into the letters, crumbles where the cursor digs, and heals itself.",
+      "docs": "https://uiarc.dev/components/sand-text"
+    },
+    {
+      "slug": "typewriter-terminal",
+      "title": "Typewriter terminal",
+      "kind": "special",
+      "category": "Motion and interaction",
+      "tier": "pro",
+      "description": "A terminal that types a scripted CLI session with a seeded human cadence, colors the shell syntax, and streams output lines, progress bars and spinners, with a scrubber, play/pause and replay controls.",
+      "docs": "https://uiarc.dev/components/typewriter-terminal"
+    },
+    {
+      "slug": "product-gallery",
+      "title": "Product gallery",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A product gallery with a hover magnifier, gliding thumbnails, and color and size variants that crossfade photos.",
+      "docs": "https://uiarc.dev/components/product-gallery"
+    },
+    {
+      "slug": "lightbox-gallery",
+      "title": "Lightbox gallery",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A masonry grid where photos zoom from their slot into a viewer you can swipe, pinch, and drag away.",
+      "docs": "https://uiarc.dev/components/lightbox-gallery"
+    },
+    {
+      "slug": "photo-grid",
+      "title": "Photo grid",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "Pinch through zoom levels and open any photo straight from its cell.",
+      "docs": "https://uiarc.dev/components/photo-grid"
+    },
+    {
+      "slug": "cover-flow",
+      "title": "Cover flow",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A depth rail of images you can throw, with soft grounded shadows and a quiet reflection.",
+      "docs": "https://uiarc.dev/components/cover-flow"
+    },
+    {
+      "slug": "voice-orb",
+      "title": "Voice orb",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A voice mode orb that listens, thinks, and speaks, with a live transcript and call controls.",
+      "docs": "https://uiarc.dev/components/voice-orb"
+    },
+    {
+      "slug": "now-playing",
+      "title": "Now playing",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "Grow a mini player into the full player in one continuous morph.",
+      "docs": "https://uiarc.dev/components/now-playing"
+    },
+    {
+      "slug": "voice-recorder",
+      "title": "Voice recorder",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "Record with a live waveform, review and scrub, then send the take into the thread.",
+      "docs": "https://uiarc.dev/components/voice-recorder"
+    },
+    {
+      "slug": "page-curl",
+      "title": "Page curl",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A small magazine you read by dragging page corners, with a real fold, lit curl, and flick to turn.",
+      "docs": "https://uiarc.dev/components/page-curl"
+    },
+    {
+      "slug": "sticker-peel",
+      "title": "Sticker peel",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "Peel stickers off a surface with a real curl, move them around, and stick them back down.",
+      "docs": "https://uiarc.dev/components/sticker-peel"
+    },
+    {
+      "slug": "dot-grid",
+      "title": "Dot grid",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A dot field that bulges around the cursor like a lens and ripples from every click.",
+      "docs": "https://uiarc.dev/components/dot-grid"
+    },
+    {
+      "slug": "gravity-well",
+      "title": "Gravity well",
+      "kind": "special",
+      "category": "Media and input",
+      "tier": "pro",
+      "description": "A grid of tiles that bends toward the cursor like spacetime, with a click that sends a shockwave through it.",
+      "docs": "https://uiarc.dev/components/gravity-well"
+    },
+    {
+      "slug": "agent-status",
+      "title": "Agent status",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "A compact live status pill for a running AI agent: the agent's mark in a live ring, the current activity and an elapsed timer, opening into the steps so far.",
+      "docs": "https://uiarc.dev/components/agent-status"
+    },
+    {
+      "slug": "tool-call",
+      "title": "Tool call",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "A tool call row for agent transcripts: the tool's mark and the call in plain words, a live state while it runs, and the input and output a click away, with approval and retry when needed.",
+      "docs": "https://uiarc.dev/components/tool-call"
+    },
+    {
+      "slug": "agent-plan",
+      "title": "Agent plan",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "The plan an agent writes before it acts: edit, reorder or add steps while it is a draft, then watch it work through them as a live checklist.",
+      "docs": "https://uiarc.dev/components/agent-plan"
+    },
+    {
+      "slug": "agent-timeline",
+      "title": "Agent timeline",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "A compact timeline of one orchestrated agent run: the orchestrator and its subagents share a time axis, handoffs draw in between rows, and a playhead replays thinking, tool calls and waiting while the header counts time, tokens and cost.",
+      "docs": "https://uiarc.dev/components/agent-timeline"
+    },
+    {
+      "slug": "context-window",
+      "title": "Context window",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "An AI context window as a grid of 200 cells: the system prompt, tools, files, summary and messages fill it in order, a threshold row marks where compaction starts, and sending a message, attaching a file or compacting shows exactly how much still fits.",
+      "docs": "https://uiarc.dev/components/context-window"
+    },
+    {
+      "slug": "ink-fluid",
+      "title": "Ink fluid",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "A real time fluid simulation behind your hero: the cursor stirs soft ink that swirls, settles and fades; calm when left alone.",
+      "docs": "https://uiarc.dev/components/ink-fluid"
+    },
+    {
+      "slug": "activity-rings",
+      "title": "Activity rings",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "Daily goals as tick rings that sweep, count up, and trace a second lap past 100%.",
+      "docs": "https://uiarc.dev/components/activity-rings"
+    },
+    {
+      "slug": "stretch-refresh",
+      "title": "Stretch refresh",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "Pull a feed down and a line stretches to tell you when to let go.",
+      "docs": "https://uiarc.dev/components/stretch-refresh"
+    },
+    {
+      "slug": "morph-loader",
+      "title": "Morph loader",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "Tiny loaders that morph between shapes and fold into a check or a cross when done.",
+      "docs": "https://uiarc.dev/components/morph-loader"
+    },
+    {
+      "slug": "skeleton-morph",
+      "title": "Skeleton morph",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "Loading skeletons that grow into the real content, block by block, instead of swapping.",
+      "docs": "https://uiarc.dev/components/skeleton-morph"
+    },
+    {
+      "slug": "black-hole",
+      "title": "Black hole",
+      "kind": "special",
+      "category": "AI widgets",
+      "tier": "pro",
+      "description": "A delete transition that pulls the chosen items into a tiny singularity while the rest of the list bends around it; undo spins them back out.",
+      "docs": "https://uiarc.dev/components/black-hole"
+    },
+    {
+      "slug": "data-flow",
+      "title": "Data flow",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "Data flow illustration.",
+      "docs": "https://uiarc.dev/components/data-flow"
+    },
+    {
+      "slug": "payment-flow",
+      "title": "Payment flow",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "A card tap goes to a processor, then the network, then the bank and back with authorization, then settlement; each hop lights up with a status label and the amount travels as a chip.",
+      "docs": "https://uiarc.dev/components/payment-flow"
+    },
+    {
+      "slug": "multi-region-failover",
+      "title": "Multi-region failover",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "Animated multi-region failover on a 2.5D stage: users stream requests through a global load balancer to two regions; the primary degrades, fails three health checks, traffic shifts smoothly to the healthy region, then it recovers, passes three checks and traffic ramps back to an even split.",
+      "docs": "https://uiarc.dev/components/multi-region-failover"
+    },
+    {
+      "slug": "vector-search",
+      "title": "Vector search",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "Documents drop onto a tilted embedding plane and fold into points that cluster by topic; the index links neighbours, a query is typed, embedded and lowered onto the plane, a signal hops along the graph toward it, and a widening ring lights the nearest documents with connecting lines, similarity scores and a ranked list.",
+      "docs": "https://uiarc.dev/components/vector-search"
+    },
+    {
+      "slug": "agent-loop",
+      "title": "Agent loop",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "An illustration of the agent loop: gather context, take action, verify, repeat, with a bright head circling three stations around the model.",
+      "docs": "https://uiarc.dev/components/agent-loop"
+    },
+    {
+      "slug": "mixture-of-experts",
+      "title": "Mixture of experts",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "An illustration of mixture of experts routing: each token is scored by a router, travels to its top experts, and their outputs merge into the token's result.",
+      "docs": "https://uiarc.dev/components/mixture-of-experts"
+    },
+    {
+      "slug": "speculative-decoding",
+      "title": "Speculative decoding",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "An illustration of speculative decoding: a fast draft model guesses a few tokens, the target model checks them in one pass, and accepted guesses join the answer.",
+      "docs": "https://uiarc.dev/components/speculative-decoding"
+    },
+    {
+      "slug": "prompt-cache",
+      "title": "Prompt cache",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "An animated explainer for prompt caching: the shared prefix of each request is cached once, later requests read it back, and the cost and time saved add up.",
+      "docs": "https://uiarc.dev/components/prompt-cache"
+    },
+    {
+      "slug": "reasoning-tree",
+      "title": "Reasoning tree",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "An illustration of tree search over thoughts: candidates are scored, weak branches fade, the best expand, and the winning path from question to answer draws in.",
+      "docs": "https://uiarc.dev/components/reasoning-tree"
+    },
+    {
+      "slug": "time-dial",
+      "title": "Time dial",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "Spin a dial to pick an hour and see which team cities are at work.",
+      "docs": "https://uiarc.dev/components/time-dial"
+    },
+    {
+      "slug": "date-reel",
+      "title": "Date reel",
+      "kind": "special",
+      "category": "AI explainers",
+      "tier": "pro",
+      "description": "A 3D wheel date and time picker (like iOS reels) with momentum scrolling, snapping, curved perspective, and full keyboard support.",
+      "docs": "https://uiarc.dev/components/date-reel"
+    }
+  ],
+  "blockItems": [
+    {
+      "slug": "site-header",
+      "title": "Site header",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A sticky website header that turns solid on scroll, with a gliding active link, mega menu panels, and a mobile sheet.",
+      "docs": "https://uiarc.dev/components/blocks/site-header"
+    },
+    {
+      "slug": "site-footer",
+      "title": "Site footer",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A website footer with link columns and newsletter, a minimal layout, and a large fading Arc mark.",
+      "docs": "https://uiarc.dev/components/blocks/site-footer"
+    },
+    {
+      "slug": "hero-section",
+      "title": "Hero section",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "Three full screen SaaS heroes: a live dashboard rising from the bottom edge over a drifting mesh, a workflow graph that routes sample events node by node, and editorial type over a mesh gradient.",
+      "docs": "https://uiarc.dev/components/blocks/hero-section"
+    },
+    {
+      "slug": "faq-section",
+      "title": "FAQ section",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "FAQs as an accordion, a topic rail, or a searchable list that highlights matches.",
+      "docs": "https://uiarc.dev/components/blocks/faq-section"
+    },
+    {
+      "slug": "contact-section",
+      "title": "Contact section",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A validated contact form that morphs into a confirmation, support channels, and office cards with local times.",
+      "docs": "https://uiarc.dev/components/blocks/contact-section"
+    },
+    {
+      "slug": "blog-grid",
+      "title": "Blog grid",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A blog index with a featured post, category filter, post cards, pagination and an in-place reader.",
+      "docs": "https://uiarc.dev/components/blocks/blog-grid"
+    },
+    {
+      "slug": "comparison-table",
+      "title": "Comparison table",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "An us versus them table with a sticky header, a highlighted column, and a stacked phone view.",
+      "docs": "https://uiarc.dev/components/blocks/comparison-table"
+    },
+    {
+      "slug": "stats-band",
+      "title": "Stats band",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "Headline numbers that count up in view, each with a tiny visual that proves it and a context line on hover, plain or in a hairline grid.",
+      "docs": "https://uiarc.dev/components/blocks/stats-band"
+    },
+    {
+      "slug": "cta-section",
+      "title": "CTA section",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A call to action as a centered closing section, a split beside a setup card that completes itself, or a dismissible banner.",
+      "docs": "https://uiarc.dev/components/blocks/cta-section"
+    },
+    {
+      "slug": "newsletter-signup",
+      "title": "Newsletter signup",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "An email signup framed by a stack of past issues; subscribing drops the next issue, addressed to you, onto the front.",
+      "docs": "https://uiarc.dev/components/blocks/newsletter-signup"
+    },
+    {
+      "slug": "logo-marquee",
+      "title": "Logo marquee",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A quiet, continuously moving row of brand marks with a pause control.",
+      "docs": "https://uiarc.dev/components/blocks/logo-marquee"
+    },
+    {
+      "slug": "page-header",
+      "title": "Page header",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "A project page header that folds into a compact bar as you scroll, with tabs whose counts roll.",
+      "docs": "https://uiarc.dev/components/blocks/page-header"
+    },
+    {
+      "slug": "hero-signup",
+      "title": "Hero signup",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "pro",
+      "description": "A full screen waitlist hero on a soft, drifting mesh gradient: the email field validates as you type and its button grows into the confirmation with your place in line.",
+      "docs": "https://uiarc.dev/components/blocks/hero-signup"
+    },
+    {
+      "slug": "spotlight-grid",
+      "title": "Spotlight grid",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "pro",
+      "description": "A feature grid where light follows the pointer, cards play live demos, and a click morphs a card into its detail.",
+      "docs": "https://uiarc.dev/components/blocks/spotlight-grid"
+    },
+    {
+      "slug": "scroll-story",
+      "title": "Scroll story",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "pro",
+      "description": "A feature section where scrolling the copy drives a pinned product view through each step.",
+      "docs": "https://uiarc.dev/components/blocks/scroll-story"
+    },
+    {
+      "slug": "feature-bento",
+      "title": "Feature bento",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "pro",
+      "description": "A six cell feature bento where small, real product UI acts each feature out on hover.",
+      "docs": "https://uiarc.dev/components/blocks/feature-bento"
+    },
+    {
+      "slug": "plan-comparison",
+      "title": "Plan comparison",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "free",
+      "description": "Compare meaningful differences between plans and billing periods.",
+      "docs": "https://uiarc.dev/components/blocks/plan-comparison"
+    },
+    {
+      "slug": "pricing-calculator",
+      "title": "Pricing calculator",
+      "kind": "block",
+      "category": "Marketing and site",
+      "tier": "pro",
+      "description": "A seat slider and billing toggle drive plan cards with rolling prices and a moving recommended badge.",
+      "docs": "https://uiarc.dev/components/blocks/pricing-calculator"
+    },
+    {
+      "slug": "product-listing",
+      "title": "Product listing",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A storefront grid with price, color and size filters, a sort menu, hover photo swaps, and quick add with a size row.",
+      "docs": "https://uiarc.dev/components/blocks/product-listing"
+    },
+    {
+      "slug": "product-detail",
+      "title": "Product detail",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A product page with a swipeable gallery, finish and size variants, add to bag that confirms in place, shipping, a reviews summary, and details.",
+      "docs": "https://uiarc.dev/components/blocks/product-detail"
+    },
+    {
+      "slug": "cart-drawer",
+      "title": "Cart drawer",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "Products fly into the cart, counts roll, and a drawer handles quantities, shipping progress, and checkout.",
+      "docs": "https://uiarc.dev/components/blocks/cart-drawer"
+    },
+    {
+      "slug": "checkout-summary",
+      "title": "Checkout summary",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "An order summary with a promo code that becomes a chip, discount and tax lines, and pay button states.",
+      "docs": "https://uiarc.dev/components/blocks/checkout-summary"
+    },
+    {
+      "slug": "usage-pricing",
+      "title": "Usage pricing",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A pricing calculator that finds your plan as you drag seats and traffic.",
+      "docs": "https://uiarc.dev/components/blocks/usage-pricing"
+    },
+    {
+      "slug": "usage-billing",
+      "title": "Usage billing",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A usage based billing dashboard with a projected spend line, meters against limits, alerts, and an upgrade that morphs into a confirm sheet.",
+      "docs": "https://uiarc.dev/components/blocks/usage-billing"
+    },
+    {
+      "slug": "wallet-card",
+      "title": "Wallet card",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A compact account view with balance, recent activity, and focused money actions.",
+      "docs": "https://uiarc.dev/components/blocks/wallet-card"
+    },
+    {
+      "slug": "invoice-studio",
+      "title": "Invoice studio",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "An editable invoice with live totals and a clear save flow.",
+      "docs": "https://uiarc.dev/components/blocks/invoice-studio"
+    },
+    {
+      "slug": "delivery-tracker",
+      "title": "Delivery tracker",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A live order tracker whose marker glides between stops while the arrival time rolls.",
+      "docs": "https://uiarc.dev/components/blocks/delivery-tracker"
+    },
+    {
+      "slug": "cancel-flow",
+      "title": "Cancel flow",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A cancellation flow that answers each reason with a tailored offer and a calm hold-to-cancel.",
+      "docs": "https://uiarc.dev/components/blocks/cancel-flow"
+    },
+    {
+      "slug": "integrations",
+      "title": "Integrations",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "An integrations directory where Connect morphs to Connected and the filters recount as you go.",
+      "docs": "https://uiarc.dev/components/blocks/integrations"
+    },
+    {
+      "slug": "help-center",
+      "title": "Help center",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A help center with instant search, topic cards, and popular articles that open into a readable article with an outline and feedback.",
+      "docs": "https://uiarc.dev/components/blocks/help-center"
+    },
+    {
+      "slug": "support-widget",
+      "title": "Support widget",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "An in-app help launcher that grows into live article search, reading, and a chat with your team.",
+      "docs": "https://uiarc.dev/components/blocks/support-widget"
+    },
+    {
+      "slug": "support-conversation",
+      "title": "Support conversation",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A responsive message thread with useful quick replies and live feedback.",
+      "docs": "https://uiarc.dev/components/blocks/support-conversation"
+    },
+    {
+      "slug": "changelog-feed",
+      "title": "Changelog feed",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "free",
+      "description": "Release notes you can filter, open in place, and scroll through month by month.",
+      "docs": "https://uiarc.dev/components/blocks/changelog-feed"
+    },
+    {
+      "slug": "empty-states",
+      "title": "Empty states",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "free",
+      "description": "Four empty states in one illustration whose shapes morph between scenes as you switch tabs.",
+      "docs": "https://uiarc.dev/components/blocks/empty-states"
+    },
+    {
+      "slug": "billing-overview",
+      "title": "Billing overview",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A billing page where the plan card morphs into a picker and usage, invoices, and card follow.",
+      "docs": "https://uiarc.dev/components/blocks/billing-overview"
+    },
+    {
+      "slug": "checkout-live",
+      "title": "Live checkout",
+      "kind": "block",
+      "category": "Commerce",
+      "tier": "pro",
+      "description": "A subscription checkout whose summary recomputes as you edit, then glides to the centre and unfolds into a receipt.",
+      "docs": "https://uiarc.dev/components/blocks/checkout-live"
+    },
+    {
+      "slug": "workspace-sidebar",
+      "title": "Workspace sidebar",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A product sidebar with a workspace switcher, live search, draggable favorites, and inline projects.",
+      "docs": "https://uiarc.dev/components/blocks/workspace-sidebar"
+    },
+    {
+      "slug": "sidebar-rail",
+      "title": "Sidebar rail",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "An app shell whose sidebar folds into an icon rail and slides in as a sheet on phones.",
+      "docs": "https://uiarc.dev/components/blocks/sidebar-rail"
+    },
+    {
+      "slug": "settings-page",
+      "title": "Settings page",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "Account settings with a gliding section nav and a save bar that morphs in as you edit.",
+      "docs": "https://uiarc.dev/components/blocks/settings-page"
+    },
+    {
+      "slug": "settings-command",
+      "title": "Settings command",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "Workspace settings where a search field grows into a palette that flies you to any setting.",
+      "docs": "https://uiarc.dev/components/blocks/settings-command"
+    },
+    {
+      "slug": "docs-sidebar",
+      "title": "Docs sidebar",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A docs layout with a live filtering nav tree, version switcher, and a gliding on this page outline.",
+      "docs": "https://uiarc.dev/components/blocks/docs-sidebar"
+    },
+    {
+      "slug": "inbox-sidebar",
+      "title": "Inbox sidebar",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A mail sidebar whose Compose button grows into a composer and whose folders take dropped mail.",
+      "docs": "https://uiarc.dev/components/blocks/inbox-sidebar"
+    },
+    {
+      "slug": "inbox-triage",
+      "title": "Inbox triage",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "Process a focused inbox with archive, snooze, and restore actions.",
+      "docs": "https://uiarc.dev/components/blocks/inbox-triage"
+    },
+    {
+      "slug": "command-palette",
+      "title": "Command palette",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A complete keyboard driven action surface with search, grouped results, and shortcuts.",
+      "docs": "https://uiarc.dev/components/blocks/command-palette"
+    },
+    {
+      "slug": "notification-center",
+      "title": "Notification center",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A home for updates with read state, grouped information, and animated disclosure.",
+      "docs": "https://uiarc.dev/components/blocks/notification-center"
+    },
+    {
+      "slug": "selection-toolbar",
+      "title": "Selection toolbar",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A contextual batch action surface that appears when items are selected.",
+      "docs": "https://uiarc.dev/components/blocks/selection-toolbar"
+    },
+    {
+      "slug": "file-upload",
+      "title": "File upload",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A complete file selection flow with constraints, progress, and error feedback.",
+      "docs": "https://uiarc.dev/components/blocks/file-upload"
+    },
+    {
+      "slug": "otp-input",
+      "title": "OTP input",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A six digit verification flow with paste support and keyboard navigation.",
+      "docs": "https://uiarc.dev/components/blocks/otp-input"
+    },
+    {
+      "slug": "multi-step-form",
+      "title": "Multi-step form",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A guided form that presents one decision at a time and preserves progress.",
+      "docs": "https://uiarc.dev/components/blocks/multi-step-form"
+    },
+    {
+      "slug": "signup-form",
+      "title": "Sign up form",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "An account creation flow with field validation, password strength, and a clear completion state.",
+      "docs": "https://uiarc.dev/components/blocks/signup-form"
+    },
+    {
+      "slug": "sign-in",
+      "title": "Sign in",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A sign in card that morphs from email to a six digit code to your account.",
+      "docs": "https://uiarc.dev/components/blocks/sign-in"
+    },
+    {
+      "slug": "login-centered",
+      "title": "Centered login",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "free",
+      "description": "A passkey-first login card on a quiet ring backdrop that morphs through email and code.",
+      "docs": "https://uiarc.dev/components/blocks/login-centered"
+    },
+    {
+      "slug": "login-immersive",
+      "title": "Immersive login",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A glass magic link card over dusk photography that folds its envelope shut once sent.",
+      "docs": "https://uiarc.dev/components/blocks/login-immersive"
+    },
+    {
+      "slug": "login-split",
+      "title": "Login split",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A full screen split login: an email-first form that morphs into a password step beside a photo.",
+      "docs": "https://uiarc.dev/components/blocks/login-split"
+    },
+    {
+      "slug": "security-settings",
+      "title": "Security settings",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "An account security page with guided two-factor setup, password change and active sessions.",
+      "docs": "https://uiarc.dev/components/blocks/security-settings"
+    },
+    {
+      "slug": "search-results",
+      "title": "Search results",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "A faceted workspace search page with suggestions, facet counts that follow the query, filter chips, mixed doc, person and file results with highlighted matches, a gliding keyboard cursor and a preview pane.",
+      "docs": "https://uiarc.dev/components/blocks/search-results"
+    },
+    {
+      "slug": "media-player",
+      "title": "Media player",
+      "kind": "block",
+      "category": "App shell and settings",
+      "tier": "pro",
+      "description": "An audio player with a living playlist and complete playback controls.",
+      "docs": "https://uiarc.dev/components/blocks/media-player"
+    },
+    {
+      "slug": "team-directory",
+      "title": "Team directory",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "Searchable people, team filters, and a focused profile panel.",
+      "docs": "https://uiarc.dev/components/blocks/team-directory"
+    },
+    {
+      "slug": "team-showcase",
+      "title": "Team showcase",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "An image led team introduction with profiles that open in place.",
+      "docs": "https://uiarc.dev/components/blocks/team-showcase"
+    },
+    {
+      "slug": "testimonial-stage",
+      "title": "Studio perspectives",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "Portrait led editorial stories with a focused reading state.",
+      "docs": "https://uiarc.dev/components/blocks/testimonial-stage"
+    },
+    {
+      "slug": "team-members",
+      "title": "Team members",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A members list where typed emails turn into chips and fly into pending invites as seats roll.",
+      "docs": "https://uiarc.dev/components/blocks/team-members"
+    },
+    {
+      "slug": "invite-people",
+      "title": "Invite people",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "Invite teammates with roles, bulk paste validation, a seat meter, and avatars that fly into a pending list.",
+      "docs": "https://uiarc.dev/components/blocks/invite-people"
+    },
+    {
+      "slug": "availability-picker",
+      "title": "Availability picker",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "Find a meeting time across people and see the choice come together.",
+      "docs": "https://uiarc.dev/components/blocks/availability-picker"
+    },
+    {
+      "slug": "project-board",
+      "title": "Project board",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A living workflow board for moving work between stages.",
+      "docs": "https://uiarc.dev/components/blocks/project-board"
+    },
+    {
+      "slug": "kanban-board",
+      "title": "Kanban board",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A kanban board where cards lift, tilt and spring into the slot that opens for them, with swimlanes and live WIP limits.",
+      "docs": "https://uiarc.dev/components/blocks/kanban-board"
+    },
+    {
+      "slug": "week-calendar",
+      "title": "Week calendar",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A week calendar where you drag to create, move, and resize events, with color coded calendars, day and agenda views, and swipes on phones.",
+      "docs": "https://uiarc.dev/components/blocks/week-calendar"
+    },
+    {
+      "slug": "api-keys",
+      "title": "API keys",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "API key management where Create key unfolds into its form and each secret is shown once.",
+      "docs": "https://uiarc.dev/components/blocks/api-keys"
+    },
+    {
+      "slug": "webhooks",
+      "title": "Webhooks",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A webhooks console with delivery history, a payload inspector and retries that roll the rate.",
+      "docs": "https://uiarc.dev/components/blocks/webhooks"
+    },
+    {
+      "slug": "roles-permissions",
+      "title": "Roles and permissions",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A permissions matrix with group toggles that ripple, role duplication and a review bar.",
+      "docs": "https://uiarc.dev/components/blocks/roles-permissions"
+    },
+    {
+      "slug": "env-variables",
+      "title": "Environment variables",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "An environment variables and secrets manager with masked values, per-environment scope toggles, .env paste import with duplicate and invalid key warnings, write-only sensitive values, an environment diff by fingerprint, and a redeploy banner.",
+      "docs": "https://uiarc.dev/components/blocks/env-variables"
+    },
+    {
+      "slug": "release-readiness",
+      "title": "Release readiness",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A launch checklist that keeps prerequisites, progress, and the final action together.",
+      "docs": "https://uiarc.dev/components/blocks/release-readiness"
+    },
+    {
+      "slug": "onboarding-illustration",
+      "title": "Onboarding illustration",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A compact onboarding card whose line illustration morphs from folder to files, team, and badge.",
+      "docs": "https://uiarc.dev/components/blocks/onboarding-illustration"
+    },
+    {
+      "slug": "cohort-retention",
+      "title": "Cohort retention",
+      "kind": "block",
+      "category": "Team and collaboration",
+      "tier": "pro",
+      "description": "A cohort retention triangle that morphs into retention curves and rewashes by segment.",
+      "docs": "https://uiarc.dev/components/blocks/cohort-retention"
+    },
+    {
+      "slug": "metrics-dashboard",
+      "title": "Metrics dashboard",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A dense analytics view with KPI tabs, one inspectable chart, and top pages and sources.",
+      "docs": "https://uiarc.dev/components/blocks/metrics-dashboard"
+    },
+    {
+      "slug": "revenue-explorer",
+      "title": "Revenue explorer",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A SaaS revenue chart you zoom with a brush while paths, axes and figures glide to the range.",
+      "docs": "https://uiarc.dev/components/blocks/revenue-explorer"
+    },
+    {
+      "slug": "journey-flow",
+      "title": "Journey flow",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A Sankey of user journeys whose flows morph by channel and trace a cohort on hover.",
+      "docs": "https://uiarc.dev/components/blocks/journey-flow"
+    },
+    {
+      "slug": "usage-forecast",
+      "title": "Usage forecast",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A billing period usage chart with a forecast cone and a draggable budget that dates the crossing.",
+      "docs": "https://uiarc.dev/components/blocks/usage-forecast"
+    },
+    {
+      "slug": "mrr-waterfall",
+      "title": "MRR waterfall",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "An MRR bridge whose floating bars morph by period and open the accounts behind each move.",
+      "docs": "https://uiarc.dev/components/blocks/mrr-waterfall"
+    },
+    {
+      "slug": "metric-explorer",
+      "title": "Metric explorer",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "KPI cards that open into a scrubbable chart and morph between metrics and ranges.",
+      "docs": "https://uiarc.dev/components/blocks/metric-explorer"
+    },
+    {
+      "slug": "activity-terrain",
+      "title": "Activity terrain",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A 3D terrain of hourly activity you can orbit, zoom, fly into and flatten into a heatmap.",
+      "docs": "https://uiarc.dev/components/blocks/activity-terrain"
+    },
+    {
+      "slug": "revenue-globe",
+      "title": "Revenue globe",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A dotted globe where live payments arc home to headquarters, with a replayable day.",
+      "docs": "https://uiarc.dev/components/blocks/revenue-globe"
+    },
+    {
+      "slug": "customer-galaxy",
+      "title": "Customer galaxy",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "2,400 accounts as a drifting galaxy that spirals into clusters by plan, region or health.",
+      "docs": "https://uiarc.dev/components/blocks/customer-galaxy"
+    },
+    {
+      "slug": "semantic-zoom",
+      "title": "Semantic zoom",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "An infinite-zoom map of a company that reveals teams, projects, tasks and people as you fly in.",
+      "docs": "https://uiarc.dev/components/blocks/semantic-zoom"
+    },
+    {
+      "slug": "layout-morph",
+      "title": "Layout morph",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A 24 card gallery that flies between grid, masonry, list, fan, carousel and a 3D helix.",
+      "docs": "https://uiarc.dev/components/blocks/layout-morph"
+    },
+    {
+      "slug": "budget-variance",
+      "title": "Budget variance",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "Budget against actual operating spend by department as aligned bullet charts, with favorable and unfavorable variance, a month, quarter and year to date switch that springs every bar, in-place drill-down into budget lines, and a total row.",
+      "docs": "https://uiarc.dev/components/blocks/budget-variance"
+    },
+    {
+      "slug": "choropleth-explorer",
+      "title": "Choropleth explorer",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A filled-region map that shades every state or region by revenue, growth or penetration on a stepped scale, with a country switch (United States, Canada, Brazil, United Kingdom, France, Germany, Italy, Australia), a hoverable legend, a synced ranked list and a camera zoom into local detail.",
+      "docs": "https://uiarc.dev/components/blocks/choropleth-explorer"
+    },
+    {
+      "slug": "small-multiples",
+      "title": "Small multiples",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A trellis of small line charts that reads as one chart, with a synced crosshair, a shared or independent y scale that springs the axes, sorting with a FLIP reorder, a ghost of the overall total behind every panel and dimming for flat trends.",
+      "docs": "https://uiarc.dev/components/blocks/small-multiples"
+    },
+    {
+      "slug": "connected-scatter",
+      "title": "Connected scatter",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A connected scatterplot of monthly CAC against LTV where the path draws itself in, a scrubber moves a head along the curve, and a channel switch morphs the path against a shaded 3x target line.",
+      "docs": "https://uiarc.dev/components/blocks/connected-scatter"
+    },
+    {
+      "slug": "horizon-chart",
+      "title": "Horizon chart",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A horizon chart that stacks fourteen daily series as compact folded rows, with a synced crosshair, a sort by name, peak or latest, a band count setting that folds every row on one spring, and a legend that explains how to read the bands.",
+      "docs": "https://uiarc.dev/components/blocks/horizon-chart"
+    },
+    {
+      "slug": "line-replay",
+      "title": "Line replay",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A time replay line chart that draws a day of traffic with a moving playhead, a value label on the tip, a scrubber, speed control and key moments annotated as the playhead passes them.",
+      "docs": "https://uiarc.dev/components/blocks/line-replay"
+    },
+    {
+      "slug": "exploded-view",
+      "title": "Exploded view",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A scroll driven exploded view where a live phone screen built from five CSS 3D layers lies back, separates in depth with labels that follow each layer, takes each layer into focus, and then reassembles.",
+      "docs": "https://uiarc.dev/components/blocks/exploded-view"
+    },
+    {
+      "slug": "kpi-drilldown",
+      "title": "KPI drilldown",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "KPI cards that expand into a full detail chart with period comparison and a breakdown table, then fold back.",
+      "docs": "https://uiarc.dev/components/blocks/kpi-drilldown"
+    },
+    {
+      "slug": "market-terminal",
+      "title": "Market terminal",
+      "kind": "block",
+      "category": "Data and charts",
+      "tier": "pro",
+      "description": "A trading terminal with a canvas candlestick chart, volume, moving averages, crosshair OHLC readout, wheel, drag and pinch zoom, a live watchlist with sparklines and flashing prices, and a market and limit order ticket.",
+      "docs": "https://uiarc.dev/components/blocks/market-terminal"
+    },
+    {
+      "slug": "ai-composer",
+      "title": "AI composer",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "The prompt box at the bottom of an AI app: files upload in place, / opens commands, @ inserts mentions, a model and effort menu sits in the toolbar, and the send button turns into a stop control ringed by the reply's progress.",
+      "docs": "https://uiarc.dev/components/blocks/ai-composer"
+    },
+    {
+      "slug": "ai-chat",
+      "title": "AI chat",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A full-screen AI chat where answers stream in as markdown with folding reasoning, tool chips and cited sources.",
+      "docs": "https://uiarc.dev/components/blocks/ai-chat"
+    },
+    {
+      "slug": "ai-side-panel",
+      "title": "AI side panel",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "An assistant docked beside a page that reads it and edits it: ask about the page or a selected passage, review each edit as a word diff, and apply it with a tint sweep on the page and one-click undo.",
+      "docs": "https://uiarc.dev/components/blocks/ai-side-panel"
+    },
+    {
+      "slug": "research-run",
+      "title": "Research run",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "Deep research that plans searches, reads sources with their marks, and streams a cited answer where every chip lights up the sentence it supports.",
+      "docs": "https://uiarc.dev/components/blocks/research-run"
+    },
+    {
+      "slug": "ai-answer",
+      "title": "AI answer",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "One AI answer set like a clean article: it thinks, shows its sources as small cards with colored marks, and streams a formatted answer where every citation lights the sentence it supports.",
+      "docs": "https://uiarc.dev/components/blocks/ai-answer"
+    },
+    {
+      "slug": "model-picker",
+      "title": "Model picker",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A model picker in one quiet pill: open it to choose from featured models with a one line note each, set the reasoning effort, or browse every other model by provider, and the pill swaps to your choice in place.",
+      "docs": "https://uiarc.dev/components/blocks/model-picker"
+    },
+    {
+      "slug": "model-arena",
+      "title": "Model arena",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A blind side by side model comparison in one card: send one prompt to two models, watch both answers stream at the same pace, vote for the better one, then reveal which model wrote each.",
+      "docs": "https://uiarc.dev/components/blocks/model-arena"
+    },
+    {
+      "slug": "prompt-studio",
+      "title": "Prompt studio",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "One card for editing, testing and shipping a prompt template: variables as chips with sample values, a test run against the chosen model, and versions you can compare and promote to production.",
+      "docs": "https://uiarc.dev/components/blocks/prompt-studio"
+    },
+    {
+      "slug": "document-extract",
+      "title": "Document extraction",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "Turns a document into typed data with a model and shows where every value came from: fields fill in as the page is read, and hovering a value lights its source on the PDF.",
+      "docs": "https://uiarc.dev/components/blocks/document-extract"
+    },
+    {
+      "slug": "agent-memory",
+      "title": "Agent memory",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "One card for what an assistant remembers about you: filter and search memories, edit or forget one in place, and turn saved memories and chat history on or off.",
+      "docs": "https://uiarc.dev/components/blocks/agent-memory"
+    },
+    {
+      "slug": "agent-tasks",
+      "title": "Agent tasks",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A home for background coding agents: start a task on a repository and branch, watch each card move from queued to running to ready for review, and open a pull request from the result.",
+      "docs": "https://uiarc.dev/components/blocks/agent-tasks"
+    },
+    {
+      "slug": "agent-approvals",
+      "title": "Agent approvals",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "One approval card for agents: the waiting tool call reads like a permission prompt with the tool's mark, the agent's reason and its arguments, and you approve, deny or allow it from now on.",
+      "docs": "https://uiarc.dev/components/blocks/agent-approvals"
+    },
+    {
+      "slug": "agent-routines",
+      "title": "Agent routines",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "Scheduled agents in one card: each routine reads as a sentence with its schedule, next run countdown, connectors and destination, and opens smoothly to edit or run it now.",
+      "docs": "https://uiarc.dev/components/blocks/agent-routines"
+    },
+    {
+      "slug": "agent-orchestrator",
+      "title": "Agent orchestrator",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A lead agent splits a goal into a plan, fans the subtasks out to parallel worker lanes and merges what comes back, with each lane's model, progress and result in view.",
+      "docs": "https://uiarc.dev/components/blocks/agent-orchestrator"
+    },
+    {
+      "slug": "mcp-servers",
+      "title": "MCP servers",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "Manage the MCP servers that give an agent its tools: see what the enabled tools cost in context, connect or pause a server, and switch single tools on or off.",
+      "docs": "https://uiarc.dev/components/blocks/mcp-servers"
+    },
+    {
+      "slug": "knowledge-base",
+      "title": "Knowledge base",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A retrieval knowledge base in one card: add sources and watch them parse, chunk, embed and index, then test a question and see which chunks come back and why.",
+      "docs": "https://uiarc.dev/components/blocks/knowledge-base"
+    },
+    {
+      "slug": "eval-suite",
+      "title": "Eval suite",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "Run an evaluation suite on a new version of an LLM feature against its baseline: results stream in case by case, and regressions and fixes are called out with the cases behind them.",
+      "docs": "https://uiarc.dev/components/blocks/eval-suite"
+    },
+    {
+      "slug": "agent-run",
+      "title": "Agent run",
+      "kind": "block",
+      "category": "AI",
+      "tier": "pro",
+      "description": "A single card that follows one AI coding agent through a task: steps stream in with the live one shimmering, tool calls open in place, and the agent stops on a two-file diff for you to approve or send back before it writes.",
+      "docs": "https://uiarc.dev/components/blocks/agent-run"
+    }
+  ]
+}

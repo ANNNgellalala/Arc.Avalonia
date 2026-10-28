@@ -1,0 +1,15 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs">
+
+  <ControlTheme x:Key="{x:Type c:ArcChipGroup}" TargetType="c:ArcChipGroup">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <WrapPanel x:Name="ChipPanel" Orientation="Horizontal" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

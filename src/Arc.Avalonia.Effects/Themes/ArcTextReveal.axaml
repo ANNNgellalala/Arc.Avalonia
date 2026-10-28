@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:e="using:Arc.Avalonia.Effects.Controls">
+
+  <ControlTheme x:Key="{x:Type e:ArcTextReveal}" TargetType="e:ArcTextReveal">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <StackPanel x:Name="PART_Lines"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

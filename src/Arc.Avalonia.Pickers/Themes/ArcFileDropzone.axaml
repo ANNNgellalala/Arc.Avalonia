@@ -1,0 +1,103 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <!-- The dashed target is one button, so the whole surface opens the picker. -->
+  <ControlTheme x:Key="ArcDropzoneTheme" TargetType="Button">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Padding" Value="28" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Surface"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}" />
+          <Rectangle x:Name="Dash"
+                     Margin="0.5"
+                     Stroke="{DynamicResource ArcBorderStrong}"
+                     StrokeThickness="1"
+                     StrokeDashArray="4,4"
+                     RadiusX="26"
+                     RadiusY="26" />
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="{TemplateBinding Padding}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.dragover /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+    </Style>
+    <Style Selector="^.dragover /template/ Rectangle#Dash">
+      <Setter Property="Stroke" Value="{DynamicResource ArcAccent}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type p:ArcFileDropzone}" TargetType="p:ArcFileDropzone">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="10">
+          <Button x:Name="PART_Drop"
+                  Theme="{StaticResource ArcDropzoneTheme}"
+                  HorizontalAlignment="Stretch">
+            <StackPanel Spacing="10">
+              <c:ArcIcon Icon="arrow-up"
+                         Size="24"
+                         HorizontalAlignment="Center" />
+              <StackPanel Spacing="4">
+                <TextBlock x:Name="PART_Title"
+                           Classes="arc-label"
+                           Text="Add files"
+                           HorizontalAlignment="Center" />
+                <TextBlock x:Name="PART_Hint"
+                           Classes="arc-caption"
+                           Text="Drop files here or choose from your device"
+                           TextWrapping="Wrap"
+                           MaxWidth="320"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center" />
+              </StackPanel>
+              <Border Background="{DynamicResource ArcSurfaceMuted}"
+                      CornerRadius="{DynamicResource ArcRadiusControl}"
+                      Padding="14,7"
+                      HorizontalAlignment="Center">
+                <TextBlock Text="Browse files" Classes="arc-label" />
+              </Border>
+              <TextBlock x:Name="PART_Note"
+                         Classes="arc-caption"
+                         HorizontalAlignment="Center"
+                         TextWrapping="Wrap"
+                         MaxWidth="320"
+                         TextAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <TextBlock x:Name="PART_Error"
+                     Classes="arc-caption"
+                     Foreground="{DynamicResource ArcDanger}"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <StackPanel x:Name="PART_List" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

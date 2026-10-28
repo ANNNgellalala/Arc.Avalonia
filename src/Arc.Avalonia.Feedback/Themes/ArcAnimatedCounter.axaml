@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Feedback.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcAnimatedCounter}" TargetType="c:ArcAnimatedCounter">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="2">
+          <TextBlock x:Name="LabelText"
+                     Classes="arc-caption"
+                     IsVisible="False" />
+          <StackPanel Orientation="Horizontal" Spacing="0">
+            <TextBlock x:Name="PrefixText"
+                       FontSize="{DynamicResource ArcTextLg}"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource ArcTextSecondary}"
+                       Margin="0,0,2,4"
+                       VerticalAlignment="Bottom" />
+            <TextBlock x:Name="ValueText"
+                       FontFamily="{DynamicResource ArcFontDisplay}"
+                       FontSize="{DynamicResource ArcText3xl}"
+                       FontWeight="Medium"
+                       LetterSpacing="-1"
+                       LineHeight="40"
+                       VerticalAlignment="Bottom" />
+            <TextBlock x:Name="SuffixText"
+                       FontSize="{DynamicResource ArcTextLg}"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource ArcTextSecondary}"
+                       Margin="2,0,0,4"
+                       VerticalAlignment="Bottom" />
+          </StackPanel>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

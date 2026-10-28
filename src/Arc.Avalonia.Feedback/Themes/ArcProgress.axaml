@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Feedback.Controls"
+                    xmlns:ac="using:Arc.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcProgress}" TargetType="c:ArcProgress">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="8">
+          <Grid x:Name="Header" ColumnDefinitions="*,Auto" IsVisible="False">
+            <TextBlock x:Name="LabelText"
+                       Classes="arc-label"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" />
+            <StackPanel x:Name="ValuePanel"
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center">
+              <TextBlock x:Name="ValueText" Classes="arc-label" VerticalAlignment="Center" />
+              <ac:ArcIcon x:Name="Check"
+                         Icon="check"
+                         Size="15"
+                         IsVisible="False"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+          <c:ArcProgressTrack x:Name="Bar"
+                              TrackBrush="{DynamicResource ArcControlTrack}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

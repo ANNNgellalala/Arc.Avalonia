@@ -1,0 +1,46 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Shared chrome: icon buttons, key caps, option controls. -->
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcAdvancedShared.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcInlineEdit.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcScrubInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcPhoneInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcShortcutRecorder.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcMentionInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcMorphSelect.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcExpandingSearch.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcBillingToggle.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.AdvancedInputs/Themes/ArcRadioCards.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- A text box that is only a caret and its text: the Arc shell around it owns every border. -->
+  <Style Selector="TextBox.arc-bare">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="TextBox.arc-bare /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="TextBox.arc-bare:pointerover /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="TextBox.arc-bare:focus /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="TextBox.arc-bare:disabled /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+</Styles>

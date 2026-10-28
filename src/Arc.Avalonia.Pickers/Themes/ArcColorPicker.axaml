@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="{x:Type p:ArcColorEditor}" TargetType="p:ArcColorEditor">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Width="272" Spacing="12">
+          <p:ArcColorArea x:Name="PART_Area" Height="148" />
+          <StackPanel Spacing="4">
+            <p:ArcColorRamp x:Name="PART_Hue" Mode="Hue" />
+            <p:ArcColorRamp x:Name="PART_Alpha" Mode="Alpha" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox x:Name="PART_Input"
+                     Classes="picker-input"
+                     AutomationProperties.Name="Color value" />
+            <c:ArcButton x:Name="PART_Format"
+                         Grid.Column="1"
+                         Variant="Secondary"
+                         Size="Sm"
+                         Height="36"
+                         Padding="10,0"
+                         Margin="8,0,0,0"
+                         Content="HEX" />
+          </Grid>
+          <TextBlock x:Name="PART_Error"
+                     Classes="arc-caption"
+                     Foreground="{DynamicResource ArcDanger}"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <StackPanel x:Name="PART_Contrast" Orientation="Horizontal" Spacing="6" />
+          <StackPanel Spacing="6">
+            <TextBlock Text="Saved" Classes="arc-caption" />
+            <StackPanel x:Name="PART_Swatches" Orientation="Horizontal" Spacing="6" />
+          </StackPanel>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type p:ArcColorPicker}" TargetType="p:ArcColorPicker">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <Button x:Name="PART_Trigger"
+                  Theme="{StaticResource ArcPickerFieldTheme}"
+                  HorizontalAlignment="Stretch">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+              <Border x:Name="PART_Swatch"
+                      Width="22"
+                      Height="22"
+                      CornerRadius="7"
+                      BorderBrush="{DynamicResource ArcBorder}"
+                      BorderThickness="1"
+                      VerticalAlignment="Center" />
+              <TextBlock x:Name="PART_Name"
+                         Grid.Column="1"
+                         Classes="arc-label"
+                         Margin="10,0,8,0"
+                         Text="Color"
+                         VerticalAlignment="Center" />
+              <TextBlock x:Name="PART_Hex"
+                         Grid.Column="2"
+                         Classes="arc-caption"
+                         VerticalAlignment="Center" />
+              <c:ArcIcon Grid.Column="3"
+                         Icon="chevron-down"
+                         Size="16"
+                         Margin="8,0,0,0"
+                         VerticalAlignment="Center" />
+            </Grid>
+          </Button>
+          <TextBlock x:Name="PART_Description"
+                     Classes="arc-caption"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <Popup x:Name="PART_Popup"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <Border Classes="picker-popup">
+              <p:ArcColorEditor x:Name="PART_Editor" />
+            </Border>
+          </Popup>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

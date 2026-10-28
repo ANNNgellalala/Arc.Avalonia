@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcResizablePanels}" TargetType="c:ArcResizablePanels">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="MinHeight" Value="180" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Frame"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Panel>
+            <c:ArcPanePanel x:Name="PART_Stage" />
+            <TextBlock x:Name="Status"
+                       Height="0"
+                       Opacity="0"
+                       IsHitTestVisible="False"
+                       AutomationProperties.LiveSetting="Polite" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

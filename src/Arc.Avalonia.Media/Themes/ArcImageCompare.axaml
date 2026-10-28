@@ -1,0 +1,43 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcImageCompare}" TargetType="c:ArcImageCompare">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Frame"
+                  Background="{DynamicResource ArcSurfaceMuted}"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  ClipToBounds="True">
+            <c:ArcCompareSurface x:Name="PART_Surface"
+                                 FrameRadius="25"
+                                 AspectRatio="{TemplateBinding AspectRatio}" />
+          </Border>
+          <TextBlock x:Name="Status"
+                     Height="0"
+                     Opacity="0"
+                     IsHitTestVisible="False"
+                     AutomationProperties.LiveSetting="Polite" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

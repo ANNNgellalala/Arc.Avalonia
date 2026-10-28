@@ -1,0 +1,135 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs"
+                    xmlns:arc="clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia"
+                    xmlns:conv="using:Avalonia.Data.Converters">
+
+  <!-- Slider -->
+  <ControlTheme x:Key="{x:Type c:ArcSlider}" TargetType="c:ArcSlider">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="LabelText" Classes="arc-label" />
+            <TextBlock x:Name="Readout"
+                       Grid.Column="1"
+                       Classes="arc-body-sm"
+                       Foreground="{DynamicResource ArcTextSecondary}" />
+          </Grid>
+          <Panel x:Name="TrackArea"
+                 Height="36"
+                 Background="Transparent"
+                 ClipToBounds="False">
+            <Border x:Name="Ring"
+                    Margin="-4,0"
+                    CornerRadius="12"
+                    BorderThickness="2"
+                    BorderBrush="{DynamicResource ArcFocusOutline}"
+                    IsVisible="False"
+                    IsHitTestVisible="False" />
+            <Border x:Name="Track"
+                    Height="6"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ArcControlTrack}"
+                    CornerRadius="{DynamicResource ArcRadiusPill}" />
+            <Border x:Name="Fill"
+                    Height="6"
+                    Width="0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource ArcAccent}"
+                    CornerRadius="{DynamicResource ArcRadiusPill}" />
+            <Canvas x:Name="Marks" Height="6" VerticalAlignment="Center" IsHitTestVisible="False" />
+            <Border x:Name="Bubble"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="0,-24,0,0"
+                    Background="{DynamicResource ArcForeground}"
+                    CornerRadius="8"
+                    Padding="8,3"
+                    IsVisible="False">
+              <Border.RenderTransform>
+                <TranslateTransform />
+              </Border.RenderTransform>
+              <TextBlock x:Name="BubbleText"
+                         FontSize="12"
+                         Foreground="{DynamicResource ArcBackground}" />
+            </Border>
+            <Border x:Name="Thumb"
+                    Width="20"
+                    Height="20"
+                    CornerRadius="10"
+                    Background="{DynamicResource ArcSurface}"
+                    BorderBrush="{DynamicResource ArcBorderStrong}"
+                    BorderThickness="1.5"
+                    BoxShadow="{DynamicResource ArcShadowResting}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+              <Border.RenderTransform>
+                <TranslateTransform />
+              </Border.RenderTransform>
+            </Border>
+          </Panel>
+          <TextBlock x:Name="Description"
+                     Classes="arc-caption"
+                     TextWrapping="Wrap"
+                     IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#Track">
+      <Setter Property="Background" Value="{DynamicResource ArcControlTrackHover}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Rating -->
+  <ControlTheme x:Key="{x:Type c:ArcRating}" TargetType="c:ArcRating">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="LabelText" Classes="arc-label" />
+          <Panel HorizontalAlignment="Left">
+            <Border x:Name="Ring"
+                    Margin="-4,-2"
+                    CornerRadius="12"
+                    BorderThickness="2"
+                    BorderBrush="{DynamicResource ArcFocusOutline}"
+                    IsVisible="False"
+                    IsHitTestVisible="False" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <StackPanel x:Name="Stars" Orientation="Horizontal" VerticalAlignment="Center" />
+              <TextBlock x:Name="ValueText"
+                         Classes="arc-body-sm"
+                         Foreground="{DynamicResource ArcTextSecondary}"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+          </Panel>
+          <TextBlock x:Name="Description"
+                     Classes="arc-caption"
+                     TextWrapping="Wrap"
+                     IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

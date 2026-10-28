@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="{x:Type p:ArcCalendar}" TargetType="p:ArcCalendar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Padding" Value="8" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}"
+                CornerRadius="{DynamicResource ArcRadiusPanel}">
+          <Grid RowDefinitions="Auto,Auto,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto" Height="36">
+              <TextBlock x:Name="PART_Title"
+                         Classes="arc-label"
+                         Margin="4,0,0,0"
+                         VerticalAlignment="Center" />
+              <Button x:Name="PART_Previous"
+                      Grid.Column="1"
+                      Margin="0,0,2,0"
+                      Theme="{StaticResource ArcPickerIconTheme}">
+                <c:ArcIcon Icon="chevron-left" Size="16" />
+              </Button>
+              <Button x:Name="PART_Next"
+                      Grid.Column="2"
+                      Theme="{StaticResource ArcPickerIconTheme}">
+                <c:ArcIcon Icon="chevron-right" Size="16" />
+              </Button>
+            </Grid>
+            <p:ArcCalendarSurface x:Name="PART_Surface" Grid.Row="1" Margin="0,2,0,0" />
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="2,8,0,0">
+              <c:ArcButton x:Name="PART_Today"
+                           Variant="Ghost"
+                           Size="Sm"
+                           Height="30"
+                           Padding="10,0"
+                           Content="Today" />
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

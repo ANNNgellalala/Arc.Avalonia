@@ -1,0 +1,81 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- A grid cell: a quiet hover wash, the accent ring for the keyboard-active cell is inside the item. -->
+  <Style Selector="Border.emoji-cell">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.emoji-cell:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+
+  <!-- The search field: a two-pixel ring around the whole field, accent-tinted only while it holds focus. -->
+  <Style Selector="Border.emoji-search">
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.emoji-search:focus-within">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcFocusOutline}" />
+  </Style>
+
+  <!-- Wrappers around the list controls: keyboard focus inside draws Arc's 2px ring. -->
+  <Style Selector="Border.emoji-frame">
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.emoji-frame:focus-within">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcFocusOutline}" />
+  </Style>
+
+  <!-- The embedded search field: no chrome of its own, the field wrapper owns the ring. -->
+  <Style Selector="TextBox.emoji-search-input">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="Height" Value="26" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Strip the Fluent field chrome so the wrapper's ring is the only outline the search field shows. -->
+  <Style Selector="TextBox.emoji-search-input /template/ Border#PART_Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+  </Style>
+
+  <Style Selector="TextBox.emoji-search-input:focus /template/ Border#PART_Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="TextBox.emoji-search-input:pointerover /template/ Border#PART_Border">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+</Styles>

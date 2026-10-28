@@ -1,0 +1,94 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- Floating panel used by every picker popup and by the inline open-state previews. -->
+  <Style Selector="Border.picker-popup">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    <Setter Property="Padding" Value="16" />
+  </Style>
+
+  <!-- A row inside a preset rail or a time list. -->
+  <Style Selector="c|ArcButton.picker-option">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+
+  <!-- ArcButton centres its content; option rows need a full-width, left-aligned label. -->
+  <Style Selector="c|ArcButton.picker-option /template/ Grid">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="c|ArcButton.picker-option /template/ ContentPresenter#Content">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <Style Selector="c|ArcButton.picker-option.selected">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+
+  <!-- A small read-only value pill, used for the contrast readout. -->
+  <Style Selector="Border.picker-chip">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPill}" />
+    <Setter Property="Padding" Value="8,3" />
+  </Style>
+
+  <!-- Hairline between regions inside a panel. -->
+  <Style Selector="Border.picker-separator">
+    <Setter Property="Background" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="Height" Value="1" />
+  </Style>
+
+  <!-- The value line in a picker trigger. -->
+  <Style Selector="TextBlock.picker-value">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+
+  <Style Selector="TextBlock.picker-placeholder">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- A 1 px line the signature pad signs above. -->
+  <Style Selector="Border.picker-baseline">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderStrong}" />
+    <Setter Property="Height" Value="1" />
+  </Style>
+
+  <!-- A typed colour value field. -->
+  <Style Selector="TextBox.picker-input">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="TextBox.picker-input.invalid">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+  </Style>
+</Styles>

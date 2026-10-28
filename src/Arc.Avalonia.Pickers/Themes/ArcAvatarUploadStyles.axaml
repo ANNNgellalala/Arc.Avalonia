@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Upload and error copy under the avatar; errors take the danger token and announce politely. -->
+  <Style Selector="TextBlock.avatar-status">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXs}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+
+  <Style Selector="TextBlock.avatar-status.danger">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+
+  <!-- The crop stage draws Arc's focus ring when the crop surface inside it has keyboard focus. -->
+  <Style Selector="Border.avatar-crop-stage">
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.avatar-crop-stage:focus-within">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcFocusOutline}" />
+  </Style>
+</Styles>

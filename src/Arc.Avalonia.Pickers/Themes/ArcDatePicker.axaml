@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="{x:Type p:ArcDatePicker}" TargetType="p:ArcDatePicker">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock x:Name="PART_Label" Classes="arc-label" IsVisible="False" />
+          <Panel>
+            <Button x:Name="PART_Trigger"
+                    Theme="{StaticResource ArcPickerFieldTheme}"
+                    HorizontalAlignment="Stretch">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="PART_Value"
+                           Grid.Column="0"
+                           Classes="picker-placeholder"
+                           Text="Select a date" />
+                <c:ArcIcon Grid.Column="1"
+                           Icon="calendar"
+                           Size="18"
+                           Margin="8,0,0,0"
+                           VerticalAlignment="Center" />
+              </Grid>
+            </Button>
+            <Button x:Name="PART_Clear"
+                    Theme="{StaticResource ArcPickerIconTheme}"
+                    Width="24"
+                    Height="24"
+                    Margin="0,0,10,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    IsVisible="False">
+              <c:ArcIcon Icon="x" Size="14" />
+            </Button>
+          </Panel>
+          <TextBlock x:Name="PART_Description"
+                     Classes="arc-caption"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <Popup x:Name="PART_Popup"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <Border Classes="picker-popup">
+              <p:ArcCalendar x:Name="PART_Calendar" />
+            </Border>
+          </Popup>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

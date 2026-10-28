@@ -1,0 +1,117 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcButton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcCard.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcBadge.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource ArcBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+  </Style>
+
+  <Style Selector="TextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="LetterSpacing" Value="{DynamicResource ArcTrackingBody}" />
+  </Style>
+
+  <!-- Buttons set their own foreground per variant; labels passed as content should follow it. -->
+  <Style Selector="Button TextBlock">
+    <Setter Property="Foreground" Value="{Binding $parent[Button].Foreground}" />
+  </Style>
+
+  <!-- Type scale. Display face from 28px up, body face below; hierarchy comes from size and colour. -->
+  <Style Selector="TextBlock.arc-display">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontDisplay}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcText5xl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="79" />
+    <Setter Property="LetterSpacing" Value="-2.16" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-title">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontDisplay}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcText4xl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="57" />
+    <Setter Property="LetterSpacing" Value="-1.56" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-title-sm">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontDisplay}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcText3xl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="40" />
+    <Setter Property="LetterSpacing" Value="-1.08" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-subtitle">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontDisplay}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcText2xl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="31" />
+    <Setter Property="LetterSpacing" Value="-0.84" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-heading">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="31" />
+    <Setter Property="LetterSpacing" Value="-0.44" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-body-lg">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextLg}" />
+    <Setter Property="LineHeight" Value="25" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-body">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextBase}" />
+    <Setter Property="LineHeight" Value="22" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-body-sm">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="LineHeight" Value="20" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-caption">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXs}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+    <Setter Property="LineHeight" Value="17" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-label">
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="LineHeight" Value="20" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-secondary">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-muted">
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-medium">
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+
+  <Style Selector="TextBlock.arc-mono">
+    <Setter Property="FontFamily" Value="Consolas, Menlo, monospace" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+  </Style>
+</Styles>
+
+

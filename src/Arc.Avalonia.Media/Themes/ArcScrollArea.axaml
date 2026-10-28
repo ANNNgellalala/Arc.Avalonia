@@ -1,0 +1,48 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcScrollArea}" TargetType="c:ArcScrollArea">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="FadeX" ClipToBounds="True">
+            <ScrollViewer x:Name="PART_Viewport"
+                          Background="Transparent"
+                          Focusable="True"
+                          IsTabStop="True"
+                          BringIntoViewOnFocusChange="False"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalContentAlignment="Stretch"
+                          VerticalContentAlignment="Stretch">
+              <ContentPresenter x:Name="PART_Content"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </ScrollViewer>
+          </Border>
+          <c:ArcScrollOverlay x:Name="PART_Overlay" IsHitTestVisible="False" />
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.keyboard-focus /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

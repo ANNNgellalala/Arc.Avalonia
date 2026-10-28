@@ -1,0 +1,197 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs"
+                    xmlns:arc="clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia"
+                    xmlns:conv="using:Avalonia.Data.Converters"
+                    xmlns:motion="using:Arc.Avalonia.Motion">
+
+  <!-- Checkbox -->
+  <ControlTheme x:Key="{x:Type c:ArcCheckbox}" TargetType="c:ArcCheckbox">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="12"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <Border x:Name="Box"
+                    Width="20"
+                    Height="20"
+                    CornerRadius="6"
+                    Background="{DynamicResource ArcSurface}"
+                    BorderBrush="{DynamicResource ArcBorderStrong}"
+                    BorderThickness="1.5"
+                    VerticalAlignment="Top"
+                    Margin="0,2,0,0">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="Background" Duration="0:0:0.16" />
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                </Transitions>
+              </Border.Transitions>
+              <Panel>
+                <arc:ArcIcon x:Name="CheckGlyph"
+                             Icon="check"
+                             Size="14"
+                             StrokeWidth="2.2"
+                             Foreground="{DynamicResource ArcControlGlyph}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsVisible="False" />
+                <arc:ArcIcon x:Name="DashGlyph"
+                             Icon="minus"
+                             Size="14"
+                             StrokeWidth="2.2"
+                             Foreground="{DynamicResource ArcControlGlyph}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsVisible="False" />
+              </Panel>
+            </Border>
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Text="{TemplateBinding Label}"
+                         FontSize="14"
+                         FontWeight="Medium"
+                         TextWrapping="Wrap"
+                         IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+              <TextBlock Text="{TemplateBinding Description}"
+                         Classes="arc-caption"
+                         TextWrapping="Wrap"
+                         IsVisible="{TemplateBinding Description, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#Box">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.checked /template/ Border#Box">
+      <Setter Property="Background" Value="{DynamicResource ArcControlOn}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcControlOn}" />
+    </Style>
+    <Style Selector="^.indeterminate /template/ Border#Box">
+      <Setter Property="Background" Value="{DynamicResource ArcControlOn}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcControlOn}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.45" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Switch -->
+  <ControlTheme x:Key="{x:Type c:ArcSwitch}" TargetType="c:ArcSwitch">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <TextBlock Text="{TemplateBinding Label}"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       VerticalAlignment="Center"
+                       TextWrapping="Wrap"
+                       IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+            <Border x:Name="Track"
+                    Width="46"
+                    Height="28"
+                    CornerRadius="{DynamicResource ArcRadiusPill}"
+                    Background="{DynamicResource ArcControlTrack}"
+                    VerticalAlignment="Center">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="Background" Duration="0:0:0.16" />
+                </Transitions>
+              </Border.Transitions>
+              <Border x:Name="Thumb"
+                      Width="22"
+                      Height="22"
+                      CornerRadius="11"
+                      Background="{DynamicResource ArcControlThumb}"
+                      BoxShadow="{DynamicResource ArcControlThumbShadow}"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Margin="3,0,0,0">
+                <Border.Transitions>
+                  <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.16" />
+                  </Transitions>
+                </Border.Transitions>
+                <Border.RenderTransform>
+                  <TranslateTransform>
+                    <TranslateTransform.Transitions>
+                      <Transitions>
+                        <DoubleTransition Property="X"
+                                          Duration="0:0:0.26"
+                                          Easing="{x:Static motion:ArcMotion.SpringSnappy}" />
+                      </Transitions>
+                    </TranslateTransform.Transitions>
+                  </TranslateTransform>
+                </Border.RenderTransform>
+              </Border>
+            </Border>
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#Track">
+      <Setter Property="Background" Value="{DynamicResource ArcControlTrackHover}" />
+    </Style>
+    <Style Selector="^.checked /template/ Border#Track">
+      <Setter Property="Background" Value="{DynamicResource ArcControlOn}" />
+    </Style>
+    <Style Selector="^.checked /template/ Border#Thumb">
+      <Setter Property="Background" Value="{DynamicResource ArcControlThumbOn}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.45" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Radio group -->
+  <ControlTheme x:Key="{x:Type c:ArcRadioGroup}" TargetType="c:ArcRadioGroup">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="8">
+          <TextBlock Text="{TemplateBinding Label}"
+                     Classes="arc-label"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+          <StackPanel x:Name="Rows" Spacing="4" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

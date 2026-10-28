@@ -1,0 +1,88 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="ArcTimeOptionItem" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="Transparent"
+                BorderThickness="2"
+                CornerRadius="10"
+                Padding="10,5">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#Root">
+      <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcFocusOutline}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type p:ArcTimePicker}" TargetType="p:ArcTimePicker">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock x:Name="PART_Label" Classes="arc-label" IsVisible="False" />
+          <Button x:Name="PART_Trigger"
+                  Theme="{StaticResource ArcPickerFieldTheme}"
+                  HorizontalAlignment="Stretch">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="PART_Value"
+                         Grid.Column="0"
+                         Classes="picker-value"
+                         Text="9:00 AM" />
+              <c:ArcIcon Grid.Column="1"
+                         Icon="clock"
+                         Size="18"
+                         Margin="8,0,0,0"
+                         VerticalAlignment="Center" />
+            </Grid>
+          </Button>
+          <TextBlock x:Name="PART_Description"
+                     Classes="arc-caption"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <Popup x:Name="PART_Popup"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <Border Classes="picker-popup" Padding="8">
+              <ListBox x:Name="PART_List"
+                       Width="176"
+                       MaxHeight="250"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       Padding="0"
+                       SelectionMode="Single"
+                       ItemContainerTheme="{StaticResource ArcTimeOptionItem}" />
+            </Border>
+          </Popup>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,80 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:e="using:Arc.Avalonia.Effects.Controls">
+
+  <ControlTheme x:Key="{x:Type e:ArcCookieConsent}" TargetType="e:ArcCookieConsent">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="Layer" ClipToBounds="False">
+          <Border x:Name="Surface"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Bottom"
+                  Margin="16"
+                  Background="{DynamicResource ArcSurfaceRaised}"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  BorderThickness="1"
+                  BoxShadow="{DynamicResource ArcShadowFloating}"
+                  ClipToBounds="True">
+            <Panel x:Name="Faces">
+              <StackPanel x:Name="FaceBar" Spacing="12" Margin="20,16">
+                <TextBlock x:Name="BarMessage"
+                           Classes="arc-body-sm"
+                           TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <c:ArcButton x:Name="BarPolicy"
+                               Variant="Ghost"
+                               Size="Sm"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1"
+                              Orientation="Horizontal"
+                              Spacing="8"
+                              HorizontalAlignment="Right">
+                    <c:ArcButton x:Name="CustomizeButton" Variant="Ghost" Size="Sm" />
+                    <c:ArcButton x:Name="RejectButton" Variant="Secondary" Size="Sm" />
+                    <c:ArcButton x:Name="AcceptButton" Variant="Primary" Size="Sm" />
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel x:Name="FacePanel" Spacing="10" Margin="18,14" IsVisible="False">
+                <TextBlock x:Name="PanelTitle" Classes="arc-heading" TextWrapping="Wrap" />
+                <TextBlock x:Name="PanelDescription"
+                           Classes="arc-body-sm arc-secondary"
+                           TextWrapping="Wrap" />
+                <StackPanel x:Name="CategoryHost" Spacing="4" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <c:ArcButton x:Name="PanelPolicy"
+                               Variant="Ghost"
+                               Size="Sm"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1"
+                              Orientation="Horizontal"
+                              Spacing="8"
+                              HorizontalAlignment="Right">
+                    <c:ArcButton x:Name="PanelReject" Variant="Secondary" Size="Sm" />
+                    <c:ArcButton x:Name="PanelSave" Variant="Primary" Size="Sm" />
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+
+              <c:ArcButton x:Name="ReopenButton"
+                           Variant="Secondary"
+                           Compact="True"
+                           Width="48"
+                           Height="48"
+                           Padding="0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           IsVisible="False" />
+            </Panel>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

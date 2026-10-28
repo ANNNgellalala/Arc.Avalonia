@@ -1,0 +1,122 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls">
+
+  <!-- One revealed action. Square-edged so the row reads as a single sliding surface. -->
+  <ControlTheme x:Key="{x:Type c:ArcSwipeActionButton}" TargetType="c:ArcSwipeActionButton">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Padding" Value="8,10" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXs}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="1"
+                  CornerRadius="6"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.accent">
+      <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcAccentForeground}" />
+    </Style>
+    <Style Selector="^.danger">
+      <Setter Property="Background" Value="{DynamicResource ArcDanger}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcDangerForeground}" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Root">
+      <Setter Property="Opacity" Value="0.78" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcSwipeActions}" TargetType="c:ArcSwipeActions">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="Padding" Value="16,14" />
+    <Setter Property="MinHeight" Value="64" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Frame"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  ClipToBounds="True">
+            <Grid>
+              <StackPanel x:Name="LeadingHost"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Stretch" />
+              <StackPanel x:Name="TrailingHost"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Stretch" />
+              <Border x:Name="Surface"
+                      Background="{TemplateBinding Background}"
+                      RenderTransformOrigin="0.5,0.5">
+                <ContentPresenter x:Name="Content"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Margin="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+              </Border>
+            </Grid>
+          </Border>
+          <TextBlock x:Name="Status"
+                     Height="0"
+                     Opacity="0"
+                     IsHitTestVisible="False"
+                     AutomationProperties.LiveSetting="Polite" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

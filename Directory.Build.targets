@@ -1,0 +1,10 @@
+<Project>
+  <!--
+    Avalonia's stats task writes a telemetry log to %LOCALAPPDATA%\AvaloniaUI\BuildServices\buildtasks.log,
+    which the sandbox denies. The task runs only when UsedAvaloniaProducts is non-empty, so clear it here:
+    Directory.Build.targets is evaluated after the Avalonia package props that set the property.
+  -->
+  <PropertyGroup>
+    <UsedAvaloniaProducts></UsedAvaloniaProducts>
+  </PropertyGroup>
+</Project>

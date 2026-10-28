@@ -1,0 +1,13 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Feedback.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcCountdown}" TargetType="c:ArcCountdown">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="PART_Host" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

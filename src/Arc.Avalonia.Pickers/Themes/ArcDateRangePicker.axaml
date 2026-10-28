@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:p="using:Arc.Avalonia.Pickers.Controls">
+
+  <ControlTheme x:Key="{x:Type p:ArcDateRangePicker}" TargetType="p:ArcDateRangePicker">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock x:Name="PART_Label" Classes="arc-label" IsVisible="False" />
+          <Button x:Name="PART_Trigger"
+                  Theme="{StaticResource ArcPickerFieldTheme}"
+                  HorizontalAlignment="Stretch">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <c:ArcIcon Grid.Column="0"
+                         Icon="calendar"
+                         Size="18"
+                         Margin="0,0,10,0"
+                         VerticalAlignment="Center" />
+              <TextBlock x:Name="PART_Value"
+                         Grid.Column="1"
+                         Classes="picker-placeholder"
+                         Text="Select dates" />
+              <c:ArcIcon Grid.Column="2"
+                         Icon="chevron-down"
+                         Size="16"
+                         Margin="8,0,0,0"
+                         VerticalAlignment="Center" />
+            </Grid>
+          </Button>
+          <TextBlock x:Name="PART_Description"
+                     Classes="arc-caption"
+                     IsVisible="False"
+                     TextWrapping="Wrap" />
+          <Popup x:Name="PART_Popup"
+                 Placement="BottomEdgeAlignedLeft"
+                 VerticalOffset="6"
+                 IsLightDismissEnabled="True">
+            <Border Classes="picker-popup">
+              <Grid ColumnDefinitions="Auto,Auto">
+                <StackPanel Grid.Column="0"
+                            Width="156"
+                            Margin="0,0,16,0"
+                            Spacing="2">
+                  <TextBlock Text="Presets"
+                             Classes="arc-caption"
+                             Margin="10,0,0,6" />
+                  <StackPanel x:Name="PART_Presets" Spacing="2" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="12">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <p:ArcCalendar x:Name="PART_CalendarLeft" />
+                    <p:ArcCalendar x:Name="PART_CalendarRight" />
+                  </StackPanel>
+                  <Border Classes="picker-separator" />
+                  <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBlock x:Name="PART_Footer"
+                               Classes="arc-caption"
+                               VerticalAlignment="Center" />
+                    <c:ArcButton x:Name="PART_Cancel"
+                                 Grid.Column="1"
+                                 Variant="Secondary"
+                                 Size="Sm"
+                                 Content="Cancel"
+                                 Margin="0,0,8,0" />
+                    <c:ArcButton x:Name="PART_Apply"
+                                 Grid.Column="2"
+                                 Variant="Primary"
+                                 Size="Sm"
+                                 Content="Apply" />
+                  </Grid>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Popup>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Arc.Avalonia.Gallery</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Gallery</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.AdvancedInputs\Arc.Avalonia.AdvancedInputs.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.AdvancedActions\Arc.Avalonia.AdvancedActions.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />    <ProjectReference Include="..\Arc.Avalonia.SpecialGlass\Arc.Avalonia.SpecialGlass.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.SpecialMotion\Arc.Avalonia.SpecialMotion.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.SpecialMedia\Arc.Avalonia.SpecialMedia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.SpecialAIWidgets\Arc.Avalonia.SpecialAIWidgets.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.SpecialAIExplainers\Arc.Avalonia.SpecialAIExplainers.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksMarketing\Arc.Avalonia.BlocksMarketing.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksCommerce\Arc.Avalonia.BlocksCommerce.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksApp\Arc.Avalonia.BlocksApp.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksTeam\Arc.Avalonia.BlocksTeam.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksData\Arc.Avalonia.BlocksData.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.BlocksAI\Arc.Avalonia.BlocksAI.csproj" />
+  </ItemGroup>
+</Project>
+

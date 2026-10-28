@@ -1,0 +1,2339 @@
+{
+  "schema": "arc-extension-catalog/v2",
+  "version": 2,
+  "generatedFor": "面向“AI Agent 界面”的 Arc for Avalonia UI 扩展目录（纯 UI，不含宿主运行时）",
+  "generatedFrom": [
+    "docs/arc-catalog.json（现有 294 项目录基线）",
+    "docs/agent-life-tools/02-life-proposals.json（生活域 24 项）",
+    "docs/agent-life-tools/03-agent-proposals.json（Agent 域 28 项）",
+    "Lead 评审补充 5 项 + 4 项优先级调整",
+    "v2（2026-10-28）范围修订：移除 v1 的宿主侧服务字段，改为宿主责任（scope.hostResponsibilities）"
+  ],
+  "conventions": {
+    "kind": {
+      "component": "可复用交互控件",
+      "special": "自绘/动画型特殊组件",
+      "block": "页面级组合，复用现有控件"
+    },
+    "priority": {
+      "P0": "不补就无法做出可用的 Agent 生活工具（MVP 阻塞）",
+      "P1": "显著提升可用性与生活域完整度",
+      "P2": "锦上添花或垂直场景"
+    },
+    "effort": {
+      "S": "≤1 人日",
+      "M": "2–4 人日",
+      "L": "1–2 周",
+      "_personDays": {
+        "S": 1,
+        "M": 3,
+        "L": 8
+      }
+    },
+    "asset": {
+      "life": "生活内容域",
+      "agent": "Agent 状态与交互 UI",
+      "foundation": "跨域 UI 基础件"
+    },
+    "itemFields": {
+      "reviewNote": "Lead 评审对优先级/范围的调整说明（4 项）",
+      "dedupeNote": "与现有 294 项的去重判断说明（习惯连续条为变体优先、参考带图表为扩展优先，各 1 条）"
+    },
+    "scope": "UI only：组件展示状态、发出意图事件；Agent 逻辑/数据/运行时由宿主应用负责（见顶层 scope 字段）"
+  },
+  "scope": {
+    "uiOnly": true,
+    "libraryResponsibility": "组件/页面负责展示状态与发出交互意图；不实现 Agent 逻辑、数据、调度、通知、权限、模型/工具调用。",
+    "hostResponsibilities": [
+      "Agent 规划、推理、模型调用与工具执行",
+      "数据持久化、同步、迁移、备份",
+      "定时/触发与后台任务调度",
+      "系统通知投放、托盘常驻、全局热键、开机启动",
+      "权限校验、沙箱与策略执行",
+      "MCP/插件连接、认证与重连",
+      "语音 VAD/ASR/TTS 与音频设备",
+      "成本计量、日志采集与上报",
+      "文案翻译与地区数据"
+    ],
+    "componentContract": [
+      "输入：ItemsSource / 只读模型 + 状态枚举",
+      "输出：ActionRequested / DecisionChanged / Dismissed 等意图事件",
+      "无副作用：不读写宿主数据、不发网络/模型调用、不注册系统能力",
+      "内置完整视觉状态：Loading/Empty/Error/Partial/Running/Paused/NeedsInput/Done/Failed"
+    ],
+    "note": "items 的 notes 中涉及宿主运行时的句子，均表示‘组件需要展示的宿主状态/接口’，不属于本目录交付物。"
+  },
+  "summary": {
+    "uiOnly": true,
+    "total": 57,
+    "byPriority": {
+      "P0": 14,
+      "P1": 34,
+      "P2": 9
+    },
+    "byKind": {
+      "component": 16,
+      "special": 9,
+      "block": 32
+    },
+    "byAsset": {
+      "life": 25,
+      "agent": 28,
+      "foundation": 4
+    },
+    "byEffort": {
+      "S": 8,
+      "M": 33,
+      "L": 16
+    },
+    "effortPersonDays": 235,
+    "p0PersonDays": 72,
+    "byProject": {
+      "Arc.Avalonia": 1,
+      "Arc.Avalonia.Actions": 2,
+      "Arc.Avalonia.AdvancedInputs": 3,
+      "Arc.Avalonia.BlocksAI": 7,
+      "Arc.Avalonia.BlocksApp": 18,
+      "Arc.Avalonia.BlocksCommerce": 5,
+      "Arc.Avalonia.BlocksData": 2,
+      "Arc.Avalonia.Charts": 2,
+      "Arc.Avalonia.Content": 2,
+      "Arc.Avalonia.Feedback": 3,
+      "Arc.Avalonia.Inputs": 1,
+      "Arc.Avalonia.Media": 1,
+      "Arc.Avalonia.Pickers": 1,
+      "Arc.Avalonia.SpecialAIWidgets": 8,
+      "Arc.Avalonia.SpecialMedia": 1
+    },
+    "byCategory": {
+      "AI": 7,
+      "AI widgets": 8,
+      "Activity": 2,
+      "App shell and settings": 3,
+      "Cards": 1,
+      "Charts": 2,
+      "Daily life": 22,
+      "Editors": 1,
+      "Foundation": 1,
+      "Gestures": 1,
+      "Media and input": 1,
+      "Messages": 2,
+      "Pickers": 1,
+      "Progress": 1,
+      "Selects": 1,
+      "Special inputs": 2,
+      "Toggles": 1
+    }
+  },
+  "grouping": {
+    "componentCategories": [
+      {
+        "name": "Gestures",
+        "items": [
+          "spoken-confirmation"
+        ]
+      },
+      {
+        "name": "Special inputs",
+        "items": [
+          "quick-capture-bar",
+          "global-hotkey-field"
+        ]
+      },
+      {
+        "name": "Selects",
+        "items": [
+          "permission-scope-picker"
+        ]
+      },
+      {
+        "name": "Toggles",
+        "items": [
+          "autonomy-dial"
+        ]
+      },
+      {
+        "name": "Pickers",
+        "items": [
+          "routine-schedule-editor"
+        ]
+      },
+      {
+        "name": "Editors",
+        "items": [
+          "diff-review"
+        ]
+      },
+      {
+        "name": "Messages",
+        "items": [
+          "agent-handoff-banner",
+          "guardrail-alert"
+        ]
+      },
+      {
+        "name": "Progress",
+        "items": [
+          "agent-budget-bar"
+        ]
+      },
+      {
+        "name": "Cards",
+        "items": [
+          "weather-forecast"
+        ]
+      },
+      {
+        "name": "Charts",
+        "items": [
+          "habit-streak-strip",
+          "reference-band-chart"
+        ]
+      },
+      {
+        "name": "Activity",
+        "items": [
+          "agent-transcript",
+          "reminder-row"
+        ]
+      },
+      {
+        "name": "Foundation",
+        "items": [
+          "virtualized-list"
+        ]
+      }
+    ],
+    "specialGroups": [
+      {
+        "name": "Media and input",
+        "items": [
+          "voice-session-bar"
+        ]
+      },
+      {
+        "name": "AI widgets",
+        "items": [
+          "agent-ask-card",
+          "background-run-dock",
+          "run-control-bar",
+          "tool-approval-sheet",
+          "checkpoint-restore",
+          "local-model-status",
+          "memory-review-queue",
+          "run-trace-viewer"
+        ]
+      }
+    ],
+    "blockGroups": [
+      {
+        "name": "App shell and settings",
+        "items": [
+          "desktop-agent-settings",
+          "notification-routing",
+          "tray-menu"
+        ]
+      },
+      {
+        "name": "AI",
+        "items": [
+          "agent-attention-inbox",
+          "agent-audit-log",
+          "connector-health",
+          "offline-action-queue",
+          "trust-rules-manager",
+          "model-routing-policy",
+          "run-history-list"
+        ]
+      },
+      {
+        "name": "Daily life",
+        "items": [
+          "daily-brief",
+          "day-agenda",
+          "medication-schedule",
+          "reminder-center",
+          "bill-due-list",
+          "budget-board",
+          "daily-journal",
+          "document-vault",
+          "expense-ledger",
+          "focus-session",
+          "grocery-list",
+          "habit-tracker",
+          "home-maintenance",
+          "meal-planner",
+          "smart-home-panel",
+          "subscription-tracker",
+          "task-board",
+          "trip-itinerary",
+          "chore-board",
+          "energy-usage",
+          "package-inbox",
+          "pet-care"
+        ]
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "morning-brief",
+      "title": "晨间简报",
+      "summary": "起床后五分钟内看到今天的日程、到期提醒、健康与预算概览，以及一条可以立即执行的建议；用户确认后由 Agent 完成排程与通知。",
+      "domain": "life",
+      "proposalSlugs": [
+        "daily-brief",
+        "day-agenda",
+        "focus-session",
+        "habit-tracker",
+        "quick-capture-bar",
+        "reminder-center",
+        "reminder-row",
+        "task-board",
+        "weather-forecast"
+      ]
+    },
+    {
+      "id": "medication-plan",
+      "title": "服药计划",
+      "summary": "慢病或短期用药每天多次服药，记录剂量与已服/漏服，续方与库存不足提前提醒，家属可以代为确认。",
+      "domain": "life",
+      "proposalSlugs": [
+        "habit-streak-strip",
+        "medication-schedule",
+        "reminder-center",
+        "reminder-row"
+      ]
+    },
+    {
+      "id": "bill-due",
+      "title": "账单到期",
+      "summary": "房租、水电、信用卡、保险等周期性账单在到期前分层提醒，标记已付，查看本期与未来三十天的支出。",
+      "domain": "life",
+      "proposalSlugs": [
+        "bill-due-list",
+        "budget-board",
+        "daily-brief",
+        "energy-usage",
+        "expense-ledger",
+        "reference-band-chart",
+        "reminder-center",
+        "reminder-row",
+        "subscription-tracker"
+      ]
+    },
+    {
+      "id": "weekly-meal-plan",
+      "title": "每周备餐",
+      "summary": "周末规划一周三餐，复用常做菜谱，按人数调整份量，自动汇总成按货架分区的采买清单。",
+      "domain": "life",
+      "proposalSlugs": [
+        "grocery-list",
+        "meal-planner"
+      ]
+    },
+    {
+      "id": "trip-itinerary",
+      "title": "旅行行程",
+      "summary": "出行前把交通、住宿、预约与证件集中在一处；行程中按天查看下一步，天气变化时由 Agent 提出调整。",
+      "domain": "life",
+      "proposalSlugs": [
+        "document-vault",
+        "package-inbox",
+        "trip-itinerary",
+        "weather-forecast"
+      ]
+    },
+    {
+      "id": "home-repair",
+      "title": "家庭维修",
+      "summary": "家电或房屋报修：记录故障、预约上门、核对保修到期、归档维修单据与费用。",
+      "domain": "life",
+      "proposalSlugs": [
+        "document-vault",
+        "home-maintenance",
+        "package-inbox"
+      ]
+    },
+    {
+      "id": "mood-journal",
+      "title": "情绪日记",
+      "summary": "每天用一分钟记录心情、事件与一句话总结，按月回看情绪与睡眠、社交的关联。",
+      "domain": "life",
+      "proposalSlugs": [
+        "daily-journal",
+        "focus-session",
+        "habit-streak-strip",
+        "virtualized-list"
+      ]
+    },
+    {
+      "id": "focus-block",
+      "title": "专注时段",
+      "summary": "进入五十分钟专注：声明本次目标、压掉非紧急打扰、记录中断，结束时给出完成情况与下一步。",
+      "domain": "life",
+      "proposalSlugs": [
+        "day-agenda",
+        "focus-session",
+        "habit-streak-strip",
+        "habit-tracker",
+        "smart-home-panel"
+      ]
+    },
+    {
+      "id": "parcel-tracking",
+      "title": "包裹快递",
+      "summary": "多个包裹的物流状态与预计到达集中查看，代收与改约提前处理，异常件主动提示。",
+      "domain": "life",
+      "proposalSlugs": [
+        "daily-brief",
+        "package-inbox",
+        "reminder-center"
+      ]
+    },
+    {
+      "id": "subscription-audit",
+      "title": "订阅管理",
+      "summary": "按月检查所有订阅的续费日、涨价与闲置情况，计算月度与年度总成本，逐项决定保留或取消。",
+      "domain": "life",
+      "proposalSlugs": [
+        "bill-due-list",
+        "expense-ledger",
+        "reminder-row",
+        "subscription-tracker"
+      ]
+    },
+    {
+      "id": "id-expiry",
+      "title": "证件到期",
+      "summary": "身份证、护照、驾照、保险与签证的到期日前置提醒，附续办材料清单与办理入口。",
+      "domain": "life",
+      "proposalSlugs": [
+        "document-vault",
+        "reminder-center",
+        "reminder-row"
+      ]
+    },
+    {
+      "id": "report-archive",
+      "title": "体检报告归档",
+      "summary": "把体检、化验与影像报告归档，抽取指标做趋势与参考范围对照，异常值单独提示。",
+      "domain": "life",
+      "proposalSlugs": [
+        "document-vault",
+        "medication-schedule",
+        "reference-band-chart"
+      ]
+    },
+    {
+      "id": "relationship-upkeep",
+      "title": "生日与关系维护",
+      "summary": "记住家人朋友的生日与纪念日、上次联系时间与对方近况，按合适节奏提醒问候，避免群发式打扰。",
+      "domain": "life",
+      "proposalSlugs": [
+        "daily-journal"
+      ]
+    },
+    {
+      "id": "home-energy",
+      "title": "家庭能耗",
+      "summary": "结合账单、天气与设备使用解释本月电水气费用，发现异常用量并给出可执行的节省建议。",
+      "domain": "life",
+      "proposalSlugs": [
+        "budget-board",
+        "daily-brief",
+        "energy-usage",
+        "home-maintenance",
+        "reference-band-chart",
+        "smart-home-panel",
+        "weather-forecast"
+      ]
+    },
+    {
+      "id": "pet-care",
+      "title": "宠物照护",
+      "summary": "喂食、遛弯、驱虫、疫苗与兽医预约的时间表，记录体重与用药，出门时给照看人一份交接说明。",
+      "domain": "life",
+      "proposalSlugs": [
+        "pet-care"
+      ]
+    },
+    {
+      "id": "grocery-run",
+      "title": "采买清单",
+      "summary": "按货架分区排列的家庭采买清单，边买边勾选，缺货可替换，多人可同时补充。",
+      "domain": "life",
+      "proposalSlugs": [
+        "chore-board",
+        "grocery-list",
+        "meal-planner"
+      ]
+    },
+    {
+      "id": "chore-rota",
+      "title": "家务轮值",
+      "summary": "把重复家务分配到家庭成员并轮换，到期提醒、完成确认与本月分担是否公平的简单回顾。",
+      "domain": "life",
+      "proposalSlugs": [
+        "chore-board",
+        "habit-streak-strip",
+        "pet-care",
+        "reminder-center",
+        "reminder-row",
+        "task-board"
+      ]
+    },
+    {
+      "id": "sleep-trend",
+      "title": "睡眠与健康趋势",
+      "summary": "睡眠时长、入睡时间与日间精力放在同一时间轴上看趋势，和参考范围对照，异常时建议就诊。",
+      "domain": "life",
+      "proposalSlugs": [
+        "daily-journal",
+        "habit-tracker",
+        "reference-band-chart"
+      ]
+    },
+    {
+      "id": "expense-split",
+      "title": "聚餐分摊",
+      "summary": "朋友聚餐或合租费用按人/按项分摊，记录谁先垫付、谁还欠谁，结算后归档。",
+      "domain": "life",
+      "proposalSlugs": [
+        "expense-ledger"
+      ]
+    },
+    {
+      "id": "smart-home-scene",
+      "title": "回家场景",
+      "summary": "回家、离家、睡眠三个场景一键调整灯光、空调与安防，设备离线时给出降级操作。",
+      "domain": "life",
+      "proposalSlugs": [
+        "energy-usage",
+        "smart-home-panel"
+      ]
+    },
+    {
+      "id": "spend-capture",
+      "title": "随手记账",
+      "summary": "花完钱顺手记一笔：金额、分类、备注与收据照片，月底看分类占比与超支项。",
+      "domain": "life",
+      "proposalSlugs": [
+        "bill-due-list",
+        "budget-board",
+        "expense-ledger",
+        "quick-capture-bar",
+        "subscription-tracker"
+      ]
+    },
+    {
+      "id": "appointment-prep",
+      "title": "就诊准备",
+      "summary": "就诊前汇总症状、用药、近期报告与要问医生的问题；就诊后记录结论、处方与下次复查时间。",
+      "domain": "life",
+      "proposalSlugs": [
+        "day-agenda",
+        "document-vault",
+        "medication-schedule",
+        "quick-capture-bar"
+      ]
+    },
+    {
+      "id": "outdoor-plan",
+      "title": "周末户外",
+      "summary": "根据天气窗口、同行人与装备约束安排周末户外活动，出发前确认集合时间与地点。",
+      "domain": "life",
+      "proposalSlugs": [
+        "day-agenda",
+        "trip-itinerary",
+        "weather-forecast"
+      ]
+    },
+    {
+      "id": "family-logistics",
+      "title": "家庭日程协同",
+      "summary": "家庭成员的接送、聚会、家务与外出安排放在同一视图里，冲突提前暴露并给出替代方案。",
+      "domain": "life",
+      "proposalSlugs": [
+        "budget-board",
+        "chore-board",
+        "day-agenda",
+        "grocery-list",
+        "home-maintenance",
+        "meal-planner",
+        "pet-care",
+        "task-board",
+        "trip-itinerary"
+      ]
+    },
+    {
+      "id": "daily-plan-approval",
+      "title": "每日计划审批",
+      "summary": "每天早晨 Agent 根据日历、待办、差事与预算生成一天的计划；用户在计划草稿上改步骤、重排、看预计耗时与花费，批准后 Agent 才执行。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-ask-card",
+        "autonomy-dial",
+        "tool-approval-sheet"
+      ]
+    },
+    {
+      "id": "first-run-permissions",
+      "title": "首次能力授权",
+      "summary": "安装后授权日历、邮件、文件、支付等能力，同时设定默认自主级别、通知通道与本地/云端模型，之后可随时收紧。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-ask-card",
+        "autonomy-dial",
+        "connector-health",
+        "desktop-agent-settings",
+        "guardrail-alert",
+        "local-model-status",
+        "permission-scope-picker",
+        "routine-schedule-editor",
+        "trust-rules-manager"
+      ]
+    },
+    {
+      "id": "errand-preflight",
+      "title": "代办前预演",
+      "summary": "下单、预约、转账、发邮件之前，Agent 展示将要执行的工具调用、参数、副作用与撤销方式，用户确认或改参后再执行。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-ask-card",
+        "agent-audit-log",
+        "checkpoint-restore",
+        "diff-review",
+        "permission-scope-picker",
+        "tool-approval-sheet",
+        "trust-rules-manager"
+      ]
+    },
+    {
+      "id": "routine-fire-review",
+      "title": "例行任务触发与复核",
+      "summary": "到点后 routine 在后台执行，完成后给出结果、变更与失败项；用户复核、重做、调整排期或暂停该 routine。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-attention-inbox",
+        "agent-budget-bar",
+        "agent-transcript",
+        "background-run-dock",
+        "connector-health",
+        "notification-routing",
+        "routine-schedule-editor",
+        "run-history-list",
+        "tray-menu"
+      ]
+    },
+    {
+      "id": "interrupted-run",
+      "title": "打断与改向",
+      "summary": "多步任务运行中，用户停止（立即或做完当前步）、暂停、补充新目标或直接接管某一步，Agent 按新指令继续。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-handoff-banner",
+        "agent-transcript",
+        "run-control-bar",
+        "voice-session-bar"
+      ]
+    },
+    {
+      "id": "failure-recovery",
+      "title": "失败恢复",
+      "summary": "工具报错、网络断开、授权过期时，Agent 提出并展示重试、换工具、降级或从检查点回滚的选项与影响范围。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-attention-inbox",
+        "checkpoint-restore",
+        "connector-health",
+        "offline-action-queue",
+        "run-trace-viewer"
+      ]
+    },
+    {
+      "id": "budget-guard",
+      "title": "成本护栏",
+      "summary": "长任务与常驻 routine 的 tokens、时长、金额接近预算时预警，自动降级模型、暂停或等待用户继续授权。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-budget-bar",
+        "model-routing-policy",
+        "run-trace-viewer"
+      ]
+    },
+    {
+      "id": "memory-review",
+      "title": "记忆周检",
+      "summary": "每周审阅 Agent 新学到的记忆与冲突项，查看来源与置信度，编辑、合并、遗忘或标记永不再记。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "memory-review-queue",
+        "virtualized-list"
+      ]
+    },
+    {
+      "id": "focus-hours",
+      "title": "专注时段打扰控制",
+      "summary": "工作与睡眠时段内 Agent 只记录不打扰，紧急审批才升级提醒，其余进每日摘要；用户可临时突破静默。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-attention-inbox",
+        "autonomy-dial",
+        "background-run-dock",
+        "desktop-agent-settings",
+        "notification-routing",
+        "tray-menu"
+      ]
+    },
+    {
+      "id": "offline-travel",
+      "title": "离线与本地模型",
+      "summary": "断网或旅行时由本地模型接管可离线完成的任务，动作排队等待恢复，恢复后重放并解决本地/云端冲突。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "guardrail-alert",
+        "local-model-status",
+        "model-routing-policy",
+        "offline-action-queue"
+      ]
+    },
+    {
+      "id": "voice-morning-checkin",
+      "title": "语音晨间问询",
+      "summary": "免手场景下用语音问答获取今天的安排，语音确认敏感动作，Agent 读出结果与待办。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "global-hotkey-field",
+        "spoken-confirmation",
+        "voice-session-bar"
+      ]
+    },
+    {
+      "id": "audit-after-fact",
+      "title": "事后审计",
+      "summary": "回溯过去一周 Agent 做了什么、为什么这么做、谁批准、花了多少，按域/结果筛选并导出。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-audit-log",
+        "agent-transcript",
+        "checkpoint-restore",
+        "diff-review",
+        "run-history-list",
+        "run-trace-viewer",
+        "trust-rules-manager",
+        "virtualized-list"
+      ]
+    },
+    {
+      "id": "unattended-background",
+      "title": "后台常驻",
+      "summary": "关闭主窗口后 Agent 继续执行，托盘或菜单栏显示运行状态，完成或失败时通过系统通知触达并可从托盘唤回。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-attention-inbox",
+        "agent-budget-bar",
+        "background-run-dock",
+        "desktop-agent-settings",
+        "diff-review",
+        "global-hotkey-field",
+        "notification-routing",
+        "run-control-bar",
+        "tray-menu"
+      ]
+    },
+    {
+      "id": "handoff-takeover",
+      "title": "人工接管",
+      "summary": "Agent 卡在验证码、银行 2FA 或复杂表单时，用户接管当前步骤，完成后把控制权交还 Agent 从下一步继续。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "agent-handoff-banner",
+        "run-control-bar"
+      ]
+    },
+    {
+      "id": "sensitive-confirm",
+      "title": "敏感动作确认",
+      "summary": "支付、发送、删除等不可逆动作需要二次确认；免手场景可要求语音复述关键信息后才执行。",
+      "domain": "agent",
+      "proposalSlugs": [
+        "guardrail-alert",
+        "spoken-confirmation",
+        "tool-approval-sheet"
+      ]
+    }
+  ],
+  "crossDomainDependencies": [
+    {
+      "from": "reminder-row",
+      "to": [
+        "routine-schedule-editor",
+        "notification-routing"
+      ],
+      "reason": "重复规则编辑与通知偏好页面复用 Agent 域 UI。"
+    },
+    {
+      "from": "reminder-center",
+      "to": [
+        "routine-schedule-editor",
+        "notification-routing",
+        "background-run-dock"
+      ],
+      "reason": "提醒分组/延后需要排期编辑、通知偏好与运行状态坞。"
+    },
+    {
+      "from": "day-agenda",
+      "to": [
+        "routine-schedule-editor"
+      ],
+      "reason": "跨天/重复事件的展示依赖重复规则编辑器。"
+    },
+    {
+      "from": "medication-schedule",
+      "to": [
+        "notification-routing"
+      ],
+      "reason": "服药提醒的渠道偏好复用通知路由 UI。"
+    },
+    {
+      "from": "daily-brief",
+      "to": [
+        "agent-attention-inbox"
+      ],
+      "reason": "简报中的“待你处理”建议来自统一待处理队列 UI。"
+    },
+    {
+      "from": "task-board",
+      "to": [
+        "quick-capture-bar"
+      ],
+      "reason": "任务快速添加复用捕获条。"
+    },
+    {
+      "from": "agent-transcript",
+      "to": [
+        "virtualized-list"
+      ],
+      "reason": "长会话事件流必须建立在列表虚拟化之上。"
+    },
+    {
+      "from": "run-trace-viewer",
+      "to": [
+        "virtualized-list"
+      ],
+      "reason": "执行轨迹条目数大，必须虚拟化。"
+    },
+    {
+      "from": "expense-ledger",
+      "to": [
+        "virtualized-list"
+      ],
+      "reason": "交易明细上量前必须虚拟化。"
+    },
+    {
+      "from": "tool-approval-sheet",
+      "to": [
+        "permission-scope-picker",
+        "trust-rules-manager"
+      ],
+      "reason": "审批单的“记住范围/规则”落到权限选择器与信任规则 UI。"
+    },
+    {
+      "from": "background-run-dock",
+      "to": [
+        "tray-menu"
+      ],
+      "reason": "后台运行状态与托盘入口（视觉）互补。"
+    },
+    {
+      "from": "agent-attention-inbox",
+      "to": [
+        "notification-routing",
+        "tray-menu"
+      ],
+      "reason": "统一待处理队列需要通知偏好与桌面入口 UI。"
+    }
+  ],
+  "projectSuggestions": [
+    {
+      "group": "Daily life",
+      "recommendation": "22 个生活域 block 建议新建 Arc.Avalonia.BlocksLife；扩展目录暂把 project 指向现有 BlocksApp/BlocksCommerce/BlocksData（15/5/2）以保证可构建，落地时一次性迁移。"
+    },
+    {
+      "group": "Foundation",
+      "recommendation": "virtualized-list 放在基础层 Arc.Avalonia（与 ArcButton/ArcCard 同级），供所有长列表组件复用。"
+    },
+    {
+      "group": "AI widgets",
+      "recommendation": "run-control-bar / tool-approval-sheet / agent-ask-card / background-run-dock 等 4 个 P0 special 落在 Arc.Avalonia.SpecialAIWidgets，与现有 11 项并列。"
+    }
+  ],
+  "items": [
+    {
+      "slug": "quick-capture-bar",
+      "title": "Quick capture bar",
+      "kind": "component",
+      "category": "Special inputs",
+      "project": "Arc.Avalonia.AdvancedInputs",
+      "asset": "foundation",
+      "priority": "P0",
+      "effort": "M",
+      "why": "全局热键唤起的一句话捕获入口是生活工具最高频动作，但现有 command-palette 是整页 block，输入组件里没有“自然语言 → 解析 chips → 确认”的捕获原语。",
+      "scenarios": [
+        "spend-capture",
+        "appointment-prep",
+        "morning-brief"
+      ],
+      "composes": [
+        "expanding-search",
+        "tag-input",
+        "mention-input",
+        "shortcut-recorder",
+        "command-palette"
+      ],
+      "notes": "浮层式输入条：输入文本 → 解析结果 chips（时间、人物、金额、清单）→ 确认；Esc 关闭、Enter 确认、Tab 在 chips 间移动。控件只暴露 Show/Hide 与 SubmitRequested，解析与落库由宿主完成；全局热键注册属宿主。",
+      "source": "lead"
+    },
+    {
+      "slug": "routine-schedule-editor",
+      "title": "Routine schedule editor",
+      "kind": "component",
+      "category": "Pickers",
+      "project": "Arc.Avalonia.Pickers",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "L",
+      "why": "agent-routines 的 schedule editor 只改句子与倒计时字符串（ImplementationNotes 明示），没有 RRULE、时区、下次运行预览、错过与重叠策略；而定时例行任务是桌面助手的主循环。",
+      "scenarios": [
+        "routine-fire-review",
+        "first-run-permissions"
+      ],
+      "composes": [
+        "agent-routines",
+        "calendar",
+        "time-picker",
+        "select",
+        "switch",
+        "countdown"
+      ],
+      "notes": "人类句子与结构化 RRULE 双向同步，预览 next 5 runs（跨时区/夏令时），策略：错过补跑或跳过、重叠跳过或排队、需要用户在场、静默时段；输出 ScheduleSpec(rrule, timezone, misfire, overlap)。桌面约束：休眠唤醒后重算 misfire 并提示，而不是静默补跑一串任务。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "agent-transcript",
+      "title": "Agent transcript",
+      "kind": "component",
+      "category": "Activity",
+      "project": "Arc.Avalonia.Content",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "M",
+      "why": "Agent 运行需要一条可增量追加、可虚拟化的统一事件流；现有 ai-chat 是整页 block、chat-thread 只有聊天气泡且每次变更整树重建。",
+      "scenarios": [
+        "interrupted-run",
+        "routine-fire-review",
+        "audit-after-fact"
+      ],
+      "composes": [
+        "ai-chat",
+        "chat-thread",
+        "tool-call",
+        "agent-plan",
+        "agent-approvals",
+        "agent-ask-card",
+        "empty-state"
+      ],
+      "notes": "复用 ChatThread 气泡与 AiChat 的 markdown 子集，但以事件类型（message/thinking/tool/plan/approval/ask/result/error）的只读数据模型驱动；增量 Insert/Update/Remove，而不是 Children.Clear 全量重建（见 docs/04 R4 与 G-P0-7）；含 stick-to-bottom、jump-to-latest、新输出 pill、逐事件操作。与 ai-chat 的分工：后者是完整聊天产品页，本项是可嵌进任意 Agent 面板的事件列表原语。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "reminder-row",
+      "title": "Reminder row",
+      "kind": "component",
+      "category": "Activity",
+      "project": "Arc.Avalonia.Feedback",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "现有列表行没有一个能同时表达「到期时间 + 重复标记 + 完成/延后动作」，提醒只能散落在 notification-center 的只读行和 inbox-triage 的消息行里。",
+      "scenarios": [
+        "morning-brief",
+        "medication-plan",
+        "bill-due",
+        "chore-rota",
+        "id-expiry",
+        "subscription-audit"
+      ],
+      "composes": [
+        "badge",
+        "checkbox",
+        "swipe-actions",
+        "dropdown-menu",
+        "toast"
+      ],
+      "notes": "单一原子行：前导完成控件、标题、到期 chip（今天/2 小时后/逾期 1 天）、重复与来源标记、右侧动作菜单（延后 10 分钟/1 小时/明天、改期、完成、跳过）。状态枚举 Pending/Due/Snoozed/Done/Missed/Paused；延后走本地时间并用 RelativeTime 文案，不自己写定时器逐帧刷新。重复规则不内建，依赖 03 号 Agent 提案 routine-schedule-editor 或简单预设；桌面端系统通知与托盘属应用层，不能只在页面内提示。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "virtualized-list",
+      "title": "Virtualized list",
+      "kind": "component",
+      "category": "Foundation",
+      "project": "Arc.Avalonia",
+      "asset": "foundation",
+      "priority": "P0",
+      "effort": "L",
+      "why": "全库仅 EmojiPicker 有行级虚拟化，DataGrid/TreeTable/ChatThread/Blocks 列表都是 Children.Clear() 全量重建（docs/04 §2.6、R4）；聊天、日志、交易、收件箱这些生活工具主列表在真实数据量下会直接卡死。",
+      "scenarios": [
+        "mood-journal",
+        "audit-after-fact",
+        "memory-review"
+      ],
+      "composes": [
+        "scroll-area",
+        "chat-thread",
+        "data-grid",
+        "sortable-data-table",
+        "tree-view"
+      ],
+      "notes": "基于 ItemsRepeater/VirtualizingStackPanel 的列表原语，提供 ItemsSource、ItemTemplate、增量 Insert/Update/Remove、粘底滚动与 jump-to-latest；作为 agent-transcript / run-trace-viewer / expense-ledger / inbox 的公共底座。必须与共享帧时钟和主题缓存协议一起交付（docs/04 §R1/R2），否则收益被绘制分配抵消。",
+      "source": "lead"
+    },
+    {
+      "slug": "agent-ask-card",
+      "title": "Agent question card",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "M",
+      "why": "ai-chat 只能文本追问；当 Agent 需要用户从日历选日期、从账户列表选卡、上传单据或二选一时，缺少结构化问询与延后回答的卡片。",
+      "scenarios": [
+        "daily-plan-approval",
+        "errand-preflight",
+        "first-run-permissions"
+      ],
+      "composes": [
+        "ai-answer",
+        "dialog",
+        "calendar",
+        "file-dropzone",
+        "radio-cards"
+      ],
+      "notes": "对齐 MCP elicitation：问题 + 字段（single/multi/date/date-range/file/confirm），带校验、跳过、稍后再问、改为文本回答；回答作为结构化 payload 回传，不写死在控件里。状态 Question/Answered/Skipped/Deferred/Expired。与 agent-approvals 的区别是『补充信息』而非『授权』，二者常在同一轮出现。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "background-run-dock",
+      "title": "Background run dock",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "L",
+      "why": "桌面个人助手必须关窗后常驻，但全仓没有任何 TrayIcon 或后台运行 UI（grep 0 处）；agent-status 只在页面内，缺少托盘/浮动坞表达后台运行与一键暂停。",
+      "scenarios": [
+        "unattended-background",
+        "focus-hours",
+        "routine-fire-review"
+      ],
+      "composes": [
+        "agent-status",
+        "control-center",
+        "notification-center",
+        "progress",
+        "tooltip"
+      ],
+      "notes": "运行中/排队 run 列表、总耗时与成本、Pause all、Open last result、静默开关。Avalonia 的 TrayIcon 只支持原生菜单，富 popover 需自建无边框窗口贴托盘定位；Windows 托盘、macOS 菜单栏、Linux AppIndicator 行为不同，需降级为窗口内浮动坞。托盘不可用时由宿主回退到任务栏窗口 + 系统通知（组件只展示回退状态）。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "run-control-bar",
+      "title": "Run control bar",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "M",
+      "why": "现有 agent-status 的 Pause/Stop 只改自身 Status 属性且 Open run 无处理器，ai-composer 的 Stop 只写在注释里；缺少真正向运行时发出停止、改向、接管指令的控件。",
+      "scenarios": [
+        "interrupted-run",
+        "handoff-takeover",
+        "unattended-background"
+      ],
+      "composes": [
+        "agent-status",
+        "hold-to-confirm",
+        "toast",
+        "agent-plan"
+      ],
+      "notes": "常驻运行控制条：Stop now（立即）、Finish step（安全点停止）、Pause、Steer（插入新指令）、Take over；Stop 与不可逆操作接 hold-to-confirm；对外事件 StopRequested(scope)、PauseRequested、SteerRequested(text)、TakeoverRequested。控件不得像 ArcToolCall.Approve 那样直接改数据模型（现状见 ArcToolCall.cs:637-678），必须由宿主拦截。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "tool-approval-sheet",
+      "title": "Tool approval sheet",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "L",
+      "why": "agent-approvals 的参数是只读行、Always allow 只是一枚 chip 且不触达 agent；付款、发邮件、改日历等高风险动作需要可预览副作用、可改参、可过期的审批单。",
+      "scenarios": [
+        "errand-preflight",
+        "daily-plan-approval",
+        "sensitive-confirm"
+      ],
+      "composes": [
+        "tool-call",
+        "agent-approvals",
+        "drawer",
+        "hold-to-confirm",
+        "security-settings",
+        "diff-review",
+        "permission-scope-picker"
+      ],
+      "notes": "从底部或右侧升起的审批 surface：工具与图标、自然语言意图、可编辑参数表、将要改动对象的预览（diff/日历/金额）、风险与不可逆提示、有效期倒计时；Decision=Approve/Deny/Approve with edits/Delegate，Scope=Once/Task/Always；审批结果以事件回传。桌面约束：主窗口失焦时由宿主同时发系统通知与托盘红点（组件只展示状态），否则审批准入会被错过。与 agent-approvals 的分工：后者是审批样例页，本项是可复用的审批交互与数据契约。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "agent-attention-inbox",
+      "title": "Agent attention inbox",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P0",
+      "effort": "M",
+      "why": "审批、追问、失败、到期 routine 目前散落在 agent-approvals、notification-center、agent-tasks 三个样例页里，缺少『等你处理』的统一队列供桌面助手常驻。",
+      "scenarios": [
+        "routine-fire-review",
+        "failure-recovery",
+        "focus-hours",
+        "unattended-background"
+      ],
+      "composes": [
+        "agent-approvals",
+        "agent-tasks",
+        "notification-center",
+        "inbox-triage",
+        "filter-toolbar",
+        "empty-state",
+        "agent-ask-card"
+      ],
+      "notes": "按阻塞度排序：阻塞中 > 需授权 > 需补充信息 > 失败 > 已自动处理待复核；行内展开审批或回答，支持批量批准与全部延后；每条带来源 routine/run、到期时间、预计人工耗时。与 notification-center 的分工：前者是通知收件箱（知会），本项是行动队列（必须处理），需要反向计数与托盘红点。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "daily-brief",
+      "title": "Daily brief",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "现有 dashboard 类 block 都是工作/营收视角，没有一个把天气、日程、到期提醒、健康环与预算拼成「今天」的简报卡并给出一个可执行建议。",
+      "scenarios": [
+        "morning-brief",
+        "home-energy",
+        "bill-due",
+        "parcel-tracking"
+      ],
+      "composes": [
+        "day-agenda",
+        "weather-forecast",
+        "reminder-row",
+        "activity-rings",
+        "metric-card",
+        "card",
+        "sparkline",
+        "empty-state"
+      ],
+      "notes": "分节可折叠：今天、天气、到期、健康、钱、包裹；顶部只放一条「下一步」而不是罗列所有建议。数据只在被请求时刷新，不要进页即启动多个 60fps 动画（docs/04 G-P0-2/R5）；截图用固定 now 保证确定性。空数据必须给下一步而不是空白卡片；Agent 生成的建议要标注来源与可拒绝。",
+      "source": "life-proposals",
+      "reviewNote": "Lead 评估：daily-brief 是 morning-brief 场景的旗舰页，提升为 P0（原 02 提案为 P1）。"
+    },
+    {
+      "slug": "day-agenda",
+      "title": "Day agenda",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "L",
+      "why": "calendar 无任何事件标记（仅日期/区间/min/max/DisabledDates），week-calendar 是硬编码示例且不支持新建/移动，没有把事件、提醒、任务、服药放在同一时间轴的日常视图。",
+      "scenarios": [
+        "morning-brief",
+        "family-logistics",
+        "focus-block",
+        "appointment-prep",
+        "outdoor-plan"
+      ],
+      "composes": [
+        "week-calendar",
+        "calendar",
+        "timeline",
+        "reminder-row",
+        "segmented-control",
+        "empty-state",
+        "badge"
+      ],
+      "notes": "三段式：日期头（前一天/今天/日历跳转）、全天条、小时网格；条目按类型着色但只用 token 语义色，当前时间线用一条细线而不是动画。状态：Loading/Empty/Populated/Conflict/Error；冲突只标记不自动重排。时区与 DST 必须由数据层提供 DateTimeOffset 与 IANA 时区，现有 pickers 只存 naive DateTime/TimeSpan。列表少于 50 条可手工构建，超过后必须走虚拟化方案（docs/04 R4）。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "medication-schedule",
+      "title": "Medication schedule",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "M",
+      "why": "健康域只有 activity-rings、gauge 和图表，没有药物/剂量/服药记录/续方库存这些真实健康场景需要的结构与安全确认。",
+      "scenarios": [
+        "medication-plan",
+        "report-archive",
+        "appointment-prep"
+      ],
+      "composes": [
+        "reminder-row",
+        "usage-meter",
+        "progress",
+        "timeline",
+        "badge",
+        "empty-state"
+      ],
+      "notes": "今日卡片按时间列剂量（药名、剂量、餐前/餐后），可「已服/跳过/稍后」；课程进度与续方库存用进度/用量形态；历史用 timeline。状态 Due/Taken/Skipped/Missed/Paused/LowStock。健康数据属高敏感：默认本地、可一键导出与删除、不进入普通搜索索引；漏服补记必须写清时间避免误服。提醒投递与静默时段依赖 agent 域 notification-routing 与托盘方案，不在本项内重复实现。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "reminder-center",
+      "title": "Reminder center",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P0",
+      "effort": "L",
+      "why": "notification-center 只有已读/忽略，inbox-triage 的 snooze 是消息语义且时间不可编辑（ImplementationNotes），缺一个按「逾期/今天/即将/已延后」分组、可批量延后与改期的行动中心。",
+      "scenarios": [
+        "morning-brief",
+        "bill-due",
+        "medication-plan",
+        "chore-rota",
+        "id-expiry",
+        "parcel-tracking"
+      ],
+      "composes": [
+        "reminder-row",
+        "inbox-triage",
+        "notification-center",
+        "segmented-control",
+        "filter-toolbar",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "顶部显示逾期与今天计数，分段为「待处理/即将/已延后/已完成」；支持多选批量延后、改期与完成，单条展开就地编辑。与 notification-center 的分工：后者是知会历史，本项是必须处理的行动队列；与 03 号 Agent 提案 agent-attention-inbox 的分工：本项只处理生活提醒，不接管审批。桌面约束：无浏览器通知，窗口未打开时只能靠系统通知或托盘红点，应用未常驻则不可能触发；休眠唤醒后要重算逾期而不是静默补发。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "permission-scope-picker",
+      "title": "Permission scope picker",
+      "kind": "component",
+      "category": "Selects",
+      "project": "Arc.Avalonia.AdvancedInputs",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "S",
+      "why": "『Always allow』必须落到可审计范围（一次/本任务/1 小时/永久，并限定文件夹、金额、账户、时段），现有 agent-approvals 只有一枚 chip。",
+      "scenarios": [
+        "first-run-permissions",
+        "errand-preflight"
+      ],
+      "composes": [
+        "radio-cards",
+        "tag-input",
+        "segmented-control",
+        "agent-approvals"
+      ],
+      "notes": "选 scope 后追加约束 chips（路径/金额上限/账户/时段），实时生成人类可读的规则句；返回 PermissionGrant(scope, constraints, expiresAt)。与 env-variables 的写保护语义一致：敏感值永不回显，只在摘要里写指纹。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "autonomy-dial",
+      "title": "Autonomy dial",
+      "kind": "component",
+      "category": "Toggles",
+      "project": "Arc.Avalonia.Inputs",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "S",
+      "why": "『哪些事 Agent 可以自己做』必须按域可调（建议→询问→执行→全自动），现有 agent-approvals 只有逐次批准、agent-routines 只有开关。",
+      "scenarios": [
+        "first-run-permissions",
+        "focus-hours",
+        "daily-plan-approval"
+      ],
+      "composes": [
+        "radio-cards",
+        "segmented-control",
+        "switch",
+        "security-settings",
+        "agent-routines"
+      ],
+      "notes": "四档 + 每域例外（日历/邮件/财务/家居）；档位旁显示『过去 7 天该域有多少动作需要你批准』；改动需一次确认并列出会受影响的 Always allow 规则；返回 AutonomyPolicy(domain, level, exceptions)。与 permission-scope-picker 的分工：本项是长期策略，后者是单次授权范围。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "diff-review",
+      "title": "Diff review",
+      "kind": "component",
+      "category": "Editors",
+      "project": "Arc.Avalonia.Content",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "改动批准是 Agent 生活助手的信任核心，但仓库没有通用 diff 控件：ai-side-panel 的 word diff 是预计算样例，agent-run 的 diff 用 token 且是页面内静态。",
+      "scenarios": [
+        "errand-preflight",
+        "unattended-background",
+        "audit-after-fact"
+      ],
+      "composes": [
+        "code-block",
+        "tree-view",
+        "json-viewer",
+        "dialog"
+      ],
+      "notes": "unified/split 两种视图、文件树、逐 hunk Accept/Reject、before/after 切换、只读与可编辑模式；对外事件 HunkDecision。与 ai-side-panel/agent-run 的分工：本项数据驱动、可嵌入审批单与审计页。桌面约束：大文件要虚拟化，遵循 docs/04 R4 的增量/虚拟化要求。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "agent-handoff-banner",
+      "title": "Agent handoff banner",
+      "kind": "component",
+      "category": "Messages",
+      "project": "Arc.Avalonia.Actions",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "S",
+      "why": "Agent 卡在验证码、银行 2FA 或复杂表单时需要用户接管某一步，现有 agent-status 没有『谁在控制、接管多久、何时交还』的表达。",
+      "scenarios": [
+        "handoff-takeover",
+        "interrupted-run"
+      ],
+      "composes": [
+        "agent-status",
+        "presence-stack",
+        "avatar",
+        "dialog",
+        "tooltip"
+      ],
+      "notes": "顶部横幅：Agent 暂停等待你操作 + 接管按钮 + 接管计时 + 交还；接管期间 Agent 只读观察并标注；交还后从下一步继续。状态 AgentWorking/HumanTakeover/Paused/Returning。复用在线的 presence 语义，但不伪装成真人。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "guardrail-alert",
+      "title": "Guardrail alert",
+      "kind": "component",
+      "category": "Messages",
+      "project": "Arc.Avalonia.Actions",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "S",
+      "why": "Agent 读网页/邮件可能遇到提示注入或被策略拦截，现有 alert 没有『规则/风险/覆盖请求』结构，也没有把拦截事件写入审批与审计流。",
+      "scenarios": [
+        "sensitive-confirm",
+        "first-run-permissions",
+        "offline-travel"
+      ],
+      "composes": [
+        "alert",
+        "security-settings",
+        "badge",
+        "dialog"
+      ],
+      "notes": "行内横幅 + 详情抽屉：触发规则、证据片段（不可信来源隔离标注）、风险等级、建议动作、带理由的 override（需二次确认并留痕）；状态 Info/Warn/Blocked/Overridden。与 alert 的分工：本项是结构化安全事件并写审计，不是普通提示。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "agent-budget-bar",
+      "title": "Agent budget bar",
+      "kind": "component",
+      "category": "Progress",
+      "project": "Arc.Avalonia.Feedback",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "S",
+      "why": "agent-timeline 只在运行结束后显示 tokens/cost，usage-meter 是账单视角；缺少运行中的 token/时长/金额预算条与阈值自动降级、暂停。",
+      "scenarios": [
+        "budget-guard",
+        "routine-fire-review",
+        "unattended-background"
+      ],
+      "composes": [
+        "usage-meter",
+        "progress",
+        "gauge",
+        "agent-timeline",
+        "alert"
+      ],
+      "notes": "三段：已用/预算/预测；70%、90%、100% 阈值配文案与颜色；超限动作可选 Pause、降级模型、继续并记录；数据来自运行时 BudgetSnapshot，控件不自行计时。桌面约束：后台 run 超预算时通过托盘红点与系统通知触达，而不是只改应用内颜色。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "weather-forecast",
+      "title": "Weather forecast",
+      "kind": "component",
+      "category": "Cards",
+      "project": "Arc.Avalonia.Feedback",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "全仓没有任何天气展示（grep 仅 emoji 数据里出现 weather 字样），而晨间简报、出行与户外场景都依赖「今天/未来几天」的天气窗口。",
+      "scenarios": [
+        "morning-brief",
+        "trip-itinerary",
+        "outdoor-plan",
+        "home-energy"
+      ],
+      "composes": [
+        "card",
+        "sparkline",
+        "badge",
+        "tooltip"
+      ],
+      "notes": "今日主态（图标/温度/体感/降水概率/风）加 5 天条；温度单位、时区与数据时间戳都是属性，不在控件内部读系统时钟。天气数据源属非 UI 能力，组件只接收已归一化的数据并为「过期/不可用」提供状态；不要内置任何第三方服务或密钥。图标只能用现有 Lucide 子集，缺的天气图标需先在 foundation 补，不在本组件内嵌 SVG。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "habit-streak-strip",
+      "title": "Habit streak strip",
+      "kind": "component",
+      "category": "Charts",
+      "project": "Arc.Avalonia.Charts",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "S",
+      "why": "activity-heatmap 是整年一格一天的节奏视图、activity-rings 是一次三目标的环形，缺一个 7/30 天可点击勾选的紧凑连续条与当前连续天数。",
+      "scenarios": [
+        "medication-plan",
+        "focus-block",
+        "mood-journal",
+        "chore-rota"
+      ],
+      "composes": [
+        "activity-heatmap",
+        "sparkline",
+        "progress",
+        "badge"
+      ],
+      "notes": "建议先作为 activity-heatmap 的 window=week/month 变体实现，确实需要独立标题与点击回填时再升为独立条目；本项按「变体优先」估算为 S。状态：Future/Today/Done/Missed/Partial；颜色只用成功/强调/边框 token，不用红绿表达好坏。当天格可点击补记，键盘可用方向键移动。",
+      "source": "life-proposals",
+      "dedupeNote": "02 §9 判为“变体优先”：先给 activity-heatmap 加 7/30 天窗口；保留为目录项是为独立页面/截图与点击回填契约，实现先在 activity-heatmap 上加窗口参数。"
+    },
+    {
+      "slug": "reference-band-chart",
+      "title": "Reference band chart",
+      "kind": "component",
+      "category": "Charts",
+      "project": "Arc.Avalonia.Charts",
+      "asset": "foundation",
+      "priority": "P1",
+      "effort": "M",
+      "why": "line-chart 没有参考范围带/目标线/阈值注释，gauge 只能表达单值；体检指标的正常范围、预算线和能耗基线都缺一个可读的「值 vs 范围」图形。",
+      "scenarios": [
+        "report-archive",
+        "sleep-trend",
+        "home-energy",
+        "bill-due"
+      ],
+      "composes": [
+        "line-chart",
+        "gauge",
+        "badge"
+      ],
+      "notes": "作为 ArcLineChart 的扩展（Band/Target/Annotation 属性）而不是新的绘制引擎；复用 ChartCore 的测量、文本与像素对齐；与 docs/04 G-P0-3/G-P0-4 的绘制缓存一致，禁止在 Render 内新建 Pen/FormattedText。行为：悬停读出值与范围关系，范围外点用状态色+文字；不做医学建议，只做数据呈现。",
+      "source": "life-proposals",
+      "dedupeNote": "02 §9 判为“扩展优先”：作为 ArcLineChart 的 Band/Target 属性；保留为目录项是为公开 API（ArcLineChart Band/Target）提供文档页，不新增绘制引擎。"
+    },
+    {
+      "slug": "voice-session-bar",
+      "title": "Voice session bar",
+      "kind": "special",
+      "category": "Media and input",
+      "project": "Arc.Avalonia.SpecialMedia",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "voice-orb 是全屏演示件、无事件且麦克风为模拟；缺少常驻的按住说话/打断/静音/转写纠错的紧凑语音条，双向语音无法接入真实会话。",
+      "scenarios": [
+        "voice-morning-checkin",
+        "interrupted-run"
+      ],
+      "composes": [
+        "voice-orb",
+        "voice-recorder",
+        "hold-to-confirm",
+        "tooltip"
+      ],
+      "notes": "Push-to-talk 与免提两态、barge-in（Agent 说话时插话即停）、实时转写单行与纠错、取消、麦克风设备与电平；状态 Idle/Listening/Transcribing/Thinking/Speaking/Interrupted/Error。控件不自行采集音频，由宿主注入电平与转写结果；与 voice-orb 的分工：后者是语音模式的视觉主体，本项是常驻控制条。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "checkpoint-restore",
+      "title": "Checkpoint restore",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "生活助手会发邮件、改日历、下单；失败恢复不能只靠重试，需要运行检查点列表、恢复范围预览与一键回滚。",
+      "scenarios": [
+        "failure-recovery",
+        "errand-preflight",
+        "audit-after-fact"
+      ],
+      "composes": [
+        "timeline",
+        "diff-review",
+        "dialog",
+        "agent-run"
+      ],
+      "notes": "检查点是动作前后快照；列表显示时间、步骤、影响对象；Restore 前预览将撤销哪些副作用（已发出的邮件只能标记不可撤回）；支持 restore to here 与 restore only this action。状态 Snapshot/Restoring/Restored/Partial/Unrecoverable。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "local-model-status",
+      "title": "Local model status",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "离线与隐私是桌面助手的卖点，model-picker 只选模型名；缺少本地模型下载进度、内存/显存适配、离线可用性与云端回退的状态面。",
+      "scenarios": [
+        "offline-travel",
+        "first-run-permissions"
+      ],
+      "composes": [
+        "model-picker",
+        "progress",
+        "usage-meter",
+        "badge",
+        "switch"
+      ],
+      "notes": "模型卡：下载与校验进度、RAM/VRAM 需求与实际占用、量化档位、隐私徽章（数据不出本机）、离线时可承接哪些任务、回退链；状态 NotInstalled/Downloading/Ready/TooLargeForDevice/Updating/Error。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "memory-review-queue",
+      "title": "Memory review queue",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "agent-memory 只能逐条浏览、编辑、遗忘；缺少定期审阅新记忆（来源、置信度、冲突、批量遗忘）的队列，用户无法低成本纠正长期记忆。",
+      "scenarios": [
+        "memory-review"
+      ],
+      "composes": [
+        "agent-memory",
+        "tree-view",
+        "tag-input",
+        "toast",
+        "segmented-control"
+      ],
+      "notes": "周检队列分三组：新记忆、低置信、冲突；每条显示来源对话与时间、置信度、作用域（个人/家庭/项目），可编辑/合并/遗忘/永不再记；删除带 5 秒撤销。与 agent-memory 的分工：后者是日常浏览与开关，本项是批量治理与 provenance。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "desktop-agent-settings",
+      "title": "Desktop agent settings",
+      "kind": "block",
+      "category": "App shell and settings",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "关窗后是否继续跑、开机自启、托盘行为、全局唤起键、休眠策略、本地缓存与权限，这些桌面运行时开关没有归属页面。",
+      "scenarios": [
+        "unattended-background",
+        "first-run-permissions",
+        "focus-hours"
+      ],
+      "composes": [
+        "settings-page",
+        "switch",
+        "shortcut-recorder",
+        "notification-center",
+        "select"
+      ],
+      "notes": "分节：启动与常驻（登录自启/关窗行为/托盘）、通知权限与自检、全局快捷键与冲突、后台资源上限（CPU/内存/并发）、本地数据与缓存、权限总览；每项标注平台可用性（Windows/macOS/Linux），并为不可用项提供诚实降级文案。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "notification-routing",
+      "title": "Notification routing",
+      "kind": "block",
+      "category": "App shell and settings",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "桌面端没有浏览器通知、notification-center 只是页内样例；必须配置事件类型 × 通道（应用内/系统/托盘红点/摘要/静默）与静默时段、升级规则。",
+      "scenarios": [
+        "focus-hours",
+        "routine-fire-review",
+        "unattended-background"
+      ],
+      "composes": [
+        "notification-center",
+        "settings-page",
+        "switch",
+        "select",
+        "time-picker",
+        "toast"
+      ],
+      "notes": "矩阵行：审批/追问/失败/完成/例行结果/成本预警；列：应用内 toast、系统通知、托盘、每日摘要、静默；静默时段与『仅紧急升级』；提供各通道可用性检测（Windows toast 权限、macOS 通知权限、Linux DBus）与降级说明。与 notification-center 的分工：本项是投递策略，不是收件箱。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "tray-menu",
+      "title": "Tray menu",
+      "kind": "block",
+      "category": "App shell and settings",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "foundation",
+      "priority": "P1",
+      "effort": "M",
+      "why": "桌面常驻助手的真正入口是托盘：全局热键、今天状态、暂停提醒、专注模式、退出；现有 settings-page/notification-center 都只在窗口内。",
+      "scenarios": [
+        "unattended-background",
+        "focus-hours",
+        "routine-fire-review"
+      ],
+      "composes": [
+        "dropdown-menu",
+        "badge",
+        "theme-switch",
+        "desktop-agent-settings"
+      ],
+      "notes": "托盘菜单 + 托盘图标状态（空闲/运行中/需审批/专注）；菜单项：打开、快速捕获、今天、暂停提醒 1 小时、专注 25 分钟、设置、退出。Avalonia TrayIcon + NativeMenu 实现，各平台差异写入 notes；菜单本身可复用 dropdown-menu 视觉。",
+      "source": "lead"
+    },
+    {
+      "slug": "agent-audit-log",
+      "title": "Agent audit log",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "生活助手要能回答『它做了什么、为什么、谁批准的、花了多少』；timeline 偏展示，缺少可筛选、可导出、带审批证据的审计台账。",
+      "scenarios": [
+        "audit-after-fact",
+        "errand-preflight"
+      ],
+      "composes": [
+        "timeline",
+        "filter-toolbar",
+        "data-grid",
+        "json-viewer",
+        "search-results"
+      ],
+      "notes": "只追加事件：actor（agent/user/system）、intent、tool 与参数摘要、policy/approval 引用、结果、成本；按日期/域/结果/风险筛选；导出 JSONL/CSV；默认本地加密存储，支持一键清空并保留删除动作自身的审计记录。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "connector-health",
+      "title": "Connector health",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "生活助手的日历/邮箱/银行/智能家居连接会过期或降级；mcp-servers 只管工具开关与 context 成本，没有授权到期、最后同步、降级与重新授权的运营视图。",
+      "scenarios": [
+        "routine-fire-review",
+        "failure-recovery",
+        "first-run-permissions"
+      ],
+      "composes": [
+        "mcp-servers",
+        "settings-page",
+        "alert",
+        "empty-state",
+        "badge"
+      ],
+      "notes": "每个 connector：状态（Connected/Expired/Degraded/Error）、scope、最后同步、依赖它的 routine、重新授权/暂停/移除。与 mcp-servers 的分工：MCP 管工具与上下文成本，本项管账号授权与同步健康；两者在页面上互相跳转。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "offline-action-queue",
+      "title": "Offline action queue",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "断网时工具调用会失败或重复；缺少离线排队、恢复后重放、本地/云端冲突解决与幂等提示。",
+      "scenarios": [
+        "offline-travel",
+        "failure-recovery"
+      ],
+      "composes": [
+        "alert",
+        "timeline",
+        "toast",
+        "switch",
+        "empty-state"
+      ],
+      "notes": "队列行：动作、目标、排队时间、风险（可重放/需确认/已过期）；恢复后逐条或批量重放，冲突项要求选择保留哪一版；与 checkpoint-restore 配合。状态 Queued/Replaying/NeedsReview/Applied/Discarded。桌面约束：休眠与网络切换会频繁触发，恢复时的批量提示要克制。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "trust-rules-manager",
+      "title": "Trust rules manager",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P1",
+      "effort": "M",
+      "why": "『Always allow』会累积长期规则，但没有任何界面审查、撤销、收紧这些授权；security-settings 只管账号安全，agent-approvals 只显示规则数量。",
+      "scenarios": [
+        "first-run-permissions",
+        "errand-preflight",
+        "audit-after-fact"
+      ],
+      "composes": [
+        "agent-approvals",
+        "roles-permissions",
+        "data-grid",
+        "filter-toolbar",
+        "env-variables"
+      ],
+      "notes": "规则表：工具、范围约束、来源（哪次审批创建）、最近使用、命中次数、过期时间；可撤销/收紧/临时停用；按域分组；敏感工具默认高亮；导出可读清单。与 autonomy-dial 的分工：后者调档位，本项治理已生成的具体规则。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "bill-due-list",
+      "title": "Bill due list",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "billing-overview/usage-billing/invoice-studio 全部是 SaaS 账单或开票流程，budget-variance 是部门预算，没有个人/家庭「周期性账单到期 + 已付 + 未来三十天」的台账。",
+      "scenarios": [
+        "bill-due",
+        "subscription-audit",
+        "spend-capture"
+      ],
+      "composes": [
+        "sortable-data-table",
+        "filter-toolbar",
+        "countdown",
+        "money-input",
+        "badge",
+        "toast"
+      ],
+      "notes": "按到期日分组，行含账单名/金额/到期/自动扣款/状态；顶部本期合计与未来 30 天合计，可切月视图；标记已付就地确认并可撤销。状态 Upcoming/Due/Paid/Overdue/AutoPay。重复规则复用 agent 域排期提案，不重复造 RRULE；金额用 money-input 的 minor units，多币种必须存币种而不是只存符号。无银行接口时只支持手工/CSV 导入，文案不得暗示已自动扣款。",
+      "source": "life-proposals",
+      "reviewNote": "Lead 评估：到期提醒先由 reminder-row/reminder-center/daily-brief 承载，账单专页降为 P1（原 02 提案为 P0）。"
+    },
+    {
+      "slug": "budget-board",
+      "title": "Budget board",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksData",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "usage-meter 是配额进度、budget-variance 是部门预算对比，缺家庭「分类信封预算 + 结转 + 月底预测 + 超支预警」的日常预算板。",
+      "scenarios": [
+        "spend-capture",
+        "bill-due",
+        "home-energy",
+        "family-logistics"
+      ],
+      "composes": [
+        "usage-meter",
+        "budget-variance",
+        "reference-band-chart",
+        "range-histogram-slider",
+        "progress",
+        "empty-state"
+      ],
+      "notes": "每个分类一张信封卡：已用/预算/剩余、结转规则、月底预测；顶部总预算与超支分类数。状态 Healthy/Warning/Over/Unbudgeted。预测必须标注为估算并给依据（近 N 天），不能伪装成确定值；金额与周期可切换。复用 usage-meter 的 WarnAt 语义，不重画进度条。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "daily-journal",
+      "title": "Daily journal",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "rich-text-editor 是通用写作、card-to-article/page-curl 只是展示形态，缺「心情 + 标签 + 当天事件 + 照片 + 可回看」的日记结构。",
+      "scenarios": [
+        "mood-journal",
+        "sleep-trend",
+        "relationship-upkeep"
+      ],
+      "composes": [
+        "rich-text-editor",
+        "rating",
+        "tag-input",
+        "carousel",
+        "activity-heatmap",
+        "card-to-article",
+        "date-picker"
+      ],
+      "notes": "正文用 rich-text-editor 的 Markdown 输出，心情用 rating 的 5 档但必须配文字标签（不能只有星星），标签、照片、当天事件作为附件区；历史用 calendar/heatmap 进入。隐私：默认本地加密、可导出、可删除，明确不用于训练或自动分享；富文本每次按键全量重建（G-P0-6），长日记要等增量解析修复后再上线。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "document-vault",
+      "title": "Document vault",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "file-upload/file-dropzone 只记录文件名与大小且从不落盘（ImplementationNotes），document-extract 只做抽取审阅，缺一个带类型、归属人、到期/续办、可搜索的本地证件与报告归档。",
+      "scenarios": [
+        "id-expiry",
+        "report-archive",
+        "home-repair",
+        "trip-itinerary",
+        "appointment-prep"
+      ],
+      "composes": [
+        "file-dropzone",
+        "file-upload",
+        "filter-toolbar",
+        "sortable-data-table",
+        "drawer",
+        "empty-state",
+        "document-extract"
+      ],
+      "notes": "文档行含类型（证件/保险/保修/体检/票据）、归属人、到期日、标签与缩略图；到期排序与「30/7/1 天」提醒入口；预览用 drawer，不内嵌 PDF 渲染器。文件要复制到应用数据目录而不是只记路径，需处理 Windows/macOS/Linux 权限、路径长度、移动盘失效与备份；敏感数据静态加密与访问审计是应用层前置，UI 只负责明示。document-extract 可用于回填字段，但不得在本项重复实现抽取。",
+      "source": "life-proposals",
+      "reviewNote": "Lead 评估：文档保险库不是 MVP 阻塞项，降为 P1，随生活域第二批次交付（原 02 提案为 P0）。"
+    },
+    {
+      "slug": "expense-ledger",
+      "title": "Expense ledger",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "wallet-card 只有示例余额与活动、budget-variance 是部门预算，缺个人流水的按月列表、分类占比、搜索筛选与快速记一笔。",
+      "scenarios": [
+        "spend-capture",
+        "expense-split",
+        "subscription-audit",
+        "bill-due"
+      ],
+      "composes": [
+        "sortable-data-table",
+        "filter-toolbar",
+        "donut-chart",
+        "money-input",
+        "drawer",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "月份切换、分类筛选、搜索、行展开编辑、右侧 drawer 记一笔（金额/分类/日期/备注/收据）；顶部本月合计与分类 donut。docs/04 R4 明确整库几乎零虚拟化、DataGrid 选中/排序整表重建（G-P0-5），真实流水必须先接共享虚拟列表（docs/04 阶段 1-3）或改用分页，不能把 demo 的 20 行直接放大到 2000 行。金额存 minor units + 币种，不做汇率换算除非显式提供。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "focus-session",
+      "title": "Focus session",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "control-center 只有一个专注时长拨盘与频道开关，缺「本次目标 + 计时 + 环境音 + 中断记录 + 结束复盘」的完整专注会话。",
+      "scenarios": [
+        "focus-block",
+        "morning-brief",
+        "mood-journal"
+      ],
+      "composes": [
+        "control-center",
+        "countdown",
+        "media-player",
+        "now-playing",
+        "switch",
+        "timeline",
+        "progress"
+      ],
+      "notes": "开始前选目标与时长，进行中显示剩余时间、当前任务、环境音与「允许打扰的人」；结束后记录中断次数与完成度。状态 Idle/Running/Paused/Break/Completed/Abandoned。计时器必须单帧时钟+可见性门控（docs/04 R1/R5/G-P0-2），不要为倒计时造新的逐帧 timer；桌面端无法真屏蔽系统通知，只能请求应用内静默并在文案中诚实说明。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "grocery-list",
+      "title": "Grocery list",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "饮食域现有组件为 0（recipe/meal/grocery/nutrition 全仓 grep 无匹配），reorderable-list 只有标题/详情/禁用，没有勾选、数量单位与分区，无法承载最日常的采买清单。",
+      "scenarios": [
+        "grocery-run",
+        "weekly-meal-plan",
+        "family-logistics"
+      ],
+      "composes": [
+        "checkbox",
+        "input",
+        "number-field",
+        "chip-group",
+        "swipe-actions",
+        "progress",
+        "empty-state",
+        "toast"
+      ],
+      "notes": "按货架/品类分区的清单，行含勾选、名称、数量+单位、备注、添加人；顶部已购/总数进度；支持把菜谱食材一键加入与缺货替换。状态 Empty/Active/Shopping/Completed/Archived。共享给家人需要同步能力，不能只做本地状态；离线勾选要能合并冲突。数量单位不做自由文本拼接，保存 quantity + unit 结构化值。",
+      "source": "life-proposals",
+      "reviewNote": "Lead 评估：购物清单先在 meal-planner 内交付，独立清单页降为 P1（原 02 提案为 P0）。"
+    },
+    {
+      "slug": "habit-tracker",
+      "title": "Habit tracker",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "习惯是生活工具的核心留存机制；现有 activity-heatmap 只能展示，缺少打卡、连续天数、目标与周视图的组合。",
+      "scenarios": [
+        "morning-brief",
+        "sleep-trend",
+        "focus-block"
+      ],
+      "composes": [
+        "habit-streak-strip",
+        "activity-heatmap",
+        "waffle-chart",
+        "empty-state"
+      ],
+      "notes": "习惯网格（周）× 连续天数 × 月热力图；打卡即时反馈但不打断（无全屏庆祝）；Agent 可建议“把提醒提前 30 分钟”或“降低目标”，建议先预览后应用。",
+      "source": "lead"
+    },
+    {
+      "slug": "home-maintenance",
+      "title": "Home maintenance",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "家庭维修/保修/服务记录没有任何承载：project-board 是软件任务、document-extract 只抽单据，缺「资产 + 保修到期 + 保养周期 + 服务商」的家庭维护台账。",
+      "scenarios": [
+        "home-repair",
+        "home-energy",
+        "family-logistics"
+      ],
+      "composes": [
+        "document-vault",
+        "calendar",
+        "timeline",
+        "sortable-data-table",
+        "badge",
+        "reminder-row",
+        "empty-state"
+      ],
+      "notes": "资产行（设备/房屋部位、购买日、保修到期、服务商、上次/下次保养）；保修到期与保养周期复用生活域排期依赖；维修记录用 timeline，单据进 document-vault。状态 Active/DueSoon/Expired/Retired。费用与记录本地保存，不上传；服务商联系方式属个人数据，需明示用途。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "meal-planner",
+      "title": "Meal planner",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "全仓没有菜谱/备餐/营养结构，week-calendar 是日程语义且不能放「早餐/午餐/晚餐」槽位与一键生成采买清单。",
+      "scenarios": [
+        "weekly-meal-plan",
+        "grocery-run",
+        "family-logistics"
+      ],
+      "composes": [
+        "week-calendar",
+        "calendar",
+        "grocery-list",
+        "chip-group",
+        "card",
+        "donut-chart",
+        "empty-state"
+      ],
+      "notes": "周网格按早餐/午餐/晚餐三行、七天列；每格放菜谱卡（时间、份数、标签），可从「常做」拖入或选择；下方营养概览与「生成采买清单」动作。状态 Empty/Planned/Generated。不做食材库存推断，生成清单前明确列出将加入的条目；份数按家庭人数缩放，单位保持结构化。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "smart-home-panel",
+      "title": "Smart home panel",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "control-center 是工作区快捷设置（专注模式/频道/音量/字号），没有房间、设备、场景与离线状态的智能家居控制面。",
+      "scenarios": [
+        "smart-home-scene",
+        "home-energy",
+        "focus-block"
+      ],
+      "composes": [
+        "control-center",
+        "switch",
+        "slider",
+        "segmented-control",
+        "dialog",
+        "badge",
+        "card"
+      ],
+      "notes": "按房间分组的设备卡（灯/空调/插座/门锁），每卡含开关、亮度/温度滑杆与在线状态；场景为回家/离家/睡眠三档，危险设备（门锁、灶具）需二次确认。桌面无统一智能家居协议，本项只定义 UI 适配契约（ID/能力/状态/命令），真实连接由应用层插件实现；离线/超时要显示最后已知状态而不是假装成功，命令失败要有可撤销反馈。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "subscription-tracker",
+      "title": "Subscription tracker",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "billing-overview 是单个 SaaS 账户的套餐与发票，cancel-flow 只是取消文案流；缺一个跨服务的个人订阅清单（续费日、周期、月度/年度总成本、涨价与取消）。",
+      "scenarios": [
+        "subscription-audit",
+        "bill-due",
+        "spend-capture"
+      ],
+      "composes": [
+        "countdown",
+        "sortable-data-table",
+        "cancel-flow",
+        "confirm-morph",
+        "money-input",
+        "filter-toolbar",
+        "badge"
+      ],
+      "notes": "按续费日排序，行含服务、周期（月/年）、折算月成本、下次续费、支付方式、状态；顶部月度/年度总成本与「本月将扣」。取消流程复用 cancel-flow 的挽留结构但文案必须诚实，不得伪造保留优惠；无银行接口时手工维护，涨价检测靠用户输入或邮件导入（非 UI 能力）。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "task-board",
+      "title": "Task board",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "M",
+      "why": "day-agenda 只回答“今天”，缺少跨天、按项目/优先级组织任务的主页面；现有 kanban-board 是团队协作语义且为静态演示数据。",
+      "scenarios": [
+        "morning-brief",
+        "family-logistics",
+        "chore-rota"
+      ],
+      "composes": [
+        "checkbox",
+        "kanban-board",
+        "reminder-row",
+        "filter-toolbar",
+        "empty-state",
+        "segmented-control"
+      ],
+      "notes": "列表/看板双视图 + 筛选（今天/本周/逾期/无日期）；任务行复用 reminder-row 的到期 chip 与动作菜单；支持自然语言快速添加（quick-capture-bar）与 Agent 批量重排建议（先预览后应用）。",
+      "source": "lead"
+    },
+    {
+      "slug": "trip-itinerary",
+      "title": "Trip itinerary",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P1",
+      "effort": "L",
+      "why": "delivery-tracker 只跟单个订单、choropleth 只是分析地图，缺出行的日期范围头、逐日行程、交通/住宿/预约与证件清单的组合。",
+      "scenarios": [
+        "trip-itinerary",
+        "outdoor-plan",
+        "family-logistics"
+      ],
+      "composes": [
+        "date-range-picker",
+        "timeline",
+        "stepper",
+        "booking-pill",
+        "weather-forecast",
+        "document-vault",
+        "empty-state"
+      ],
+      "notes": "顶部：目的地、日期范围、倒计时、同行人；按天 timeline，条目区分交通/住宿/预约/活动；右侧证件与预订参考号来自 document-vault。跨时区必须显示「当地时间」与出发地时间，现有 pickers 的 naive DateTime 不能直接用。地图能力不做承诺：离线无瓦片，地点用地址文本+外部打开链接，不画假地图。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "spoken-confirmation",
+      "title": "Spoken confirmation",
+      "kind": "component",
+      "category": "Gestures",
+      "project": "Arc.Avalonia.Media",
+      "asset": "agent",
+      "priority": "P2",
+      "effort": "S",
+      "why": "支付、发送、删除等敏感动作在免手场景需要口述复述确认；hold-to-confirm 与 confirm-morph 只覆盖按住/点击，没有语音确认与读回。",
+      "scenarios": [
+        "sensitive-confirm",
+        "voice-morning-checkin"
+      ],
+      "composes": [
+        "hold-to-confirm",
+        "confirm-morph",
+        "voice-recorder",
+        "alert"
+      ],
+      "notes": "读回动作（例如『向张三转账 200 元』）并要求复述关键词或数字，或改为按住确认；失败三次退回键入。状态 Asking/Listening/Matched/Mismatch/Cancelled；转写复用 voice-session-bar。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "global-hotkey-field",
+      "title": "Global hotkey field",
+      "kind": "component",
+      "category": "Special inputs",
+      "project": "Arc.Avalonia.AdvancedInputs",
+      "asset": "agent",
+      "priority": "P2",
+      "effort": "S",
+      "why": "随时唤起助手是桌面核心手势；shortcut-recorder 只录制组合键，不处理全局注册、系统占用冲突与平台限制。",
+      "scenarios": [
+        "unattended-background",
+        "voice-morning-checkin"
+      ],
+      "composes": [
+        "shortcut-recorder",
+        "settings-command",
+        "tooltip"
+      ],
+      "notes": "录制后由宿主尝试注册并显示冲突（系统或其他应用）、平台支持状态（macOS 需辅助功能权限）、清除与恢复默认；返回 HotkeyBinding(modifiers, key, registered)。注册失败时给出可替代的托盘/菜单项。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "run-trace-viewer",
+      "title": "Run trace viewer",
+      "kind": "special",
+      "category": "AI widgets",
+      "project": "Arc.Avalonia.SpecialAIWidgets",
+      "asset": "agent",
+      "priority": "P2",
+      "effort": "L",
+      "why": "agent-timeline 是演示型可视化，缺少调试与复盘用的 span 瀑布（模型/工具/等待）、逐 span 的 tokens/成本/错误以及两次运行对比。",
+      "scenarios": [
+        "failure-recovery",
+        "audit-after-fact",
+        "budget-guard"
+      ],
+      "composes": [
+        "agent-timeline",
+        "code-block",
+        "json-viewer",
+        "brush-chart",
+        "data-grid"
+      ],
+      "notes": "span 瀑布 + 详情面板（输入输出、耗时、tokens、成本、重试链）、按阶段过滤、失败高亮、与基线运行 diff；数据来自运行时 trace 导出；大 trace 需虚拟化，避免 docs/04 R4 的重建型问题。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "model-routing-policy",
+      "title": "Model routing policy",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P2",
+      "effort": "L",
+      "why": "成本、延迟、隐私需要按任务类型路由到本地/小模型/强模型；model-picker 只做单次选择，eval-suite 只评质量，缺规则编辑与成本预估。",
+      "scenarios": [
+        "budget-guard",
+        "offline-travel"
+      ],
+      "composes": [
+        "model-picker",
+        "model-arena",
+        "eval-suite",
+        "data-grid",
+        "select"
+      ],
+      "notes": "规则表：条件（任务类型/域/隐私级别/离线/预算）→ 模型与推理档位；实时预估每条规则命中率与月成本；可测试单条规则；与 autonomy-dial、local-model-status 联动，避免三处各配一套。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "run-history-list",
+      "title": "Run history list",
+      "kind": "block",
+      "category": "AI",
+      "project": "Arc.Avalonia.BlocksAI",
+      "asset": "agent",
+      "priority": "P2",
+      "effort": "M",
+      "why": "agent-run 只看一次运行、agent-tasks 只看排队任务；缺少可搜索、可按结果/成本/时间筛选的历史运行列表与重放入口。",
+      "scenarios": [
+        "audit-after-fact",
+        "routine-fire-review"
+      ],
+      "composes": [
+        "agent-run",
+        "agent-tasks",
+        "filter-toolbar",
+        "data-grid",
+        "eval-suite"
+      ],
+      "notes": "行：目标、来源（手动/routine）、结果、时长、成本、批准次数；打开进入 run 详情或重放；可批量加入 eval 用例。与 agent-audit-log 的分工：本项面向日常使用，审计页面向合规与导出。",
+      "source": "agent-proposals"
+    },
+    {
+      "slug": "chore-board",
+      "title": "Chore board",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "kanban-board/project-board 是团队任务语义（阶段、WIP、负责人），缺家庭场景的重复家务、轮换规则、完成确认与本月公平性回顾。",
+      "scenarios": [
+        "chore-rota",
+        "family-logistics",
+        "grocery-run"
+      ],
+      "composes": [
+        "kanban-board",
+        "project-board",
+        "reminder-row",
+        "avatar-group",
+        "calendar",
+        "empty-state"
+      ],
+      "notes": "按人或按周组织，卡片含家务、频率、轮值人、下次到期、完成历史；顶部本月每人完成数用于公平性回顾。状态 Todo/Due/Done/Skipped/Reassigned。轮值算法可简单轮转，不宣称智能均衡；成员用头像组而非邀请流程，避免与 team-members 的团队语义混淆。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "energy-usage",
+      "title": "Energy usage",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksData",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "没有家庭能耗视图：activity-terrain/globe 是分析装饰，缺按日/月/设备的用电用气用水趋势、费用对照与异常提示。",
+      "scenarios": [
+        "home-energy",
+        "bill-due",
+        "smart-home-scene"
+      ],
+      "composes": [
+        "bar-chart",
+        "line-chart",
+        "reference-band-chart",
+        "usage-meter",
+        "metric-card",
+        "filter-toolbar",
+        "empty-state"
+      ],
+      "notes": "日/月切换、按设备或全屋、费用与用量双轴（避免双轴误导时改用两张图），参考带为本月预算或去年同期；异常日用 badge 标记并给解释入口。数据来自手工账单或智能电表导入，无内置协议；与天气关联时必须标注相关不等于因果。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "package-inbox",
+      "title": "Package inbox",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksCommerce",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "delivery-tracker 只展示单个包裹、且明示没有承运商 webhook，缺多包裹汇总、异常件与代收/改约的统一收件箱。",
+      "scenarios": [
+        "parcel-tracking",
+        "trip-itinerary",
+        "home-repair"
+      ],
+      "composes": [
+        "delivery-tracker",
+        "timeline",
+        "badge",
+        "filter-toolbar",
+        "empty-state"
+      ],
+      "notes": "列表汇总运单号、承运商、当前状态、预计到达与代收点；点开进入 delivery-tracker。状态 PreTransit/InTransit/OutForDelivery/Delivered/Exception/Returned。没有物流 API 时靠手工单号，文案不能暗示自动刷新；预计时间要显示数据更新时刻，避免「明天到」的假承诺。",
+      "source": "life-proposals"
+    },
+    {
+      "slug": "pet-care",
+      "title": "Pet care",
+      "kind": "block",
+      "category": "Daily life",
+      "project": "Arc.Avalonia.BlocksApp",
+      "asset": "life",
+      "priority": "P2",
+      "effort": "M",
+      "why": "宠物照护完全空白（pet 相关代码只出现在示例文案），喂食/遛弯/驱虫/疫苗/体重与兽医预约需要一套轻量日常面板。",
+      "scenarios": [
+        "pet-care",
+        "chore-rota",
+        "family-logistics"
+      ],
+      "composes": [
+        "reminder-row",
+        "line-chart",
+        "document-vault",
+        "usage-meter",
+        "timeline",
+        "avatar",
+        "empty-state"
+      ],
+      "notes": "宠物档案（头像/品种/体重/过敏）、今日任务、疫苗与驱虫周期、体重曲线、兽医联系与就诊记录。状态 Normal/DueSoon/Overdue。宠物体重和用药属于健康数据，默认本地；出门交接说明支持只读导出。周期规则同样复用排期能力，不内建重复算法。",
+      "source": "life-proposals"
+    }
+  ]
+}

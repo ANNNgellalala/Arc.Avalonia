@@ -1,0 +1,23 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcPickersShared.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcCalendar.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcDatePicker.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcDateRangePicker.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcTimePicker.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcColorPicker.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcFileDropzone.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcSignaturePad.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcEmojiPicker.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcAvatarUpload.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcPickersStyles.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcEmojiPickerStyles.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcAvatarUploadStyles.axaml" />
+</Styles>

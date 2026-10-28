@@ -1,0 +1,30 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcIconButton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcProgress.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcSkeleton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcStepper.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcAvatar.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcAvatarGroup.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcCountdown.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcUsageMeter.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcEmptyState.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcAnimatedCounter.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcTimeline.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcCodeBlock.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcJsonViewer.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcCommentThread.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcSortableDataTable.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcTreeView.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcFilterToolbar.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcActivityHeatmap.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcPresenceStack.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcDataGrid.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcTreeTable.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

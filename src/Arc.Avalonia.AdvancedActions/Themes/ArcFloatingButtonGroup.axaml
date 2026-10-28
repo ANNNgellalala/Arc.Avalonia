@@ -1,0 +1,70 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:aa="using:Arc.Avalonia.AdvancedActions.Controls">
+
+  <!-- ============================ Shared highlight ============================ -->
+  <ControlTheme x:Key="{x:Type aa:ArcAdvancedGlide}" TargetType="aa:ArcAdvancedGlide">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Tint"
+                Background="{DynamicResource ArcForeground}"
+                Opacity="{TemplateBinding TintOpacity}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <Border.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+            </Transitions>
+          </Border.Transitions>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.danger /template/ Border#Tint">
+      <Setter Property="Background" Value="{DynamicResource ArcDanger}" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ============================ Floating button group ============================ -->
+  <ControlTheme x:Key="{x:Type aa:ArcFloatingButtonGroup}" TargetType="aa:ArcFloatingButtonGroup">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Tray"
+                Background="Transparent"
+                BorderBrush="{DynamicResource ArcBorderSubtle}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusControl}"
+                Padding="{TemplateBinding Padding}">
+          <Panel ClipToBounds="False">
+            <Border x:Name="TrayTint"
+                    Background="{DynamicResource ArcForeground}"
+                    Opacity="0.05"
+                    CornerRadius="{DynamicResource ArcRadiusControl}"
+                    IsHitTestVisible="False" />
+            <Panel x:Name="HighlightLayer" ClipToBounds="False" IsHitTestVisible="False">
+              <aa:ArcAdvancedGlide x:Name="Highlight" CornerRadius="13" />
+            </Panel>
+            <StackPanel x:Name="ItemsHost"
+                        Orientation="Horizontal"
+                        Background="Transparent"
+                        VerticalAlignment="Center" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- The raised tray for overlays: hairline edge, floating shadow, no page tint. -->
+    <Style Selector="^.floating /template/ Border#Tray">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource ArcShadowFloating}" />
+    </Style>
+    <Style Selector="^.floating /template/ Border#TrayTint">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.vertical /template/ StackPanel#ItemsHost">
+      <Setter Property="Orientation" Value="Vertical" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

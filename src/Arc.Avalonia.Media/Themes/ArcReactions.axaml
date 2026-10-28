@@ -1,0 +1,96 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcReactions}" TargetType="c:ArcReactions">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <WrapPanel x:Name="Pills" Orientation="Horizontal" HorizontalAlignment="Left" />
+          <Canvas x:Name="BurstLayer" IsHitTestVisible="False" ClipToBounds="False" />
+          <TextBlock x:Name="Status"
+                     Height="0"
+                     Opacity="0"
+                     IsHitTestVisible="False"
+                     AutomationProperties.LiveSetting="Polite" />
+          <Popup x:Name="PART_Picker" IsLightDismissEnabled="True" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcReactionPill}" TargetType="c:ArcReactionPill">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPill}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXs}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-3"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}"
+                  RenderTransformOrigin="0.5,0.5">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.16" />
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.26" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- You reacted: the pill takes the accent, but only the thin border and the wash. -->
+    <Style Selector="^.on">
+      <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcAccent}" />
+    </Style>
+    <Style Selector="^.add">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.add:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+      <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Root">
+      <Setter Property="RenderTransform" Value="scale(0.96)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

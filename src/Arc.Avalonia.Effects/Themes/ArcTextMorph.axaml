@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:e="using:Arc.Avalonia.Effects.Controls">
+
+  <ControlTheme x:Key="{x:Type e:ArcTextMorph}" TargetType="e:ArcTextMorph">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Frame"
+                ClipToBounds="False"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center">
+          <Panel x:Name="PART_Layers"
+                 ClipToBounds="False"
+                 HorizontalAlignment="Left" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

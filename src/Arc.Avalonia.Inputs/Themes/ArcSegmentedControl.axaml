@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs"
+                    xmlns:motion="using:Arc.Avalonia.Motion">
+
+  <ControlTheme x:Key="{x:Type c:ArcSegmentedControl}" TargetType="c:ArcSegmentedControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Track"
+                Background="{DynamicResource ArcSurfaceMuted}"
+                CornerRadius="{DynamicResource ArcRadiusPill}"
+                Padding="3"
+                HorizontalAlignment="Left">
+          <Panel>
+            <Border x:Name="Pill"
+                    Background="{DynamicResource ArcSurface}"
+                    CornerRadius="{DynamicResource ArcRadiusPill}"
+                    BoxShadow="{DynamicResource ArcShadowResting}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Stretch"
+                    IsVisible="False">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Width"
+                                    Duration="0:0:0.42"
+                                    Easing="{x:Static motion:ArcMotion.SpringMorph}" />
+                </Transitions>
+              </Border.Transitions>
+              <Border.RenderTransform>
+                <TranslateTransform>
+                  <TranslateTransform.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="X"
+                                        Duration="0:0:0.42"
+                                        Easing="{x:Static motion:ArcMotion.SpringMorph}" />
+                    </Transitions>
+                  </TranslateTransform.Transitions>
+                </TranslateTransform>
+              </Border.RenderTransform>
+            </Border>
+            <StackPanel x:Name="Segments" Orientation="Horizontal" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

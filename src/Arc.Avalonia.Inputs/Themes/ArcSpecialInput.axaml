@@ -1,0 +1,265 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs"
+                    xmlns:arc="clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia"
+                    xmlns:conv="using:Avalonia.Data.Converters">
+
+  <!-- Number field -->
+  <ControlTheme x:Key="{x:Type c:ArcNumberField}" TargetType="c:ArcNumberField">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Padding" Value="14,0,6,0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{TemplateBinding Label}"
+                       Classes="arc-label"
+                       IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock x:Name="LimitHint"
+                       Grid.Column="1"
+                       Classes="arc-caption"
+                       Foreground="{DynamicResource ArcWarning}"
+                       IsVisible="False" />
+          </Grid>
+          <Border x:Name="Shell"
+                  MinHeight="{DynamicResource ArcControlHeightMd}"
+                  Padding="{TemplateBinding Padding}"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorderStrong}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusControl}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" VerticalAlignment="Stretch">
+              <TextBlock x:Name="PrefixText"
+                         Grid.Column="0"
+                         Classes="arc-secondary"
+                         FontSize="{TemplateBinding FontSize}"
+                         VerticalAlignment="Center"
+                         Margin="0,0,2,0"
+                         IsVisible="False" />
+              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+                       Grid.Column="1"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       Padding="0"
+                       MinHeight="0"
+                       FontSize="{TemplateBinding FontSize}"
+                       Foreground="{TemplateBinding Foreground}"
+                       CaretBrush="{DynamicResource ArcAccentStrong}"
+                       VerticalAlignment="Center"
+                       VerticalContentAlignment="Center"
+                       AcceptsReturn="False"
+                       TextWrapping="NoWrap" />
+              <TextBlock x:Name="SuffixText"
+                         Grid.Column="2"
+                         Classes="arc-secondary"
+                         FontSize="{TemplateBinding FontSize}"
+                         VerticalAlignment="Center"
+                         Margin="2,0,8,0"
+                         IsVisible="False" />
+              <StackPanel Grid.Column="3" Width="30" VerticalAlignment="Stretch">
+                <Button x:Name="IncreaseAction"
+                        Theme="{DynamicResource ArcStepperButtonTheme}"
+                        Height="21">
+                  <arc:ArcIcon Icon="chevron-up" Size="13" Foreground="{DynamicResource ArcTextMuted}" />
+                </Button>
+                <Button x:Name="DecreaseAction"
+                        Theme="{DynamicResource ArcStepperButtonTheme}"
+                        Height="21">
+                  <arc:ArcIcon Icon="chevron-down" Size="13" Foreground="{DynamicResource ArcTextMuted}" />
+                </Button>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <TextBlock x:Name="Message"
+                     Classes="arc-caption"
+                     TextWrapping="Wrap"
+                     IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.sm /template/ Border#Shell">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
+    </Style>
+    <Style Selector="^.lg /template/ Border#Shell">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.focus /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.invalid /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^.invalid /template/ TextBlock#Message">
+      <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>  </ControlTheme>
+
+  <!-- Money input -->
+  <ControlTheme x:Key="{x:Type c:ArcMoneyInput}" TargetType="c:ArcMoneyInput">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock Text="{TemplateBinding Label}"
+                     Classes="arc-label"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+          <Border x:Name="Shell"
+                  MinHeight="{DynamicResource ArcControlHeightMd}"
+                  Padding="{TemplateBinding Padding}"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorderStrong}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusControl}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+            <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+              <TextBlock x:Name="CurrencySymbol"
+                         Grid.Column="0"
+                         Classes="arc-secondary"
+                         FontSize="{TemplateBinding FontSize}"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Margin="0,0,2,0" />
+              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+                       Grid.Column="1"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       Padding="0"
+                       MinHeight="0"
+                       FontSize="{DynamicResource ArcTextBase}"
+                       FontWeight="Medium"
+                       Foreground="{TemplateBinding Foreground}"
+                       CaretBrush="{DynamicResource ArcAccentStrong}"
+                       VerticalAlignment="Center"
+                       VerticalContentAlignment="Center"
+                       AcceptsReturn="False"
+                       TextWrapping="NoWrap" />
+            </Grid>
+          </Border>
+          <StackPanel Spacing="2">
+            <TextBlock x:Name="Message"
+                       Classes="arc-caption"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+            <TextBlock x:Name="RangeHint"
+                       Classes="arc-caption"
+                       Foreground="{DynamicResource ArcWarning}"
+                       IsVisible="False" />
+            <StackPanel x:Name="QuickAddPanel"
+                        Orientation="Horizontal"
+                        Margin="0,4,0,0"
+                        IsVisible="False" />
+          </StackPanel>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.sm /template/ Border#Shell">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
+    </Style>
+    <Style Selector="^.lg /template/ Border#Shell">
+      <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.focus /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.invalid /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^.invalid /template/ TextBlock#Message">
+      <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>  </ControlTheme>
+
+  <!-- Tag input -->
+  <ControlTheme x:Key="{x:Type c:ArcTagInput}" TargetType="c:ArcTagInput">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="6">
+          <TextBlock Text="{TemplateBinding Label}"
+                     Classes="arc-label"
+                     IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
+          <Border x:Name="Shell"
+                  MinHeight="{DynamicResource ArcControlHeightMd}"
+                  Padding="8,6"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorderStrong}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusControl}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </Border.Transitions>
+            <WrapPanel x:Name="TagPanel" Orientation="Horizontal">
+              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       Padding="2,0"
+                       MinHeight="28"
+                       MinWidth="80"
+                       FontSize="{TemplateBinding FontSize}"
+                       Foreground="{TemplateBinding Foreground}"
+                       CaretBrush="{DynamicResource ArcAccentStrong}"
+                       PlaceholderForeground="{DynamicResource ArcTextMuted}"
+                       VerticalContentAlignment="Center"
+                       AcceptsReturn="False"
+                       TextWrapping="NoWrap" />
+            </WrapPanel>
+          </Border>
+          <TextBlock x:Name="Message"
+                     Classes="arc-caption"
+                     TextWrapping="Wrap"
+                     IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
+    </Style>
+    <Style Selector="^.focus /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
+    </Style>
+    <Style Selector="^.invalid /template/ Border#Shell">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^.invalid /template/ TextBlock#Message">
+      <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+    </Style>
+    <Style Selector="^ /template/ WrapPanel Border.tag-chip.picked">
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcAccent}" />
+    </Style>
+    <Style Selector="^.disabled">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,26 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Component ControlThemes for the Special motion project are merged here. -->
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- The demo stage every Special motion page draws into: one hairline, surface radius, clipped content. -->
+  <Style Selector="Border.sp-stage">
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="26" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </Style>
+
+  <!-- The hint row under a stage: quiet copy that explains the demo without competing with it. -->
+  <Style Selector="TextBlock.sp-hint">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="LineHeight" Value="18" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+</Styles>

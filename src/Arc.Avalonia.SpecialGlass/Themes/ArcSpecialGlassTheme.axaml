@@ -1,0 +1,51 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Arc.Avalonia.Controls">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Component ControlThemes for this project are merged here. -->
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!--
+    The glass items are composed controls: their surfaces, tints and rims are painted from semantic
+    tokens in code (see ArcGlass) because Avalonia has no backdrop filter and every fill needs an alpha
+    that XAML cannot derive from a token. These styles only flatten ArcButton for use as a transparent
+    row inside a glass surface, so the highlight pill owns the hover state.
+  -->
+  <Style Selector="c|ArcButton.sg-plain">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-plain:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-plain:pressed /template/ Border#Root">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
+  <Style Selector="c|ArcButton.sg-row">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-row:pointerover /template/ Border#Root">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-row:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-row:pressed /template/ Border#Root">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+  <Style Selector="c|ArcButton.sg-row.danger">
+    <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
+  </Style>
+</Styles>

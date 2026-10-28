@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Media.Controls"
+                    xmlns:ac="using:Arc.Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcCardStack}" TargetType="c:ArcCardStack">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusSurface}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <StackPanel Spacing="16" HorizontalAlignment="Center">
+            <Border x:Name="Stage"
+                    Background="{DynamicResource ArcSurfaceMuted}"
+                    CornerRadius="{DynamicResource ArcRadiusSurface}"
+                    Padding="18,18,18,56"
+                    MinHeight="180"
+                    MaxWidth="420"
+                    ClipToBounds="True">
+              <Panel>
+                <Grid x:Name="PART_CardLayer" />
+                <StackPanel x:Name="PART_Empty"
+                            Spacing="6"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsVisible="False">
+                  <TextBlock Text="All cards reviewed"
+                             Classes="arc-label"
+                             HorizontalAlignment="Center" />
+                  <TextBlock Text="Every card in the deck has a decision."
+                             Classes="arc-caption"
+                             HorizontalAlignment="Center" />
+                  <ac:ArcButton x:Name="PART_Reset"
+                                Variant="Secondary"
+                                Size="Sm"
+                                HorizontalAlignment="Center"
+                                Margin="0,6,0,0" />
+                </StackPanel>
+              </Panel>
+            </Border>
+            <Grid ColumnDefinitions="Auto,*,Auto" MaxWidth="420">
+              <ac:ArcButton x:Name="PART_Undo"
+                            Variant="Ghost"
+                            Size="Sm"
+                            HorizontalAlignment="Left" />
+              <StackPanel Grid.Column="2"
+                          Orientation="Horizontal"
+                          Spacing="8"
+                          HorizontalAlignment="Right">
+                <ac:ArcButton x:Name="PART_Left"
+                              Variant="Secondary"
+                              Size="Sm" />
+                <ac:ArcButton x:Name="PART_Right"
+                              Variant="Primary"
+                              Size="Sm" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+          <TextBlock x:Name="Status"
+                     Height="0"
+                     Opacity="0"
+                     IsHitTestVisible="False"
+                     AutomationProperties.LiveSetting="Polite" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

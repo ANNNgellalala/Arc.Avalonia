@@ -1,0 +1,65 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Feedback.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ArcTreeTable}" TargetType="c:ArcTreeTable">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Ring"
+                  Margin="-6"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="PART_Shell"
+                  Margin="6"
+                  CornerRadius="{DynamicResource ArcRadiusPanel}"
+                  BorderThickness="1"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  ClipToBounds="True">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+              <Panel x:Name="PART_Toolbar"
+                     Grid.Row="0"
+                     Margin="14,10,12,8" />
+              <Border x:Name="PART_HeaderHost"
+                      Grid.Row="1"
+                      Background="{DynamicResource ArcSurface}"
+                      BorderThickness="0,1,0,1"
+                      BorderBrush="{DynamicResource ArcBorderSubtle}"
+                      ClipToBounds="False" />
+              <ScrollViewer x:Name="PART_Scroll"
+                            Grid.Row="2"
+                            Background="Transparent"
+                            HorizontalContentAlignment="Stretch"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Auto">
+                <Panel x:Name="PART_Body" />
+              </ScrollViewer>
+              <Border x:Name="PART_FooterHost"
+                      Grid.Row="3"
+                      Background="{DynamicResource ArcSurface}"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="{DynamicResource ArcBorderSubtle}"
+                      ClipToBounds="True" />
+            </Grid>
+          </Border>
+          <TextBlock x:Name="PART_Live"
+                     Width="1"
+                     Height="1"
+                     Opacity="0"
+                     IsHitTestVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

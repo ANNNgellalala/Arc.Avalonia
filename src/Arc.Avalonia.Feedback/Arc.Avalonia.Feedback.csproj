@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Feedback</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Feedback</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Demo portraits for the avatar components; loaded through avares:// URIs. -->
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+</Project>

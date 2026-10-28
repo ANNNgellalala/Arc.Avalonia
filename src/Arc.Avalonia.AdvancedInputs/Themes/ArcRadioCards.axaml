@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ai="using:Arc.Avalonia.AdvancedInputs.Controls">
+
+  <!-- Radio cards: the cards live in a layout panel, one accent ring slides over the selected one. -->
+  <ControlTheme x:Key="{x:Type ai:ArcRadioCards}" TargetType="ai:ArcRadioCards">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Panel x:Name="Host" />
+          <Canvas x:Name="RingHost" IsHitTestVisible="False">
+            <Border x:Name="Ring"
+                    BorderBrush="{DynamicResource ArcAccent}"
+                    BorderThickness="2"
+                    CornerRadius="{DynamicResource ArcRadiusPanel}"
+                    Background="Transparent"
+                    IsVisible="False" />
+          </Canvas>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

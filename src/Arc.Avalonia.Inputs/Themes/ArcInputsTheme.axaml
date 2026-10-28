@@ -1,0 +1,18 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcPrimitives.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcTextField.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcPasswordStrength.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSpecialInput.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSelect.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcChipGroup.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcToggle.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSegmentedControl.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcSlider.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

@@ -1,0 +1,76 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Controls"
+                    xmlns:e="using:Arc.Avalonia.Effects.Controls">
+
+  <ControlTheme x:Key="{x:Type e:ArcBottomSheet}" TargetType="e:ArcBottomSheet">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="Layer" ClipToBounds="True" IsVisible="False">
+          <Border x:Name="Scrim"
+                  Background="{DynamicResource ArcScrim}"
+                  Opacity="0" />
+
+          <Border x:Name="Sheet"
+                  MaxWidth="576"
+                  Height="0"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Bottom"
+                  Background="{DynamicResource ArcSurface}"
+                  BorderBrush="{DynamicResource ArcBorder}"
+                  BorderThickness="1"
+                  BoxShadow="{DynamicResource ArcShadowFloating}"
+                  ClipToBounds="True"
+                  Focusable="True">
+            <Grid RowDefinitions="Auto,*">
+              <StackPanel x:Name="Header" Margin="24,10,16,0">
+                <c:ArcButton x:Name="Grabber"
+                             Classes="sheet-grabber"
+                             Variant="Ghost"
+                             Size="Sm"
+                             Compact="True"
+                             Width="56"
+                             MinHeight="24"
+                             Padding="0"
+                             HorizontalAlignment="Center">
+                  <Border Width="40"
+                          Height="4"
+                          CornerRadius="2"
+                          Background="{DynamicResource ArcBorderStrong}" />
+                </c:ArcButton>
+
+                <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                  <StackPanel Spacing="4">
+                    <TextBlock x:Name="Title" Classes="arc-heading" TextWrapping="Wrap" />
+                    <TextBlock x:Name="Description" Classes="arc-body-sm arc-secondary" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <c:ArcButton x:Name="CloseButton"
+                               Grid.Column="1"
+                               Variant="Ghost"
+                               Size="Sm"
+                               Compact="True"
+                               Width="32"
+                               MinHeight="32"
+                               Padding="0"
+                               VerticalAlignment="Top"
+                               Margin="8,0,0,0" />
+                </Grid>
+              </StackPanel>
+
+              <ScrollViewer Grid.Row="1"
+                            Margin="0,14,0,0"
+                            HorizontalScrollBarVisibility="Disabled">
+                <ContentPresenter x:Name="Body"
+                                  Margin="24,0,24,24"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+              </ScrollViewer>
+            </Grid>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

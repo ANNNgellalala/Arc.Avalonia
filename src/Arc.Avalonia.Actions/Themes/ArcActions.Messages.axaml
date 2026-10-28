@@ -1,0 +1,131 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- ============================ Toast ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcToast}" TargetType="a:ArcToast">
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="MaxWidth" Value="416" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Surface" Classes="toast-surface">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <c:ArcIcon x:Name="Icon"
+                       Icon="circle-check"
+                       Size="18"
+                       Margin="0,1,12,0"
+                       VerticalAlignment="Top"
+                       Classes="toast-icon" />
+            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+              <TextBlock x:Name="Title" Classes="arc-label" TextWrapping="NoWrap" />
+              <TextBlock x:Name="Description"
+                         Classes="arc-caption"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center"
+                        Margin="12,0,0,0">
+              <c:ArcButton x:Name="Action"
+                           Variant="Ghost"
+                           Size="Sm"
+                           MinHeight="30"
+                           Padding="8,0" />
+              <c:ArcButton x:Name="Close"
+                           Variant="Ghost"
+                           Size="Sm"
+                           Compact="True"
+                           Width="30"
+                           MinHeight="30"
+                           Padding="0" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Toast host ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcToastHost}" TargetType="a:ArcToastHost">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <StackPanel x:Name="Stack"
+                      VerticalAlignment="Bottom"
+                      HorizontalAlignment="Right"
+                      Spacing="8"
+                      Margin="16" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Alert ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcAlert}" TargetType="a:ArcAlert">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Surface" Classes="alert-surface">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <c:ArcIcon x:Name="Icon"
+                       Icon="info"
+                       Size="18"
+                       Margin="0,1,12,0"
+                       VerticalAlignment="Top"
+                       Classes="alert-icon" />
+            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+              <TextBlock x:Name="Title" Classes="arc-label" TextWrapping="Wrap" />
+              <ContentPresenter x:Name="Details"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center"
+                        Margin="16,0,0,0">
+              <c:ArcButton x:Name="Action"
+                           Variant="Ghost"
+                           Size="Sm"
+                           MinHeight="30"
+                           Padding="8,0" />
+              <c:ArcButton x:Name="Close"
+                           Variant="Ghost"
+                           Size="Sm"
+                           Compact="True"
+                           Width="30"
+                           MinHeight="30"
+                           Padding="0"
+                           Content="{x:Null}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^ /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    </Style>
+    <Style Selector="^.info /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.success /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcSuccessSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.warning /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcWarningSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.danger /template/ Border#Surface">
+      <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

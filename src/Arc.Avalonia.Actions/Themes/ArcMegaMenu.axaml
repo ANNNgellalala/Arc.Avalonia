@@ -1,0 +1,59 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- ============================ Mega menu morph ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcMegaMenu}" TargetType="a:ArcMegaMenu">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Bar"
+                  Classes="mm-bar"
+                  Padding="12,9"
+                  VerticalAlignment="Top">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" VerticalAlignment="Center">
+              <ContentControl x:Name="BrandHost"
+                              Grid.Column="0"
+                              VerticalAlignment="Center" />
+              <Panel x:Name="TriggerZone"
+                     Grid.Column="1"
+                     Margin="12,0,0,0"
+                     VerticalAlignment="Center">
+                <a:ArcGlide x:Name="BarHighlight" Classes="mm-highlight" CornerRadius="12" />
+                <a:ArcGlide x:Name="Caret" Classes="mm-caret" CornerRadius="1" />
+                <StackPanel x:Name="Triggers"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center" />
+              </Panel>
+              <StackPanel Grid.Column="3"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center">
+                <StackPanel x:Name="ActionsHost"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center" />
+                <c:ArcButton x:Name="MenuButton"
+                             Variant="Secondary"
+                             Size="Sm"
+                             Height="36"
+                             MinHeight="36"
+                             IsVisible="False">
+                  <StackPanel Orientation="Horizontal" Spacing="7">
+                    <c:ArcIcon Icon="menu" Size="16" Classes="mm-chevron" VerticalAlignment="Center" />
+                    <TextBlock Text="Menu" VerticalAlignment="Center" />
+                  </StackPanel>
+                </c:ArcButton>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Canvas x:Name="Overlay" ClipToBounds="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

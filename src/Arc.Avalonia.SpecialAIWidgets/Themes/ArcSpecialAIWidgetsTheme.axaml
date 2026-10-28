@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!--
+          Every AI widget in this project is a self-drawn illustration: a C# composite that resolves tokens at
+          build time and paints with DrawingContext, so there is no ControlTheme to merge here. This file stays
+          the single theme entry the Gallery includes, so a future templated control can be added without
+          touching App.axaml.
+        -->
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

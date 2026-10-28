@@ -1,0 +1,121 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:a="using:Arc.Avalonia.Actions.Controls"
+                    xmlns:c="using:Arc.Avalonia.Controls">
+
+  <!-- ============================ Button group ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcButtonGroup}" TargetType="a:ArcButtonGroup">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusControl}" />
+    <Setter Property="Padding" Value="2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Surface"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <Panel ClipToBounds="False">
+              <Panel x:Name="HighlightLayer" IsHitTestVisible="False">
+                <a:ArcGlide x:Name="Highlight" CornerRadius="16" />
+              </Panel>
+              <StackPanel x:Name="Segments" Orientation="Horizontal" />
+            </Panel>
+          </Border>
+          <Canvas x:Name="Overlay" ClipToBounds="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.solid">
+      <Setter Property="Background" Value="{DynamicResource ArcAccent}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ============================ Split button ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcSplitButton}" TargetType="a:ArcSplitButton">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <StackPanel Orientation="Horizontal">
+            <c:ArcButton x:Name="Main"
+                         Size="Md"
+                         Padding="16,0"
+                         CornerRadius="18,0,0,18" />
+            <Border x:Name="Divider"
+                    Classes="split-divider"
+                    Width="1"
+                    Height="24"
+                    VerticalAlignment="Center" />
+            <c:ArcButton x:Name="Chevron"
+                         Size="Md"
+                         Compact="True"
+                         Width="44"
+                         CornerRadius="0,18,18,0" />
+          </StackPanel>
+          <Canvas x:Name="Overlay" ClipToBounds="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ============================ Confirm morph ============================ -->
+  <ControlTheme x:Key="{x:Type a:ArcConfirmMorph}" TargetType="a:ArcConfirmMorph">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Border x:Name="Ring"
+                  Margin="-4"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource ArcFocusOutline}"
+                  IsVisible="False"
+                  IsHitTestVisible="False" />
+          <Border x:Name="Pill"
+                  HorizontalAlignment="Left"
+                  Background="{DynamicResource ArcSurfaceMuted}"
+                  BorderBrush="Transparent"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource ArcRadiusPill}"
+                  MinHeight="44"
+                  Padding="16,0"
+                  ClipToBounds="True">
+            <Panel x:Name="Faces" VerticalAlignment="Center" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.confirming /template/ Border#Pill">
+      <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    </Style>
+    <Style Selector="^.done /template/ Border#Pill">
+      <Setter Property="Background" Value="{DynamicResource ArcSuccessSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.error /template/ Border#Pill">
+      <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.pending /template/ Border#Pill">
+      <Setter Property="Opacity" Value="0.85" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>
