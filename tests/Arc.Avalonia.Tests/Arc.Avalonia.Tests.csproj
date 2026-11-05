@@ -11,5 +11,10 @@
     <!-- M1-T3: token ThemeDictionaries + the 47 Fluent resource-key overrides live in the L2.5 theme. -->
     <ProjectReference Include="..\..\src\Theme\Arc.Avalonia.Theme\Arc.Avalonia.Theme.csproj" />
     <ProjectReference Include="..\..\src\Docs\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
+    <!-- M2-G3c: window arithmetic + row cache (DataDisplay) and the Feature DataGrid host paging contract. -->
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
+    <!-- M2-G3b: service layer + ArcWindow shell (headless service contracts). -->
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
+    <ProjectReference Include="..\..\src\Feature\Arc.Avalonia.Feature.DataGrid\Arc.Avalonia.Feature.DataGrid.csproj" />
   </ItemGroup>
 </Project>

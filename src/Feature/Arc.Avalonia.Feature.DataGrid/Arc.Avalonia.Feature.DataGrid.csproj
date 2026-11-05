@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Feature.DataGrid</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Feature.DataGrid</AssemblyName>
+    <PackageId>Arc.Avalonia.Feature.DataGrid</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Opt-in Arc skin and paging host for Avalonia's official DataGrid, for large data sets. The design-system data grid (Arc.Avalonia.DataDisplay) stays the small-data default.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Window/reuse and paging assertions live in the plain console Verify harness (the sandbox cannot
+         start the vstest host). No other assembly needs the internals. -->
+    <InternalsVisibleTo Include="Arc.Avalonia.Verify" />
+  </ItemGroup>
+</Project>

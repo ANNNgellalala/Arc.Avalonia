@@ -51,6 +51,8 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+    <!-- L2f feature packages (opt-in; the large-data scenario pages use them) -->
+    <ProjectReference Include="..\..\Feature\Arc.Avalonia.Feature.DataGrid\Arc.Avalonia.Feature.DataGrid.csproj" />
     <!-- Agent surfaces -->
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />

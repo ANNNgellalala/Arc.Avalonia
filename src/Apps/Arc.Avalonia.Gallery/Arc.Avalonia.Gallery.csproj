@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Glass\Arc.Avalonia.Special.Glass.csproj" />
     <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Motion\Arc.Avalonia.Special.Motion.csproj" />

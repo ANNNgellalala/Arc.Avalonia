@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    M2-G3b service layer (L2): dialog / notification / navigation / file-picker / theme services plus the
+    ArcWindow shell with an overlay host. Opt-in static registry (ArcServiceProvider) - no DI container.
+    Depends only on L1 Foundation and the two L2 packages it composes (Actions toasts, Overlays dialog).
+  -->
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Services</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Services</AssemblyName>
+    <PackageId>Arc.Avalonia.Services</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Arc for Avalonia service layer and window shell: dialog, notification, navigation, file-picker and theme services behind an opt-in static registry, plus ArcWindow with an overlay host for dialogs and toasts.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
+  </ItemGroup>
+</Project>

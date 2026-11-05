@@ -104,12 +104,14 @@ public sealed class ArcTreeTableSort
 /// (uiarc.dev/components/tree-table); no Pro source was used. The rows model is
 /// <see cref="ArcTreeTableRow"/> with a keyed <see cref="ArcTreeTableRow.Values"/> dictionary.
 /// Deliberately simplified from the React component: there is no DOM grid-track/ResizeObserver
-/// responsive column hiding (<c>hideBelow</c>), no row virtualisation, no height-spring layout
-/// animation or sort position animation (expand, collapse and sort rebuild instantly), and no
-/// external <c>collectExpandableIds</c> helper. The pinned header works whenever
-/// <see cref="MaxBodyHeight"/> constrains the body. Sorting reorders siblings only, with blank
-/// values kept at the bottom in either direction, and selection is normalised so a parent is checked
-/// exactly when every known child is checked and mixed when only some descendants are. Keyboard
+/// responsive column hiding (<c>hideBelow</c>), no height-spring layout animation or sort position
+/// animation (expand, collapse and sort rebuild instantly), and no external
+/// <c>collectExpandableIds</c> helper. The visible tree is flattened into a row list and only the
+/// rows intersecting the scroll viewport (plus an overscan margin) are instantiated, so a 10,000 node
+/// tree keeps a viewport-sized control tree; the scrollbar still reflects every row. The pinned header
+/// works whenever <see cref="MaxBodyHeight"/> constrains the body. Sorting reorders siblings only, with
+/// blank values kept at the bottom in either direction, and selection is normalised so a parent is
+/// checked exactly when every known child is checked and mixed when only some descendants are. Keyboard
 /// support follows the public treegrid table (arrows, Home/End, PageUp/PageDown, <c>*</c>, Space,
 /// Enter, Ctrl/Cmd+A) plus label typeahead.
 /// </remarks>
@@ -196,7 +198,15 @@ public class ArcTreeTable : TemplatedControl
     private readonly HashSet<string> _loadFailed = new(StringComparer.Ordinal);
     private readonly List<DisplayRow> _display = new();
     private readonly List<VisibleRow> _visible = new();
-    private readonly List<Border> _rowFrames = new();
+
+    // Windowed realisation: _display is the flattened row list, and only the rows intersecting the
+    // viewport (plus overscan) exist as controls. The maps keep focus/frame bookkeeping aligned when
+    // loading/error placeholder rows are interleaved with data rows.
+    private readonly Dictionary<int, Border> _framesByIndex = new();
+    private readonly Dictionary<int, Control> _realizedRows = new();
+    private readonly List<int> _displayVisibleIndex = new();
+    private readonly List<int> _visibleDisplayIndex = new();
+    private readonly ArcRowWindowCache _rowCache = new(80);
     private readonly List<ArcTreeTableRow> _loadQueue = new();
     private readonly Dictionary<string, ArcTreeTableRow> _known = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ArcTreeTableRow?> _parentOf = new(StringComparer.Ordinal);
@@ -208,6 +218,10 @@ public class ArcTreeTable : TemplatedControl
     private Border? _headerHost;
     private ScrollViewer? _scroll;
     private Panel? _bodyHost;
+    private ArcVirtualRowsPanel? _rowsPanel;
+    private int _windowFirst;
+    private int _windowLast = -1;
+    private bool _updatingWindow;
     private Border? _footerHost;
     private TextBlock? _live;
     private TextBlock? _countText;
@@ -400,8 +414,17 @@ public class ArcTreeTable : TemplatedControl
 
         if (_scroll is not null)
         {
-            _scroll.LayoutUpdated += (_, _) => SyncHeaderGutter();
-            _scroll.ScrollChanged += (_, _) => SyncHeaderGutter();
+            _scroll.LayoutUpdated += (_, _) =>
+            {
+                SyncHeaderGutter();
+                UpdateBodyWindow();
+            };
+            _scroll.ScrollChanged += (_, _) =>
+            {
+                SyncHeaderGutter();
+                UpdateBodyWindow();
+            };
+            _scroll.SizeChanged += (_, _) => UpdateBodyWindow(force: true);
         }
 
         ApplyBodyHeight();
@@ -605,7 +628,11 @@ public class ArcTreeTable : TemplatedControl
         UpdateCountText();
         UpdateAutomation();
         StartQueuedLoads();
-        Dispatcher.UIThread.Post(SyncHeaderGutter, DispatcherPriority.Loaded);
+        Dispatcher.UIThread.Post(() =>
+        {
+            SyncHeaderGutter();
+            UpdateBodyWindow(force: true);
+        }, DispatcherPriority.Loaded);
     }
 
     private void RebuildIndex()
@@ -656,7 +683,11 @@ public class ArcTreeTable : TemplatedControl
 
         _display.Clear();
         _visible.Clear();
-        _rowFrames.Clear();
+        _displayVisibleIndex.Clear();
+        _visibleDisplayIndex.Clear();
+        _framesByIndex.Clear();
+        _realizedRows.Clear();
+        _rowCache.Clear();
         _chevrons.Clear();
         _loadQueue.Clear();
         RebuildIndex();
@@ -671,8 +702,11 @@ public class ArcTreeTable : TemplatedControl
 
     private void AddDisplayRow(ArcTreeTableRow row, int depth, int position, int setSize)
     {
+        var visibleIndex = _visible.Count;
         _visible.Add(new VisibleRow(row, depth));
+        _visibleDisplayIndex.Add(_display.Count);
         _display.Add(new DisplayRow(row, depth, DisplayKind.Row, position, setSize));
+        _displayVisibleIndex.Add(visibleIndex);
 
         if (!_expanded.Contains(row.Id))
         {
@@ -699,6 +733,7 @@ public class ArcTreeTable : TemplatedControl
         if (_loadFailed.Contains(row.Id))
         {
             _display.Add(new DisplayRow(row, depth + 1, DisplayKind.Error));
+            _displayVisibleIndex.Add(Math.Max(0, _visible.Count - 1));
             return;
         }
 
@@ -709,6 +744,7 @@ public class ArcTreeTable : TemplatedControl
         }
 
         _display.Add(new DisplayRow(row, depth + 1, DisplayKind.Loading));
+        _displayVisibleIndex.Add(Math.Max(0, _visible.Count - 1));
     }
 
     private List<ArcTreeTableRow> SortSiblings(IReadOnlyList<ArcTreeTableRow> rows)
@@ -1234,6 +1270,13 @@ public class ArcTreeTable : TemplatedControl
         }
 
         _bodyHost.Children.Clear();
+        _rowsPanel = null;
+        _framesByIndex.Clear();
+        _realizedRows.Clear();
+        _rowCache.Clear();
+        _windowFirst = 0;
+        _windowLast = -1;
+
         var columns = VisibleColumns();
         if (columns.Count == 0)
         {
@@ -1255,15 +1298,175 @@ public class ArcTreeTable : TemplatedControl
             return;
         }
 
-        var stack = new StackPanel();
-        foreach (var item in _display)
+        _rowsPanel = new ArcVirtualRowsPanel
         {
-            stack.Children.Add(item.Kind == DisplayKind.Row
-                ? BuildDataRow(item, columns)
-                : BuildPlaceholderRow(item, columns));
+            RowHeight = RowHeight,
+            TotalRows = _display.Count
+        };
+        _bodyHost.Children.Add(_rowsPanel);
+        UpdateBodyWindow(force: true);
+        UpdateFocusVisuals();
+    }
+
+    private Control BuildRowControl(int displayIndex, IReadOnlyList<ArcTreeTableColumn> columns)
+    {
+        var item = _display[displayIndex];
+        return item.Kind == DisplayKind.Row
+            ? BuildDataRow(item, columns, displayIndex)
+            : BuildPlaceholderRow(item, columns, displayIndex);
+    }
+
+    /// <summary>Flattened row count (diagnostics for the 10k scenario pages and the Verify harness).</summary>
+    internal int FlattenedRowCount => _display.Count;
+
+    /// <summary>Row controls that currently exist. Must stay viewport-sized, independent of the row count.</summary>
+    internal int RealisedRowCount => _realizedRows.Count;
+
+    /// <summary>First flattened index in the current window, or 0 when empty.</summary>
+    internal int WindowFirstRow => _windowFirst;
+
+    /// <summary>Last flattened index in the current window, or -1 when empty.</summary>
+    internal int WindowLastRow => _windowLast;
+
+    /// <summary>Detached row controls kept for reuse.</summary>
+    internal int CachedRowCount => _rowCache.Count;
+
+    private double ViewportHeight
+    {
+        get
+        {
+            var height = _scroll?.Viewport.Height ?? 0;
+            if (double.IsNaN(height) || double.IsInfinity(height) || height <= 0)
+            {
+                height = MaxBodyHeight > 0 ? MaxBodyHeight : 360;
+            }
+
+            return height;
+        }
+    }
+
+    /// <summary>
+    /// Realises exactly the rows the viewport can show (plus overscan) and detaches the rest. Rows
+    /// that leave the window are recycled through <see cref="_rowCache"/> so scrolling back reuses the
+    /// visual instead of rebuilding it. Budget: at most <c>ceil(viewport/RowHeight) + 2*overscan + 1</c>
+    /// controls exist at any time, regardless of the flattened row count.
+    /// </summary>
+    private void UpdateBodyWindow(bool force = false)
+    {
+        if (_rowsPanel is null || _display.Count == 0 || _updatingWindow)
+        {
+            return;
         }
 
-        _bodyHost.Children.Add(stack);
+        _updatingWindow = true;
+        try
+        {
+            _rowsPanel.TotalRows = _display.Count;
+            var offset = _scroll?.Offset.Y ?? 0;
+            var (first, last) = ArcTreeTableWindow.Compute(
+                _display.Count,
+                RowHeight,
+                ViewportHeight,
+                offset,
+                ArcTreeTableWindow.DefaultOverscan);
+
+            if (!force && first == _windowFirst && last == _windowLast)
+            {
+                return;
+            }
+
+            _windowFirst = first;
+            _windowLast = last;
+            var columns = VisibleColumns();
+
+            foreach (var pair in _realizedRows.ToList())
+            {
+                if (pair.Key >= first && pair.Key <= last)
+                {
+                    continue;
+                }
+
+                _rowsPanel.RemoveRow(pair.Value);
+                _realizedRows.Remove(pair.Key);
+                _framesByIndex.Remove(pair.Key);
+                _rowCache.Return(pair.Key, pair.Value);
+            }
+
+            for (var index = first; index <= last; index++)
+            {
+                if (_realizedRows.ContainsKey(index))
+                {
+                    continue;
+                }
+
+                if (!_rowCache.TryTake(index, out var control))
+                {
+                    control = BuildRowControl(index, columns);
+                }
+
+                _realizedRows[index] = control;
+                _rowsPanel.SetRow(control, index);
+            }
+
+            UpdateFocusVisuals();
+        }
+        finally
+        {
+            _updatingWindow = false;
+        }
+    }
+
+    private int DisplayToVisibleIndex(int displayIndex) =>
+        displayIndex >= 0 && displayIndex < _displayVisibleIndex.Count
+            ? _displayVisibleIndex[displayIndex]
+            : 0;
+
+    private int VisibleToDisplayIndex(int visibleIndex) =>
+        visibleIndex >= 0 && visibleIndex < _visibleDisplayIndex.Count
+            ? _visibleDisplayIndex[visibleIndex]
+            : -1;
+
+    /// <summary>
+    /// Scrolls the viewport just enough to show a flattened row and realises it before focus paints.
+    /// </summary>
+    private void EnsureVisible(int visibleIndex)
+    {
+        if (_rowsPanel is null || _visible.Count == 0)
+        {
+            return;
+        }
+
+        var displayIndex = VisibleToDisplayIndex(Math.Clamp(visibleIndex, 0, _visible.Count - 1));
+        if (displayIndex < 0)
+        {
+            return;
+        }
+
+        var viewport = ViewportHeight;
+        var offset = _scroll?.Offset.Y ?? 0;
+        var top = displayIndex * RowHeight;
+        if (top < offset)
+        {
+            offset = top;
+        }
+        else if (top + RowHeight > offset + viewport)
+        {
+            offset = top + RowHeight - viewport;
+        }
+
+        var maxOffset = Math.Max(0, _display.Count * RowHeight - viewport);
+        offset = Math.Clamp(offset, 0, maxOffset);
+        if (_scroll is not null && Math.Abs(_scroll.Offset.Y - offset) > 0.5)
+        {
+            _scroll.Offset = new Vector(_scroll.Offset.X, offset);
+        }
+
+        UpdateBodyWindow(force: true);
+        if (_framesByIndex.TryGetValue(displayIndex, out var frame))
+        {
+            frame.BringIntoView();
+        }
+
         UpdateFocusVisuals();
     }
 
@@ -1283,7 +1486,7 @@ public class ArcTreeTable : TemplatedControl
         };
     }
 
-    private Control BuildDataRow(DisplayRow item, IReadOnlyList<ArcTreeTableColumn> columns)
+    private Control BuildDataRow(DisplayRow item, IReadOnlyList<ArcTreeTableColumn> columns, int displayIndex)
     {
         var row = item.Row;
         var depth = item.Depth;
@@ -1384,9 +1587,8 @@ public class ArcTreeTable : TemplatedControl
             };
         }
 
-        var indexInView = _rowFrames.Count;
-        _rowFrames.Add(frame);
-        frame.Tag = indexInView;
+        var indexInView = displayIndex;
+        _framesByIndex[displayIndex] = frame;
 
         frame.PointerEntered += (_, _) =>
         {
@@ -1410,7 +1612,7 @@ public class ArcTreeTable : TemplatedControl
             }
 
             _keyboardFocus = false;
-            _focusIndex = indexInView;
+            _focusIndex = DisplayToVisibleIndex(indexInView);
             Focus();
             UpdateFocusVisuals();
             if (CanExpand(row))
@@ -1530,8 +1732,9 @@ public class ArcTreeTable : TemplatedControl
         };
     }
 
-    private Control BuildPlaceholderRow(DisplayRow item, IReadOnlyList<ArcTreeTableColumn> columns)
+    private Control BuildPlaceholderRow(DisplayRow item, IReadOnlyList<ArcTreeTableColumn> columns, int displayIndex)
     {
+        _ = displayIndex;
         var row = item.Row;
         var depth = item.Depth;
         var grid = CreateGrid(columns);
@@ -2148,11 +2351,8 @@ public class ArcTreeTable : TemplatedControl
     {
         _focusIndex = Math.Clamp(index, 0, Math.Max(0, _visible.Count - 1));
         _keyboardFocus = true;
+        EnsureVisible(_focusIndex);
         UpdateFocusVisuals();
-        if (_focusIndex >= 0 && _focusIndex < _rowFrames.Count)
-        {
-            _rowFrames[_focusIndex].BringIntoView();
-        }
     }
 
     private bool TryTypeahead(KeyEventArgs e)
@@ -2183,11 +2383,8 @@ public class ArcTreeTable : TemplatedControl
             {
                 _focusIndex = index;
                 _keyboardFocus = true;
+                EnsureVisible(index);
                 UpdateFocusVisuals();
-                if (index < _rowFrames.Count)
-                {
-                    _rowFrames[index].BringIntoView();
-                }
 
                 return true;
             }
@@ -2233,6 +2430,11 @@ public class ArcTreeTable : TemplatedControl
             _keyboardFocus = true;
         }
 
+        if (_keyboardFocus && _visible.Count > 0)
+        {
+            EnsureVisible(_focusIndex);
+        }
+
         UpdateFocusVisuals();
     }
 
@@ -2251,16 +2453,15 @@ public class ArcTreeTable : TemplatedControl
 
     private void UpdateFocusVisuals()
     {
-        for (var index = 0; index < _rowFrames.Count; index++)
+        foreach (var pair in _framesByIndex)
         {
-            _rowFrames[index].Paint(
+            var focused = IsFocused && _keyboardFocus && DisplayToVisibleIndex(pair.Key) == _focusIndex;
+            pair.Value.Paint(
                 Border.BorderBrushProperty,
-                IsFocused && _keyboardFocus && index == _focusIndex
-                    ? ArcTokens.FocusOutline
-                    : ArcTokens.BorderSubtle);
-            if (!IsFocused || !_keyboardFocus || index != _focusIndex)
+                focused ? ArcTokens.FocusOutline : ArcTokens.BorderSubtle);
+            if (!focused)
             {
-                _rowFrames[index].BorderBrush = Brushes.Transparent;
+                pair.Value.BorderBrush = Brushes.Transparent;
             }
         }
     }

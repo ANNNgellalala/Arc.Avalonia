@@ -5,9 +5,13 @@ using Avalonia;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Demo;
+using Arc.Avalonia.Feature.DataGrid;
 using Arc.Avalonia.Motion;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Verify;
@@ -28,6 +32,7 @@ public static class Program
         MotionChecks();
         CatalogChecks();
         ThemeChecks();
+        ListChecks();
 
         Console.WriteLine($"VERIFY: checks={_checks} failures={Failures.Count}");
         foreach (var failure in Failures)
@@ -351,6 +356,188 @@ public static class Program
             }
 
             return Values.TryGetValue(key, out value);
+        }
+    }
+
+    /// <summary>
+    /// M2-G3c: the tree table's window arithmetic, the bounded row-reuse cache and the Feature DataGrid
+    /// host's paging contract. All three are pure logic, so they run in this no-UI console harness.
+    /// </summary>
+    private static void ListChecks()
+    {
+        // Tree table window: 10,000 rows, 44 px rows, 600 px viewport, 6 rows overscan.
+        const int total = 10_000;
+        const double rowHeight = 44;
+        const double viewport = 600;
+        const int overscan = ArcTreeTableWindow.DefaultOverscan;
+        var viewportRows = (int)Math.Ceiling(viewport / rowHeight);
+
+        var (first, last) = ArcTreeTableWindow.Compute(total, rowHeight, viewport, 0, overscan);
+        var realized = last - first + 1;
+        Check("tree window starts at the top", first == 0 && last >= viewportRows - 1);
+        Check("tree window is viewport-sized, not 10k", realized <= viewportRows + 2 * overscan + 1);
+        Check("tree window within 2x viewport budget", realized <= viewportRows * 2);
+
+        var (midFirst, midLast) = ArcTreeTableWindow.Compute(total, rowHeight, viewport, 220_000, overscan);
+        Check("tree window follows the scroll offset", midFirst > 4_900 && midLast < 5_100);
+        Check("tree window at mid is viewport-sized", midLast - midFirst + 1 <= viewportRows + 2 * overscan + 1);
+
+        var (endFirst, endLast) = ArcTreeTableWindow.Compute(total, rowHeight, viewport, total * rowHeight - viewport, overscan);
+        Check("tree window clamps to the last row", endLast == total - 1 && endFirst < endLast);
+
+        var (emptyFirst, emptyLast) = ArcTreeTableWindow.Compute(0, rowHeight, viewport, 0, overscan);
+        Check("tree window empty data", emptyFirst == 0 && emptyLast == -1);
+        var (tinyFirst, tinyLast) = ArcTreeTableWindow.Compute(3, rowHeight, viewport, 0, overscan);
+        Check("tree window tiny data", tinyFirst == 0 && tinyLast == 2);
+
+        // Row reuse cache: re-entry returns the same instance, capacity evicts the oldest entry.
+        var cache = new ArcRowWindowCache(2);
+        var firstControl = new Border();
+        var secondControl = new Border();
+        var thirdControl = new Border();
+        cache.Return(1, firstControl);
+        cache.Return(2, secondControl);
+        _ = secondControl;
+        cache.Return(3, thirdControl);
+        Check("row cache evicts the oldest entry", cache.Count == 2 && !cache.TryTake(1, out _));
+        Check("row cache reuses the same control instance",
+            cache.TryTake(3, out var reused) && ReferenceEquals(reused, thirdControl));
+
+        // Feature DataGrid host: defaults, page count and slicing are public contract.
+        var host = new ArcDataGridHost();
+        Check("feature host defaults", host.PageSize == 100 && host.PageIndex == 0 && host.TotalItems == -1 && host.AutoPage);
+        host.ItemsSource = Enumerable.Range(0, 250).Cast<object?>().ToArray();
+        Check("feature host page count", host.PageCount == 3);
+        host.NextPage();
+        Check("feature host slices the middle page", host.CurrentPageItems.Count == 100 && host.PageIndex == 1);
+        host.LastPage();
+        Check("feature host last page is short", host.CurrentPageItems.Count == 50 && host.PageCount == 3);
+    }
+
+    /// <summary>
+    /// M2-G3b: the service layer's headless contract. A fake presenter, sink and file picker exercise the
+    /// generic dialog result plumbing, the dialog queue, notification de-duplication and file-picker injection
+    /// without a platform window.
+    /// </summary>
+    private static void ServiceChecks()
+    {
+        ArcServiceProvider.Reset();
+
+        // Registry round trip + fake file picker injection (what the file controls resolve at click time).
+        var picker = new FakeFilePickerService();
+        ArcServiceProvider.Register<IFilePickerService>(picker);
+        var found = ArcServiceProvider.TryGet<IFilePickerService>(out var resolved) && ReferenceEquals(resolved, picker);
+        var files = resolved!.OpenFileAsync(new FilePickerOpenOptions { AllowMultiple = true }).GetAwaiter().GetResult();
+        Check("service provider registration round trip", found);
+        Check("file picker fake is called through the service", picker.Calls == 1 && files.Count == 0);
+
+        // Dialog result plumbing + one-at-a-time queue.
+        var presenter = new FakeDialogPresenter();
+        var dialogs = new ArcDialogService(presenter);
+        var confirmTask = dialogs.ConfirmAsync(new ArcConfirmRequest { Title = "Delete?", Message = "Sure?" });
+        var renameTask = dialogs.ShowAsync(new ArcDialogRequest<string>
+        {
+            Title = "Rename",
+            PrimaryResult = "renamed"
+        });
+        var confirmed = confirmTask.GetAwaiter().GetResult();
+        var renamed = renameTask.GetAwaiter().GetResult();
+        Check("dialog confirm returns the confirm value", confirmed);
+        Check("dialog generic result round trip", renamed == "renamed" && presenter.Requests == 2);
+        Check("dialog service serialises one dialog at a time", presenter.MaxConcurrent == 1);
+
+        // Notification de-duplication + lifecycle.
+        var sink = new FakeNotificationSink();
+        var notifications = new ArcNotificationService(sink);
+        var dismissed = 0;
+        notifications.Dismissed += (_, _) => dismissed++;
+        var first = notifications.Show(new ArcNotification { Title = "Saved", Key = "save" });
+        var second = notifications.Show(new ArcNotification { Title = "Saved again", Key = "save" });
+        var dismissedByKey = notifications.Dismiss("save");
+        Check("notification dedup by key", first && !second && sink.Presented == 1);
+        Check("notification lifecycle", dismissedByKey && notifications.Active.Count == 0 && dismissed == 1);
+
+        // Navigation stack over the minimal frame.
+        var frame = new ContentControl();
+        var navigation = new ArcNavigationService();
+        navigation.Attach(frame);
+        navigation.Navigate("a");
+        navigation.Navigate("b");
+        var wentBack = navigation.GoBack();
+        navigation.Replace("c");
+        Check("navigation stack pushes, pops and replaces",
+            wentBack && navigation.Stack.Count == 1 && (string?)navigation.Current == "c" &&
+            ReferenceEquals(frame.Content, "c"));
+
+        ArcServiceProvider.Reset();
+    }
+
+    private sealed class FakeFilePickerService : IFilePickerService
+    {
+        public int Calls { get; private set; }
+
+        public Task<IReadOnlyList<IStorageFile>> OpenFileAsync(
+            FilePickerOpenOptions options,
+            TopLevel? owner = null,
+            CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Task.FromResult<IReadOnlyList<IStorageFile>>(Array.Empty<IStorageFile>());
+        }
+
+        public Task<IStorageFile?> SaveFileAsync(
+            FilePickerSaveOptions options,
+            TopLevel? owner = null,
+            CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Task.FromResult<IStorageFile?>(null);
+        }
+
+        public Task<IReadOnlyList<IStorageFolder>> PickFolderAsync(
+            FolderPickerOpenOptions options,
+            TopLevel? owner = null,
+            CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Task.FromResult<IReadOnlyList<IStorageFolder>>(Array.Empty<IStorageFolder>());
+        }
+    }
+
+    private sealed class FakeDialogPresenter : IArcDialogPresenter
+    {
+        private int _active;
+        private int _requests;
+
+        public int Requests => _requests;
+
+        public int MaxConcurrent { get; private set; }
+
+        public async Task<TResult> ShowAsync<TResult>(ArcDialogRequest<TResult> request, CancellationToken cancellationToken)
+        {
+            _requests++;
+            _active++;
+            MaxConcurrent = Math.Max(MaxConcurrent, _active);
+            try
+            {
+                await Task.Delay(5, cancellationToken);
+                return request.PrimaryResult;
+            }
+            finally
+            {
+                _active--;
+            }
+        }
+    }
+
+    private sealed class FakeNotificationSink : IArcNotificationSink
+    {
+        public int Presented { get; private set; }
+
+        public void Present(ArcNotification notification, Action dismiss) => Presented++;
+
+        public void Clear()
+        {
         }
     }
 

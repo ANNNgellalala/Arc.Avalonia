@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     对 artifacts/ 下的 *.nupkg 逐包检查（docs/15 §5 / docs/13 §2.2 R5）：
-      1. 包集合：恰好是 26 个发布库 + 2 个 meta 包（Arc.Avalonia / Arc.Avalonia.All），
+      1. 包集合：恰好是「所有 IsPackable=true 的 csproj」推导出的包（含 2 个 meta：Arc.Avalonia / Arc.Avalonia.All），
          不得出现 Docs/Abstractions/Gallery/samples/POC 包；
       2. 依赖：只允许 Avalonia 官方包（Avalonia/Avalonia.Themes.Fluent/Avalonia.Fonts.Inter）
          与 Arc.Avalonia.* 包；Arc 依赖版本必须是同一 lockstep 版本；禁止 third-party 与 Docs 依赖；
@@ -51,9 +51,14 @@ $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 
 # ---------------------------------------------------------------------------
-# Expectations (keep in sync with src/**/*.csproj: IsPackable=true / PackageId)
+# Expectations. The package set is derived from the repository: every src/**/*.csproj with
+# <IsPackable>true</IsPackable> contributes its <PackageId> (falling back to <AssemblyName>). Adding a
+# package therefore never requires editing this script. The two meta packages keep an explicit dependency
+# shape check below; they are not expected to aggregate the Feature packages.
 # ---------------------------------------------------------------------------
-$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter')
+$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid')
+
+# Layer families the meta packages must aggregate (dependency-shape contract for Arc.Avalonia / .All).
 $components = @(
     'Arc.Avalonia.Inputs', 'Arc.Avalonia.Actions', 'Arc.Avalonia.Navigation', 'Arc.Avalonia.Overlays',
     'Arc.Avalonia.Feedback', 'Arc.Avalonia.DataDisplay', 'Arc.Avalonia.Charts', 'Arc.Avalonia.Pickers',
@@ -68,17 +73,41 @@ $blocks = @(
     'Arc.Avalonia.Blocks.Marketing', 'Arc.Avalonia.Blocks.Commerce', 'Arc.Avalonia.Blocks.App',
     'Arc.Avalonia.Blocks.Team', 'Arc.Avalonia.Blocks.Data', 'Arc.Avalonia.Blocks.AI'
 )
-$libraryPackages = @('Arc.Avalonia.Foundation', 'Arc.Avalonia.Theme') + $components + $agents + $specials + $blocks
 $metaExpectedDeps = @{
     'Arc.Avalonia'     = @('Arc.Avalonia.Theme') + $components + $agents
     'Arc.Avalonia.All' = @('Arc.Avalonia') + $specials + $blocks
 }
 $metaPackages = @('Arc.Avalonia', 'Arc.Avalonia.All')
-$expectedPackages = $libraryPackages + $metaPackages
 
-# Assembly file name inside lib/ (PackageId == AssemblyName for every library package today).
+function Get-PublishedProjects {
+    param([string]$RepoRoot)
+    $projects = [System.Collections.Generic.List[object]]::new()
+    foreach ($file in Get-ChildItem -Recurse -File -Filter *.csproj (Join-Path $RepoRoot 'src')) {
+        if ($file.FullName -match '\\(bin|obj)\\') { continue }
+        $text = [IO.File]::ReadAllText($file.FullName)
+        if ($text -notmatch '<IsPackable>true</IsPackable>') { continue }
+        $assembly = if ($text -match '<AssemblyName>([^<]+)</AssemblyName>') { $Matches[1] } else { $file.BaseName }
+        $packageId = if ($text -match '<PackageId>([^<]+)</PackageId>') { $Matches[1] } else { $assembly }
+        $projects.Add([pscustomobject]@{ PackageId = $packageId; AssemblyName = $assembly; Project = $file.FullName })
+    }
+
+    return @($projects | Sort-Object PackageId)
+}
+
+$publishedProjects = @(Get-PublishedProjects -RepoRoot $root)
+if ($publishedProjects.Count -eq 0) {
+    Write-Output 'PACKAGE GATE: ERROR - 未找到任何 IsPackable=true 的工程'
+    exit 2
+}
+
+$expectedPackages = @($publishedProjects | ForEach-Object { $_.PackageId })
+foreach ($meta in $metaPackages) {
+    if ($expectedPackages -notcontains $meta) { $expectedPackages += $meta }
+}
+
+# Assembly file name inside lib/ per package (PackageId can differ from AssemblyName, e.g. meta packages).
 $assemblyNameByPackage = @{}
-foreach ($id in $libraryPackages) { $assemblyNameByPackage[$id] = $id }
+foreach ($project in $publishedProjects) { $assemblyNameByPackage[$project.PackageId] = $project.AssemblyName }
 
 $forbiddenPackagePatterns = @(
     'Arc.Avalonia.Docs*', 'Arc.Avalonia.Gallery*', '*.Sample.*', '*Poc*', '*POC*'
@@ -332,7 +361,7 @@ $report = [ordered]@{
             newViolations = $issues.Count
             items         = @($issues)
             notes         = @(
-                "包数: $($rows.Count) / 期望 $($expectedPackages.Count)（26 发布库 + 2 meta）",
+                "包数: $($rows.Count) / 期望 $($expectedPackages.Count)（从 IsPackable=true 的 csproj 推导 + 2 meta 显式校验）",
                 "报告: $(Convert-Path $mdPath)"
             )
         })

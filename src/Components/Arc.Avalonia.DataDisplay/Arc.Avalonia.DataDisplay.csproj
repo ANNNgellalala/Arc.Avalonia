@@ -17,5 +17,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
+    <!-- The console Verify harness asserts the window arithmetic and the row-reuse cache directly; the
+         sandbox cannot start the vstest host, so these stay plain console checks. -->
+    <InternalsVisibleTo Include="Arc.Avalonia.Verify" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

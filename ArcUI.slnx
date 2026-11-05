@@ -5,6 +5,9 @@
   <Folder Name="/Theme/">
     <Project Path="src/Theme/Arc.Avalonia.Theme/Arc.Avalonia.Theme.csproj" />
   </Folder>
+  <Folder Name="/Feature/">
+    <Project Path="src/Feature/Arc.Avalonia.Feature.DataGrid/Arc.Avalonia.Feature.DataGrid.csproj" />
+  </Folder>
   <Folder Name="/Components/">
     <Project Path="src/Components/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Actions/Arc.Avalonia.Actions.csproj" />
@@ -17,6 +20,7 @@
     <Project Path="src/Components/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
+    <Project Path="src/Components/Arc.Avalonia.Services/Arc.Avalonia.Services.csproj" />
   </Folder>
   <Folder Name="/Agent/">
     <Project Path="src/Agent/Arc.Avalonia.AgentUI/Arc.Avalonia.AgentUI.csproj" />

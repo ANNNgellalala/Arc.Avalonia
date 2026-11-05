@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Gallery;
@@ -20,7 +21,7 @@ namespace Arc.Avalonia.Gallery;
 /// The sidebar materialises one category's rows on first expand; selection moves between existing rows instead
 /// of rebuilding the tree.
 /// </summary>
-public sealed class GalleryWindow : Window
+public sealed class GalleryWindow : ArcWindow
 {
     private const int CacheLimit = 16;
 
@@ -148,7 +149,7 @@ public sealed class GalleryWindow : Window
         Grid.SetColumn(_tocHost, 2);
         root.Children.Add(_tocHost);
 
-        Content = root;
+        PageHost.Content = root;
         RebuildSidebar();
     }
 

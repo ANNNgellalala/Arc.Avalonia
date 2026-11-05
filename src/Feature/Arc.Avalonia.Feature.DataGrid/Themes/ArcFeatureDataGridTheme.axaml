@@ -1,0 +1,120 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Arc.Avalonia.Feature.DataGrid">
+
+  <!--
+    Arc skin for the official Avalonia DataGrid (large-data path, R7). This file deliberately does NOT
+    include Avalonia.Controls.DataGrid/Themes/Fluent.xaml: R4 keeps third-party / official-theme
+    includes out of library themes. The consumer (and the Gallery demo page) includes the DataGrid
+    Fluent theme first, then this file, so these setters sit on top of the official templates.
+
+    Everything here resolves Arc tokens through DynamicResource, so the skin follows the active
+    light/dark scheme and the eight accents. No literal colours (R6).
+  -->
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ControlTheme x:Key="{x:Type c:ArcDataGridHost}" TargetType="c:ArcDataGridHost">
+        <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Border x:Name="PART_Shell"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{DynamicResource ArcBorder}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource ArcRadiusPanel}"
+                    ClipToBounds="True">
+              <Grid RowDefinitions="*,Auto">
+                <Grid Grid.Row="0">
+                  <DataGrid x:Name="PART_Grid"
+                            Background="Transparent"
+                            BorderThickness="0" />
+                  <TextBlock x:Name="PART_Empty"
+                             IsVisible="False"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource ArcTextMuted}" />
+                </Grid>
+                <Border x:Name="PART_PagerBar"
+                        Grid.Row="1"
+                        BorderBrush="{DynamicResource ArcBorderSubtle}"
+                        BorderThickness="0,1,0,0"
+                        Padding="12,6">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock x:Name="PART_Summary"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource ArcTextXs}"
+                               Foreground="{DynamicResource ArcTextSecondary}" />
+                    <StackPanel x:Name="PART_Pager"
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="6" />
+                  </Grid>
+                </Border>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Official DataGrid parts: property setters only, so the official templates keep their behaviour. -->
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextSm}" />
+    <Setter Property="RowHeight" Value="40" />
+    <Setter Property="ColumnHeaderHeight" Value="42" />
+    <Setter Property="GridLinesVisibility" Value="Horizontal" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="RowBackground" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="HeadersVisibility" Value="Column" />
+    <Setter Property="SelectionMode" Value="Single" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcTextSecondary}" />
+    <Setter Property="FontSize" Value="{DynamicResource ArcTextXs}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="MinHeight" Value="42" />
+    <Setter Property="SeparatorBrush" Value="{DynamicResource ArcBorderSubtle}" />
+    <Setter Property="AreSeparatorsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+  </Style>
+
+  <Style Selector="DataGridCell">
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="DataGridRow">
+    <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="MinHeight" Value="40" />
+  </Style>
+
+  <Style Selector="DataGridRow:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
+  </Style>
+
+  <Style Selector="DataGridRow:selected">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+
+  <Style Selector="DataGridRow:selected:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
+  </Style>
+</Styles>

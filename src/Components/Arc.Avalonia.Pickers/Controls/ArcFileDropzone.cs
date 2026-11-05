@@ -14,6 +14,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Pickers.Controls;
@@ -305,17 +306,32 @@ public class ArcFileDropzone : TemplatedControl
     {
         e.Handled = true;
         var top = TopLevel.GetTopLevel(this);
+        var options = new FilePickerOpenOptions
+        {
+            Title = Label ?? "Add files",
+            AllowMultiple = Multiple,
+            FileTypeFilter = BuildFileTypes()
+        };
+
+        // An application may register IFilePickerService (a headless picker or a custom file portal);
+        // without one the control keeps using the platform storage provider directly.
+        if (ArcServiceProvider.TryGet<IFilePickerService>(out var picker) && picker is not null)
+        {
+            var picked = await picker.OpenFileAsync(options, top);
+            if (picked.Count > 0)
+            {
+                await AddFilesAsync(picked);
+            }
+
+            return;
+        }
+
         if (top?.StorageProvider is null)
         {
             return;
         }
 
-        var files = await top.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = Label ?? "Add files",
-            AllowMultiple = Multiple,
-            FileTypeFilter = BuildFileTypes()
-        });
+        var files = await top.StorageProvider.OpenFilePickerAsync(options);
 
         if (files.Count > 0)
         {

@@ -8,6 +8,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Arc.Avalonia.Demo;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Gallery;
@@ -22,6 +23,11 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         ArcThemeManager.Apply(this, ArcColorScheme.Light, ArcAccent.Neutral);
+
+        // M2-G3b: app-level services. ArcWindow registers defaults for its own overlay-backed services;
+        // the file picker and theme facade are registered here so every window shares one implementation.
+        ArcServiceProvider.Register<IFilePickerService>(StorageProviderFilePickerService.Instance);
+        ArcServiceProvider.Register<IArcThemeService>(new ArcThemeService(this));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

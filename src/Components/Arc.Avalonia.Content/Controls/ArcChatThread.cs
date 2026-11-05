@@ -18,6 +18,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
@@ -974,16 +975,28 @@ public class ArcChatThread : TemplatedControl
         try
         {
             var top = TopLevel.GetTopLevel(this);
-            if (top?.StorageProvider is null)
-            {
-                return;
-            }
-
-            var files = await top.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            var options = new FilePickerOpenOptions
             {
                 Title = "Attach files",
                 AllowMultiple = true
-            });
+            };
+
+            // An app may register IFilePickerService (a headless picker or a custom attachment portal);
+            // without one the control keeps using the platform storage provider directly.
+            IReadOnlyList<IStorageFile> files;
+            if (ArcServiceProvider.TryGet<IFilePickerService>(out var picker) && picker is not null)
+            {
+                files = await picker.OpenFileAsync(options, top);
+            }
+            else
+            {
+                if (top?.StorageProvider is null)
+                {
+                    return;
+                }
+
+                files = await top.StorageProvider.OpenFilePickerAsync(options);
+            }
 
             foreach (var file in files)
             {

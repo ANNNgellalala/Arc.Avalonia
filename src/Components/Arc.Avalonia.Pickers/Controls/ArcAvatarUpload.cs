@@ -16,6 +16,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Pickers.Controls;
@@ -301,12 +302,7 @@ public class ArcAvatarUpload : TemplatedControl
         }
 
         var top = TopLevel.GetTopLevel(this);
-        if (top?.StorageProvider is null)
-        {
-            return;
-        }
-
-        var files = await top.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        var options = new FilePickerOpenOptions
         {
             Title = string.IsNullOrWhiteSpace(Label) ? "Profile photo" : Label,
             AllowMultiple = false,
@@ -318,7 +314,27 @@ public class ArcAvatarUpload : TemplatedControl
                     MimeTypes = new[] { "image/png", "image/jpeg", "image/webp" }
                 }
             }
-        });
+        };
+
+        // An app may register IFilePickerService (a headless picker or a custom image portal); without one
+        // the control keeps using the platform storage provider directly.
+        if (ArcServiceProvider.TryGet<IFilePickerService>(out var picker) && picker is not null)
+        {
+            var picked = await picker.OpenFileAsync(options, top);
+            if (picked.Count > 0)
+            {
+                await LoadFileAsync(picked[0]);
+            }
+
+            return;
+        }
+
+        if (top?.StorageProvider is null)
+        {
+            return;
+        }
+
+        var files = await top.StorageProvider.OpenFilePickerAsync(options);
 
         if (files.Count > 0)
         {

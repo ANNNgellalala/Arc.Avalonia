@@ -55,6 +55,9 @@ Read the analysis first:
 * [`docs/15-m1-task-cards.zh.md`](docs/15-m1-task-cards.zh.md) — the five M1 task cards (docs/pages extraction, foundation
   purity + Internal dissolution, theme adaptation + `ArcTheme`, release engineering, gates/regression) with write scopes,
   DoD and the 82 person-day parallel plan.
+* [`docs/16-m2-wave1-services-and-lists.zh.md`](docs/16-m2-wave1-services-and-lists.zh.md) — M2 wave 1: the window-scoped
+  service layer (`ArcWindow`, dialog/notification/navigation/file-picker), the windowed tree table and the
+  `Feature.DataGrid` package for large data sets.
 
 ## Install
 
