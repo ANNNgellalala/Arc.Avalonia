@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ArcThemePoc.ArcTheme">
+
+  <!-- POC-A hypothesis 1: a custom Styles can host <FluentTheme/> plus component StyleIncludes and
+       its own token ThemeDictionaries, so consumers write a single <poc:ArcTheme/> element. -->
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- Probe key (not theme-aware): tells us whether a nested Styles' Resources are visible to the
+           application resource chain at all, separately from ThemeDictionaries behaviour. -->
+      <SolidColorBrush x:Key="PocPlainBrush" Color="#00FF00" />
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <CornerRadius x:Key="ControlCornerRadius">14</CornerRadius>
+          <CornerRadius x:Key="OverlayCornerRadius">18</CornerRadius>
+          <x:Double x:Key="ControlContentThemeFontSize">15</x:Double>
+          <SolidColorBrush x:Key="PocTokenBrush" Color="#3366FF" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <CornerRadius x:Key="ControlCornerRadius">10</CornerRadius>
+          <CornerRadius x:Key="OverlayCornerRadius">14</CornerRadius>
+          <x:Double x:Key="ControlContentThemeFontSize">15</x:Double>
+          <SolidColorBrush x:Key="PocTokenBrush" Color="#8FA8FF" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <FluentTheme />
+
+  <!-- Two component themes are enough to prove the aggregation mechanism (docs/14 §5.2 step 2). -->
+  <StyleInclude Source="avares://Arc.Avalonia/Theme/ArcTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcInputsTheme.axaml" />
+</Styles>

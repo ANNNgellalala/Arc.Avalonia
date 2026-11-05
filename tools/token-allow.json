@@ -1,0 +1,183 @@
+{
+  "$comment": "R6 token-only 存量豁免基线。规则：cs/axaml 中 #RRGGBB(#RRGGBBAA)、小写 rgb()/rgba() 字面量、Color.FromArgb 都不得出现在“控件取色”里；自绘控件的 alpha 派生、颜色引擎/取色器数学、palette 定义源属于 docs/14 §4 允许的既有例外。每条按 file+rule 记录 max（命中行数），新增行数超过 max 即 RED；新文件未登记直接 RED。",
+  "version": 1,
+  "rules": {
+    "hex": "正则 #[0-9A-Fa-f]{6,8}",
+    "rgb": "正则 (?<![A-Za-z0-9_])rgba?\\s*\\(（大小写敏感，避免误伤 ArcColor.Rgb 方法名）",
+    "fromargb": "Color.FromArgb"
+  },
+  "allow": [
+    {
+      "file": "src/Foundation/Arc.Avalonia/Theme/ArcPalette.cs",
+      "rule": "hex",
+      "max": 51,
+      "reason": "palette 是 token 定义源头（OKLCH 基色/语义色常量），不是控件取色；R6 允许 token 源头定义。"
+    },
+    {
+      "file": "src/Foundation/Arc.Avalonia/Theme/ArcColor.cs",
+      "rule": "fromargb",
+      "max": 5,
+      "reason": "颜色引擎把 OKLCH/浮点颜色转换成 Avalonia Color 的底层适配（ArcColor.Rgb/Alpha 等）。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcColorMath.cs",
+      "rule": "fromargb",
+      "max": 5,
+      "reason": "取色器的颜色数学（HSV/RGB/HSL 互转与 alpha 合成），输入来自用户取色而非硬编码设计色。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcColorMath.cs",
+      "rule": "rgb",
+      "max": 3,
+      "reason": "取色器解析/格式化 rgb()/rgba() 文本协议，属于功能字符串，不是设计色。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcColorSurfaces.cs",
+      "rule": "fromargb",
+      "max": 6,
+      "reason": "alpha 渐变遮罩（白/黑/透明叠加）是取色器绘制算法的一部分。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcColorEditor.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "alpha 滑杆的 ramp 颜色派生。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcColorEditor.cs",
+      "rule": "rgb",
+      "max": 1,
+      "reason": "错误提示文案里的格式示例字符串。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "演示页的示例 tint（M1 随 Pages 出库一并移走）。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
+      "rule": "rgb",
+      "max": 1,
+      "reason": "演示页文案里的格式示例字符串（M1 随 Pages 出库）。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcAvatarCropSurface.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "裁剪遮罩的 alpha 派生。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Media/Controls/ArcScrollArea.cs",
+      "rule": "fromargb",
+      "max": 2,
+      "reason": "边缘渐隐遮罩的透明/不透明端点（绘图算法，非设计色）。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Charts/Core/ChartCore.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘图表 alpha 派生（docs/14 §4 明示例外）。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Charts/Controls/ArcAdvancedChartModels.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘图表 alpha 派生。"
+    },
+    {
+      "file": "src/Components/Arc.Avalonia.Charts/Controls/ArcBrushChart.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘图表 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.AI/Controls/AiKit.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "Blocks 自绘 alpha 派生（输入色来自 token）。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.App/Controls/AppKit.cs",
+      "rule": "fromargb",
+      "max": 3,
+      "reason": "Blocks 自绘 alpha/渐变派生（输入色来自 token）。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Commerce/Controls/ArcEmptyScene.cs",
+      "rule": "fromargb",
+      "max": 2,
+      "reason": "自绘场景的 accent alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Commerce/Controls/CommerceKit.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "Blocks 自绘 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Data/Controls/ArcTerrainStage.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘地形图 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Data/Controls/DataDraw.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘图表 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Data/Controls/DataKit.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Marketing/Controls/ArcMeshWash.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘网格光的 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Marketing/Controls/ArcSpotlightCard.cs",
+      "rule": "fromargb",
+      "max": 2,
+      "reason": "自绘聚光渐变的 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Marketing/Controls/MarketingKit.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "Blocks 自绘 alpha 派生。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Team/Controls/ArcCohortChart.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘图表颜色混合。"
+    },
+    {
+      "file": "src/Blocks/Arc.Avalonia.Blocks.Team/Controls/TeamKit.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "Blocks 自绘 alpha 派生。"
+    },
+    {
+      "file": "src/Special/Arc.Avalonia.Special.AIExplainers/Controls/ExplainInk.cs",
+      "rule": "fromargb",
+      "max": 1,
+      "reason": "自绘墨迹 alpha 派生。"
+    },
+    {
+      "file": "src/Special/Arc.Avalonia.Special.Glass/Controls/ArcGlassBackdrop.cs",
+      "rule": "fromargb",
+      "max": 2,
+      "reason": "玻璃背景渐变的透明端点（绘图算法）。"
+    }
+  ],
+  "notes": [
+    "新增自绘代码若必须做 alpha 派生，请在 tools/token-allow.json 追加条目并写 reason，同时在 PR 里说明为什么不能走 ArcResources 的现成 Brush。",
+    "M1 出库后 Pages/ 下的两条豁免应随页面一起删除；基线清理是 M1-T5 的职责。"
+  ]
+}

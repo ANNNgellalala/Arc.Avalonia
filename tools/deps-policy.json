@@ -1,0 +1,107 @@
+{
+  "$comment": "R3 外部依赖策略（docs/13 §2.2 + docs/14 §3.2）。check-deps.ps1 用它做 fail-closed 判定：默认拒绝；deny 优先级高于 allow；任何 Avalonia.* 不在白名单内一律拒绝。修改本文件需在 docs/adr/0002-dependency-policy.md 记录理由。",
+  "version": 1,
+  "scan": {
+    "publishRoots": [
+      "src/Foundation",
+      "src/Components",
+      "src/Agent",
+      "src/Special",
+      "src/Blocks",
+      "src/Theme",
+      "src/Feature",
+      "src/Patterns"
+    ],
+    "appsRoots": [
+      "src/Apps"
+    ],
+    "excludePathSegments": [
+      "/bin/",
+      "/obj/",
+      "/.recon/",
+      "/poc/"
+    ]
+  },
+  "allowedDirect": [
+    { "id": "Avalonia", "scope": "libraries" },
+    { "id": "Avalonia.Base", "scope": "libraries" },
+    { "id": "Avalonia.Controls", "scope": "libraries" },
+    { "id": "Avalonia.Markup.Xaml", "scope": "libraries" },
+    { "id": "Avalonia.Themes.Fluent", "scope": "libraries" },
+    { "id": "Avalonia.Fonts.Inter", "scope": "libraries" },
+    { "id": "Avalonia.Desktop", "scope": "appsOnly" },
+    { "id": "Avalonia.Controls.DataGrid", "scope": "featureOnly" },
+    { "id": "Avalonia.Controls.ColorPicker", "scope": "featureOnly" }
+  ],
+  "allowedTransitive": [
+    "Avalonia.Angle.Windows.Natives",
+    "Avalonia.BuildServices",
+    "Avalonia.FreeDesktop",
+    "Avalonia.FreeDesktop.AtSpi",
+    "Avalonia.HarfBuzz",
+    "Avalonia.Native",
+    "Avalonia.Remote.Protocol",
+    "Avalonia.Skia",
+    "Avalonia.Wayland",
+    "Avalonia.Win32",
+    "Avalonia.X11",
+    "HarfBuzzSharp",
+    "MicroCom.Runtime",
+    "SkiaSharp",
+    "Tmds.DBus.Protocol"
+  ],
+  "allowedTransitivePatterns": [
+    "SkiaSharp.NativeAssets.*",
+    "HarfBuzzSharp.NativeAssets.*",
+    "runtime.*"
+  ],
+  "systemBuild": {
+    "patterns": [
+      "System.*",
+      "Microsoft.*"
+    ],
+    "note": "仅构建/SDK 级依赖；出现新的 Microsoft.*/System.* 时评审需确认它不属于 UI 运行时库。"
+  },
+  "denied": {
+    "exact": [
+      "ShimSkiaSharp"
+    ],
+    "patterns": [
+      "AtomUI.*",
+      "Semi.Avalonia*",
+      "Ursa*",
+      "Irihi.*",
+      "FluentAvalonia*",
+      "SukiUI*",
+      "Material.*",
+      "AntDesign*",
+      "IconPacks.*",
+      "Lucide.*",
+      "Dock.*",
+      "Tabalonia*",
+      "AvaloniaEdit*",
+      "Markdown.Avalonia*",
+      "DialogHost*",
+      "Svg.*",
+      "ColorDocument*"
+    ]
+  },
+  "rules": {
+    "denyWins": true,
+    "unknownAvalonia": "deny",
+    "defaultVerdict": "deny",
+    "featureProjects": {
+      "pathPatterns": [
+        "src/Feature/*",
+        "*/Arc.Avalonia.Feature.*/*.csproj"
+      ],
+      "note": "Avalonia.Controls.DataGrid / Avalonia.Controls.ColorPicker 只允许出现在 Feature.* 发布包（R7）。"
+    }
+  },
+  "notes": [
+    "判定单位是 NuGet package id（小写比较），不是 dll 文件名。",
+    "闭包来源：obj/project.assets.json 的 targets.<tfm>.*.dependencies，含 project 类型节点继续下钻，因此“官方附加控件/项目引用间接带来第三方包”也会被抓到。",
+    "Avalonia 本体（Avalonia、Avalonia.Base、Avalonia.Controls、Avalonia.Markup.Xaml、Avalonia.Themes.Fluent）属于 L0 官方平台，不计为外部 UI 框架。",
+    "Avalonia.Desktop 只允许应用（src/Apps）直接引用；发布库不得引用。"
+  ]
+}

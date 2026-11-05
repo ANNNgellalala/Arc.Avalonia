@@ -1,0 +1,59 @@
+{
+  "version": 3,
+  "targets": {
+    "net10.0": {
+      "Arc.Avalonia.Fixture.Transitive/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Avalonia": "12.1.4",
+          "Avalonia.Themes.Fluent": "12.1.4"
+        }
+      },
+      "Avalonia/12.1.4": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia.BuildServices": "11.3.2",
+          "MicroCom.Runtime": "0.11.6"
+        }
+      },
+      "Avalonia.BuildServices/11.3.2": {
+        "type": "package"
+      },
+      "Avalonia.Themes.Fluent/12.1.4": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "12.1.4",
+          "Svg.Skia": "2.0.0"
+        }
+      },
+      "MicroCom.Runtime/0.11.6": {
+        "type": "package"
+      },
+      "Svg.Skia/2.0.0": {
+        "type": "package"
+      }
+    }
+  },
+  "libraries": {
+    "Avalonia/12.1.4": { "type": "package", "path": "avalonia/12.1.4" },
+    "Avalonia.BuildServices/11.3.2": { "type": "package", "path": "avalonia.buildservices/11.3.2" },
+    "Avalonia.Themes.Fluent/12.1.4": { "type": "package", "path": "avalonia.themes.fluent/12.1.4" },
+    "MicroCom.Runtime/0.11.6": { "type": "package", "path": "microcom.runtime/0.11.6" },
+    "Svg.Skia/2.0.0": { "type": "package", "path": "svg.skia/2.0.0" }
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectName": "Arc.Avalonia.Fixture.Transitive",
+      "projectPath": "fixture/Arc.Avalonia.Fixture.Transitive.csproj"
+    },
+    "frameworks": {
+      "net10.0": {
+        "dependencies": {
+          "Avalonia": { "target": "Package", "version": "[12.1.4, )" },
+          "Avalonia.Themes.Fluent": { "target": "Package", "version": "[12.1.4, )" }
+        }
+      }
+    }
+  }
+}

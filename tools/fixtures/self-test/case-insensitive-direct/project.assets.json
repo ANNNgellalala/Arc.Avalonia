@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "targets": {
+    "net10.0": {
+      "Arc.Avalonia.Fixture.CaseInsensitive/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Avalonia": "12.1.4",
+          "semi.avalonia": "11.0.5"
+        }
+      },
+      "Avalonia/12.1.4": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia.BuildServices": "11.3.2",
+          "MicroCom.Runtime": "0.11.6"
+        }
+      },
+      "Avalonia.BuildServices/11.3.2": {
+        "type": "package"
+      },
+      "MicroCom.Runtime/0.11.6": {
+        "type": "package"
+      },
+      "Semi.Avalonia/11.0.5": {
+        "type": "package"
+      }
+    }
+  },
+  "libraries": {
+    "Avalonia/12.1.4": { "type": "package", "path": "avalonia/12.1.4" },
+    "Avalonia.BuildServices/11.3.2": { "type": "package", "path": "avalonia.buildservices/11.3.2" },
+    "MicroCom.Runtime/0.11.6": { "type": "package", "path": "microcom.runtime/0.11.6" },
+    "Semi.Avalonia/11.0.5": { "type": "package", "path": "semi.avalonia/11.0.5" }
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectName": "Arc.Avalonia.Fixture.CaseInsensitive",
+      "projectPath": "fixture/Arc.Avalonia.Fixture.CaseInsensitive.csproj"
+    },
+    "frameworks": {
+      "net10.0": {
+        "dependencies": {
+          "Avalonia": { "target": "Package", "version": "[12.1.4, )" },
+          "semi.avalonia": { "target": "Package", "version": "[11.0.5, )" }
+        }
+      }
+    }
+  }
+}

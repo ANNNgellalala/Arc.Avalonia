@@ -1,0 +1,11 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TopControlSkinPoc.App"
+             RequestedThemeVariant="Light">
+
+  <!-- POC-B deliberately keeps only the stock Fluent theme: the whole question is whether bare controls
+       can be re-skinned through ThemeDictionaries key overrides, with no component theme involved. -->
+  <Application.Styles>
+    <FluentTheme />
+  </Application.Styles>
+</Application>

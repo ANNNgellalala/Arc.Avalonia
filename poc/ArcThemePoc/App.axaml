@@ -1,0 +1,12 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:poc="using:ArcThemePoc"
+             x:Class="ArcThemePoc.App"
+             RequestedThemeVariant="Light">
+
+  <!-- The whole point of POC-A: exactly one line, no FluentTheme / token dictionary / StyleInclude
+       list leaking into the consumer app. -->
+  <Application.Styles>
+    <poc:ArcTheme />
+  </Application.Styles>
+</Application>

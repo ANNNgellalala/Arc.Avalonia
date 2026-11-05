@@ -52,6 +52,9 @@ Read the analysis first:
 * [`docs/14-m0-baseline-and-gates.zh.md`](docs/14-m0-baseline-and-gates.zh.md) — the M0 execution checklist:
   freeze the baseline, land the dependency/architecture/theme gates, and run the two POCs (theme aggregation entry,
   top built-in control skinning) before the restructure starts.
+* [`docs/15-m1-task-cards.zh.md`](docs/15-m1-task-cards.zh.md) — the five M1 task cards (docs/pages extraction, foundation
+  purity + Internal dissolution, theme adaptation + `ArcTheme`, release engineering, gates/regression) with write scopes,
+  DoD and the 82 person-day parallel plan.
 
 ## Gallery
 

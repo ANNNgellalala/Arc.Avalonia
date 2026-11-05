@@ -1,0 +1,18 @@
+{
+  "$comment": "R8 无渲染层自研扫描的存量豁免。默认空：M0 之后新增文件命中 FrameClock/RenderTimer/DrawingCache/ThemeVersion/CompositionTarget.Rendering 即 RED；只有经评审确认的“历史代码”才允许按 file+signal 登记。",
+  "version": 1,
+  "signals": [
+    "FrameClock",
+    "RenderTimer",
+    "DrawingCache",
+    "ThemeVersion",
+    "CompositionTarget.Rendering"
+  ],
+  "historical": [],
+  "filePatterns": [],
+  "notes": [
+    "docs/13 §2.0/R8：帧时钟、绘制缓存、主题资源失效协议属于 Avalonia 渲染层职责，Arc 不得自研；动画请用 Avalonia Animation/Transitions，时间请用 Dispatcher 而不是自建帧调度。",
+    "若历史文件确实需要登记，条目格式：{ \"file\": \"src/...\", \"signal\": \"FrameClock\", \"reason\": \"...\" }；filePatterns 支持 * 通配，仅用于第三方生成的不可改文件。",
+    "M0 实测当前树 0 命中（见 docs/adr/0001-layering.md 验证一节）。"
+  ]
+}

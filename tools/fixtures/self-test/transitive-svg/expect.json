@@ -1,0 +1,14 @@
+{
+  "$comment": "自检 fixture：黑名单包由“白名单包”间接带入（Avalonia.Themes.Fluent → Svg.Skia）。Fluent 的真实依赖并非如此，这里刻意合成，用来验证 targets 传递闭包下钻与引入路径。",
+  "name": "transitive-svg",
+  "type": "negative",
+  "projectName": "Arc.Avalonia.Fixture.Transitive",
+  "expectClean": false,
+  "expect": [
+    {
+      "package": "Svg.Skia",
+      "pathContains": ["Arc.Avalonia.Fixture.Transitive", "Avalonia.Themes.Fluent", "Svg.Skia"],
+      "reason": "经 Avalonia.Themes.Fluent 传递引入，命中 denied.patterns 的 Svg.*"
+    }
+  ]
+}

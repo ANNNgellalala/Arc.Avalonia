@@ -1,0 +1,14 @@
+{
+  "$comment": "自检 fixture：大小写不敏感判定。依赖字典写 semi.avalonia（小写），libraries/targets 节点写 Semi.Avalonia；门禁必须按 package id 大小写不敏感命中。",
+  "name": "case-insensitive-direct",
+  "type": "negative",
+  "projectName": "Arc.Avalonia.Fixture.CaseInsensitive",
+  "expectClean": false,
+  "expect": [
+    {
+      "package": "Semi.Avalonia",
+      "pathContains": ["Arc.Avalonia.Fixture.CaseInsensitive", "Semi.Avalonia"],
+      "reason": "依赖键大小写与节点 id 不一致时仍须命中"
+    }
+  ]
+}

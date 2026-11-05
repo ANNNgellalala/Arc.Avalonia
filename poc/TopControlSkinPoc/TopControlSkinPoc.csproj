@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- M0-5 POC-B: can the Top bare Fluent controls (TextBox / ScrollBar / TabControl / ComboBox) be
+       re-skinned by ThemeDictionaries resource-key overrides alone? References Foundation only (to read
+       the Arc token values), never an Arc component package. Not in ArcUI.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TopControlSkinPoc</RootNamespace>
+    <AssemblyName>TopControlSkinPoc</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+  </ItemGroup>
+</Project>

@@ -268,3 +268,80 @@ M0-1 ──> M0-2 ──> M0-3 ──> M0-4 ─┐
 | POC | `poc/ArcThemePoc/**`、`poc/TopControlSkinPoc/**`（不进 slnx） |
 | ADR | `docs/adr/0001-layering.md`、`0002-dependency-policy.md`、`0003-theme-strategy.md`、`0004-top-control-keys.md` |
 | 计划 | 本文 `docs/14-m0-baseline-and-gates.zh.md` + M1 任务卡 |
+
+---
+
+## 12. M0 执行结果（2026-11-05）
+
+### 12.1 状态
+
+| 任务 | 状态 | 产出 |
+|---|---|---|
+| M0-1 冻结基线 | ✅ | tag `pre-framework`（指向基线提交 `bfdcffd`）；`docs/baseline/2026-11-baseline.md`；`shots-manifest.csv`（466 张）；`assets-manifest.csv`（29 个工程） |
+| M0-2 依赖门禁 | ✅ | `tools/check-deps.ps1` + `deps-policy.json`；传递闭包；`-SelfTest` 4/4 PASS |
+| M0-3 其余门禁 | ✅ | `check-architecture/-theme/-token-only/-no-render/-all` + 策略/基线 json + `gates-common.ps1`；ADR 0001/0002 |
+| M0-4 POC-A | ✅ | `poc/ArcThemePoc`；3 张截图；ADR 0003 |
+| M0-5 POC-B | ✅ | `poc/TopControlSkinPoc`；2 张 before/after 截图；ADR 0004 |
+| M0-6 M1 任务拆分 | ✅ | [`docs/15-m1-task-cards.zh.md`](15-m1-task-cards.zh.md)（5 张卡、82 人日） |
+
+### 12.2 基线复测
+
+| 检查 | 结果 |
+|---|---|
+| 全量构建 | 0 error / 9 warning |
+| `VERIFY` | `checks=34 failures=0` |
+| `--audit` | `items=294 docs=294 pages=294 errors=0 warnings=0 pageFailures=0` |
+| `--smoke` | `itemShows=294 pageShows=315 failures=0` |
+| 截图 | `shots/` 466 张 PNG（基线 manifest 已提交） |
+
+### 12.3 门禁结果（`pwsh tools/check-all.ps1`）
+
+```text
+R3 依赖(传递闭包)  GREEN   0 new / 0 known-red   (26 发布库 / 130 包节点)
+R1 分层            GREEN   0 new / 0 known-red   (115 条 ProjectReference 边)
+R2 库边界          KNOWN-RED  24 Demo 引用 + 24 EmbeddedResource Docs  (M1-T1 清零)
+R4 主题来源        GREEN   0 new / 0 known-red   (117 主题 axaml / 91 Include)
+R6 token-only      GREEN   0 new / 28 exempt      (763 文件)
+R8 无渲染层自研    GREEN   0 new / 0 known-red
+R5 发布物内容      KNOWN-RED（M1-T4/T5 实现）
+=> red=0；已知红不阻塞 M0
+```
+
+`check-deps.ps1 -SelfTest`：直接黑名单、传递引入（`Svg.Skia`）、大小写、干净对照 **4/4 PASS**（负例均给出引入路径）。
+
+### 12.4 POC 结论
+
+**POC-A（`<arc:ArcTheme/>` 单行入口）：可行，无需 fallback。**
+* `ArcTheme : Styles` 在 XAML 内嵌套 `<FluentTheme/>` + token `ThemeDictionaries` + 组件 `StyleInclude` 编译/运行通过；
+* 51 条断言（3 个主题 × 17）全 PASS：模板解析、`DynamicResource` 真解析、聚合 token 覆盖 Fluent（`ControlCornerRadius` 3→14/10）；
+* `FluentTheme.Palettes` 运行时映射 accent 生效（Violet 截图可见）；
+* 证据：`poc/ArcThemePoc/`、`docs/images/poc/theme-*.png`、[ADR 0003](adr/0003-theme-strategy.md)。
+
+**POC-B（Top 内建控件键覆盖）：47 键、46/47 纯键覆盖、0 键需模板替换。**
+* TextBox 11 / ComboBox 16 / TabItem 11 / ScrollBar 7 键；MinHeight 32→44、CornerRadius 3→18、TabItem 字号 24→14、ScrollBar 粗细 16→10 均生效；
+* 仅 TextBox/ComboBox 字号需局部 `ControlTheme`；ScrollBar 自动收缩需样式（非键值/非模板）；
+* **M2 主题覆盖 15 → 18 人日**（总量 442→445）；
+* 两个坑：① Fluent 11.x→12.1.4 约 30% 键改名（`TextControlPadding→TextControlThemePadding` 等，见 ADR 0004 迁移表）；② `ArcResources` 无 variant 的 `TryFindResource` 会在 token 迁入 `ThemeDictionaries` 后静默取默认值 → **M1-T3 必须修**；
+* 证据：`poc/TopControlSkinPoc/`、`docs/images/poc/skin-before-after-*.png`、[ADR 0004](adr/0004-top-control-keys.md)。
+
+### 12.5 与计划的偏离（均已记录）
+
+| 项 | 计划 | 实际 | 说明 |
+|---|---|---|---|
+| 门禁报告目录 | `artifacts/gates/` | `.recon/gates/` | `.gitignore` 已含 `.recon/`，避免产物入库（ADR 0002） |
+| R2 计数口径 | 25 个 Demo 引用 | **24**（发布库口径） | 排除 Apps/Tests/POC；ADR 0001 记录 |
+| R1 的 L3→L1 | 禁止 | 放宽为允许 | 11 个 L3 工程直接用 Foundation token；ADR 0001 例外 E2 |
+| R5 / BannedApi | M0 实现 | 推迟到 M1-T5 | 需要 pack 与 Agent 程序集，M0 无产物可检 |
+| POC 渲染方式 | Headless（docs/14 初稿） | **Desktop 离屏渲染** | 本地 Headless 仅 12.1.5 与仓库 12.1.4 不一致；ADR 0003 记录 |
+
+### 12.6 M0 退出标准核对
+
+- [x] `pre-framework` tag + 基线文件已提交；
+- [x] `check-all.ps1` 一键运行；R1/R3/R4/R6/R8 绿，R2/R5 known-red；
+- [x] 依赖门禁可复现抓到负例（4/4 self-test）；
+- [x] POC-A 结论：单行入口可行；
+- [x] POC-B 结论：47 键分类表 + 覆盖清单；
+- [x] M1 任务卡（5 张、82 人日）已评审；
+- [x] M1 排期与 v3.2.1 的 90 人日一致（主题 +3 只影响 M2）。
+
+**结论：M0 通过，可进入 M1。** 启动顺序见 docs/15 §1（T1/T2 先行，T3 依赖 T2 与 POC-A）。

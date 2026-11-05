@@ -1,0 +1,175 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TopControlSkinPoc.MainWindow"
+        Title="Top-control skin POC-B"
+        Width="1140"
+        Height="512">
+
+  <Border x:Name="Root" Padding="26,20,26,20">
+    <StackPanel Spacing="12">
+      <TextBlock x:Name="Headline" FontSize="22" FontWeight="SemiBold"
+                 Text="POC-B · bare Fluent controls: Before / After ThemeDictionaries key overrides" />
+      <TextBlock x:Name="ThemeLine" FontSize="12" />
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+        <!-- BEFORE: stock Fluent 12.1.4 defaults -->
+        <Border x:Name="BeforePanel" Padding="14" CornerRadius="12" BorderThickness="1">
+          <StackPanel Spacing="10">
+            <TextBlock Text="BEFORE · Fluent 12.1.4 defaults" FontSize="12" FontWeight="SemiBold" Opacity="0.7" />
+            <TextBox x:Name="BeforeTextBox" Text="Invoice #1042" PlaceholderText="Search invoices" />
+            <ComboBox x:Name="BeforeComboBox" SelectedIndex="0">
+              <ComboBoxItem>Neutral</ComboBoxItem>
+              <ComboBoxItem>Violet</ComboBoxItem>
+            </ComboBox>
+            <TabControl x:Name="BeforeTabControl" Height="96">
+              <TabItem Header="Overview">
+                <TextBlock Text="Bare TabItem content." FontSize="12" />
+              </TabItem>
+              <TabItem Header="Details">
+                <TextBlock Text="Second tab." FontSize="12" />
+              </TabItem>
+            </TabControl>
+            <StackPanel Orientation="Horizontal" Spacing="18">
+              <ScrollBar x:Name="BeforeScrollBarV" Orientation="Vertical" Height="96" Maximum="100" Value="35" ViewportSize="40" />
+              <ScrollBar x:Name="BeforeScrollBarH" Orientation="Horizontal" Width="200" VerticalAlignment="Top" Maximum="100" Value="35" ViewportSize="40" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- AFTER: ThemeDictionaries overrides keyed to Arc token values -->
+        <Border x:Name="AfterPanel" Grid.Column="1" Padding="14" CornerRadius="12" BorderThickness="1">
+          <Border.Resources>
+            <ResourceDictionary>
+              <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                  <!-- Global -->
+                  <CornerRadius x:Key="ControlCornerRadius">18</CornerRadius>
+                  <x:Double x:Key="ControlContentThemeFontSize">16</x:Double>
+                  <!-- TextBox: key names verified against the Fluent 12.1.4 resource inventory -->
+                  <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="TextControlBorderBrush" Color="#FFE9E9E9" />
+                  <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#FFC4C4C4" />
+                  <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FF0B0B0B" />
+                  <SolidColorBrush x:Key="TextControlForeground" Color="#FF0B0B0B" />
+                  <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF7D7D7D" />
+                  <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="#33353535" />
+                  <x:Double x:Key="TextControlThemeMinHeight">44</x:Double>
+                  <Thickness x:Key="TextControlThemePadding">16,10,16,10</Thickness>
+                  <!-- ComboBox -->
+                  <SolidColorBrush x:Key="ComboBoxBackground" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FFF8F8F8" />
+                  <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#FFE9E9E9" />
+                  <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#FFC4C4C4" />
+                  <SolidColorBrush x:Key="ComboBoxForeground" Color="#FF0B0B0B" />
+                  <SolidColorBrush x:Key="ComboBoxPlaceHolderForeground" Color="#FF7D7D7D" />
+                  <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FFFFFFFF" />
+                  <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#FFE9E9E9" />
+                  <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#FFF8F8F8" />
+                  <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#FFF8F8F8" />
+                  <SolidColorBrush x:Key="ComboBoxItemForeground" Color="#FF0B0B0B" />
+                  <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#FF0B0B0B" />
+                  <Thickness x:Key="ComboBoxPadding">16,10,12,10</Thickness>
+                  <x:Double x:Key="ComboBoxThemeMinWidth">140</x:Double>
+                  <x:Double x:Key="ComboBoxMinHeight">44</x:Double>
+                  <!-- TabControl / TabItem -->
+                  <x:Double x:Key="TabItemHeaderFontSize">14</x:Double>
+                  <Thickness x:Key="TabItemMargin">0,0,0,0</Thickness>
+                  <Thickness x:Key="TabItemHeaderMargin">0,0,16,0</Thickness>
+                  <x:Double x:Key="TabItemMinHeight">40</x:Double>
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselectedPointerOver" Color="#FFF3F3F3" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderForegroundUnselected" Color="#FF585858" />
+                  <SolidColorBrush x:Key="TabItemHeaderForegroundSelected" Color="#FF0B0B0B" />
+                  <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill" Color="#FF0B0B0B" />
+                  <!-- ScrollBar -->
+                  <x:Double x:Key="ScrollBarSize">10</x:Double>
+                  <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#FFC4C4C4" />
+                  <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#FF7D7D7D" />
+                  <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#FF585858" />
+                  <SolidColorBrush x:Key="ScrollBarTrackFill" Color="#00FFFFFF" />
+                  <SolidColorBrush x:Key="ScrollBarTrackStroke" Color="#00FFFFFF" />
+                  <SolidColorBrush x:Key="ScrollBarBackground" Color="#00FFFFFF" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                  <CornerRadius x:Key="ControlCornerRadius">18</CornerRadius>
+                  <x:Double x:Key="ControlContentThemeFontSize">16</x:Double>
+                  <SolidColorBrush x:Key="TextControlBackground" Color="#FF191919" />
+                  <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FF191919" />
+                  <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF191919" />
+                  <SolidColorBrush x:Key="TextControlBorderBrush" Color="#FF2B2B2B" />
+                  <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#FF484848" />
+                  <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FFF2F2F2" />
+                  <SolidColorBrush x:Key="TextControlForeground" Color="#FFF2F2F2" />
+                  <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF8C8C8C" />
+                  <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="#55BEBEBE" />
+                  <x:Double x:Key="TextControlThemeMinHeight">44</x:Double>
+                  <Thickness x:Key="TextControlThemePadding">16,10,16,10</Thickness>
+                  <SolidColorBrush x:Key="ComboBoxBackground" Color="#FF191919" />
+                  <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FF242424" />
+                  <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="#FF191919" />
+                  <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#FF2B2B2B" />
+                  <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#FF484848" />
+                  <SolidColorBrush x:Key="ComboBoxForeground" Color="#FFF2F2F2" />
+                  <SolidColorBrush x:Key="ComboBoxPlaceHolderForeground" Color="#FF8C8C8C" />
+                  <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FF191919" />
+                  <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#FF2B2B2B" />
+                  <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#FF242424" />
+                  <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#FF242424" />
+                  <SolidColorBrush x:Key="ComboBoxItemForeground" Color="#FFF2F2F2" />
+                  <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#FFF2F2F2" />
+                  <Thickness x:Key="ComboBoxPadding">16,10,12,10</Thickness>
+                  <x:Double x:Key="ComboBoxThemeMinWidth">140</x:Double>
+                  <x:Double x:Key="ComboBoxMinHeight">44</x:Double>
+                  <x:Double x:Key="TabItemHeaderFontSize">14</x:Double>
+                  <Thickness x:Key="TabItemMargin">0,0,0,0</Thickness>
+                  <Thickness x:Key="TabItemHeaderMargin">0,0,16,0</Thickness>
+                  <x:Double x:Key="TabItemMinHeight">40</x:Double>
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselectedPointerOver" Color="#FF222222" />
+                  <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="#00000000" />
+                  <SolidColorBrush x:Key="TabItemHeaderForegroundUnselected" Color="#FFB4B4B4" />
+                  <SolidColorBrush x:Key="TabItemHeaderForegroundSelected" Color="#FFF2F2F2" />
+                  <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill" Color="#FFF2F2F2" />
+                  <x:Double x:Key="ScrollBarSize">10</x:Double>
+                  <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#FF484848" />
+                  <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#FF8C8C8C" />
+                  <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#FFB4B4B4" />
+                  <SolidColorBrush x:Key="ScrollBarTrackFill" Color="#00000000" />
+                  <SolidColorBrush x:Key="ScrollBarTrackStroke" Color="#00000000" />
+                  <SolidColorBrush x:Key="ScrollBarBackground" Color="#00000000" />
+                </ResourceDictionary>
+              </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+          </Border.Resources>
+
+          <StackPanel Spacing="10">
+            <TextBlock Text="AFTER · ThemeDictionaries key overrides (Arc token values)" FontSize="12" FontWeight="SemiBold" Opacity="0.7" />
+            <TextBox x:Name="AfterTextBox" Text="Invoice #1042" PlaceholderText="Search invoices" />
+            <ComboBox x:Name="AfterComboBox" SelectedIndex="0">
+              <ComboBoxItem>Neutral</ComboBoxItem>
+              <ComboBoxItem>Violet</ComboBoxItem>
+            </ComboBox>
+            <TabControl x:Name="AfterTabControl" Height="96">
+              <TabItem Header="Overview">
+                <TextBlock Text="Bare TabItem content." FontSize="12" />
+              </TabItem>
+              <TabItem Header="Details">
+                <TextBlock Text="Second tab." FontSize="12" />
+              </TabItem>
+            </TabControl>
+            <StackPanel Orientation="Horizontal" Spacing="18">
+              <ScrollBar x:Name="AfterScrollBarV" Orientation="Vertical" Height="96" Maximum="100" Value="35" ViewportSize="40" />
+              <ScrollBar x:Name="AfterScrollBarH" Orientation="Horizontal" Width="200" VerticalAlignment="Top" Maximum="100" Value="35" ViewportSize="40" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </Border>
+</Window>

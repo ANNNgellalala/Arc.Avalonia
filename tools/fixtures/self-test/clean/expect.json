@@ -1,0 +1,8 @@
+{
+  "$comment": "自检 fixture：干净项目。只含官方白名单包，期望 0 违规（对照组，证明门禁不是无条件红）。",
+  "name": "clean",
+  "type": "positive-control",
+  "projectName": "Arc.Avalonia.Fixture.Clean",
+  "expectClean": true,
+  "expect": []
+}

@@ -1,0 +1,47 @@
+{
+  "$comment": "R1 分层规则的显式配置（docs/13 §2.1/§2.2 + docs/14 §4）。脚本内没有硬编码的层级白名单：所有“层→允许目标层”和例外边都从这里读取，便于评审 diff。修改需在 docs/adr/0001-layering.md 记录。",
+  "version": 1,
+  "layerPrefixes": [
+    { "prefix": "src/Foundation/", "layer": "L1" },
+    { "prefix": "src/Theme/", "layer": "L2.5" },
+    { "prefix": "src/Feature/", "layer": "L2f" },
+    { "prefix": "src/Components/", "layer": "L2" },
+    { "prefix": "src/Patterns/", "layer": "L3" },
+    { "prefix": "src/Special/", "layer": "L3" },
+    { "prefix": "src/Blocks/", "layer": "L3" },
+    { "prefix": "src/Agent/", "layer": "L4" },
+    { "prefix": "src/Docs/", "layer": "app" },
+    { "prefix": "src/Apps/", "layer": "app" },
+    { "prefix": "tests/", "layer": "app" }
+  ],
+  "allowedTargetLayers": {
+    "L1": [],
+    "L2": ["L1", "L2"],
+    "L2f": ["L1", "L2"],
+    "L2.5": ["L1", "L2"],
+    "L3": ["L1", "L2"],
+    "L4": ["L1", "L2", "L3"],
+    "app": ["L0", "L1", "L2", "L2f", "L2.5", "L3", "L4", "app"]
+  },
+  "allowedEdges": [
+    {
+      "from": "Arc.Avalonia.Internal",
+      "to": "Arc.Avalonia",
+      "reason": "Foundation 内部辅助程序集（L1 内部边）；M1-T2 解散 Internal 后删除此例外",
+      "until": "M1-T2"
+    }
+  ],
+  "leafProjects": [
+    "Arc.Avalonia.Demo",
+    "Arc.Avalonia.Docs",
+    "Arc.Avalonia.Docs.Abstractions",
+    "Arc.Avalonia.Samples",
+    "Arc.Avalonia.Tests"
+  ],
+  "notes": [
+    "R1 的判定轴是“依赖方向”而不是“相邻层”：L3 允许直接引用 L1（L3→L2→L1 的下行方向未变），这是对 docs/13 §2.1 表格的显式放宽，11 个现有 L3 项目都直接使用 Foundation token。M1 文档出库后可收紧为只允许 L2（见 ADR 0001 例外 E2）。",
+    "L2.5（Arc.Avalonia.Theme）按 docs/13 §2.3 是对 L2 的聚合例外；其允许目标仍是 L1/L2，若出现其它边需在 allowedEdges 里逐条登记。",
+    "leafProjects 的引用由 R2 判定（known-red），R1 不重复报；R2 清完后 M1 应把 leaf 引用也纳入 R1 硬失败。",
+    "apps/tests 允许任意层（app 是宿主/叶子）。"
+  ]
+}

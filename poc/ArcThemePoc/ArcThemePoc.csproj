@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- M0-4 POC-A: can a single `ArcTheme : Styles` aggregate FluentTheme + token ThemeDictionaries
+       + component StyleIncludes, so the consumer writes only `<poc:ArcTheme/>`?
+       Deliberately NOT in ArcUI.slnx; offline restore (NuGet.config clears sources). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ArcThemePoc</RootNamespace>
+    <AssemblyName>ArcThemePoc</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Foundation (tokens + ArcButton) and Inputs (ArcInput theme). Demo is only pulled in
+         transitively because Arc.Avalonia.Inputs still references it (known R2 violation). -->
+    <ProjectReference Include="..\..\src\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+  </ItemGroup>
+</Project>

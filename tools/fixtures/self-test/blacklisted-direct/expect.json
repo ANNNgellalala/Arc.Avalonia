@@ -1,0 +1,14 @@
+{
+  "$comment": "自检 fixture：黑名单包直接被引用（Semi.Avalonia）。期望 R3 命中并给出引入路径。",
+  "name": "blacklisted-direct",
+  "type": "negative",
+  "projectName": "Arc.Avalonia.Fixture.Direct",
+  "expectClean": false,
+  "expect": [
+    {
+      "package": "Semi.Avalonia",
+      "pathContains": ["Arc.Avalonia.Fixture.Direct", "Semi.Avalonia"],
+      "reason": "denied.patterns 中的 Semi.Avalonia*"
+    }
+  ]
+}

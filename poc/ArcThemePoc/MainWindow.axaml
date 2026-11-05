@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:arc="using:Arc.Avalonia.Controls"
+        xmlns:inputs="using:Arc.Avalonia.Inputs.Controls"
+        x:Class="ArcThemePoc.MainWindow"
+        Title="ArcTheme POC-A"
+        Width="1100"
+        Height="540">
+
+  <Border x:Name="Root" Background="{DynamicResource ArcBackground}" Padding="40,32,40,32">
+    <StackPanel Spacing="18">
+      <TextBlock Text="POC-A · single-line &lt;ArcTheme/&gt; entry point" Classes="arc-title-sm" />
+      <TextBlock x:Name="ThemeLine" Classes="arc-caption" />
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="36">
+        <StackPanel Spacing="14">
+          <TextBlock Text="Arc components (aggregated component themes)" Classes="arc-label" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <arc:ArcButton x:Name="ArcPrimary" Content="Primary" />
+            <arc:ArcButton x:Name="ArcSecondary" Content="Secondary" Variant="Secondary" />
+            <arc:ArcButton x:Name="ArcGhost" Content="Ghost" Variant="Ghost" />
+          </StackPanel>
+          <inputs:ArcInput x:Name="ArcField" Label="Email" Placeholder="you@arc.dev" Value="hello@arc.dev" />
+          <inputs:ArcInput x:Name="ArcPassword" Label="Password" Placeholder="Stored locally" Value="hunter2" ShowClearButton="False" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Spacing="14">
+          <TextBlock Text="Bare Fluent controls (must not throw, must pick up token overrides)" Classes="arc-label" />
+          <TextBox x:Name="BareTextBox" PlaceholderText="Bare TextBox" Text="Typed text" />
+          <ComboBox x:Name="BareComboBox" SelectedIndex="0">
+            <ComboBoxItem>Neutral accent</ComboBoxItem>
+            <ComboBoxItem>Violet accent</ComboBoxItem>
+            <ComboBoxItem>Blue accent</ComboBoxItem>
+          </ComboBox>
+          <TabControl x:Name="BareTabControl">
+            <TabItem Header="Overview">
+              <TextBlock Text="Bare TabControl page one." Classes="arc-body" />
+            </TabItem>
+            <TabItem Header="Details">
+              <TextBlock Text="Bare TabControl page two." Classes="arc-body" />
+            </TabItem>
+          </TabControl>
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+  </Border>
+</Window>

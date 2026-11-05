@@ -11,6 +11,8 @@
 >   ② 主题聚合包从 L1 改为 **L2.5 聚合层**（修正依赖方向倒置）；
 >   ③ `Arc.Avalonia.Internal` 解散、614 个文档/页面文件出库、Agent 多会话 Workspace API 补入 WBS。
 >   总量 **357 → 442 人日（288–594）**。评审明细见 §10 与 [`analysis/13-review-*.zh.md`](analysis/)。
+> * **v3.2.1**（2026-11-05，M0 POC 结论）：`<arc:ArcTheme/>` 单行入口**可行**（51 断言通过，无需 fallback）；Top 内建控件皮肤 **47 键覆盖、46/47 纯键、0 模板替换**（仅字号需局部 ControlTheme、ScrollBar 自动收缩需样式）。
+>   据此 M2 主题覆盖 15 → **18 人日**，总量 **442 → 445（291–597）**；M1 不变（90）。证据见 [`docs/adr/0003`](adr/0003-theme-strategy.md)/[`0004`](adr/0004-top-control-keys.md)。
 >
 > * **v3.2**（2026-11-05，四项决策确认）：**Arc 与 AtomUI/Semi/Ursa 处于同一生态位，但不承诺"完全 drop-in 替代"**；
 >   Agent 采用 C 报告 **M 档（124 人日）**；网格采用"**自有网格（小数据）+ 官方 DataGrid Feature（大数据）**"分工；
@@ -29,11 +31,12 @@
 | 项 | v1（过严） | v2 | v3 | **v3.1 → v3.2（本版）** |
 |---|---|---|---|---|
 | 依赖边界 | 连 Fluent 也要替换 | 官方允许、第三方禁止 | 同 v2 + 渲染层不做 | 同 v3；**门禁升级为传递依赖检查** |
-| 主题 | 自建 43–78 个内建主题（48 人日） | 取消自建，10 人日适配 | 同 v2 | **Top 15–20 内建控件覆盖，30 人日**（为"替代 AtomUI"） |
+| 主题 | 自建 43–78 个内建主题（48 人日） | 取消自建，10 人日适配 | 同 v2 | **Top 15–20 内建控件覆盖，33 人日**（POC 后 30→33） |
 | 主题包位置 | L2 独立层 | L1 独立包 | L1 独立包 | **L2.5 聚合层**（依赖 L1+L2，修正倒置） |
 | 中间层 | 以帧调度/绘制缓存为支柱 | 以通用 UI 能力为主体 | 渲染层不做 | 同 v3 + **契约/服务/网格方案按评审重估** |
 | 层数 | 6 层 | 5 层 | 5 层 | 5 层 + 1 个聚合例外 |
-| 总量 | ≈435（290–580） | ≈357（280–470） | ≈357（280–470） | **≈442（288–594）** |
+| 总量 | ≈435（290–580） | ≈357（280–470） | ≈357（280–470） | **≈445（291–597）** |
+| **M0 结论**（2026-11-05） | — | — | — | POC-A 单行入口可行；POC-B 47 键 / 46 纯键 / 0 模板替换 → 主题 +3 |
 | 定位表述 | — | 第三方 UI 库替代 | UI 组件库（对标 AtomUI） | **同一生态位、不承诺完全 drop-in 替代**；主题覆盖 = 设计一致性，不是替代承诺 |
 | 关键增量 | — | 官方 UI 允许 | 渲染层不做 | 主题覆盖 +20、Internal 解散 +5、614 文件出库 +5、契约 +9、网格方案 +5、Agent Workspace/压测 +20、图标/Theme API +8、门禁 +4，去重 −10 |
 
@@ -41,7 +44,7 @@
 
 当前仓库**已不依赖任何第三方 UI 组件库**（26 个库项目只引 Avalonia 官方包），目标 ④ 只需守门；Arc 与 AtomUI/Semi/Ursa **同一生态位**（设计系统 + 组件库 + 组合），差异化在 Agent 顶层与 294 条目文档，**不以"完全替代"为承诺**；
 真正的工作量在 **目标 ③ 的通用 UI 能力（≈190 人日）**、**"替代 AtomUI"所需的内建控件皮肤与图标/Theme API（≈34 人日）**
-与 **目标 ① 的 Agent 顶层（54–155 人日）**。经评审修正后总工程量 **≈442 人日（288–594）**，3–4 人约 **6.5–8 个月**。
+与 **目标 ① 的 Agent 顶层（54–155 人日）**。经评审与 M0 POC 修正后总工程量 **≈445 人日（291–597）**，3–4 人约 **6.5–8 个月**。
 
 ### 0.2 四项需求的可行性判断（v3.1）
 
@@ -78,13 +81,13 @@
 | 里程碑 | 范围 | 人日（中性，区间） | 3–4 人日历 |
 |---|---|---|---|
 | **M1 分层 + 可发布（α）** | 基础层纯度、Internal 解散、Fluent 主题基础适配、`ArcTheme` 聚合入口、614 文件出库、包元数据/samples/许可/门禁 | **≈90（62–118）** | 6–8 周 |
-| **M2 通用 UI 能力 + 内建控件皮肤 + Agent MVP（β，与 AtomUI 同生态位）** | 契约/API、服务层+窗口壳、数据驱动列表、Top 15–20 内建控件覆盖、图标扩展、Theme API、本地化最小集、Agent Workspace/投影/组合根、迁移收尾 | **≈298（225–384）**（累计） | 18–25 周（累计） |
-| **M3 全量成熟（1.0）** | 无障碍、本地化全量、DnD/MVVM/容器、测试基线、Agent 完整顶层 | **≈442（288–594）**（累计） | 27–36 周（累计，约 6.5–8 个月） |
+| **M2 通用 UI 能力 + 内建控件皮肤 + Agent MVP（β，与 AtomUI 同生态位）** | 契约/API、服务层+窗口壳、数据驱动列表、Top 15–20 内建控件覆盖、图标扩展、Theme API、本地化最小集、Agent Workspace/投影/组合根、迁移收尾 | **≈301（228–387）**（累计） | 18–25 周（累计） |
+| **M3 全量成熟（1.0）** | 无障碍、本地化全量、DnD/MVVM/容器、测试基线、Agent 完整顶层 | **≈445（291–597）**（累计） | 27–36 周（累计，约 6.5–8 个月） |
 
 **分档结论**：
 * 只做"分层 + 可发布"（组件库形态，不承诺 drop-in）：**≈90 人日**（3 人 6–8 周）。
-* 做到"**能日常写业务应用 + 与 AtomUI 同生态位**"：**≈298 人日**（3 人约 25 周 / 4 人约 18 周）。
-* 做到"通用框架能力完整 + Agent 完整顶层"：**≈442 人日**（3–4 人约 6.5–8 个月）。
+* 做到"**能日常写业务应用 + 与 AtomUI 同生态位**"：**≈301 人日**（3 人约 25 周 / 4 人约 18 周）。
+* 做到"通用框架能力完整 + Agent 完整顶层"：**≈445 人日**（3–4 人约 6.5–8 个月）。
 * 若砍掉 Top 皮肤 / 图标扩展 / Theme API（不追求与 AtomUI 同级的设计一致性）：**≈419 人日**；本版**不采用**该裁剪。
 * 估算不确定性 **±30%**；评审已把 4 份审计的乐观项（主题 10、虚拟化 20、C1 44、G4 104）全部上调。
 
@@ -174,7 +177,7 @@ Avalonia 官方（内核 + Fluent 主题 + Inter 字体）                    �
 |---|---|---|---|
 | 渲染后端（Skia）、文本整形、输入栈、布局引擎、动画时钟/合成器 | Avalonia 本体 | ❌ | 重做等于重做 Avalonia |
 | 内建控件**模板机制**与 Fluent 主题（80 个 ControlTheme） | Avalonia 官方 | ❌ | 但**要在其上做 Top 15–20 的皮肤覆盖**（组件库职责） |
-| 内建控件**皮肤覆盖**（Window/TextBox/ComboBox/ScrollBar/Button/CheckBox/…） | Arc L2.5 | ✅ | 这是"替代 AtomUI"的核心，30 人日（§D3） |
+| 内建控件**皮肤覆盖**（Window/TextBox/ComboBox/ScrollBar/Button/CheckBox/…） | Arc L2.5 | ✅ | 这是"同生态位"的核心，33 人日（§D3） |
 | 列表/树虚拟化**机制**（`VirtualizingStackPanel`/容器回收） | Avalonia 本体 | ❌ | Arc 只把控件改成 `ItemsSource`+`DataTemplate`，用上该机制 |
 | 绘制缓存、帧调度、主题资源失效协议 | Avalonia 本体 | ❌ | v3 起明确不做；CI 禁止新增 |
 | 平台窗口、托盘、原生菜单、系统文件对话框 | Avalonia 官方 | ❌ | Arc 只做外观与服务包装 |
@@ -285,7 +288,7 @@ Avalonia 12 官方：Avalonia + Avalonia.Themes.Fluent + Avalonia.Fonts.Inter   
 * 全量自建 78 个内建控件主题 = 48 人日 + 每次 Avalonia 升级跟进，且 Arc 的差异化不在重写官方模板；
 * 同生态位的 AtomUI/Semi/Ursa 都会换肤；Arc 不承诺 drop-in 完全替代，但若不覆盖裸控件，会在"设计一致性"这一生态位指标上明显落后。评审结论（R1/R4）：
   只做"Arc 表面 6 类定向覆盖"（10 人日）**不够**，消费者用裸 `ComboBox/Menu/TabControl/Button/CheckBox` 会露 Fluent；
-* 折中方案：**Top 15–20 个内建控件做"资源键 + 少量模板"覆盖**（30 人日，清单已于 2026-11-05 认可），其余接受 Fluent 并文档说明。
+* 折中方案：**Top 15–20 个内建控件做"资源键 + 少量模板"覆盖**（33 人日，清单已于 2026-11-05 认可；M0 POC 实测 47 键、46/47 纯键、0 模板替换），其余接受 Fluent 并文档说明。
   覆盖清单：Window 背景、TextBox、ComboBox(+Item)、ListBox(+Item)、ScrollBar/ScrollViewer、Button、CheckBox、RadioButton、
   ToggleSwitch、Slider、ProgressBar、TabControl(+Item)、Menu/MenuItem/ContextMenu、ToolTip/Flyout/Popup、Expander、TreeView(+Item)、Label/Separator。
 * 机制（评审 P1）：必须用 `ResourceDictionary.ThemeDictionaries`（Light/Dark 两套）与 `FluentTheme.Palettes`
@@ -322,16 +325,16 @@ Avalonia 12 官方：Avalonia + Avalonia.Themes.Fluent + Avalonia.Fonts.Inter   
 * **风险**：发现顺序导致静默缺失（`--audit` 报 missing 而不是构建失败）；回验必须看计数。
 * **代价**：`Navigation`/`Overlays` 对 `Actions` 的两个"假依赖"随页面迁出消失。
 
-### D3 主题：官方 Fluent 之上的"适配 + Top 内建覆盖 + 聚合入口"（30 人日）
+### D3 主题：官方 Fluent 之上的"适配 + Top 内建覆盖 + 聚合入口"（33 人日）
 
 * **背景**：v1 假设连 Fluent 都要替换；v2 澄清官方 UI 允许；v3.1 按同生态位对标补足皮肤覆盖；v3.2 明确"不承诺 drop-in、但设计一致性要对齐"。
-* **决策**（三块，共约 30 人日）：
+* **决策**（三块，共约 33 人日）：
   1. **基础适配（15）**：`FluentTheme.Palettes` 映射 8 accent；全局字体/字号/圆角键；TextBox/ScrollViewer/ScrollBar/ListBox/Popup/ToolTip/Window 的资源键覆盖；
      双主题（Light/Dark × 8 accent）核对 + 截图回归；覆盖键常量表 + 升级失效检测。
-  2. **Top 15–20 内建控件覆盖（15）**：见 §2.5 清单；以资源键 + 局部 `ControlTheme`（BasedOn Fluent）为主，必要处替换模板；
+  2. **Top 15–20 内建控件覆盖（18）**：见 §2.5 清单；以资源键 + 局部 `ControlTheme`（BasedOn Fluent）为主（POC：46/47 键纯键覆盖、0 模板替换）；
      焦点视觉决策（接受 Fluent 边框 or 补 Arc 焦点环）。
   3. **聚合入口（计入 G1，4 人日）**：`ArcTheme`（L2.5）装配 Fluent + token + 覆盖 + 11 个组件主题；POC 验证 ThemeDictionaries 与组件主题共存。
-* **理由**：30 人日 < 全量 48 人日 + 长期跟进；以"Top 清单 + 文档写明未覆盖控件"达成生态位对标，不承诺 drop-in。
+* **理由**：33 人日 < 全量 48 人日 + 长期跟进；以"Top 清单 + 文档写明未覆盖控件"达成生态位对标，不承诺 drop-in。
 * **代价/风险**：Fluent 升级会改键 → 键常量表 + grep 门禁 + 升级检查清单；模板替换的控件需双主题回归。
 
 ### D4 依赖边界：官方允许 / 第三方禁止（含传递闭包）
@@ -457,7 +460,7 @@ public interface IArcAgentServices { ... }             // 宿主注入的 UI 服
 | ID | 工作包 | 内容 | 人日 | 区间 | 依据 |
 |---|---|---|---:|---:|---|
 | **G0** | **治理与护栏** | 依赖白/黑名单（含传递）脚本、分层架构测试、边界 CI（BannedApi）、CI（build+verify+audit+smoke+shots+pack）、版本/发布脚本、`.editorconfig`/`global.json` | **20** | 15–27 | R3/R4/Lead |
-| **G1** | **基础层、主题与聚合入口** | 纯度+Internal 解散 10；Fluent 基础适配 15；Top 15–20 内建控件覆盖 15；`ArcTheme` 聚合入口（L2.5）4；程序集重命名 1（含在纯度内） | **44** | 32–58 | R1/R4/A |
+| **G1** | **基础层、主题与聚合入口** | 纯度+Internal 解散 10；Fluent 基础适配 15；Top 15–20 内建控件覆盖 18；`ArcTheme` 聚合入口（L2.5）4；程序集重命名 1（含在纯度内） | **47** | 34–61 | R1/R4/A + M0 POC |
 | **G2** | **文档/示例解耦与发布** | 614 文件出库 9；Docs.Abstractions 4；Gallery/audit/smoke/shots 适配 4；包元数据/XML/meta/CPM 12；samples 4；API 基线 3；LICENSE/NOTICE 2；demo 残留清理 3 | **41** | 32–52 | B/R1/R2 |
 | **G3a** | **组件契约与 API 收敛**（C1） | 见 D6 C1 | **53** | 40–70 | R2/B |
 | **G3b** | **服务层 + 窗口壳**（C2） | 4 服务 + Overlay host + `ArcWindow` + 无头替身 | **24** | 16–35 | B |
@@ -469,7 +472,7 @@ public interface IArcAgentServices { ... }             // 宿主注入的 UI 服
 | **G3h** | **Theme API** | `ArcThemeOptions`：自定义 accent（品牌色）、token 覆盖、密度/圆角 | **4** | 3–6 | R4 |
 | **G4** | **Agent 顶层** | MVP 54（Workspace 8 + 投影/事件 8 + 增量 transcript 14 + 审批/工具 8 + 视图注册/队列 5 + Gallery/护栏 6 + 迁移 5）；完整 124（+子 agent/artifact/diff 10 + 治理 UI 35 + 迁移/验收 15） | **124** | 54–160 | C/R3 |
 | **G5** | **迁移收尾** | 旧 API 兼容/弃用 5；Gallery 自举与回归 8；README/CONVENTIONS/01–13 更新 4；首版发布 3；LifeToday/Blocks 目标与许可 3 | **23** | 17–29 | R3/Lead |
-| | **合计（M3 全量）** | | **442** | **288–594** | |
+| | **合计（M3 全量）** | | **445** | **291–597** | |
 | （不做） | 网格真数据驱动重写 | 已决策采用"自有网格 + 官方 DataGrid Feature"分工，不重写 | 0 | — | 决策 D-3 |
 | （post-1.0） | Agent L 档 | 06 长尾 7 项（23 人日）+ 相关验收；1.0 不纳入 | +31 | — | 决策 D-2 |
 
@@ -482,17 +485,17 @@ public interface IArcAgentServices { ... }             // 宿主注入的 UI 服
 |---|---|---|---|
 | **M0 准备**（1 周） | 冻结基线（commit + 截图基线 + audit/smoke 计数）、落 R1–R8 门禁、`docs/13` 评审定稿、主题 POC（ThemeDictionaries+Palettes）、`ArcTheme` 聚合 POC | 8（含在 G0） | 门禁脚本能在当前树"红/绿"正确判定；两个 POC 通过 |
 | **M1 分层 + 可发布（α）** | G0+G1a+G2 | **≈90（62–118）** | ① `dotnet pack` 产出不含 Demo/页面/文档的包，依赖闭包只含官方包；② 一行 `<arc:ArcTheme/>` 可接入；③ Internal 解散、614 文件出库后 audit/smoke/双主题截图通过；④ XML/许可证/samples 齐备 |
-| **M2 通用 UI 能力 + 内建皮肤 + Agent MVP（β）** | +G1b+G3a+G3b+G3c+G3g+G3h+G3d(6)+G4 MVP+G5 | **≈298（225–384）**（累计） | ① 示例应用跑通"登录→列表→表单→对话框→文件上传→设置页"；② **设计一致性抽检**：Top 清单中 ≥12 个控件呈现 Arc 皮肤（生态位对齐；不作为 drop-in 承诺）；③ 服务层可无头测试；④ Agent：fake transport 下 Workspace 驱动 6 个叶子控件；headless 断言 0 全量重建、可见行 ≤2×视口、分配/GC 阈值；桌面 p95 ≤16.7ms |
-| **M3 全量成熟（1.0）** | +G3d(24)+G3e+G3f+G4 完整 | **≈442（288–594）**（累计） | ① 15 关键控件有 peer 且读屏抽检；② RTL 与 1.25–2x 缩放抽检；③ 公共 API 基线 + 每包 XML；④ Agent 完整顶层（Workspace/子 agent/artifact/治理 UI 清单见 R3 §4） |
+| **M2 通用 UI 能力 + 内建皮肤 + Agent MVP（β）** | +G1b+G3a+G3b+G3c+G3g+G3h+G3d(6)+G4 MVP+G5 | **≈301（228–387）**（累计） | ① 示例应用跑通"登录→列表→表单→对话框→文件上传→设置页"；② **设计一致性抽检**：Top 清单中 ≥12 个控件呈现 Arc 皮肤（生态位对齐；不作为 drop-in 承诺）；③ 服务层可无头测试；④ Agent：fake transport 下 Workspace 驱动 6 个叶子控件；headless 断言 0 全量重建、可见行 ≤2×视口、分配/GC 阈值；桌面 p95 ≤16.7ms |
+| **M3 全量成熟（1.0）** | +G3d(24)+G3e+G3f+G4 完整 | **≈445（291–597）**（累计） | ① 15 关键控件有 peer 且读屏抽检；② RTL 与 1.25–2x 缩放抽检；③ 公共 API 基线 + 每包 XML；④ Agent 完整顶层（Workspace/子 agent/artifact/治理 UI 清单见 R3 §4） |
 
 **情景对照**：
 
 | 情景 | 内容 | 人日 | 3 人 | 4 人 |
 |---|---|---:|---:|---:|
 | S1 | 分层 + 可发布（组件库形态，不承诺 drop-in） | 90 | 8 周 | 6 周 |
-| S2 | S1 + 通用 UI 能力 + Top 皮肤 + Agent MVP（**与 AtomUI 同生态位**） | 298 | 24 周 | 18 周 |
-| S3 | 全量（M3） | 442 | 36 周 | 27 周 |
-| S3′ | 不追求同级设计一致性（不做 Top 覆盖/图标/Theme API；本版不采用） | 419 | 34 周 | 26 周 |
+| S2 | S1 + 通用 UI 能力 + Top 皮肤 + Agent MVP（**与 AtomUI 同生态位**） | 301 | 24 周 | 18 周 |
+| S3 | 全量（M3） | 445 | 36 周 | 27 周 |
+| S3′ | 不追求同级设计一致性（不做 Top 覆盖/图标/Theme API；本版不采用） | 422 | 34 周 | 26 周 |
 
 > 日历按 5 人日/周 + 20% 评审/联调/回归损耗。**2 人团队**：S3 ≈ 53 周（12 个月）；**1 人**：S3 ≈ 106 周（约 2 年）。
 
@@ -557,7 +560,7 @@ public interface IArcAgentServices { ... }             // 宿主注入的 UI 服
 
 **M1 回滚点**：`ArcTheme` 内部可退化为"FluentTheme + token"（不做覆盖），至少与现状等价。
 
-### M2 · 通用 UI 能力 + 内建皮肤 + Agent MVP（+8–12 周 / 3–4 人，累计约 298 人日）
+### M2 · 通用 UI 能力 + 内建皮肤 + Agent MVP（+8–12 周 / 3–4 人，累计约 301 人日）
 
 | 顺序 | 动作 | 理由 |
 |---|---|---|
@@ -571,7 +574,7 @@ public interface IArcAgentServices { ... }             // 宿主注入的 UI 服
 
 **M2 回滚点**：Agent 独立包；Top 覆盖以"按控件开关"的方式分片发布，未覆盖控件文档标注 Fluent 外观。
 
-### M3 · 全量成熟（+8–12 周 / 3–4 人，累计约 442 人日）
+### M3 · 全量成熟（+8–12 周 / 3–4 人，累计约 445 人日）
 
 1. G3d 全量（无障碍 peer + 本地化/RTL 全量）；
 2. G3e DnD/MVVM/容器/尺寸 token；
@@ -668,9 +671,9 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 
 1. **定位确认**：Arc 是 UI 组件库（对标 AtomUI/Semi/Ursa），不是 Avalonia 替代品；渲染/布局/虚拟化机制/主题引擎/平台全部归 Avalonia。
 2. **评审修正后的判断**：v3 的 357 人日只能做出"可发布的组件库"；要做到"与 AtomUI 同生态位、设计一致性达标"，需补 **Top 15–20 内建控件皮肤 + 图标扩展 + Theme API + 服务层**，
-   总量 **442 人日（288–594）**。注意：这是"**生态位对齐**"，不是 drop-in 替代承诺（不追求 78 全量换肤/843 图标）。
+   总量 **445 人日（291–597）**。注意：这是"**生态位对齐**"，不是 drop-in 替代承诺（不追求 78 全量换肤/843 图标）。
 3. **架构推荐**：L0 官方平台 → L1 Foundation → L2 通用 UI → L2.5 主题聚合（例外）→ L3 Patterns（可选）→ L4 Agent；8 条硬规则 + 传递依赖门禁。
-4. **里程碑**：M1 ≈90（可发布 α）；M2 ≈298（**与 AtomUI 同生态位的 β**）；M3 ≈442（1.0）。
+4. **里程碑**：M1 ≈90（可发布 α）；M2 ≈301（**与 AtomUI 同生态位的 β**）；M3 ≈445（1.0）。
    3–4 人团队 6.5–8 个月；2 人约 12 个月。
 5. **四项决策已确认（2026-11-05，见 §10）**：同生态位不承诺 drop-in、Agent M 档、网格"自有 + 官方 Feature"分工、Top 清单认可。下一步按 M0 启动（冻结基线 + 门禁 + 两个 POC）。
 
@@ -697,6 +700,8 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 | **D-4** | Top 15–20 皮肤清单 | **认可** §2.5 清单 | 按清单实施；未覆盖控件在文档标注 Fluent 外观 |
 
 **残留可选（不计入 1.0）**：图标继续向 843 靠拢（按需）；Agent L 档；若未来小数据场景也需要虚拟化，再评估网格重写。
+
+> **M0 执行结果（2026-11-05）**：基线 tag `pre-framework`（commit `bfdcffd`）；门禁 R1/R3/R4/R6/R8 绿、R2/R5 known-red、依赖 self-test 4/4；POC-A/POC-B 均通过；M1 任务卡见 [`docs/15-m1-task-cards.zh.md`](15-m1-task-cards.zh.md)；执行记录见 [`docs/14`](14-m0-baseline-and-gates.zh.md) §12。
 
 ---
 
@@ -746,3 +751,4 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 | v3 | 2026-11-05 | 定位修正：Arc=UI 组件库，渲染层不做；删除 P1 性能专项；"虚拟化基座"改"数据驱动改造"；M3 357 |
 | **v3.1** | 2026-11-05 | **4 份对抗式评审后修订**：主题 10→30（Top 15–20 覆盖）；Theme 改 L2.5 聚合层；Internal 解散 +5；614 文件出库 +5；C1 44→53；C3 20→25（降级+可选重写）；Agent Workspace/压测/迁移 +20；图标 +4、Theme API +4；门禁 +4；去重 −10；**M1 71→90、M2 225→298、M3 357→442**；新增 §10 评审记录与 4 项待决策 |
 | **v3.2** | 2026-11-05 | **四项决策确认**：D-1 同生态位、不承诺 drop-in（删除"替代"表述与替代验收）；D-2 Agent 采用 M 档 124（L 档 post-1.0）；D-3 网格"自有 + 官方 Feature"分工（取消重写可选项）；D-4 Top 15–20 清单认可；WBS 维持 **442（288–594）** |
+| **v3.2.1** | 2026-11-05 | **M0 POC 结论落地**：`<arc:ArcTheme/>` 单行入口可行（51 断言，无需 fallback）；Top 皮肤 47 键 / 46 纯键 / 0 模板替换（字号需局部 ControlTheme、ScrollBar 自动收缩需样式）→ Top 覆盖 15→18；G1 44→47、M2 298→301、M3 442→445（291–597）；M1 不变 90；证据 ADR 0003/0004 |
