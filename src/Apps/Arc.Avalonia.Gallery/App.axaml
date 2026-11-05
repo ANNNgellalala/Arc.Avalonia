@@ -5,7 +5,7 @@
 
   <Application.Styles>
     <FluentTheme />
-    <StyleInclude Source="avares://Arc.Avalonia/Theme/ArcTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Foundation/Theme/ArcTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Internal/Themes/ArcInternalTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcInputsTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcActionsTheme.axaml" />

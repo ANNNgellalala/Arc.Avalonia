@@ -122,6 +122,6 @@ foreach ($entry in $allowEntries) {
 $rule.checked = $files.Count
 $rule.notes.Add("扫描文件: $($files.Count)；规则: $($patterns.Keys -join ', ')；登记豁免: $($allowEntries.Count) 条")
 $rule.notes.Add("本次命中：新增 $newCount 条、已登记豁免 $exemptCount 条、基线零命中 $stale 条")
-$rule.notes.Add('M1 出库后应删除 Pages/ 下的豁免；规则收紧（如禁用 FromArgb）由 M1-T5 评审决定。')
+$rule.notes.Add('M1-T1 出库后 Pages 豁免已迁移到 src/Docs/Arc.Avalonia.Docs；规则收紧（如禁用 FromArgb）由 M1-T5 评审决定。')
 Update-GatesRuleStatus -Rule $rule | Out-Null
 exit (Complete-GatesReport -Report $report -OutDir $OutDir -Stamp $stamp -Quiet:$Quiet)

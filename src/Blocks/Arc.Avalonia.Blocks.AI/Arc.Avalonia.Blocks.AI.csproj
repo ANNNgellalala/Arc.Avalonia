@@ -11,13 +11,12 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
-    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Docs\*.json" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
   </ItemGroup>
 </Project>

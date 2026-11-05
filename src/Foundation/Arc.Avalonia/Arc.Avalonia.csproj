@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia</RootNamespace>
-    <AssemblyName>Arc.Avalonia</AssemblyName>
+    <!-- Assembly name is the public package identity; file path and root namespace stay Arc.Avalonia
+         so the 15+ ProjectReference paths and every C# namespace remain untouched. avares URIs must
+         use avares://Arc.Avalonia.Foundation/ (see Theme/ArcTheme.axaml and Gallery/App.axaml). -->
+    <AssemblyName>Arc.Avalonia.Foundation</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

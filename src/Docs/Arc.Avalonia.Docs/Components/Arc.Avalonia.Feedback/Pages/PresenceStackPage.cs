@@ -13,9 +13,9 @@ namespace Arc.Avalonia.Feedback.Pages;
 /// </summary>
 public sealed class PresenceStackPage : ArcItemPage
 {
-    private const string Maya = "avares://Arc.Avalonia.Feedback/Assets/portrait-maya.png";
-    private const string Sara = "avares://Arc.Avalonia.Feedback/Assets/portrait-sara.png";
-    private const string Leo = "avares://Arc.Avalonia.Feedback/Assets/portrait-leo.png";
+    private const string Maya = "avares://Arc.Avalonia.Docs/Assets/portrait-maya.png";
+    private const string Sara = "avares://Arc.Avalonia.Docs/Assets/portrait-sara.png";
+    private const string Leo = "avares://Arc.Avalonia.Docs/Assets/portrait-leo.png";
 
     public override string ItemSlug => "presence-stack";
 

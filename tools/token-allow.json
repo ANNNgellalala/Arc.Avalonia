@@ -50,16 +50,16 @@
       "reason": "错误提示文案里的格式示例字符串。"
     },
     {
-      "file": "src/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
+      "file": "src/Docs/Arc.Avalonia.Docs/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
       "rule": "fromargb",
       "max": 1,
-      "reason": "演示页的示例 tint（M1 随 Pages 出库一并移走）。"
+      "reason": "演示页的示例 tint；M1-T1 已随 Pages 迁入 src/Docs 叶子工程（不再进发布库），路径随工程迁移更新。"
     },
     {
-      "file": "src/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
+      "file": "src/Docs/Arc.Avalonia.Docs/Components/Arc.Avalonia.Pickers/Pages/ColorPickerPage.cs",
       "rule": "rgb",
       "max": 1,
-      "reason": "演示页文案里的格式示例字符串（M1 随 Pages 出库）。"
+      "reason": "演示页文案里的格式示例字符串；M1-T1 已随 Pages 迁入 src/Docs 叶子工程。"
     },
     {
       "file": "src/Components/Arc.Avalonia.Pickers/Controls/ArcAvatarCropSurface.cs",
@@ -178,6 +178,7 @@
   ],
   "notes": [
     "新增自绘代码若必须做 alpha 派生，请在 tools/token-allow.json 追加条目并写 reason，同时在 PR 里说明为什么不能走 ArcResources 的现成 Brush。",
-    "M1 出库后 Pages/ 下的两条豁免应随页面一起删除；基线清理是 M1-T5 的职责。"
+    "M1-T1（2026-11-05）已完成出库：Pages 从发布库迁入 src/Docs/Arc.Avalonia.Docs，Pages 豁免路径已同步迁移；发布库内不应再新增 Pages 豁免。",
+    "基线零命中的条目会在 R6 报告的 notes 里提示清理；删除条目属于门禁维护，不单独走 M1-T5。"
   ]
 }

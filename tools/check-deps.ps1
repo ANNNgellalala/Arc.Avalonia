@@ -152,12 +152,45 @@ function New-DepsScanResult {
     }
 }
 
+function Get-CsprojPackageIdLookup {
+    # NuGet 的 targets 节点键是 PackageId（MSBuild 默认取 AssemblyName），而工程文件名/工程名可能不同
+    # （M1-T2a 后 src/Foundation/Arc.Avalonia/Arc.Avalonia.csproj 的 PackageId = Arc.Avalonia.Foundation）。
+    # 建两级映射：绝对 csproj 路径 → PackageId；工程文件名（及 PackageId 自身）→ PackageId。
+    $byPath = [System.Collections.Generic.Dictionary[string, string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    $byName = [System.Collections.Generic.Dictionary[string, string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($scanRoot in @((Join-Path $root 'src'), (Join-Path $root 'tests'))) {
+        if (-not (Test-Path -LiteralPath $scanRoot)) { continue }
+        foreach ($file in Get-ChildItem -LiteralPath $scanRoot -Recurse -File -Filter '*.csproj') {
+            if ($file.FullName -match '[\\/](bin|obj)[\\/]') { continue }
+            $fileBase = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
+            $packageId = ''
+            try {
+                [xml]$xml = Get-Content -LiteralPath $file.FullName -Raw -Encoding utf8
+                foreach ($propName in @('PackageId', 'AssemblyName')) {
+                    $node = $xml.SelectSingleNode("//Project/PropertyGroup/$propName")
+                    if ($null -ne $node -and -not [string]::IsNullOrWhiteSpace($node.InnerText)) {
+                        $packageId = $node.InnerText.Trim()
+                        break
+                    }
+                }
+            }
+            catch { $packageId = '' }
+            if ([string]::IsNullOrWhiteSpace($packageId)) { $packageId = $fileBase }
+            $byPath[[System.IO.Path]::GetFullPath($file.FullName)] = $packageId
+            $byName[$fileBase] = $packageId
+            $byName[$packageId] = $packageId
+        }
+    }
+    return @{ ByPath = $byPath; ByName = $byName }
+}
+
 function Invoke-DepsClosureScan {
     param(
         [Parameter(Mandatory)][string]$AssetsPath,
         [Parameter(Mandatory)][string]$ProjectLabel,
         [bool]$IsApp = $false,
-        [bool]$IsFeature = $false
+        [bool]$IsFeature = $false,
+        [object]$PackageIdLookup = $null
     )
     $result = New-DepsScanResult
     $assets = $null
@@ -257,7 +290,8 @@ function Invoke-DepsClosureScan {
             if ($null -ne $restoreFrameworks -and $restoreFrameworks.ContainsKey('projectReferences')) {
                 $projectDir = Split-Path -Parent (Split-Path -Parent $AssetsPath)
                 $objDir = Join-Path $projectDir 'obj'
-                # libraries 里 type=project 的 path 相对 obj/ 目录；先建绝对路径 → package id 映射。
+                # libraries 里 type=project 的 path 相对【工程目录】（NuGet 语义），不是相对 obj/。
+                # 同时保留 obj/ 作为候选，兼容历史 assets；包 id 优先取 csproj 的 PackageId/AssemblyName。
                 $libraryRefMap = @{}
                 if ($assets.ContainsKey('libraries')) {
                     foreach ($libKey in @($assets['libraries'].Keys)) {
@@ -265,21 +299,38 @@ function Invoke-DepsClosureScan {
                         if (-not $lib.ContainsKey('type') -or [string]$lib['type'] -ne 'project') { continue }
                         $libPath = [string]$lib['path']
                         if ([string]::IsNullOrWhiteSpace($libPath)) { continue }
-                        try {
-                            $abs = [System.IO.Path]::GetFullPath((Join-Path $objDir $libPath))
-                            $libraryRefMap[$abs] = Get-PackageIdFromKey $libKey
+                        $libId = Get-PackageIdFromKey $libKey
+                        foreach ($baseDir in @($projectDir, $objDir)) {
+                            try {
+                                $abs = [System.IO.Path]::GetFullPath((Join-Path $baseDir $libPath))
+                                $candidateId = $libId
+                                if ($null -ne $PackageIdLookup -and $PackageIdLookup['ByPath'].ContainsKey($abs)) {
+                                    $candidateId = [string]$PackageIdLookup['ByPath'][$abs]
+                                }
+                                $libraryRefMap[$abs] = $candidateId
+                            }
+                            catch { }
                         }
-                        catch { }
                     }
                 }
                 foreach ($refPath in @($restoreFrameworks['projectReferences'].Keys)) {
                     $id = $null
                     try {
                         $absRef = [System.IO.Path]::GetFullPath([string]$refPath)
-                        if ($libraryRefMap.ContainsKey($absRef)) { $id = $libraryRefMap[$absRef] }
+                        if ($null -ne $PackageIdLookup -and $PackageIdLookup['ByPath'].ContainsKey($absRef)) {
+                            $id = [string]$PackageIdLookup['ByPath'][$absRef]
+                        }
+                        elseif ($libraryRefMap.ContainsKey($absRef)) { $id = [string]$libraryRefMap[$absRef] }
                     }
                     catch { }
-                    if ($null -eq $id) { $id = [System.IO.Path]::GetFileNameWithoutExtension([string]$refPath) }
+                    if ($null -eq $id) {
+                        # 最后兜底：工程文件名 → csproj PackageId（改名后工程名与包 id 不一致时也能对上）。
+                        $refBase = [System.IO.Path]::GetFileNameWithoutExtension([string]$refPath)
+                        if ($null -ne $PackageIdLookup -and $PackageIdLookup['ByName'].ContainsKey($refBase)) {
+                            $id = [string]$PackageIdLookup['ByName'][$refBase]
+                        }
+                        else { $id = $refBase }
+                    }
                     if (-not [string]::IsNullOrWhiteSpace($id) -and -not $rootDeps.Contains($id)) { [void]$rootDeps.Add($id) }
                 }
             }
@@ -304,16 +355,30 @@ function Invoke-DepsClosureScan {
             $currentNode = $nodeCmps[$current]
             $currentPath = @($paths[$current])
             foreach ($dep in @($currentNode.Deps)) {
-                if (-not $nodeCmps.ContainsKey($dep)) {
+                $resolvedDep = $dep
+                if (-not $nodeCmps.ContainsKey($resolvedDep)) {
+                    # 依赖字典可能用工程名（Arc.Avalonia），而 targets 节点键是 PackageId（Arc.Avalonia.Foundation）：
+                    # 先查 csproj PackageId 映射，再退回 X.Foundation 候选（M1-T2a 的改名形态）。
+                    $candidates = [System.Collections.Generic.List[string]]::new()
+                    if ($null -ne $PackageIdLookup -and $PackageIdLookup['ByName'].ContainsKey($dep)) {
+                        $mapped = [string]$PackageIdLookup['ByName'][$dep]
+                        if (-not [string]::IsNullOrWhiteSpace($mapped)) { $candidates.Add($mapped) }
+                    }
+                    $candidates.Add("$dep.Foundation")
+                    foreach ($cand in $candidates) {
+                        if ($nodeCmps.ContainsKey($cand)) { $resolvedDep = $cand; break }
+                    }
+                }
+                if (-not $nodeCmps.ContainsKey($resolvedDep)) {
                     $unknownKey = "$tfm|$dep"
                     if (-not $result.UnknownNodes.Contains($unknownKey)) { $result.UnknownNodes.Add($unknownKey) }
                     continue
                 }
-                if ($visited.Add($dep)) {
-                    $depNode = $nodeCmps[$dep]
-                    $paths[$dep] = @($currentPath + $dep)
-                    $depths[$dep] = $depths[$current] + $(if ($depNode.Type -eq 'package') { 1 } else { 0 })
-                    $queue.Enqueue($dep)
+                if ($visited.Add($resolvedDep)) {
+                    $depNode = $nodeCmps[$resolvedDep]
+                    $paths[$resolvedDep] = @($currentPath + $depNode.Id)
+                    $depths[$resolvedDep] = $depths[$current] + $(if ($depNode.Type -eq 'package') { 1 } else { 0 })
+                    $queue.Enqueue($resolvedDep)
                 }
             }
         }
@@ -488,8 +553,8 @@ if ($SelfTest) {
 # ---------------------------------------------------------------------------
 # 正常扫描：发布库（+可选 Apps）逐个项目解析 assets 传递闭包。
 # ---------------------------------------------------------------------------
-$scopeText = '发布库: src/Foundation, src/Components, src/Agent, src/Special, src/Blocks, src/Theme, src/Feature, src/Patterns'
-if ($IncludeApps) { $scopeText += ' + 应用: src/Apps' }
+$scopeText = '发布库: ' + (@($policy.scan.publishRoots) -join ', ')
+if ($IncludeApps) { $scopeText += ' + 应用/叶子: ' + (@($policy.scan.appsRoots) -join ', ') }
 $report = New-GatesReport -Gate 'R3' -Name 'deps' -Title '依赖（直接 + 传递闭包）' -Scope $scopeText
 $rule = New-GatesRule -Id 'R3' -Title '外部依赖白名单/黑名单'
 [void]$report.rules.Add($rule)
@@ -497,6 +562,9 @@ Add-GatesNote -Report $report -Note '策略文件: tools/deps-policy.json（deny
 Add-GatesNote -Report $report -Note '闭包来源: obj/project.assets.json 的 targets.<tfm> 依赖图（project 节点继续下钻）'
 
 $projects = @(Get-PublishProjects)
+# R3 节点键 = PackageId（缺省 AssemblyName），不是工程文件名：M1-T2a 把 Foundation 的程序集改名为
+# Arc.Avalonia.Foundation 后，targets 里的键与 csproj 路径/工程名不再相同。
+$packageIdLookup = Get-CsprojPackageIdLookup
 $rule.checked = $projects.Count
 $scanErrors = 0
 $totalPackages = 0
@@ -531,7 +599,7 @@ foreach ($project in $projects) {
             continue
         }
     }
-    $scan = Invoke-DepsClosureScan -AssetsPath $assetsPath -ProjectLabel $project.Rel -IsApp $isApp -IsFeature $isFeature
+    $scan = Invoke-DepsClosureScan -AssetsPath $assetsPath -ProjectLabel $project.Rel -IsApp $isApp -IsFeature $isFeature -PackageIdLookup $packageIdLookup
     foreach ($err in $scan.Errors) {
         $scanErrors++
         Add-GatesItem -Rule $rule -Severity 'new' -Kind 'scan-error' -Project $project.Rel -Detail $err
@@ -553,6 +621,7 @@ foreach ($project in $projects) {
 
 $rule.checked = $projects.Count
 $rule.notes.Add("扫描项目数: $($projects.Count)；包节点合计: $totalPackages（直接 $totalDirect / 传递 $totalTransitive）；项目引用节点: $totalProjectRefs")
+$rule.notes.Add('节点键 = csproj PackageId（缺省 AssemblyName，再缺省工程名）；libraries[].path 按 NuGet 语义相对工程目录解析。')
 $rule.notes.Add("R3 当前无 known-red 基线：任何命中都是新增违规，必须修。")
 $report.notes.Add('Apps 与发布库共用同一策略；Avalonia.Desktop 只在 -IncludeApps 扫描 src/Apps 时判定为应用专用合法。')
 $report.notes.Add('SelfTest: pwsh -NoProfile tools/check-deps.ps1 -SelfTest')

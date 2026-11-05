@@ -15,8 +15,8 @@ namespace Arc.Avalonia.Feedback.Pages;
 /// <summary>Demo compositions shared by the feedback gallery pages.</summary>
 internal static class FeedbackDemos
 {
-    private const string Maya = "avares://Arc.Avalonia.Feedback/Assets/portrait-maya.png";
-    private const string Sara = "avares://Arc.Avalonia.Feedback/Assets/portrait-sara.png";
+    private const string Maya = "avares://Arc.Avalonia.Docs/Assets/portrait-maya.png";
+    private const string Sara = "avares://Arc.Avalonia.Docs/Assets/portrait-sara.png";
 
     public static Control Progress()
     {
@@ -251,7 +251,7 @@ internal static class FeedbackDemos
                 CornerRadius = new CornerRadius(2),
                 VerticalAlignment = VerticalAlignment.Bottom
             };
-            bar.Paint(Border.BackgroundProperty, ArcTokens.Series1);
+            bar.SetValue(Border.BackgroundProperty, DemoUi.Brush(ArcTokens.Series1));
             bar.Opacity = 0.55;
             sparkline.Children.Add(bar);
         }

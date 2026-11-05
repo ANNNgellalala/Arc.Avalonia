@@ -8,15 +8,10 @@
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
-    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Demo portraits for the avatar components; loaded through avares:// URIs. -->
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Docs\*.json" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
   </ItemGroup>
 </Project>

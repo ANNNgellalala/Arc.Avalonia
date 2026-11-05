@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Special.Glass.Controls;
 using Arc.Avalonia.Theme;
+using ArcSharePerson = Arc.Avalonia.Special.Glass.Controls.ArcSharePerson;
 
 namespace Arc.Avalonia.Special.Glass.Pages;
 

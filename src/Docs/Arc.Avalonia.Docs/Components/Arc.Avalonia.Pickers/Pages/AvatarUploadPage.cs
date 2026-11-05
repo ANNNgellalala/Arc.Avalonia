@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Pickers.Controls;
+using ArcAvatarShape = Arc.Avalonia.Pickers.Controls.ArcAvatarShape;
 
 namespace Arc.Avalonia.Pickers.Pages;
 

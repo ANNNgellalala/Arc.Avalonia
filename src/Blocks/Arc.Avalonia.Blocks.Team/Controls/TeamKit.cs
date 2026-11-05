@@ -9,7 +9,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Arc.Avalonia.Controls;
-using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Inputs.Controls;
 using Arc.Avalonia.Theme;

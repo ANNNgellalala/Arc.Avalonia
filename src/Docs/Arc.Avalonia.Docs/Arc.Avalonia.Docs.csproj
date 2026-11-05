@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Docs</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Docs</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="..\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
+  </ItemGroup>
+
+  <!--
+    Pages were authored inside their component project, so each project's GlobalUsings.cs applied. The
+    union is replicated here to keep the 320 moved pages source-compatible.
+  -->
+  <ItemGroup>
+    <Using Include="Arc.Avalonia.Internal" />
+    <Using Include="Arc.Avalonia.Charts.Controls" />
+    <Using Include="Arc.Avalonia.Feedback.Controls" />
+    <Using Include="Arc.Avalonia.Navigation.Controls" />
+    <Using Include="Arc.Avalonia.Overlays.Controls" />
+    <Using Include="Arc.Avalonia.DataDisplay.Controls" />
+    <Using Include="Arc.Avalonia.Blocks.Data.Controls" />
+  </ItemGroup>
+
+  <!--
+    Documentation payloads travel with the Docs leaf project so publishing libraries stay free of
+    Pages/Docs (R2/R5). ArcDocStore scans assemblies whose name starts with "Arc.Avalonia" and requires
+    the embedded resource name to contain ".Docs."; the logical name below satisfies both conditions and
+    leaves the slug as the file stem.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="**\Docs\*.json" LogicalName="Arc.Avalonia.Docs.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Demo-only portraits used by the avatar / presence demo pages. -->
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- L2 component families -->
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+    <!-- Agent surfaces -->
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />
+    <!-- Special components -->
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIExplainers\Arc.Avalonia.Special.AIExplainers.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIWidgets\Arc.Avalonia.Special.AIWidgets.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Glass\Arc.Avalonia.Special.Glass.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Media\Arc.Avalonia.Special.Media.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Motion\Arc.Avalonia.Special.Motion.csproj" />
+    <!-- Blocks -->
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.AI\Arc.Avalonia.Blocks.AI.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.App\Arc.Avalonia.Blocks.App.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Commerce\Arc.Avalonia.Blocks.Commerce.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Data\Arc.Avalonia.Blocks.Data.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Marketing\Arc.Avalonia.Blocks.Marketing.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Team\Arc.Avalonia.Blocks.Team.csproj" />
+  </ItemGroup>
+</Project>

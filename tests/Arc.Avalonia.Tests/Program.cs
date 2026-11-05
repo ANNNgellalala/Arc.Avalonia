@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Avalonia;
 using Avalonia.Animation.Easings;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
@@ -62,7 +64,11 @@ public static class Program
             translucent.A is >= 101 and <= 103);
 
         var tokenFields = typeof(ArcTokens).GetFields().Count(f => f.IsLiteral && f.FieldType == typeof(string));
-        Check("token count", tokenFields == 82);
+        // 82 declared constants must all materialise in ArcPalette.Build for every scheme/accent combo
+        // (ControlThumbShadow was the one that used to be computed but never registered), and the
+        // injectable IArcResourceHost must feed ArcResources without a live Application.
+        Check("token count, palette coverage and resource host",
+            tokenFields == 82 && PaletteCoversAllTokens() && ResourceHostChecks());
         Check("token keys",
             ArcTokens.Background == "ArcBackground" &&
             ArcTokens.Surface == "ArcSurface" &&
@@ -132,6 +138,120 @@ public static class Program
             button is { Category: "Buttons" } &&
             glass is { Kind: "special" } &&
             siteHeader is { Kind: "block" });
+    }
+
+    /// <summary>Every ArcTokens constant must be registered for Light/Dark x every accent (16 palettes).</summary>
+    private static bool PaletteCoversAllTokens()
+    {
+        var keys = typeof(ArcTokens)
+            .GetFields()
+            .Where(f => f.IsLiteral && f.FieldType == typeof(string))
+            .Select(f => (string)f.GetRawConstantValue()!)
+            .ToArray();
+
+        if (keys.Length < 82)
+        {
+            Console.WriteLine($"  MISSING TOKENS: only {keys.Length} declared, expected at least 82");
+            return false;
+        }
+
+        foreach (var scheme in new[] { ArcColorScheme.Light, ArcColorScheme.Dark })
+        {
+            foreach (var accent in Enum.GetValues<ArcAccent>())
+            {
+                var palette = ArcPalette.Build(scheme, accent);
+                foreach (var key in keys)
+                {
+                    if (!palette.ContainsKey(key))
+                    {
+                        Console.WriteLine($"  MISSING TOKEN: {key} in ArcPalette.Build({scheme}, {accent})");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>ArcResources must consult the injected host (default host = Application.Current).</summary>
+    private static bool ResourceHostChecks()
+    {
+        var host = new FakeResourceHost();
+        host.Values[ArcTokens.Background] = Brushes.Red;
+        host.Values[ArcTokens.TextBase] = 42.0;
+        host.Values[ArcTokens.RadiusControl] = new CornerRadius(7);
+        host.Values[ArcTokens.DurationFast] = TimeSpan.FromSeconds(1.5);
+        host.Values[ArcTokens.ShadowFloating] = new BoxShadows(new BoxShadow
+        {
+            OffsetX = 0,
+            OffsetY = 2,
+            Blur = 4,
+            Color = Colors.Black
+        });
+        host.DarkOnly[ArcTokens.Series1] = Brushes.Blue;
+
+        ArcResources.UseHost(host);
+        try
+        {
+            var ok = true;
+
+            void Expect(string label, bool passed, object? actual = null)
+            {
+                if (!passed)
+                {
+                    ok = false;
+                    Console.WriteLine($"  RESOURCE HOST: {label} failed (actual={actual})");
+                }
+            }
+
+            Expect("Brush", ReferenceEquals(ArcResources.Brush(ArcTokens.Background), Brushes.Red),
+                ArcResources.Brush(ArcTokens.Background));
+            Expect("Color", ArcResources.Color(ArcTokens.Background) == Colors.Red,
+                ArcResources.Color(ArcTokens.Background));
+            Expect("Double", ArcResources.Double(ArcTokens.TextBase) == 42.0,
+                ArcResources.Double(ArcTokens.TextBase));
+            Expect("Radius", ArcResources.Radius(ArcTokens.RadiusControl) == new CornerRadius(7),
+                ArcResources.Radius(ArcTokens.RadiusControl));
+            Expect("Duration", ArcResources.Duration(ArcTokens.DurationFast) == TimeSpan.FromSeconds(1.5),
+                ArcResources.Duration(ArcTokens.DurationFast));
+            Expect("Shadows", ArcResources.Shadows(ArcTokens.ShadowFloating).Count == 1,
+                ArcResources.Shadows(ArcTokens.ShadowFloating).Count);
+            // Variant-aware overload reaches ThemeDictionaries-style entries; the untargeted
+            // overload must not see them (ADR 0003 §4.2).
+            Expect("untargeted lookup ignores theme-dictionary entries",
+                ReferenceEquals(ArcResources.Brush(ArcTokens.Series1), Brushes.Transparent),
+                ArcResources.Brush(ArcTokens.Series1));
+            Expect("variant lookup uses theme-dictionary entries",
+                ReferenceEquals(ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Dark), Brushes.Blue),
+                ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Dark));
+
+            return ok;
+        }
+        finally
+        {
+            ArcResources.UseHost(null);
+        }
+    }
+
+    private sealed class FakeResourceHost : IArcResourceHost
+    {
+        public Dictionary<string, object?> Values { get; } = new();
+        public Dictionary<string, object?> DarkOnly { get; } = new();
+
+        public ThemeVariant? ActualThemeVariant => ThemeVariant.Dark;
+
+        public bool TryFindResource(string key, out object? value) => Values.TryGetValue(key, out value);
+
+        public bool TryFindResource(string key, ThemeVariant variant, out object? value)
+        {
+            if (variant.Equals(ThemeVariant.Dark) && DarkOnly.TryGetValue(key, out value))
+            {
+                return true;
+            }
+
+            return Values.TryGetValue(key, out value);
+        }
     }
 
     private static void Check(string name, bool passed)

@@ -14,7 +14,7 @@ namespace Arc.Avalonia.Feedback.Pages;
 /// </summary>
 public sealed class TimelinePage : ArcItemPage
 {
-    private const string Sara = "avares://Arc.Avalonia.Feedback/Assets/portrait-sara.png";
+    private const string Sara = "avares://Arc.Avalonia.Docs/Assets/portrait-sara.png";
 
     public override string ItemSlug => "timeline";
 

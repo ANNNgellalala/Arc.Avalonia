@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RootNamespace>Arc.Avalonia.Demo</RootNamespace>
-    <AssemblyName>Arc.Avalonia.Demo</AssemblyName>
+    <AssemblyName>Arc.Avalonia.Docs.Abstractions</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

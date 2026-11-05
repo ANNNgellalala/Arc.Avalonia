@@ -26,9 +26,11 @@
   "allowedEdges": [
     {
       "from": "Arc.Avalonia.Internal",
-      "to": "Arc.Avalonia",
-      "reason": "Foundation 内部辅助程序集（L1 内部边）；M1-T2 解散 Internal 后删除此例外",
-      "until": "M1-T2"
+      "fromProject": "src/Foundation/Arc.Avalonia.Internal/Arc.Avalonia.Internal.csproj",
+      "to": "Arc.Avalonia.Foundation",
+      "toProject": "src/Foundation/Arc.Avalonia/Arc.Avalonia.csproj",
+      "reason": "Foundation 内部辅助程序集（L1 内部边）。M1-T2a 把 Foundation 的 AssemblyName/PackageId 改为 Arc.Avalonia.Foundation，而 csproj 路径仍是 Arc.Avalonia；本例外按名字或工程路径任一匹配（两者任一改回也不会误报）。M1-T2b 解散 Internal 后删除此例外。",
+      "until": "M1-T2b"
     }
   ],
   "leafProjects": [
@@ -41,7 +43,8 @@
   "notes": [
     "R1 的判定轴是“依赖方向”而不是“相邻层”：L3 允许直接引用 L1（L3→L2→L1 的下行方向未变），这是对 docs/13 §2.1 表格的显式放宽，11 个现有 L3 项目都直接使用 Foundation token。M1 文档出库后可收紧为只允许 L2（见 ADR 0001 例外 E2）。",
     "L2.5（Arc.Avalonia.Theme）按 docs/13 §2.3 是对 L2 的聚合例外；其允许目标仍是 L1/L2，若出现其它边需在 allowedEdges 里逐条登记。",
-    "leafProjects 的引用由 R2 判定（known-red），R1 不重复报；R2 清完后 M1 应把 leaf 引用也纳入 R1 硬失败。",
-    "apps/tests 允许任意层（app 是宿主/叶子）。"
+    "leafProjects 的引用由 R2 判定；M1-T1 出库后 R2 已清零（GREEN），新增 leaf 引用会直接 RED。",
+    "apps/tests 允许任意层（app 是宿主/叶子）。",
+    "allowedEdges 的一侧可用 from/to（AssemblyName 或 csproj 文件名）或 fromProject/toProject（仓库相对路径）匹配；改名时应同时核对两组字段。"
   ]
 }

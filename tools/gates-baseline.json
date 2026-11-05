@@ -1,42 +1,19 @@
 {
-  "$comment": "M0 门禁已知红基线。check-all 用它把“当前已知红（M1 目标）”与“新增违规”区分开：只有新增违规才 exit 1。清掉某项后应下调计数并同步本文件（M1-T1/T5 负责）。",
-  "version": 1,
+  "$comment": "门禁已知红基线。check-all 用它把“当前已知红（后续 milestone 目标）”与“新增违规”区分开：只有新增违规才 exit 1。M1-T1 出库完成后 R2 已清零（GREEN）；当前唯一 known-red 是未实现的 R5。",
+  "version": 2,
   "generatedAt": "2026-11-05",
+  "updatedAt": "2026-11-05 (M1-T1 出库后 R2 清零)",
   "knownRed": {
     "R2": {
-      "expected": true,
-      "reason": "M1-T1 出库前，发布库仍 ProjectReference Arc.Avalonia.Demo（页面契约）并把 Docs/*.json 作为 EmbeddedResource 打进包；docs/14 §4 明确过渡期允许为 known-red。",
+      "expected": false,
+      "reason": "M1-T1 出库已完成（Demo→src/Docs，320 页 + 294 文档迁入 Docs 叶子工程）：发布库 Demo 引用 = 0、EmbeddedResource Docs = 0。known-red 清零，任何新增 leaf 引用或 EmbeddedResource Docs 都直接判 RED。",
       "counts": {
-        "r2-demo-ref": 24,
-        "r2-embedded-docs": 24
+        "r2-demo-ref": 0,
+        "r2-embedded-docs": 0
       },
-      "permittedProjects": [
-        "src/Agent/Arc.Avalonia.AgentUI/Arc.Avalonia.AgentUI.csproj",
-        "src/Agent/Arc.Avalonia.LifeToday/Arc.Avalonia.LifeToday.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.AI/Arc.Avalonia.Blocks.AI.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.App/Arc.Avalonia.Blocks.App.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.Commerce/Arc.Avalonia.Blocks.Commerce.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.Data/Arc.Avalonia.Blocks.Data.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.Marketing/Arc.Avalonia.Blocks.Marketing.csproj",
-        "src/Blocks/Arc.Avalonia.Blocks.Team/Arc.Avalonia.Blocks.Team.csproj",
-        "src/Components/Arc.Avalonia.Actions/Arc.Avalonia.Actions.csproj",
-        "src/Components/Arc.Avalonia.Charts/Arc.Avalonia.Charts.csproj",
-        "src/Components/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj",
-        "src/Components/Arc.Avalonia.DataDisplay/Arc.Avalonia.DataDisplay.csproj",
-        "src/Components/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj",
-        "src/Components/Arc.Avalonia.Feedback/Arc.Avalonia.Feedback.csproj",
-        "src/Components/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj",
-        "src/Components/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj",
-        "src/Components/Arc.Avalonia.Navigation/Arc.Avalonia.Navigation.csproj",
-        "src/Components/Arc.Avalonia.Overlays/Arc.Avalonia.Overlays.csproj",
-        "src/Components/Arc.Avalonia.Pickers/Arc.Avalonia.Pickers.csproj",
-        "src/Special/Arc.Avalonia.Special.AIExplainers/Arc.Avalonia.Special.AIExplainers.csproj",
-        "src/Special/Arc.Avalonia.Special.AIWidgets/Arc.Avalonia.Special.AIWidgets.csproj",
-        "src/Special/Arc.Avalonia.Special.Glass/Arc.Avalonia.Special.Glass.csproj",
-        "src/Special/Arc.Avalonia.Special.Media/Arc.Avalonia.Special.Media.csproj",
-        "src/Special/Arc.Avalonia.Special.Motion/Arc.Avalonia.Special.Motion.csproj"
-      ],
-      "context": "仓库口径：引用 Demo 的 src 项目 25 个（含 Gallery，属 app 不参与 R2）；连 tests 共 26 个 csproj。R2 只对发布库报 24 个。"
+      "permittedProjects": [],
+      "clearedAt": "2026-11-05",
+      "history": "M0 起点基线为 24 个发布库 Demo 引用 + 24 个 EmbeddedResource Docs（仓库口径 25/26 含 Gallery/tests，属 app 不参与 R2）；该 48 项随 M1-T1 出库全部消失。"
     },
     "R5": {
       "expected": true,
@@ -49,7 +26,8 @@
     "BannedApi": "docs/14 §4 的 BannedApiAnalyzers（M1 配好、M2 生效）不在 M0-3 交付范围，未纳入 check-all。"
   },
   "notes": [
-    "R1/R3/R4/R6/R8 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。",
-    "known-red 只在“数量不超过基线 + 项目在 permittedProjects 内”时成立；新增项目或超出计数立即变 RED。"
+    "R1/R2/R3/R4/R6/R8 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。",
+    "known-red 只在“数量不超过基线 + 项目在 permittedProjects 内”时成立；R2 清零后 permittedProjects 为空、counts 为 0，任何命中都是新增违规。",
+    "R5 仍为 known-red，属 M1-T4/T5 目标；check-all 默认不阻塞，-KnownRed 严格模式会失败。"
   ]
 }

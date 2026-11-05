@@ -235,3 +235,34 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 - [ ] `check-all.ps1` 全绿（R1–R8）；
 - [ ] `0.9.0-alpha` 可在临时空工程安装并渲染；
 - [ ] 文档更新：README（项目表/依赖/构建）、CONVENTIONS（分层/主题规则）、docs/13 的 M1 状态。
+
+---
+
+## 9. 执行记录（2026-11-05 第一波：M1-T1 + M1-T2a）
+
+### 9.1 结果
+
+| 项 | 结果 |
+|---|---|
+| M1-T1 出库 | ✅ 617 文件（320 页 + 294 文档 + 3 portrait）迁入 `src/Docs/Arc.Avalonia.Docs`；`src/Apps/Arc.Avalonia.Demo` 整体迁为 `src/Docs/Arc.Avalonia.Docs.Abstractions`；25 个 csproj 编辑；`src/Apps` 仅剩 Gallery |
+| M1-T2a 基础层 | ✅ `AssemblyName=Arc.Avalonia.Foundation`（文件路径/命名空间/引用不变）；avares URI 4 处更新；`ControlThumbShadow` 补注册（82/82，16 套主题断言）；`IArcResourceHost` + `UseHost` 落地；6 个 Inputs 主题 `assembly=` 连带修复 |
+| 门禁 | ✅ R1/R2/R3/R4/R6/R8 **GREEN**；R5 KNOWN-RED（M1-T4/T5）；`-SelfTest` 4/4；R3 节点解析已支持 PackageId≠工程名 |
+| 构建 | ✅ `tools/build.ps1` 0 error / 0 warning |
+| 验证 | ✅ `VERIFY: checks=34 failures=0`；`AUDIT: items=294 docs=294 pages=294 errors=0`；`SMOKE: itemShows=294 pageShows=315 failures=0` |
+| 回归 | ✅ 头像页真实渲染（`.recon/shots-check/light/10083-avatar.png`），portrait 资源经 `avares://Arc.Avalonia.Docs/Assets/` 正常加载 |
+
+### 9.2 已知折中（M1 内接受，T2b/T4 清理）
+
+1. **24 个发布库各加 `<InternalsVisibleTo Include="Arc.Avalonia.Docs" />`**：页面实际依赖各库 internal kit（AiKit/AppKit/CommerceKit/MarketingKit/TeamKit/DataKit/DataSamples、LifeToday 的 TodayPageUi/TodayStateSwitch、Special 的 Sv/Sm/Spring、Pickers 的 ArcDateMath、TeamPerson 等），比 docs/15 初稿估计的"仅 1 处"多得多。M1 用 IVT 保持最小改动；T2b 可迁出 kit 或公开 API 后删除。
+2. **Docs 工程临时引用 `Arc.Avalonia.Internal`**（public 模型 ArcMenuItem/ArcActionSwapState/ArcMenuSurface 等）+ `<Using Include="Arc.Avalonia.Internal" />`；T2b 解散 Internal 时同步调整 Docs.csproj。
+3. **3 个 Blocks `*Kit.cs` 删除未使用的 `using Arc.Avalonia.Demo;`**（编译必需，无逻辑改动，已 review 接受）。
+4. **Abstractions 保留 LogicalName=`Arc.Avalonia.Demo.Catalog.arc-catalog.json`**（运行期加载契约）；命名空间仍为 `Arc.Avalonia.Demo`（避免 320 页 using 大改，命名空间重命名留待后续）。
+
+### 9.3 剩余 M1 工作
+
+| 卡 | 剩余内容 | 估 |
+|---|---|---|
+| M1-T2b | Internal 解散（4 视觉类迁入 L2、解除 12 csproj 引用与 6 处 IVT）、`ArcVirtualList`/`ArcUi` 下沉（可选） | 5–6 |
+| M1-T3 | `src/Theme` 聚合层 + Fluent 基础适配（Palettes/ThemeDictionaries/资源键）+ `ArcTheme` 一行入口 + `ArcResources` 变体修复 | 19 |
+| M1-T4 | 发布工程（元数据/XML/meta/CPM/samples/API 基线/许可） | 24 |
+| M1-T5 | 门禁回归（R5 转绿、基线对比、发布验证） | 11 |

@@ -175,6 +175,7 @@ public static class ArcPalette
         Set(dictionary, ArcTokens.ControlTrackHover, controlTrackHover);
         Set(dictionary, ArcTokens.ControlThumb, controlThumb);
         Set(dictionary, ArcTokens.ControlThumbOn, controlThumbOn);
+        Set(dictionary, ArcTokens.ControlThumbShadow, controlThumbShadow);
         Set(dictionary, ArcTokens.ControlOnSubtle, ArcColor.WithAlpha(controlOn, 0.10));
         Set(dictionary, ArcTokens.ControlFill, controlFill);
 

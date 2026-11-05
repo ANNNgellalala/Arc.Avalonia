@@ -4,9 +4,9 @@
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcButton.axaml" />
-        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcCard.axaml" />
-        <ResourceInclude Source="avares://Arc.Avalonia/Themes/ArcBadge.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Foundation/Themes/ArcButton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Foundation/Themes/ArcCard.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Foundation/Themes/ArcBadge.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

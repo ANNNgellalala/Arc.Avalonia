@@ -36,7 +36,8 @@
     <Project Path="src/Blocks/Arc.Avalonia.Blocks.AI/Arc.Avalonia.Blocks.AI.csproj" />
   </Folder>
   <Folder Name="/App/">
-    <Project Path="src/Apps/Arc.Avalonia.Demo/Arc.Avalonia.Demo.csproj" />
+    <Project Path="src/Docs/Arc.Avalonia.Docs.Abstractions/Arc.Avalonia.Docs.Abstractions.csproj" />
+    <Project Path="src/Docs/Arc.Avalonia.Docs/Arc.Avalonia.Docs.csproj" />
     <Project Path="src/Apps/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj" />
   </Folder>
   <Folder Name="/Tests/">

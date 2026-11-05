@@ -70,11 +70,41 @@ function Get-ConfigLayerTargets {
     return @($prop.Value)
 }
 
+function Test-EdgeSide {
+    # 一侧的匹配支持三种标识：AssemblyName/工程名（Name）、csproj 文件名（FileBase）、仓库相对路径（Rel）。
+    # M1-T2a 后 Foundation 的 AssemblyName/PackageId 是 Arc.Avalonia.Foundation，而 csproj 仍是 Arc.Avalonia，
+    # 因此例外必须能按路径或任一名字匹配（见 architecture-allow.json 的 fromProject/toProject）。
+    param(
+        [Parameter(Mandatory)]$Project,
+        [string]$NamePattern = '',
+        [string]$PathPattern = ''
+    )
+    $specified = $false
+    if (-not [string]::IsNullOrWhiteSpace($NamePattern)) {
+        $specified = $true
+        foreach ($candidate in @($Project.Name, $Project.FileBase, $Project.Rel)) {
+            if ([string]::Equals([string]$candidate, $NamePattern, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        }
+    }
+    if (-not [string]::IsNullOrWhiteSpace($PathPattern)) {
+        $specified = $true
+        $suffix = $PathPattern.TrimStart('/')
+        if ([string]::Equals($Project.Rel, $suffix, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        if ($Project.Rel.EndsWith($suffix, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    return (-not $specified)
+}
+
 function Test-ConfigAllowedEdge {
-    param([string]$FromName, [string]$ToName)
+    param([Parameter(Mandatory)]$FromProject, [Parameter(Mandatory)]$ToProject)
     foreach ($edge in @($allow.allowedEdges)) {
-        if ([string]::Equals([string]$edge.from, $FromName, [System.StringComparison]::OrdinalIgnoreCase) -and
-            [string]::Equals([string]$edge.to, $ToName, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $props = $edge.PSObject.Properties
+        $fromName = if ($null -ne $props['from']) { [string]$props['from'].Value } else { '' }
+        $toName = if ($null -ne $props['to']) { [string]$props['to'].Value } else { '' }
+        $fromPath = if ($null -ne $props['fromProject']) { [string]$props['fromProject'].Value } else { '' }
+        $toPath = if ($null -ne $props['toProject']) { [string]$props['toProject'].Value } else { '' }
+        if ((Test-EdgeSide -Project $FromProject -NamePattern $fromName -PathPattern $fromPath) -and
+            (Test-EdgeSide -Project $ToProject -NamePattern $toName -PathPattern $toPath)) {
             return $true
         }
     }
@@ -146,12 +176,13 @@ foreach ($scanRoot in $scanRoots) {
             $parseError = $_.Exception.Message
         }
         $projects.Add([pscustomobject]@{
-                Path      = $file.FullName
-                Rel       = $rel
-                Name      = $name
-                Layer     = $layer
-                Refs      = $refs
-                Embedded  = $embedded
+                Path       = $file.FullName
+                Rel        = $rel
+                Name       = $name
+                FileBase   = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
+                Layer      = $layer
+                Refs       = $refs
+                Embedded   = $embedded
                 ParseError = $parseError
             })
     }
@@ -189,7 +220,7 @@ foreach ($project in $projects) {
             continue
         }
         if ($project.Layer -eq 'app') { continue }
-        if (Test-ConfigAllowedEdge -FromName $project.Name -ToName $target.Name) { continue }
+        if (Test-ConfigAllowedEdge -FromProject $project -ToProject $target) { continue }
         $allowedTargets = @(Get-ConfigLayerTargets -Layer $project.Layer)
         if ($allowedTargets -contains '*') { continue }
         if ($allowedTargets -contains $target.Layer) { continue }
@@ -246,8 +277,14 @@ foreach ($candidate in $sortedCandidates) {
     Add-GatesItem -Rule $r2 -Severity $severity -Kind $kind -Project $candidate.Project -Detail $candidate.Detail
 }
 $r2.notes.Add("发布库项目数: $($publishProjects.Count)；R2 命中: $($candidates.Count)")
-$r2.notes.Add("known-red 基线: demo 引用 $($baselineCounts['r2-demo-ref']) 个、EmbeddedResource Docs $($baselineCounts['r2-embedded-docs']) 个（M1-T1 出库目标为 0）")
-$r2.notes.Add('仓库口径：引用 Demo 的 src 项目共 25 个（含 Gallery）+ tests 1 个；Gallery/tests 属 app，不属于发布库，故 R2 只报 24 个。')
+if ($r2Baseline.expected) {
+    $r2.notes.Add("known-red 基线: demo 引用 $($baselineCounts['r2-demo-ref']) 个、EmbeddedResource Docs $($baselineCounts['r2-embedded-docs']) 个（M1-T1 出库目标为 0）")
+    $r2.notes.Add('仓库口径：引用 Demo 的 src 项目共 25 个（含 Gallery）+ tests 1 个；Gallery/tests 属 app，不属于发布库，故 R2 只报 24 个。')
+}
+else {
+    $r2.notes.Add('R2 known-red 已清零（M1-T1 出库完成）：基线 counts=0、permittedProjects 为空，任何 leaf 引用/EmbeddedResource Docs 都是新增违规，直接 RED。')
+    $r2.notes.Add('历史基线：M0 起点为 24 demo 引用 + 24 EmbeddedResource Docs（仓库口径 25/26 含 Gallery/tests，属 app 不计入 R2）。')
+}
 $cleared = 0
 foreach ($kind in $baselineCounts.Keys) {
     $now = if ($seenCounts.ContainsKey($kind)) { $seenCounts[$kind] } else { 0 }

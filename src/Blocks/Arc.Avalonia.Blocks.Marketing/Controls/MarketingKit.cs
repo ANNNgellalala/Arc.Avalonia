@@ -10,7 +10,6 @@ using Arc.Avalonia.Actions.Controls;
 using Arc.Avalonia.Blocks.Marketing.Controls;
 using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
-using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Inputs.Controls;
 using Arc.Avalonia.Theme;

@@ -7,12 +7,11 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
-    <ProjectReference Include="..\..\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Docs\*.json" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
   </ItemGroup>
 </Project>

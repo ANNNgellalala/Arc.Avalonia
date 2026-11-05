@@ -15,9 +15,9 @@ namespace Arc.Avalonia.Feedback.Pages;
 /// <summary>Demo compositions for the round 3 Pro pages: presence stack and data grid.</summary>
 internal static class ProDemos
 {
-    private const string Maya = "avares://Arc.Avalonia.Feedback/Assets/portrait-maya.png";
-    private const string Sara = "avares://Arc.Avalonia.Feedback/Assets/portrait-sara.png";
-    private const string Leo = "avares://Arc.Avalonia.Feedback/Assets/portrait-leo.png";
+    private const string Maya = "avares://Arc.Avalonia.Docs/Assets/portrait-maya.png";
+    private const string Sara = "avares://Arc.Avalonia.Docs/Assets/portrait-sara.png";
+    private const string Leo = "avares://Arc.Avalonia.Docs/Assets/portrait-leo.png";
 
     private static List<PresenceMember> People() => new()
     {

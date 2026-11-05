@@ -8,6 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Arc.Avalonia.Demo\Arc.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\..\src\Docs\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
   </ItemGroup>
 </Project>
