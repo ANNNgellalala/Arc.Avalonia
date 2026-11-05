@@ -16,6 +16,9 @@
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcFloatingButtonGroup.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcIconMorph.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcUserMenu.axaml" />
+        <!-- Formerly Arc.Avalonia.Internal/Themes/ArcInternalTheme.axaml: shared action chrome. -->
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcIconButton.axaml" />
+        <ResourceInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcMenuSurface.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

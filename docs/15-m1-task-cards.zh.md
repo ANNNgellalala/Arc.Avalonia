@@ -266,3 +266,19 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 | M1-T3 | `src/Theme` 聚合层 + Fluent 基础适配（Palettes/ThemeDictionaries/资源键）+ `ArcTheme` 一行入口 + `ArcResources` 变体修复 | 19 |
 | M1-T4 | 发布工程（元数据/XML/meta/CPM/samples/API 基线/许可） | 24 |
 | M1-T5 | 门禁回归（R5 转绿、基线对比、发布验证） | 11 |
+
+### 9.4 第二波执行记录（2026-11-05 晚：M1-T2b + M1-T3）
+
+| 项 | 结果 |
+|---|---|
+| M1-T2b Internal 解散 | ✅ 删除 `src/Foundation/Arc.Avalonia.Internal`（5 cs + 3 axaml + AssemblyInfo + csproj）；类型并入 `Actions/Internal`（ArcActionVisuals/ArcMenuSurface/ArcIconButton/ArcActionModels/ArcGlide/ArcDismiss/ArcKeyboard/ArcMenuPresenter）与 `Feedback/Internal`（FeedbackUi/ArcTween），**命名空间保留 `Arc.Avalonia.Internal`**（消费者 using 零改动）；13 个 csproj 清理；IVT 处理：删 5 条 Internal、新增 Actions→Navigation/Overlays 与 Feedback→DataDisplay、移除 Feedback→Docs（避免 `.Paint` 与 `Sv.Paint` 二义）、Pickers→LifeToday 保留 |
+| M1-T3 主题聚合 | ✅ 新增 `src/Theme/Arc.Avalonia.Theme`（L2.5，AssemblyName 同名）；`ArcTheme : Styles`：Fluent（C# 创建）→ `ArcBaseStyles.axaml` → 11 个组件主题；`ArcThemeManager.Apply` 注入 token + 47 个 Fluent 键 + 8 accent Palettes；`ArcResources` 默认按 `ActualThemeVariant` 取值；Gallery `App.axaml` 一行 `<arc:ArcTheme/>`（另保留 13 条 L3/L4 主题，因 L2.5 不得依赖 L3/L4） |
+| 主题运行时验证 | ✅ 新增 `Gallery.dll --theme-report`：Light/Dark 各 47/47 Fluent 键解析、ArcBackground White/#141414、accent Neutral/Violet/Rose 的 `SystemAccentColor` 精确匹配 → `THEME REPORT OK` |
+| 构建 | ✅ 0 error（3 个既有警告） |
+| 验证 | ✅ `Verify: checks=46 failures=0`（原 34 + 12 条主题断言）；audit 294/294；smoke 315 页 |
+| 门禁 | ✅ R3/R1/R2/R4/R6/R8 GREEN；R5 KNOWN-RED（T4/T5） |
+| 截图 | `.recon/theme-shots/{light,dark}/`（button 页 7×2，未入库） |
+
+**M1-T3 已知偏差（ADR 0003 §9 已记录）**：FluentTheme 用 C# 创建（R4 禁止库内 axaml 出现 FluentTheme 元素，且注释文本也算命中）；token 与 47 键由 C# 生成（满足 R6 token-only）；TextBox/ComboBox 字号需局部 ControlTheme；ScrollBar 自动收缩未覆盖（ADR 0004 已记）。
+
+**剩余 M1**：M1-T4 发布工程（24 人日）、M1-T5 门禁回归（11 人日，R5 转绿 + 发布验证）。

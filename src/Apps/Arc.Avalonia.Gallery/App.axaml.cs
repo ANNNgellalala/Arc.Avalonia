@@ -51,6 +51,13 @@ public partial class App : Application
                 Environment.Exit(exitCode);
             }
 
+            if (args.Contains("--theme-report"))
+            {
+                var exitCode = ThemeReport.Run();
+                Console.Out.Flush();
+                Environment.Exit(exitCode);
+            }
+
             if (args.Contains("--list"))
             {
                 foreach (var page in ArcPageRegistry.Discover())

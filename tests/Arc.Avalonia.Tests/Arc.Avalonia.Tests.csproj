@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <!-- M1-T3: token ThemeDictionaries + the 47 Fluent resource-key overrides live in the L2.5 theme. -->
+    <ProjectReference Include="..\..\src\Theme\Arc.Avalonia.Theme\Arc.Avalonia.Theme.csproj" />
     <ProjectReference Include="..\..\src\Docs\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
   </ItemGroup>
 </Project>

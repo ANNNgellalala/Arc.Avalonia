@@ -7,11 +7,15 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
-    <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
+    <!-- FeedbackUi/ArcTween are internal to this assembly after the former Internal project was dissolved;
+         DataDisplay is the only remaining in-layer user. Docs does NOT get the grant: its moved pages call
+         the AIWidgets `Sv.Paint` extension, and exposing FeedbackUi.Paint there would make those calls
+         ambiguous (CS0121). -->
+    <InternalsVisibleTo Include="Arc.Avalonia.DataDisplay" />
   </ItemGroup>
 </Project>

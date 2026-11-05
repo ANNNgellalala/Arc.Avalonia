@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Arc.Avalonia.Theme.ArcTheme">
+
+  <!--
+    The aggregate theme entry point: consumers write exactly one line
+
+        <Application.Styles>
+          <arc:ArcTheme />
+        </Application.Styles>
+
+    Load order (ADR 0003 §9):
+      1. Fluent baseline    - created programmatically in ArcTheme.axaml.cs (R4 keeps the Fluent theme
+                              element out of library axaml); it must be first so the includes below
+                              override the Fluent defaults.
+      2. ArcBaseStyles.axaml            - Foundation's global styles + atomic control themes (L1).
+      3. 11 component theme families    - one StyleInclude per L2 package, in dependency-ish order.
+    Tokens and the 47 Fluent resource-key overrides are injected at runtime by ArcThemeManager.Apply
+    (see ArcPalette.BuildThemeDictionaries and ArcFluentOverrides), because they are generated from the
+    OKLCH palette and must not contain literal colours in XAML (R6 token-only).
+  -->
+  <StyleInclude Source="avares://Arc.Avalonia.Foundation/Theme/ArcBaseStyles.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcInputsTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcActionsTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Navigation/Themes/ArcNavigationTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Overlays/Themes/ArcOverlaysTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcFeedbackTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.DataDisplay/Themes/ArcDataDisplayTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Charts/Themes/ArcChartsTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcPickersTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcEffectsTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Content/Themes/ArcContentTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />
+</Styles>

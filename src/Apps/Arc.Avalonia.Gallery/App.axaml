@@ -1,25 +1,23 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:arc="using:Arc.Avalonia.Theme"
              x:Class="Arc.Avalonia.Gallery.App"
              RequestedThemeVariant="Light">
 
+  <!--
+    M1-T3: the design-system baseline is a single element. <arc:ArcTheme/> brings in the Fluent baseline,
+    Foundation's ArcBaseStyles and the 11 L2 component theme families; ArcThemeManager.Apply (App.axaml.cs)
+    injects the Arc tokens, the 47 Fluent resource-key overrides and the accent palette.
+
+    L3/L4 composite layers stay opt-in here: the L2.5 theme package must not depend on Agent/Special/Blocks
+    (docs/13 §2.1 layering + R1 gate), so the Gallery lists those 13 theme files itself.
+  -->
   <Application.Styles>
-    <FluentTheme />
-    <StyleInclude Source="avares://Arc.Avalonia.Foundation/Theme/ArcTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Internal/Themes/ArcInternalTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Inputs/Themes/ArcInputsTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Actions/Themes/ArcActionsTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Navigation/Themes/ArcNavigationTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Overlays/Themes/ArcOverlaysTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Feedback/Themes/ArcFeedbackTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.DataDisplay/Themes/ArcDataDisplayTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Charts/Themes/ArcChartsTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Pickers/Themes/ArcPickersTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Effects/Themes/ArcEffectsTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Content/Themes/ArcContentTheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />
+    <arc:ArcTheme />
+
     <StyleInclude Source="avares://Arc.Avalonia.AgentUI/Themes/ArcAgentUITheme.axaml" />
-    <StyleInclude Source="avares://Arc.Avalonia.LifeToday/Themes/ArcLifeTodayTheme.axaml" />    <StyleInclude Source="avares://Arc.Avalonia.Special.Glass/Themes/ArcSpecialGlassTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.LifeToday/Themes/ArcLifeTodayTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.Glass/Themes/ArcSpecialGlassTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Special.Motion/Themes/ArcSpecialMotionTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Special.Media/Themes/ArcSpecialMediaTheme.axaml" />
     <StyleInclude Source="avares://Arc.Avalonia.Special.AIWidgets/Themes/ArcSpecialAIWidgetsTheme.axaml" />
@@ -32,4 +30,3 @@
     <StyleInclude Source="avares://Arc.Avalonia.Blocks.AI/Themes/ArcBlocksAITheme.axaml" />
   </Application.Styles>
 </Application>
-

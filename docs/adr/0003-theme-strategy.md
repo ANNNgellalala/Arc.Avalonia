@@ -159,3 +159,30 @@ dotnet poc\ArcThemePoc\bin\Debug\net10.0\ArcThemePoc.dll --probe    # 打印 Flu
 2. 修 §4.2 的 `ArcResources` variant 问题（否则主题迁移会静默回归）；
 3. 组件主题 11 个 `StyleInclude` 全部并入 `ArcTheme`，`Gallery/App.axaml` 从 27 行降到 1 行；
 4. 加"键常量表 + Fluent 升级检测"（见 ADR 0004）。
+
+## 9. 实现形态偏差（M1-T3 落地时新增，2026-11-06）
+
+POC 验证的是 **XAML 嵌套 `<FluentTheme/>`**；正式实现改为在 `ArcTheme.axaml.cs` 构造函数里 **C# 编程式创建** FluentTheme：
+
+```csharp
+_fluentTheme = new FluentTheme(ThemeServiceProvider.Instance);
+Add(_fluentTheme);                       // 第一位：后续 StyleInclude 覆盖 Fluent 默认值
+AvaloniaXamlLoader.Load(this);           // ArcBaseStyles + 11 个组件主题
+```
+
+两处必须记录的实测事实：
+
+1. **R4 门禁（`tools/check-theme.ps1`）禁止库内 axaml 出现 Fluent 主题元素**（扫描根包含 `src/Theme`），
+   所以正式聚合入口不能照抄 POC 的 XAML 形态；改为 C# 创建后行为等价（实例仍在样式列表首位），R4 保持 GREEN。
+   若后续门禁 owner 把 `src/Theme` 从该禁止列表中豁免，可换回 POC 的 XAML 形式（两者语义一致）。
+2. **Avalonia 12 的 FluentTheme 只有 `FluentTheme(IServiceProvider)` 构造**（§4.3），而 `App.axaml` 加载期间
+   `Application.Current` 仍为 **null**（M1-T3 实测：直接用它抛 `InvalidOperationException`，`--audit` 启动即崩）。
+   实现改为传入最小 `IServiceProvider`（`GetService` 恒返回 null）：FluentTheme 从自身嵌入资源加载主题字典，
+   激活变体由每次 `TryGetResource(key, variant, …)` 显式传入，因此不需要应用服务。
+   实测：Light/Dark 双主题、`--audit 294/294`、`--smoke 315/0`、47/47 Fluent 键解析、3 个 accent 的
+   `SystemAccentColor` 映射全部通过（`Arc.Avalonia.Gallery.dll --theme-report`）。
+
+另：正式实现的 token 字典与 47 键覆盖都由 C# 生成（`ArcPalette.BuildThemeDictionaries` /
+`ArcFluentOverrides.Build`）并由 `ArcThemeManager.Apply` 合并，而不是写死在主题 XAML 里 —— 因为 Arc token 由
+OKLCH 计算产生，写进 XAML 会违反 R6（token-only，禁止字面色值）。这与 §2/§8 的"XAML 内容顺序"等价：
+装配顺序仍是 Fluent → token 字典 → Fluent 键覆盖 → 组件主题，只是后两步在运行时注入。

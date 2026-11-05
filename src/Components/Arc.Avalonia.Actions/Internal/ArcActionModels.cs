@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Media;
 
 namespace Arc.Avalonia.Internal;
 
@@ -208,16 +206,4 @@ public sealed class ArcAccordionItem
 
     /// <summary>The answer, revealed in place.</summary>
     public object? Content { get; set; }
-}
-
-/// <summary>Shorthand for a plain text panel, used by the demo pages.</summary>
-internal static class ArcText
-{
-    public static TextBlock Body(string text, double maxWidth = 620) => new()
-    {
-        Text = text,
-        Classes = { "arc-body-sm" },
-        TextWrapping = TextWrapping.Wrap,
-        MaxWidth = maxWidth
-    };
 }

@@ -7,10 +7,13 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
-    <ProjectReference Include="..\..\Foundation\Arc.Avalonia.Internal\Arc.Avalonia.Internal.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Action-shared helpers (ArcActionVisuals/ArcDismiss) are internal to this assembly after the
+         former Internal project was dissolved; Navigation and Overlays are the remaining in-layer users. -->
     <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Navigation" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Overlays" />
   </ItemGroup>
 </Project>

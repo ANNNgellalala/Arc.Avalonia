@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using Avalonia.Styling;
 
 namespace Arc.Avalonia.Theme;
 
@@ -31,6 +32,24 @@ public enum ArcAccent
 public static class ArcPalette
 {
     private const string InterFont = "avares://Avalonia.Fonts.Inter/Assets#Inter";
+
+    /// <summary>
+    /// Pairs the Light and Dark token palettes into one theme-aware dictionary, so a single merge into
+    /// <c>Application.Resources</c> makes every token resolve from <c>ThemeDictionaries</c> for the active
+    /// variant (ADR 0003 §4.2). Rebuilt whenever the accent changes.
+    /// </summary>
+    public static ResourceDictionary BuildThemeDictionaries(ArcAccent accent) => new()
+    {
+        ThemeDictionaries =
+        {
+            [ThemeVariant.Light] = Build(ArcColorScheme.Light, accent),
+            [ThemeVariant.Dark] = Build(ArcColorScheme.Dark, accent)
+        }
+    };
+
+    /// <summary>Accent colour used when mapping an Arc accent onto Fluent's <c>ColorPaletteResources</c>.</summary>
+    public static Color AccentColor(ArcColorScheme scheme, ArcAccent accent) =>
+        Build(scheme, accent)[ArcTokens.Accent] is ISolidColorBrush brush ? brush.Color : Colors.Gray;
 
     public static ResourceDictionary Build(ArcColorScheme scheme, ArcAccent accent)
     {

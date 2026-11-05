@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Arc.Avalonia.Demo;
@@ -26,6 +27,7 @@ public static class Program
         ColourChecks();
         MotionChecks();
         CatalogChecks();
+        ThemeChecks();
 
         Console.WriteLine($"VERIFY: checks={_checks} failures={Failures.Count}");
         foreach (var failure in Failures)
@@ -140,6 +142,100 @@ public static class Program
             siteHeader is { Kind: "block" });
     }
 
+    /// <summary>
+    /// M1-T3: tokens live in ThemeDictionaries (Light/Dark) and the 47 Fluent keys are covered per variant,
+    /// so both the token surface and the bare-Fluent reskin follow the active theme and accent.
+    /// </summary>
+    private static void ThemeChecks()
+    {
+        var tokenKeys = TokenKeys();
+        var neutral = ArcPalette.BuildThemeDictionaries(ArcAccent.Neutral);
+
+        Check("token dictionaries have Light and Dark",
+            neutral.ThemeDictionaries.ContainsKey(ThemeVariant.Light) &&
+            neutral.ThemeDictionaries.ContainsKey(ThemeVariant.Dark));
+        Check("token dictionaries cover every token (both variants)",
+            CoversAllKeys(neutral, tokenKeys));
+
+        var neutralLight = Variant(neutral, ThemeVariant.Light);
+        var neutralDark = Variant(neutral, ThemeVariant.Dark);
+        Check("token dictionaries differ per variant",
+            BrushColor(neutralLight, ArcTokens.Background) != BrushColor(neutralDark, ArcTokens.Background) &&
+            BrushColor(neutralLight, ArcTokens.Background) is not null);
+
+        // At least two accents must visibly swap the accent token in both schemes (M1-T3 DoD).
+        foreach (var accent in new[] { ArcAccent.Violet, ArcAccent.Rose })
+        {
+            var themed = ArcPalette.BuildThemeDictionaries(accent);
+            Check($"accent {accent} swaps the accent token (both variants)",
+                BrushColor(Variant(themed, ThemeVariant.Light), ArcTokens.Accent) != BrushColor(neutralLight, ArcTokens.Accent) &&
+                BrushColor(Variant(themed, ThemeVariant.Dark), ArcTokens.Accent) != BrushColor(neutralDark, ArcTokens.Accent));
+        }
+
+        Check("Fluent key table has 47 entries", ArcFluentKeys.All.Count == 47);
+
+        var overrides = ArcFluentOverrides.Build(ArcAccent.Neutral);
+        Check("Fluent overrides have Light and Dark",
+            overrides.ThemeDictionaries.ContainsKey(ThemeVariant.Light) &&
+            overrides.ThemeDictionaries.ContainsKey(ThemeVariant.Dark));
+        Check("Fluent overrides cover every declared key (both variants)",
+            CoversAllKeys(overrides, ArcFluentKeys.All));
+
+        var lightOverrides = Variant(overrides, ThemeVariant.Light);
+        var darkOverrides = Variant(overrides, ThemeVariant.Dark);
+        Check("Fluent overrides differ per variant",
+            BrushColor(lightOverrides, ArcFluentKeys.TextControlBackground) !=
+            BrushColor(darkOverrides, ArcFluentKeys.TextControlBackground));
+
+        var expectedRadius = ArcPalette.Build(ArcColorScheme.Light, ArcAccent.Neutral)[ArcTokens.RadiusControl];
+        Check("ControlCornerRadius follows the Arc radius token",
+            lightOverrides[ArcFluentKeys.ControlCornerRadius] is CornerRadius corner &&
+            expectedRadius is CornerRadius expected &&
+            corner == expected);
+
+        var violetOverrides = Variant(ArcFluentOverrides.Build(ArcAccent.Violet), ThemeVariant.Light);
+        Check("accent reaches the Fluent overrides",
+            ColorOf(lightOverrides[ArcFluentKeys.TextControlSelectionHighlightColor]) !=
+            ColorOf(violetOverrides[ArcFluentKeys.TextControlSelectionHighlightColor]));
+
+        Check("accent colours differ between schemes",
+            ArcPalette.AccentColor(ArcColorScheme.Light, ArcAccent.Neutral) !=
+            ArcPalette.AccentColor(ArcColorScheme.Dark, ArcAccent.Neutral));
+    }
+
+    private static IReadOnlyList<string> TokenKeys() => typeof(ArcTokens)
+        .GetFields()
+        .Where(f => f.IsLiteral && f.FieldType == typeof(string))
+        .Select(f => (string)f.GetRawConstantValue()!)
+        .ToArray();
+
+    private static ResourceDictionary Variant(ResourceDictionary themeAware, ThemeVariant variant) =>
+        (ResourceDictionary)themeAware.ThemeDictionaries[variant];
+
+    private static bool CoversAllKeys(ResourceDictionary themeAware, IReadOnlyList<string> keys)
+    {
+        foreach (var variant in new[] { ThemeVariant.Light, ThemeVariant.Dark })
+        {
+            var dictionary = Variant(themeAware, variant);
+            foreach (var key in keys)
+            {
+                if (!dictionary.ContainsKey(key))
+                {
+                    Console.WriteLine($"  MISSING KEY: {key} [{variant}]");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static Color? BrushColor(ResourceDictionary dictionary, string key) =>
+        dictionary.TryGetValue(key, out var value) && value is ISolidColorBrush brush ? brush.Color : null;
+
+    private static Color? ColorOf(object? value) =>
+        value is Color color ? color : value is ISolidColorBrush brush ? brush.Color : null;
+
     /// <summary>Every ArcTokens constant must be registered for Light/Dark x every accent (16 palettes).</summary>
     private static bool PaletteCoversAllTokens()
     {
@@ -217,11 +313,15 @@ public static class Program
                 ArcResources.Duration(ArcTokens.DurationFast));
             Expect("Shadows", ArcResources.Shadows(ArcTokens.ShadowFloating).Count == 1,
                 ArcResources.Shadows(ArcTokens.ShadowFloating).Count);
-            // Variant-aware overload reaches ThemeDictionaries-style entries; the untargeted
-            // overload must not see them (ADR 0003 §4.2).
-            Expect("untargeted lookup ignores theme-dictionary entries",
-                ReferenceEquals(ArcResources.Brush(ArcTokens.Series1), Brushes.Transparent),
+            // Variant-aware lookups reach ThemeDictionaries-style entries (ADR 0003 §4.2). The untargeted
+            // overload must follow the host's ActualThemeVariant (M1-T3 fix) instead of silently missing
+            // every theme-dictionary token.
+            Expect("untargeted lookup follows the active variant",
+                ReferenceEquals(ArcResources.Brush(ArcTokens.Series1), Brushes.Blue),
                 ArcResources.Brush(ArcTokens.Series1));
+            Expect("explicit light lookup skips dark-only entries",
+                ReferenceEquals(ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Light), Brushes.Transparent),
+                ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Light));
             Expect("variant lookup uses theme-dictionary entries",
                 ReferenceEquals(ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Dark), Brushes.Blue),
                 ArcResources.Brush(ArcTokens.Series1, ThemeVariant.Dark));

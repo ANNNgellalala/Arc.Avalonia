@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/Foundation/">
     <Project Path="src/Foundation/Arc.Avalonia/Arc.Avalonia.csproj" />
-    <Project Path="src/Foundation/Arc.Avalonia.Internal/Arc.Avalonia.Internal.csproj" />
+  </Folder>
+  <Folder Name="/Theme/">
+    <Project Path="src/Theme/Arc.Avalonia.Theme/Arc.Avalonia.Theme.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="src/Components/Arc.Avalonia.Inputs/Arc.Avalonia.Inputs.csproj" />

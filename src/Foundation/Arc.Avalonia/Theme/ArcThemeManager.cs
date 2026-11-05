@@ -21,6 +21,14 @@ public static class ArcThemeManager
     /// <summary>When true components skip travel animation, matching Arc's reduced-motion branch.</summary>
     public static bool ReducedMotion { get; set; }
 
+    /// <summary>
+    /// Raised after <see cref="Apply"/> swapped the palette (arguments: application, scheme, accent).
+    /// The aggregated theme (src/Theme/Arc.Avalonia.Theme) subscribes to keep Fluent's
+    /// <c>FluentTheme.Palettes</c> and the Fluent resource-key overrides in sync, so the Foundation
+    /// layer does not need a dependency on Avalonia.Themes.Fluent.
+    /// </summary>
+    public static event Action<Application, ArcColorScheme, ArcAccent>? Applied;
+
     public static void Apply(Application app, ArcColorScheme scheme, ArcAccent accent)
     {
         Scheme = scheme;
@@ -28,13 +36,17 @@ public static class ArcThemeManager
 
         app.RequestedThemeVariant = scheme == ArcColorScheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 
-        var palette = ArcPalette.Build(scheme, accent);
+        // Tokens live in ThemeDictionaries (Light + Dark), so a bare variant switch restyles the whole tree
+        // and only an accent change needs a rebuild (ADR 0003 §4.2).
+        var palette = ArcPalette.BuildThemeDictionaries(accent);
         if (_current is not null)
         {
             app.Resources.MergedDictionaries.Remove(_current);
         }
 
         app.Resources.MergedDictionaries.Add(_current = palette);
+
+        Applied?.Invoke(app, scheme, accent);
     }
 
     public static void SetScheme(Application app, ArcColorScheme scheme) => Apply(app, scheme, Accent);
@@ -61,17 +73,16 @@ public static class ArcResources
     public static void UseHost(IArcResourceHost? host) => _host = host ?? ApplicationResourceHost.Instance;
 
     /// <summary>
-    /// Legacy lookup (no explicit theme variant). Kept as-is for source compatibility; see the
-    /// variant-aware overloads for the ThemeDictionaries-safe path described in ADR 0003 §4.2.
+    /// Standard lookup. Tokens now live in <c>ThemeDictionaries</c>, so the lookup follows the host's
+    /// active <see cref="IArcResourceHost.ActualThemeVariant"/>; without that it would silently miss every
+    /// token and hand callers the fallback value (ADR 0003 §4.2).
     /// </summary>
     public static IBrush Brush(string key) => Brush(key, null);
 
     /// <summary>
     /// Variant-aware lookup: passes <paramref name="variant"/> to the host so resources defined in
-    /// <c>ThemeDictionaries</c> resolve for the requested Light/Dark variant. Once tokens move into
-    /// ThemeDictionaries, pass <c>ArcResources.Host.ActualThemeVariant</c> (or a known variant) from
-    /// code that must follow the active theme; the parameterless overload then keeps defaulting to
-    /// the un-targeted lookup for backwards compatibility.
+    /// <c>ThemeDictionaries</c> resolve for the requested Light/Dark variant. Pass <c>null</c> to follow
+    /// the host's active variant (the default path used by <see cref="Brush(string)"/> and friends).
     /// </summary>
     public static IBrush Brush(string key, ThemeVariant? variant) =>
         TryFind(key, variant, out var value) && value is IBrush brush ? brush : Brushes.Transparent;
@@ -103,7 +114,10 @@ public static class ArcResources
 
     private static bool TryFind(string key, ThemeVariant? variant, out object? value)
     {
-        if (variant is not null && _host.TryFindResource(key, variant, out value))
+        // ThemeDictionaries entries are only visible to a variant-targeted lookup, so default to the
+        // host's active variant before falling back to the legacy untargeted probe.
+        var effective = variant ?? _host.ActualThemeVariant;
+        if (effective is not null && _host.TryFindResource(key, effective, out value))
         {
             return true;
         }
