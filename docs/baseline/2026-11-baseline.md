@@ -2,6 +2,7 @@
 
 > 用途：M0-1 冻结基线。重构（M1）开始前的可复现快照，用于前后对比与回滚。
 > 对应计划：[`docs/14-m0-baseline-and-gates.zh.md`](../14-m0-baseline-and-gates.zh.md) §2；架构依据：[`docs/13-framework-layering-and-agent-top.zh.md`](../13-framework-layering-and-agent-top.zh.md) v3.2。
+> 基线 tag：`pre-framework`（指向包含本文件的提交）。
 
 ## 1. 环境
 
@@ -13,7 +14,7 @@
 | NuGet | 离线；全局缓存 `D:\.nuget\packages`；`NuGet.config` 源清空 |
 | 解决方案 | `ArcUI.slnx`（29 个项目：28 源 + 1 测试控制台） |
 | 仓库 HEAD（基线前） | `5c2513f docs: correct P2a project count` |
-| 基线 tag | `pre-framework`（指向本文件所在的基线提交） |
+| 基线提交 | `4477eab baseline: freeze pre-framework working tree (docs platform + framework plan v3.2)` |
 
 ## 2. 构建与验证（实测，2026-11-05）
 
