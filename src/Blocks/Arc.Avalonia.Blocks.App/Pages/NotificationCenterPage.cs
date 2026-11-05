@@ -21,6 +21,11 @@ public sealed class NotificationCenterPage : ArcItemPage
 {
     public override string ItemSlug => "notification-center";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-panel-open", "variant-unread-badge", "variant-expanded-row", "variant-view-switcher"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

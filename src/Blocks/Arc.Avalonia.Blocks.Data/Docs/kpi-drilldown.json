@@ -1,0 +1,57 @@
+{
+  "slug": "kpi-drilldown",
+  "nameZh": "KPI 下钻",
+  "summary": "四张 KPI 卡里有一张就地在原位展开：变成带上一周期对比的详情折线与拆解表，其余三张保持收起，点另一张就换它展开。",
+  "purpose": [
+    "当总览页希望「点一下就能看到细节」、又不想跳转页面时，用 KPI drilldown：卡片展开是原地替换，不打开抽屉也不弹对话框。",
+    "展开态包含一张详情折线（本期与上一周期两条）、时间范围切换与 Breakdown 拆解表；拆解表按份额与环比列出构成项，当前展开的是 Revenue。",
+    "收起态只保留标签、数值、环比与一条迷你走势，四张卡共用一套网格，展开的卡片会把行高撑开，其余卡片自动让位。"
+  ],
+  "whenToUse": [
+    "总览页需要从 KPI 直接下钻到详情时。",
+    "希望展开发生在原位置、避免页面跳转时。",
+    "拆解表需要与详情图同屏对照时。"
+  ],
+  "whenNotToUse": [
+    "需要在一张图上持续切换多个指标做探索时，用 metric-explorer。",
+    "日常总览与排名列表，用 metrics-dashboard。",
+    "只需要一个数值时，用 metric-card。"
+  ],
+  "variants": [
+    { "key": "layout-kpi", "label": "整体布局", "note": "四张 KPI 卡与展开的详情并置" },
+    { "key": "variant-collapsed-cards", "label": "Collapsed", "note": "三张收起卡：标签、数值、环比与迷你走势" },
+    { "key": "variant-expanded-chart", "label": "Expanded", "note": "Revenue 卡原位展开的详情折线" },
+    { "key": "variant-comparison", "label": "Comparison", "note": "详情图叠加上一周期的序列" },
+    { "key": "variant-breakdown-table", "label": "Breakdown", "note": "份额与环比的拆解表" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "展开后的详情与卡片迷你走势都是折线图" },
+    { "type": "uses", "target": "segmented-control", "note": "时间范围与指标切换用分段控件" },
+    { "type": "uses", "target": "badge", "note": "环比与状态用徽章标出" },
+    { "type": "uses", "target": "card", "note": "每张 KPI 卡与展开的详情共用卡片表面" },
+    { "type": "alternative", "target": "metric-explorer", "note": "需要在同一张图上持续探索多个指标时，改用 metric explorer" }
+  ],
+  "contrasts": [
+    {
+      "target": "metric-explorer",
+      "title": "KPI drilldown 与 Metric explorer",
+      "rows": [
+        { "dimension": "展开方式", "self": "卡片原位展开成完整详情", "other": "卡片选中后由下方的主图承担详情" },
+        { "dimension": "拆解", "self": "展开态带 Breakdown 拆解表", "other": "以图表读数为主，没有拆解表" },
+        { "dimension": "页面结构", "self": "四张卡与一张展开的详情同屏", "other": "四张卡加一张固定的主图" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <!-- 四张 KPI 卡，当前展开 Revenue -->\n  <charts:ArcLineChart Height=\"220\" />\n  <arc:ArcBadge Content=\"+8.4% vs previous\" Tone=\"Success\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：展开与拆解",
+      "language": "csharp",
+      "code": "var open = \"revenue\";\nvar range = 30;\n\nforeach (var metric in metrics)\n{\n    var selected = metric.Key == open;\n    grid.Children.Add(Card(metric, selected)); // 选中卡展开为图表与拆解表\n}"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "slug": "agent-orchestrator",
+  "nameZh": "智能体编排器",
+  "summary": "一个 lead agent 把目标拆成并行子任务分给 worker 泳道，收回后合并结果：并发数可调、泳道显示状态与工具，底部给出串行耗时、加速比与成本。",
+  "purpose": [
+    "它展示「并行」本身：目标是 Compare our pricing page with four competitors，计划行写明 4 subtasks 且有一条重试，下面四条泳道同时摆开，每条带模型、子任务、工具、输出摘要与状态。",
+    "并发是显式参数：顶部的 Concurrency 分段控件决定同时跑几条，超出的泳道变为 Queued 并降到 0.6 不透明度；这样用户能理解「为什么有些还没开始」。",
+    "状态从不只靠颜色：每条泳道用图标 + 词（Returned / Running / Queued / Failed）表达，计划行右侧的 1 retry 徽标标出这次运行里的重试。",
+    "底部一条合计带回答「并行值不值」：Wall time 18.4s、Sequential 41.2s、Speedup 2.2×、Cost $0.21；这些数字由示例数据算出，运行本身是模拟的。"
+  ],
+  "whenToUse": [
+    "一个目标可以拆成若干互不依赖的子任务并并行执行时。",
+    "需要让人看到并发限制、排队与重试，而不只是最终结果时。",
+    "要把并行带来的加速与成本差明确摆出来的演示或运行详情页。"
+  ],
+  "whenNotToUse": [
+    "只有一个 agent 顺序执行一个任务时，用 agent-run，泳道图没有必要。",
+    "任务按日程自动运行、关注的是节奏时，用 agent-routines。",
+    "只需要展示多次工具调用的先后与交接时，用 agent-timeline。"
+  ],
+  "variants": [
+    { "key": "variant-plan", "label": "Plan", "note": "目标、计划行与 1 retry 徽标" },
+    { "key": "variant-lanes", "label": "Lanes", "note": "四条 worker 泳道：模型、子任务、工具与状态" },
+    { "key": "variant-concurrency", "label": "Concurrency", "note": "并发数分段控件；超出上限的泳道排队" },
+    { "key": "variant-totals", "label": "Totals", "note": "Wall time / Sequential / Speedup / Cost 合计带" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Run again、Concurrency 与每条泳道的展开动作都是 ArcButton" },
+    { "type": "uses", "target": "segmented-control", "note": "并发数控制由 ArcSegmentedControl 表达，改变后重排泳道" },
+    { "type": "uses", "target": "badge", "note": "计划行的 1 retry 用徽标标出这次运行的重试" },
+    { "type": "alternative", "target": "agent-run", "note": "单个 agent 顺序执行时改用 agent run" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-run",
+      "title": "Agent orchestrator 与 Agent run",
+      "rows": [
+        { "dimension": "结构", "self": "lead 加多条并行 worker 泳道", "other": "单个 agent 的步骤列表" },
+        { "dimension": "关注点", "self": "并发、排队、重试与加速比", "other": "步骤推进、diff 与批准门" },
+        { "dimension": "产出", "self": "合并后的合计与每条泳道摘要", "other": "待批准的代码改动与结果" },
+        { "dimension": "交互", "self": "调并发、重跑整轮", "other": "批准、打回或开 PR" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "编排页骨架",
+      "language": "csharp",
+      "code": "var content = K.Stack(10,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(2,\n                K.Text(\"Compare our pricing page with four competitors\", \"arc-heading\", 560),\n                K.Caption(\"Lead: Claude Opus 5.5 · 4 worker lanes · 48.2k tokens · $0.21\")),\n            K.Row(8, concurrencyControl, runAgain)\n        }\n    },\n    K.Divider(2),\n    K.Row(7,\n        new ArcIcon { Icon = \"target\", Size = 13, Foreground = K.Brush(ArcTokens.Accent) },\n        K.Caption(\"Plan\"),\n        K.Caption(\"4 subtasks · one retry on Check enterprise terms\"),\n        K.Pill(\"1 retry\", ArcBadgeTone.Warning)),\n    lanesHost,\n    totals,\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 980 }, new Thickness(22, 15, 22, 15));"
+    },
+    {
+      "title": "泳道卡与并发排队",
+      "language": "csharp",
+      "code": "for (var index = 0; index < Lanes.Length; index++)\n{\n    var lane = Lanes[index];\n    var queued = index >= concurrency;          // 超出并发上限的排到 Queued\n    var state = queued ? \"Queued\" : lane.Status;\n\n    var body = K.Stack(5,\n        K.Row(5, K.Mark(\"anthropic\", 16), K.Caption(lane.Model)),\n        K.Text(lane.Subtask, \"arc-caption\", 170),\n        K.Row(4, new ArcIcon { Icon = \"wand-2\", Size = 10 }, K.Caption(lane.Tool)),\n        K.Mono(lane.Output, 10.5),\n        K.Row(4,\n            new ArcIcon { Icon = state == \"Returned\" ? \"circle-check\" : queued ? \"clock\" : \"loader-circle\", Size = 11 },\n            K.Caption(state)),\n        K.Caption($\"{lane.Tokens} tokens · {lane.Time}\"));\n\n    var card = new Border\n    {\n        BorderThickness = new Thickness(1),\n        CornerRadius = new CornerRadius(12),\n        Padding = new Thickness(10, 8, 10, 8),\n        Opacity = queued ? 0.6 : 1,\n        Child = body\n    };\n    laneCells[index] = card;\n}"
+    }
+  ]
+}

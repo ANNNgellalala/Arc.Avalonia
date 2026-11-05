@@ -1,0 +1,83 @@
+{
+  "slug": "rich-text-editor",
+  "nameZh": "富文本编辑器",
+  "summary": "以 Markdown 为文档的轻量富文本编辑器：标记快捷输入、选区浮动工具栏、斜杠块菜单、实时预览，并同时给出 HTML 与 Markdown 输出。",
+  "purpose": [
+    "适合评论、笔记、文章草稿这类需要一点格式、但不值得上重型编辑器的场景。文档始终是一段 Markdown，写入、渲染与存储共用同一份内容，不存在两份数据不同步的问题。",
+    "输入 #、-、>、``` 等标记会立刻变成对应块；选中文字会出现浮动工具栏，输入 / 可以打开块菜单，选择标题、列表、引用、代码块与分隔线。",
+    "右侧实时预览把 Markdown 渲染成排版后的样子；Html 与 Markdown 两个属性既可以作为初始值传入，也可以作为受控输出读回。",
+    "ReadOnly 用于只读展示但保留版式，Label 与 Placeholder 负责无障碍名称与空态提示；它不试图伪装成所见即所得引擎，文档永远以 Markdown 原文为准。"
+  ],
+  "whenToUse": [
+    "评论、笔记、文章草稿需要粗体、列表、引用、代码块等基础格式时。",
+    "团队已经用 Markdown 作为存储格式，想在编辑时就近看到渲染结果时。",
+    "需要在同一处同时拿到 HTML 与 Markdown 两种输出时。",
+    "只想读一份已存好的 Markdown 文档、又不想丢掉版式时。"
+  ],
+  "whenNotToUse": [
+    "只需要纯文本输入时改用 textarea，不必引入工具栏与预览。",
+    "就地编辑一个标题或单行字段时改用 inline-edit。",
+    "需要表格编辑、协同编辑、图片拖拽排版等完整富文本能力时，本移植版不提供，应改用专门的编辑器。",
+    "展示代码片段并需要语法高亮与一键复制时改用 code-block。"
+  ],
+  "variants": [
+    { "key": "variant-markdown", "label": "Markdown 正文", "note": "默认文档：标题、粗体、列表、引用与代码" },
+    { "key": "variant-empty", "label": "空编辑器", "note": "只有 Placeholder 与斜杠提示，没有正文" },
+    { "key": "variant-html", "label": "HTML 初始化", "note": "用 DefaultHtml 传入初稿并渲染版式" },
+    { "key": "state-readonly", "label": "只读", "note": "ReadOnly=true，工具栏与输入都不可用" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "textarea", "note": "只需要纯文本输入时，textarea 更轻" },
+    { "type": "alternative", "target": "inline-edit", "note": "就地编辑一个短字段时用 inline edit" },
+    { "type": "complement", "target": "file-dropzone", "note": "正文与附件一起提交时，编辑器旁常配一个 dropzone" },
+    { "type": "complement", "target": "code-block", "note": "预览里的代码块与独立 code block 共用同一套排版" }
+  ],
+  "contrasts": [
+    {
+      "target": "textarea",
+      "title": "Rich text editor 与 Textarea",
+      "rows": [
+        { "dimension": "格式能力", "self": "Markdown 快捷输入、工具栏、预览", "other": "纯文本，没有格式" },
+        { "dimension": "输出", "self": "同时给出 Markdown 与 HTML", "other": "只给出原始文本" },
+        { "dimension": "复杂度", "self": "带斜杠菜单与选区工具，适合写内容", "other": "一行代码即可接入，适合短输入" }
+      ]
+    },
+    {
+      "target": "inline-edit",
+      "title": "Rich text editor 与 Inline edit",
+      "rows": [
+        { "dimension": "编辑范围", "self": "一篇有结构的文档", "other": "一个标题或单行字段" },
+        { "dimension": "触发方式", "self": "常驻编辑器", "other": "点击或回车进入编辑态" },
+        { "dimension": "输出格式", "self": "Markdown / HTML", "other": "单个字符串" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "从 Markdown 初稿开始",
+      "language": "csharp",
+      "code": "var editor = new ArcRichTextEditor\n{\n    Label = \"Release notes editor\",\n    Placeholder = \"Write your update\",\n    DefaultMarkdown =\n        \"# Release notes\\n\\n\" +\n        \"Search is now **twice as fast**, with a calmer *dark* theme.\\n\\n\" +\n        \"- Fuzzy file search\\n- New **dark** theme\\n- `ArcButton` focus fix\\n\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:content=\"clr-namespace:Arc.Avalonia.Content.Controls;assembly=Arc.Avalonia.Content\">\n  <content:ArcRichTextEditor x:Name=\"Notes\"\n                             Width=\"760\"\n                             Height=\"360\"\n                             Label=\"Release notes\"\n                             Placeholder=\"Write your update\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Content.Controls.ArcRichTextEditor",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Html": "受控 HTML 输出；设置它会按 HTML 载入文档",
+      "Markdown": "Markdown 原文与输出；设置它会整体替换文档",
+      "DefaultHtml": "未设置 Html 与 Markdown 时使用的初始 HTML",
+      "DefaultMarkdown": "未提供 HTML 时使用的初始 Markdown",
+      "Placeholder": "空文档时的提示文字，默认 Start writing",
+      "BlockHint": "输入 / 旁的块提示，默认 Type / for blocks",
+      "ReadOnly": "只读展示：不显示工具栏，输入与快捷键被禁用",
+      "AutoFocus": "首次进入视觉树时把焦点放到编辑区",
+      "Label": "无障碍名称，同时显示在编辑器标题处",
+      "TextChanged": "内容变化后触发，参数同时带 Markdown 与 HTML"
+    }
+  }
+}

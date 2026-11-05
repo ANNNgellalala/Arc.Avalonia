@@ -1,0 +1,75 @@
+{
+  "slug": "radio-group",
+  "nameZh": "单选组",
+  "summary": "一组常驻可见的单选行：同一时间只有一项成立，方向键即时切换，圆点与选中行由原生单选语义驱动。",
+  "purpose": [
+    "把「只能选一个」的选项全部摊开：选项是真实的行式单选按钮，用户不需要先展开菜单就能比较，选中项由圆点标记。",
+    "每行可以带一句说明（ArcRadioOption.Description），用于解释每个方案差在哪；组的 Label 作为 fieldset 图例显示在行上方。",
+    "键盘语义完整：Tab 只停在选中项（无选中时停在第一项），方向键在行之间移动并立即切换，Home / End 跳到首尾。",
+    "它自己不会提交任何东西：Value 是唯一数据源，ValueChanged 只告诉你用户换了选项，写回与失败回滚由调用方处理。"
+  ],
+  "whenToUse": [
+    "3–8 个互斥选项，且希望用户一眼看到全部选择而不是先展开。",
+    "每个选项需要一句说明才能分辨差异（套餐、区域、权限级别）。",
+    "表单里需要键盘用户用方向键快速比较并切换的场景。"
+  ],
+  "whenNotToUse": [
+    "选项只是 2–4 个视图切片、需要更紧凑的分段外观时，改用 segmented-control。",
+    "选项带价格、图标或需要成组卡片时，改用 radio-cards。",
+    "选项很多（超过 8 个）或需要输入过滤时，改用 select 或 combobox。"
+  ],
+  "variants": [
+    { "key": "variant-plain", "label": "Label only", "note": "每行只有标题，最紧凑" },
+    { "key": "variant-description", "label": "With description", "note": "每行标题下加一句说明" },
+    { "key": "state-selected", "label": "Selected", "note": "一项被选中，Tab 停在该项" },
+    { "key": "state-unselected", "label": "Unselected", "note": "没有默认值，Tab 停在第一项" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "radio-cards", "note": "选项需要价格或卡片外观时改用 radio cards" },
+    { "type": "alternative", "target": "segmented-control", "note": "2–5 个视图切片改用 segmented control" },
+    { "type": "alternative", "target": "select", "note": "选项多到需要滚动查找时改用 select" },
+    { "type": "alternative", "target": "checkbox", "note": "可以同时勾选多项时改用 checkbox" }
+  ],
+  "contrasts": [
+    {
+      "target": "radio-cards",
+      "title": "Radio group 与 Radio cards",
+      "rows": [
+        { "dimension": "选项内容", "self": "标题加一句可选说明", "other": "标题、说明、meta、图标与禁用原因" },
+        { "dimension": "排列", "self": "单列行式，控件自带圆点", "other": "Grid 分列或 List 整行，卡片有边框" },
+        { "dimension": "适用数量", "self": "3–8 个简单选项", "other": "3–6 个需要权衡的选项" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Radio group 与 Segmented control",
+      "rows": [
+        { "dimension": "视觉", "self": "行式单选，选中行点亮圆点", "other": "紧凑分段，一块高亮 pill 滑动" },
+        { "dimension": "占用高度", "self": "每个选项一行", "other": "整组一行" },
+        { "dimension": "选项说明", "self": "每行可带说明", "other": "只有标签与尾部计数" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcRadioGroup Label=\"Plan\"\n                     Options=\"{Binding Plans}\"\n                     Value=\"{Binding Plan, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "带说明的选项",
+      "language": "csharp",
+      "code": "var plan = new ArcRadioGroup\n{\n    Label = \"Plan\",\n    Value = \"team\",\n    Options = new[]\n    {\n        new ArcRadioOption(\"solo\", \"Solo\", \"One seat and one workspace.\"),\n        new ArcRadioOption(\"team\", \"Team\", \"Up to 20 seats with shared labels.\"),\n        new ArcRadioOption(\"scale\", \"Scale\", \"Unlimited seats and SSO.\")\n    }\n};\n\nplan.ValueChanged += (_, _) => Save(plan.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcRadioGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "选项集合，元素是 ArcRadioOption（Value / Label / Description）",
+      "Value": "当前选中项的 Value，未选择时为 null",
+      "Label": "组上方的 fieldset 图例，同时作为无障碍名称",
+      "ValueChanged": "单选值变化后触发，此时 Value 已更新"
+    }
+  }
+}

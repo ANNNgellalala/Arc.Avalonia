@@ -1,0 +1,73 @@
+{
+  "slug": "morph-nav",
+  "nameZh": "变形导航条",
+  "summary": "站点顶栏与它展开的面板、搜索是同一块表面：导航条随面板尺寸弹簧变形，搜索从条内长出来，高亮在条目之间滑行。",
+  "purpose": [
+    "当营销站或产品站的顶栏只有几个分区、每个分区下又有若干目的地时，用 morph nav：点击条目不是弹出一个独立浮层，而是让顶栏本身向下长成面板。",
+    "Brand、条目、搜索与 Sign up 主行动共用一条药丸表面；条目高亮在条目之间滑行，面板内的链接与说明同属一块表面，移动时整块面板按方向滑入。",
+    "Compact 让导航条在页面滚动后收窄一档；搜索通过 OpenSearch 或按 / 在条内展开，成为覆盖结果的组合框，而不是另开一个模态。"
+  ],
+  "whenToUse": [
+    "营销站或产品站的顶部导航，分区不多但每区都有若干链接时。",
+    "希望搜索从导航条内长出来、而不是打开独立搜索页时。",
+    "需要在条尾固定一个 Sign up 之类的主行动时。"
+  ],
+  "whenNotToUse": [
+    "应用内同级分区的切换，用 liquid-tab-bar。",
+    "页内视图切换，用 tabs。",
+    "一条命令菜单而不是站点导航，用 dropdown-menu。"
+  ],
+  "variants": [
+    { "key": "state-panel-open", "label": "Panel open", "note": "默认展开 Product 面板：顶栏与面板是一块连续表面" },
+    { "key": "variant-bar-items", "label": "Bar items", "note": "条目带下箭头与滑行高亮，当前分区保持强调" },
+    { "key": "variant-panel-links", "label": "Panel links", "note": "面板内的目的链接与分区说明" },
+    { "key": "variant-brand", "label": "Brand", "note": "左侧品牌块与名称" },
+    { "key": "variant-action", "label": "Primary action", "note": "条尾固定的 Sign up 主行动与搜索按钮" },
+    { "key": "state-compact", "label": "Compact", "note": "滚动后收窄 12px 的紧凑顶栏" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "liquid-tab-bar", "note": "应用内同级分区切换用液签栏" },
+    { "type": "alternative", "target": "dropdown-menu", "note": "一条命令菜单而不是站点导航时用菜单" },
+    { "type": "complement", "target": "hero-section", "note": "顶栏通常压在 hero 之上，两者共享页面的第一屏" }
+  ],
+  "contrasts": [
+    {
+      "target": "liquid-tab-bar",
+      "title": "Morph nav 与 Liquid tab bar",
+      "rows": [
+        { "dimension": "层级", "self": "站点导航：分区下面还有链接与说明", "other": "应用内同级分区，点开即切换视图" },
+        { "dimension": "展开方式", "self": "顶栏本身长成面板", "other": "只有选中镜片在标签之间滑动" },
+        { "dimension": "搜索", "self": "条内长出的搜索字段与结果", "other": "通常不内建搜索" }
+      ]
+    },
+    {
+      "target": "dropdown-menu",
+      "title": "Morph nav 与 Dropdown menu",
+      "rows": [
+        { "dimension": "内容", "self": "带说明与分栏的导航面板", "other": "一列命令与快捷键" },
+        { "dimension": "表面", "self": "与顶栏连续，一次尺寸变形", "other": "独立的浮层列表" },
+        { "dimension": "用途", "self": "站点信息架构入口", "other": "执行命令" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcMorphNav xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                Compact=\"False\"\n                VerticalAlignment=\"Top\" />"
+    },
+    {
+      "title": "代码构建：展开搜索与紧凑态",
+      "language": "csharp",
+      "code": "var nav = new ArcMorphNav();\nnav.Compact = true;   // 滚动后的紧凑顶栏\nnav.OpenSearch();     // 搜索从条内长出来，而不是打开模态"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcMorphNav",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Compact": "收窄顶栏高度，模拟页面滚动后的紧凑态",
+      "OpenSearch": "把顶栏切换成搜索状态并聚焦输入"
+    }
+  }
+}

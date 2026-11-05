@@ -1,0 +1,52 @@
+{
+  "slug": "security-settings",
+  "nameZh": "安全设置",
+  "summary": "安全设置：沿三步轨道走完的双因素设置（扫描、验证、备份码）、带强度计的密码修改，以及可逐个吊销的活跃会话；演示码是 246810，所有动作都在本地。",
+  "purpose": [
+    "当账户安全需要集中管理时用它：左侧双因素设置按扫描 → 验证 → 备份码三步推进，右侧是活跃会话列表，密码修改带强度计。",
+    "双因素轨道有滑动的当前步标记，内容区按步展开；会话按设备、地点与时间排列，可以逐个吊销；密码强度由 ArcPasswordStrength 实时反馈。",
+    "它不生成真实密钥、也不吊销服务端会话：二维码是确定性图案，验证码固定为 246810，所有操作只更新本页状态。"
+  ],
+  "whenToUse": [
+    "账户设置里的安全标签页，需要双因素、密码与会话时。",
+    "引导式 TOTP 设置，需要扫描、验证与备份码三步时。",
+    "需要展示活跃设备并允许逐个吊销时。"
+  ],
+  "whenNotToUse": [
+    "普通账户与工作区偏好用 settings-page。",
+    "开发者令牌用 api-keys，不要与账户安全混在一起。",
+    "只需要一个密码修改表单时，用 password-field 与密码强度组件单独组合。"
+  ],
+  "variants": [
+    { "key": "state-two-factor-on", "label": "2FA on", "note": "双因素已开启的摘要与 On 徽标" },
+    { "key": "variant-two-factor-rail", "label": "Setup rail", "note": "扫描 / 验证 / 备份码三步轨道" },
+    { "key": "variant-password-strength", "label": "Password strength", "note": "修改密码与实时强度计" },
+    { "key": "variant-active-sessions", "label": "Sessions", "note": "活跃会话列表与逐个吊销" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "password-field", "note": "修改密码的输入框" },
+    { "type": "uses", "target": "password-strength", "note": "密码修改旁的实时强度计" },
+    { "type": "uses", "target": "badge", "note": "双因素开 / 关状态用徽标标出" },
+    { "type": "uses", "target": "button", "note": "扫描完成、备份码、吊销会话都是按钮" },
+    { "type": "alternative", "target": "settings-page", "note": "安全设置与常规设置页职责不同，按内容选择" }
+  ],
+  "contrasts": [
+    {
+      "target": "settings-page",
+      "title": "Security settings 与 Settings page",
+      "rows": [
+        { "dimension": "内容", "self": "双因素、密码与会话等安全项", "other": "账户、通知、外观与账单等偏好" },
+        { "dimension": "流程", "self": "三步轨道与引导式验证", "other": "直接编辑字段并即时保存" },
+        { "dimension": "风险", "self": "高：需要确认与备份码", "other": "低：可以随时改回" },
+        { "dimension": "适用", "self": "安全标签页", "other": "常规设置页" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "双因素轨道与密码强度",
+      "language": "csharp",
+      "code": "var rail = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };\nforeach (var (label, index) in new[] { (\"Scan\", 0), (\"Verify\", 1), (\"Backup codes\", 2) })\n{\n    rail.Children.Add(AppKit.Chip(label, step == index, () => Go(index)));\n}\n\nvar password = new ArcPasswordField { Label = \"Current password\", Value = string.Empty };\nvar strength = new ArcPasswordStrength { Value = password.Value, Placeholder = \"New password\" };\n\nvar columns = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,360\"), ColumnSpacing = 20 };\ncolumns.Children.Add(AppKit.Place(new StackPanel\n{\n    Spacing = 10,\n    Children = { head, rail, twoFactorHost, AppKit.Caption(\"Change password\"), password, strength }\n}, 0));\ncolumns.Children.Add(AppKit.Place(new StackPanel { Spacing = 8, Children = { AppKit.Caption(\"Active sessions\"), sessionHost } }, 1));\n\nreturn AppKit.Screen(new Border { Padding = new Thickness(20), Child = columns }, 600);"
+    }
+  ]
+}

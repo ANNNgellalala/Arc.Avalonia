@@ -1,0 +1,57 @@
+{
+  "slug": "agent-run",
+  "nameZh": "智能体运行",
+  "summary": "一个编码 agent 跑一个任务：步骤随运行推进落下，当前步骤停在人工批准门；卡片给出两个文件的 diff 与 +38 −6，批准后才写入并给出结果。",
+  "purpose": [
+    "它是一次运行的第一视角：标题是任务（Add rate limiting to the public API），下面一行是模型、仓库与计时 01:12，右侧的徽标写 Waiting for you——运行已经停下，等人做决定。",
+    "步骤列表是已经发生的事实：前四步带勾与耗时（读代码 6s、搜中间件 4s、改文件 12s、写测试 9s），最后一步标 waiting，说明它正卡在批准门上。",
+    "批准门给的是可读的改动：卡片标题写 Review changes to 2 files 与 +38 −6，两个文件页签切换 diff，删除行与新增行分别用颜色与符号标出；旁边一句 Nothing is written until you approve 把边界说清。",
+    "决定只有两条路：Approve 后步骤收起成一句 Ran 5 steps、状态变 Done 并展开结果区（改动说明、2 files changed、12 checks passed、Open pull request）；Reject 则会展开一个说明输入框，让 agent 按意见改一次。"
+  ],
+  "whenToUse": [
+    "单个编码任务需要人审查改动后再落盘时。",
+    "要让「步骤已经到哪、当前在等什么」一眼可见时。",
+    "需要在同一张卡里完成审查、批准与后续动作（开 PR）时。"
+  ],
+  "whenNotToUse": [
+    "管理一批后台任务的队列时，用 agent-tasks。",
+    "审批的是工具权限而不是代码改动时，用 agent-approvals。",
+    "要看多个 agent 并行编排与加速比时，用 agent-orchestrator。"
+  ],
+  "variants": [
+    { "key": "variant-header", "label": "Header", "note": "任务标题、模型、仓库、计时与 Waiting for you 徽标" },
+    { "key": "variant-steps", "label": "Steps", "note": "已完成的步骤带勾与耗时，当前步骤标 waiting" },
+    { "key": "variant-approval", "label": "Approval", "note": "批准门：Reject / Approve 与「未批准不写入」说明" },
+    { "key": "variant-diff", "label": "Diff", "note": "两个文件页签与逐行 diff（+38 −6）" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Approve、Reject、Open pull request、Restart 与文件页签都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "Waiting for you / Done 状态徽标由 ArcBadge 表达" },
+    { "type": "uses", "target": "textarea", "note": "打回时展开的说明输入框是 ArcTextarea" },
+    { "type": "alternative", "target": "agent-tasks", "note": "要管理一批后台任务时改用 agent tasks" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-tasks",
+      "title": "Agent run 与 Agent tasks",
+      "rows": [
+        { "dimension": "粒度", "self": "一个任务的完整运行详情", "other": "一批后台任务的队列" },
+        { "dimension": "内容", "self": "步骤、diff、批准门与结果", "other": "标题、分支、进度、检查与耗时" },
+        { "dimension": "动作", "self": "批准或打回改动、查看文件", "other": "启动、取消、发起 PR" },
+        { "dimension": "使用时机", "self": "审查一次具体改动", "other": "派活与回看结果" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "运行页骨架：步骤与批准门",
+      "language": "csharp",
+      "code": "var content = K.Stack(9,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(2,\n                K.Text(\"Add rate limiting to the public API\", \"arc-heading\", 520),\n                K.Row(6, K.Mark(\"anthropic\", 15), K.Caption(\"Claude Sonnet 5.5\"),\n                    K.Dot(ArcTokens.BorderStrong, 3), K.Caption(\"arc-ui/api\"),\n                    K.Dot(ArcTokens.BorderStrong, 3), K.Caption(\"01:12\"))),\n            K.Row(6, state, K.IconBtn(\"refresh-cw\", \"Restart run\"))\n        }\n    },\n    K.Divider(2),\n    K.Caption(\"Steps\"),\n    steps,          // 已完成的步骤与 waiting 步骤\n    folded,         // 批准后收起为一句 Ran 5 steps\n    approvalHost,   // 批准门：diff、说明输入与两个决定\n    resultHost,     // 批准后展开的结果\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 880 }, new Thickness(22, 15, 22, 15));"
+    },
+    {
+      "title": "批准门：文件页签、diff 与决定",
+      "language": "csharp",
+      "code": "var fileTabs = K.Row(6,\n    K.Chip(\"src/api/rate-limit.ts\", selected: !testFile),\n    K.Chip(\"src/api/rate-limit.test.ts\", selected: testFile));\n\nvar diffHost = new StackPanel { Spacing = 1 };\ndiffHost.Children.Add(K.DiffLine(\"ctx\", \"export function take(key: string) {\"));\ndiffHost.Children.Add(K.DiffLine(\"del\", \"  return true;\"));\ndiffHost.Children.Add(K.DiffLine(\"add\", \"  const bucket = buckets.get(key) ?? newBucket();\"));\ndiffHost.Children.Add(K.DiffLine(\"add\", \"  if (bucket.spent >= bucket.limit) return false;\"));\ndiffHost.Children.Add(K.DiffLine(\"ctx\", \"}\"));\n\nvar actions = K.Row(6,\n    K.Btn(\"Reject\", ArcButtonVariant.Ghost, ArcButtonSize.Sm, ShowNote, icon: \"x\"),\n    K.Btn(\"Approve\", ArcButtonVariant.Primary, ArcButtonSize.Sm, Approve, icon: \"check\"));\n\nvar card = K.TintedInset(K.Stack(7,\n    K.Row(7, K.Label(\"Review changes to 2 files\"), K.Caption(\"+38 −6\")),\n    fileTabs,\n    K.Inset(diffHost),\n    K.Caption(\"Nothing is written until you approve.\"),\n    actions), ArcTokens.Warning, 0.06);"
+    }
+  ]
+}

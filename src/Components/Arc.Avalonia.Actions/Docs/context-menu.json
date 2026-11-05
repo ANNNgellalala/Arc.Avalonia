@@ -1,0 +1,72 @@
+{
+  "slug": "context-menu",
+  "nameZh": "上下文菜单",
+  "summary": "把次级动作放在对象旁边：右键或 Shift+F10 在指针处或目标下打开，关闭后焦点回到被操作的对象。",
+  "purpose": [
+    "卡片、文件行、画布对象上的次级动作，不必一直摆在表面上。ArcContextMenu 包裹目标而不是替代它：一次右键或 Shift+F10 就在指针位置展开菜单，目标本身仍是焦点停靠点。",
+    "打开位置会自动夹在目标边界内，避免菜单跑到屏幕外；每行可以用 IsChecked 显示一个勾，IsDestructive 让危险动作读危险色，SeparatorBefore 画一条分组线。",
+    "菜单关闭后焦点回到目标，因此键盘用户不会在右键之后失去位置；页面也可以直接设置 IsOpen 来展示打开态，文档预览因此能静态呈现。"
+  ],
+  "whenToUse": [
+    "列表行、文件卡、画布对象上的操作，用户已经用指针指着它。",
+    "动作数量超过 3 个、不适合一直摆在表面上时。",
+    "需要让同一组动作既能用右键、也能用键盘 Shift+F10 触达。"
+  ],
+  "whenNotToUse": [
+    "动作属于页面或工具栏而不是某个对象时，改用 dropdown-menu。",
+    "动作需要常驻可见时，直接用 button-group。",
+    "入口是账号菜单这种固定位置时，改用 user-menu。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "菜单在指针处或目标下沿展开，目标仍有焦点" },
+    { "key": "state-closed", "label": "Closed", "note": "只显示目标本身，没有面板" },
+    { "key": "variant-checked-item", "label": "Checked item", "note": "行首出现勾，表示对象当前的某个开关状态" },
+    { "key": "variant-destructive-item", "label": "Destructive item", "note": "删除类动作读危险色，放在末尾" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dropdown-menu", "note": "有固定触发按钮时用 dropdown menu，动作跟对象走时用 context menu" },
+    { "type": "alternative", "target": "user-menu", "note": "账号级菜单改用 user menu" },
+    { "type": "complement", "target": "dialog", "note": "删除类动作从菜单触发后，用 dialog 再确认一次后果" }
+  ],
+  "contrasts": [
+    {
+      "target": "dropdown-menu",
+      "title": "Context menu 与 Dropdown menu",
+      "rows": [
+        { "dimension": "入口", "self": "右键、长按或 Shift+F10，位置跟随指针或目标", "other": "显式的触发按钮，位置固定" },
+        { "dimension": "绑定关系", "self": "包裹一个具体对象，动作只作用于它", "other": "属于页面或工具栏，不绑定对象" },
+        { "dimension": "可发现性", "self": "藏在次级手势后，需要用户知道可以右键", "other": "一直可见的按钮，容易被发现" }
+      ]
+    },
+    {
+      "target": "user-menu",
+      "title": "Context menu 与 User menu",
+      "rows": [
+        { "dimension": "作用域", "self": "当前对象：文件、行、画布元素", "other": "当前账号：身份、偏好与退出登录" },
+        { "dimension": "结构", "self": "任意长度的一列动作，可勾选与分组", "other": "固定三段结构，内联主题开关与带 spinner 的退出行" },
+        { "dimension": "触发", "self": "右键、长按或键盘快捷键", "other": "点击顶栏右上角的头像" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "文件行的右键菜单",
+      "language": "csharp",
+      "code": "var menu = new ArcContextMenu\n{\n    Label = \"Actions for Q3 forecast.xlsx\",\n    Content = BuildFileRow(\"Q3 forecast.xlsx\", \"4.2 MB · edited today\"),\n    Items = new List<ArcMenuItem>\n    {\n        new() { Label = \"Open\", Icon = \"external-link\" },\n        new() { Label = \"Copy link\", Icon = \"link\", Shortcut = \"⌘C\" },\n        new() { Label = \"Show in folder\", Icon = \"folder\", IsChecked = true },\n        new() { Label = \"Delete file\", Icon = \"trash-2\", IsDestructive = true, SeparatorBefore = true }\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:actions=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\"\n        xmlns:internal=\"clr-namespace:Arc.Avalonia.Internal;assembly=Arc.Avalonia.Internal\">\n  <actions:ArcContextMenu Label=\"Actions for the selected row\">\n    <actions:ArcContextMenu.Items>\n      <internal:ArcMenuItem Label=\"Open\" Icon=\"external-link\" />\n      <internal:ArcMenuItem Label=\"Copy link\" Icon=\"link\" Shortcut=\"⌘C\" />\n      <internal:ArcMenuItem Label=\"Delete\" Icon=\"trash-2\" IsDestructive=\"True\" SeparatorBefore=\"True\" />\n    </actions:ArcContextMenu.Items>\n    <TextBlock Text=\"Q3 forecast.xlsx\" />\n  </actions:ArcContextMenu>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcContextMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "动作列表；用 IsChecked 显示当前状态，破坏性项放在末尾",
+      "Label": "目标与菜单共用的无障碍名称",
+      "IsOpen": "菜单是否打开，可由页面驱动以展示静态打开态"
+    }
+  }
+}

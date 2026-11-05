@@ -1,0 +1,51 @@
+{
+  "slug": "media-player",
+  "nameZh": "媒体播放器",
+  "summary": "媒体播放器：封面、可拖拽的进度条、传输控制、带静音的音量，以及会跟着播放推进的播放列表；轨道是样本数据，位置由计时器推进。",
+  "purpose": [
+    "当页面需要完整的音频播放体验时用它：左侧封面与曲目信息，中间进度条与传输控制，右侧「Up next」播放列表。",
+    "进度条可以拖拽跳转、空格切换播放、左右方向键前后跳五秒；音量条带静音切换，静音后轨道归零但保留原音量。",
+    "它没有真实音频：位置由计时器推进，曲目是样本条目；播放列表会跟随当前曲目高亮，点击即可切歌。"
+  ],
+  "whenToUse": [
+    "播客、试听集、歌单或音频课程需要一个完整播放器时。",
+    "需要进度、音量、静音与播放列表同屏出现时。",
+    "播放状态由界面自己的计时器模拟、暂不接音频引擎的演示时。"
+  ],
+  "whenNotToUse": [
+    "只需要一个紧凑的正在播放小组件时用 now-playing。",
+    "音频正在被录制时用 voice-recorder。",
+    "需要编辑音频或显示波形时，用专门的音频编辑器而不是播放器区块。"
+  ],
+  "variants": [
+    { "key": "state-playing", "label": "Playing", "note": "播放状态：按钮显示暂停，进度持续推进" },
+    { "key": "variant-seek-bar", "label": "Seek bar", "note": "可拖拽的进度条与时间读数" },
+    { "key": "variant-volume", "label": "Volume", "note": "音量条与静音切换" },
+    { "key": "variant-playlist", "label": "Playlist", "note": "Up next 列表，当前曲目高亮" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "播放、上一首、下一首、静音与播放列表行" },
+    { "type": "uses", "target": "badge", "note": "时长、音质或状态用徽标标出" },
+    { "type": "uses", "target": "slider", "note": "进度与音量以可拖拽滑杆呈现（移植版为自绘轨道）" },
+    { "type": "alternative", "target": "now-playing", "note": "完整播放器与紧凑的正在播放小组件是两种规模" }
+  ],
+  "contrasts": [
+    {
+      "target": "now-playing",
+      "title": "Media player 与 Now playing",
+      "rows": [
+        { "dimension": "规模", "self": "封面、进度、音量与列表的完整播放器", "other": "只保留封面、标题与播放控制的紧凑条" },
+        { "dimension": "播放列表", "self": "右侧 Up next 列表可切歌", "other": "通常不显示队列" },
+        { "dimension": "调节", "self": "可拖拽进度与音量", "other": "多为上一首 / 播放 / 下一首" },
+        { "dimension": "适用", "self": "音频页、播客详情页", "other": "全局底部播放条或卡片内嵌" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "播放器结构",
+      "language": "csharp",
+      "code": "var player = new Grid\n{\n    ColumnDefinitions = new ColumnDefinitions(\"*,340\"),\n    Children =\n    {\n        new StackPanel\n        {\n            Spacing = 12,\n            Children =\n            {\n                cover,\n                AppKit.Row(10, new TextBlock { Text = track.Title, Classes = { \"arc-subtitle\" } }),\n                AppKit.Person(track.Artist, ArcAvatarSize.Xs),\n                seekHost,\n                transport\n            }\n        },\n        AppKit.Place(AppKit.Card(playlistHost, 14, 18), 1)\n    }\n};\n\nseekHost.Content = AppKit.Bar(step);\ntransport.Children.Add(AppKit.Link(playing ? \"Pause\" : \"Play\"));\ntransport.Children.Add(AppKit.Link(\"Next\"));\n\nreturn AppKit.Screen(new Border { Padding = new Thickness(18, 16, 18, 14), Child = player }, 500);"
+    }
+  ]
+}

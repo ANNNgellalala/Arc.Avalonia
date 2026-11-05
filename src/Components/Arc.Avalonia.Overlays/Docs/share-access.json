@@ -1,0 +1,79 @@
+{
+  "slug": "share-access",
+  "nameZh": "分享与访问",
+  "summary": "文档、看板或项目的分享面板：输入邮箱生成 chip、从建议里选人、用角色菜单改权限、移除时带撤销、切换链接访问并就地把链接复制走。",
+  "purpose": [
+    "当你要把一份内容分享给别人时，share access 把邀请、权限与链接访问收进一个面板，每一处改动都在原地完成，不移动其余内容。",
+    "输入地址生成 chip，合法地址立即变成可邀请的人，不合法地址保留危险色并给出错误行；Enter 或逗号提交，空字段里的退格先选中、再删除最后一个 chip。",
+    "每个人一行，角色菜单在行内展开并把标签弹性过渡到新宽度；移除后行会折叠，底部的撤销条停留五秒；链接访问在 Restricted 与 Anyone 之间切换，复制按钮就地确认。"
+  ],
+  "whenToUse": [
+    "需要按人管理一份文档、看板或项目的访问权限时。",
+    "需要同时设置“谁可以访问”和“持链接的人能做什么”时。",
+    "希望全部改动落在一个面板里、不再打开第二个对话框时。"
+  ],
+  "whenNotToUse": [
+    "只是从一份固定名单里选几个人时，改用 multi-select，更轻也更可控。",
+    "只需要展示一份只读的人员列表、不涉及权限编辑时，用普通的列表而不是分享面板。",
+    "分享流程需要分步骤引导时，改用 dialog 或 bottom-sheet 承载，面板本身作为其中一步。"
+  ],
+  "variants": [
+    { "key": "layout-invite", "label": "邀请输入", "note": "邮箱 chip 与占位提示" },
+    { "key": "state-invalid", "label": "无效地址", "note": "危险色 chip 与错误行" },
+    { "key": "state-pending", "label": "待接受", "note": "受邀人显示 Pending 徽章" },
+    { "key": "state-role-menu", "label": "角色菜单", "note": "行内展开的权限菜单" },
+    { "key": "layout-access", "label": "链接访问", "note": "Anyone 与链接角色的设置行" },
+    { "key": "layout-done", "label": "完成按钮", "note": "标题栏右侧的 Done" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "面板里的动作、角色触发器与菜单项都复用 button" },
+    { "type": "uses", "target": "input", "note": "邀请地址的输入与校验沿用 input 的文本字段行为" },
+    { "type": "complement", "target": "dialog", "note": "分享面板常作为 dialog 或 popover 的内容出现" },
+    { "type": "alternative", "target": "multi-select", "note": "从固定名单里选人时用 multi-select，邀请任意邮箱才需要这个面板" }
+  ],
+  "contrasts": [
+    {
+      "target": "multi-select",
+      "title": "Share access 与 Multi-select",
+      "rows": [
+        { "dimension": "选人方式", "self": "输入任意邮箱并校验，也可从建议里选", "other": "只能从给定选项里勾选" },
+        { "dimension": "权限模型", "self": "每人一个角色，另有链接级访问", "other": "只决定选中哪些项，没有角色" },
+        { "dimension": "变更反馈", "self": "角色菜单、撤销条与复制确认都在面板内", "other": "勾选即生效，没有额外反馈" },
+        { "dimension": "适用场景", "self": "跨组织的分享与邀请", "other": "表单里从有限选项集合中选值" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "用代码搭一个分享面板",
+      "language": "csharp",
+      "code": "var share = new ArcShareAccess\n{\n    Title = \"Q3 launch plan\",\n    ShowDone = true,\n    SelfEmail = \"maya@acme.com\",\n    LinkAccess = ArcShareLinkAccess.Anyone,\n    LinkRole = \"viewer\",\n    LinkUrl = \"https://acme.com/d/q3-launch-plan\",\n    People = new List<ArcSharePerson>\n    {\n        new() { DisplayName = \"Maya Chen\", Email = \"maya@acme.com\", Role = \"owner\" },\n        new() { DisplayName = \"Sam Rivera\", Email = \"sam@acme.com\", Role = \"commenter\", IsPending = true }\n    },\n    Suggestions = new List<ArcShareSuggestion>\n    {\n        new(\"Dana Whitfield\", \"dana@acme.com\", \"DW\"),\n        new(\"Marcus Bell\", \"marcus@acme.com\", \"MB\")\n    }\n};\n\nshare.Invite += (_, invite) => Console.WriteLine($\"Invited {invite.People.Count} people\");"
+    },
+    {
+      "title": "从代码添加 chip 并打开角色菜单",
+      "language": "csharp",
+      "code": "share.AddChip(\"dana@acme.com\");\nshare.AddChip(\"mayaatacme\");   // 不合法：保留危险色 chip 并显示错误行\nshare.OpenRoleMenu(\"nathan@acme.com\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Overlays.Controls.ArcShareAccess",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "面板标题，标题栏显示为 Share “标题”",
+      "People": "有权访问的人；控件会就地修改这个列表并通过 PeopleChanged 报告",
+      "Roles": "角色菜单的选项，默认 owner / editor / commenter / viewer",
+      "Suggestions": "输入时用来补全的目录人员",
+      "LinkAccess": "链接访问：Restricted 或 Anyone",
+      "LinkRole": "持链接的人获得的角色",
+      "LinkUrl": "复制按钮写入剪贴板的链接",
+      "SelfEmail": "当前用户的邮箱，标记为 (you) 且不可移除",
+      "InviteRole": "新邀请默认使用的角色",
+      "ShowDone": "在标题栏显示 Done 按钮",
+      "Label": "面板的可访问名称",
+      "Invite": "按下 Invite 时触发，携带合法 chip 与所选角色",
+      "Remove": "移除某人并完成折叠动画后触发",
+      "PeopleChanged": "邀请、改角色、移除或撤销后触发",
+      "LinkCopied": "链接写入剪贴板后触发"
+    }
+  }
+}

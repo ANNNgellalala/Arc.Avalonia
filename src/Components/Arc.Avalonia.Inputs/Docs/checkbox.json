@@ -1,0 +1,76 @@
+{
+  "slug": "checkbox",
+  "nameZh": "复选框",
+  "summary": "二元或三态的勾选控件：方框内一条精确的勾或横线，整行标签都是点击区，空格键切换。",
+  "purpose": [
+    "用于「可以分别成立」的多项选择，以及需要等提交才生效的确认项：勾选本身不立刻提交，值随表单一起送出。",
+    "三态用同一个控件承载：Checked 为 true 画勾、false 留空、null 画一条横线表示「部分选中」，因此父项可以带出「子项里选了一些」的状态。",
+    "命中区是整行而不只是 20 px 的方框：标签与说明文字都在点击范围内，鼠标和空格键走同一条切换路径。",
+    "它与 switch 的分工在于生效时机：checkbox 等提交，switch 立即生效；两者共用 44 px 的最小行高，所以在设置列表里可以混排。"
+  ],
+  "whenToUse": [
+    "表单里可以同时成立的多个选项：通知渠道、标签、权限。",
+    "需要等用户点提交才生效的确认项（同意条款、记住此设备）。",
+    "父项带子项时，用 null 表示部分选中，让父项一眼看出层级状态。"
+  ],
+  "whenNotToUse": [
+    "翻转就立即生效的设置项，改用 switch，它会给出更强的开关信号。",
+    "一组选项互斥、只能选一个时，改用 radio-group。",
+    "选项需要价格或说明的卡片时，改用 radio-cards。"
+  ],
+  "variants": [
+    { "key": "state-unchecked", "label": "Unchecked", "note": "空方框与灰边框" },
+    { "key": "state-checked", "label": "Checked", "note": "强调色方框加勾" },
+    { "key": "state-indeterminate", "label": "Indeterminate", "note": "Checked 为 null，方框内画横线" },
+    { "key": "variant-label", "label": "Label only", "note": "只有一行标签" },
+    { "key": "variant-description", "label": "With description", "note": "标签下加一行说明" },
+    { "key": "state-disabled", "label": "Disabled", "note": "保留勾选状态，整行降低不透明度" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "switch", "note": "翻转立即生效的设置项改用 switch" },
+    { "type": "alternative", "target": "radio-group", "note": "互斥单选改用 radio group" },
+    { "type": "complement", "target": "input", "note": "表单里的勾选项与文本字段一起提交，共用一个提交动作" }
+  ],
+  "contrasts": [
+    {
+      "target": "switch",
+      "title": "Checkbox 与 Switch",
+      "rows": [
+        { "dimension": "生效时机", "self": "等表单提交才生效", "other": "翻转立即生效" },
+        { "dimension": "外观", "self": "方框加勾选标记，可显示三态", "other": "轨道加滑动拇指，只有两态" },
+        { "dimension": "典型场景", "self": "同意条款、多选筛选", "other": "通知、隐私等设置列表" }
+      ]
+    },
+    {
+      "target": "radio-group",
+      "title": "Checkbox 与 Radio group",
+      "rows": [
+        { "dimension": "选择数量", "self": "可同时勾选多项", "other": "同一时间只有一项成立" },
+        { "dimension": "三态", "self": "支持 null 的中间态", "other": "没有中间态" },
+        { "dimension": "布局", "self": "可自由排布，常竖排或横排", "other": "固定为一组行式选项" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcCheckbox Label=\"邮件通知\"\n                   Description=\"每天 9:00 发送摘要。\"\n                   Checked=\"{Binding EmailNotifications, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "三态与禁用项",
+      "language": "csharp",
+      "code": "var selectAll = new ArcCheckbox\n{\n    Label = \"选择全部项目\",\n    Description = \"部分项目已勾选。\",\n    Checked = null\n};\n\nvar locked = new ArcCheckbox\n{\n    Label = \"安全提醒\",\n    Description = \"管理员固定开启。\",\n    Checked = true,\n    IsEnabled = false\n};\n\nselectAll.CheckedChanged += (_, _) => SelectAll(selectAll.Checked == true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcCheckbox",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Checked": "true 勾选 / false 未选 / null 中间态（画横线），默认 false",
+      "Label": "方框右侧的可见标签，同时作为读屏名称",
+      "Description": "标签下方的说明文字",
+      "CheckedChanged": "点击整行或按 Space 切换后触发；编程赋值不会触发"
+    }
+  }
+}

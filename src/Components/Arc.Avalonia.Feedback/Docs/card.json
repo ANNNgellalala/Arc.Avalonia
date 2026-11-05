@@ -1,0 +1,63 @@
+{
+  "slug": "card",
+  "nameZh": "卡片",
+  "summary": "最基础的表面容器：一像素边框、面板圆角与 24 px 内边距，可弱化为静默表面，也可做紧凑内边距。",
+  "purpose": [
+    "把一组相关内容装进一个边界清晰的表面：默认是 ArcSurface 背景加一像素边框，内边距 24 px，适合承载标题、正文与操作。",
+    "Muted 把背景换成静默表面、边框变浅，用于页面里已经有一层主卡片的次级分组；Interactive 只负责鼠标手型与悬停边框，不改变语义。",
+    "它是很多组件的底座：metric-card 继承它，empty-state 常常放进它，弹层与面板也复用同一套圆角与阴影语言。"
+  ],
+  "whenToUse": [
+    "需要把相关内容与周围页面分开、但不值得用整个区块时。",
+    "卡片网格、设置分组、指标条等重复出现的内容单元。",
+    "作为 empty-state、metric-card 等更具体组件的容器。"
+  ],
+  "whenNotToUse": [
+    "内容只是页面的一段正文、不需要边界时，直接用排版与分隔线更轻。",
+    "需要强调层级或浮在页面之上时，改用 dialog、popover 或 bottom-sheet。",
+    "承载单个数字并要表达趋势时，直接用 metric-card，它已经继承卡片并补好了数字排版。"
+  ],
+  "variants": [
+    { "key": "variant-default", "label": "Default", "note": "ArcSurface 背景加一像素边框，内边距 24 px" },
+    { "key": "variant-muted", "label": "Muted", "note": "静默背景与更浅的边框，用于次级分组" },
+    { "key": "variant-compact", "label": "Compact", "note": "内边距缩到 16 px 的紧凑卡片" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "metric-card", "note": "指标卡是卡片的一种具体形态" },
+    { "type": "complement", "target": "empty-state", "note": "空状态通常装进卡片" },
+    { "type": "complement", "target": "badge", "note": "卡片标题旁常用徽标标状态" }
+  ],
+  "contrasts": [
+    {
+      "target": "metric-card",
+      "title": "Card 与 Metric card",
+      "rows": [
+        { "dimension": "用途", "self": "通用内容容器", "other": "承载一个关键数字与它的变化" },
+        { "dimension": "内部排版", "self": "由内容自己决定", "other": "标签、数值、变化徽标与上下文固定排好" },
+        { "dimension": "数据能力", "self": "无", "other": "Trend 与 Sparkline 两个属性" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础卡片",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <c:ArcCard Width=\"320\">\n    <StackPanel Spacing=\"6\">\n      <TextBlock Text=\"Invite your team\" Classes=\"arc-label\" />\n      <TextBlock Text=\"Bring the people who will review and ship with you.\"\n                 Classes=\"arc-body-sm arc-secondary\"\n                 TextWrapping=\"Wrap\" />\n    </StackPanel>\n  </c:ArcCard>\n</Window>"
+    },
+    {
+      "title": "弱化与紧凑",
+      "language": "csharp",
+      "code": "var muted = new ArcCard\n{\n    Muted = true,\n    Content = new TextBlock { Text = \"Secondary group\" }\n};\n\nvar compact = new ArcCard\n{\n    Padding = new Thickness(16),\n    Content = new TextBlock { Text = \"Dense row\" }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Controls.ArcCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Interactive": "鼠标变成手型并在悬停时加深边框，用于可点击的卡片",
+      "Muted": "使用静默背景与更浅的边框，表示这是次级分组",
+      "Content": "卡片内容，通常是一个 StackPanel 或更具体的组件",
+      "Padding": "内边距，默认 24 px；紧凑布局可设为 16 px"
+    }
+  }
+}

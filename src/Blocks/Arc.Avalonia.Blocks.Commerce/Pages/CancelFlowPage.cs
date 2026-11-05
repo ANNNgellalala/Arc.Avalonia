@@ -23,6 +23,11 @@ public sealed class CancelFlowPage : ArcItemPage
 {
     public override string ItemSlug => "cancel-flow";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-reason-step", "variant-step-indicator", "variant-reasons"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,52 @@
+{
+  "slug": "usage-pricing",
+  "nameZh": "用量定价",
+  "summary": "按席位与用量计价的定价计算器：拖动席位与流量滑块，推荐计划、价格与明细实时更新，并可切换月付与年付。",
+  "purpose": [
+    "当产品按席位加流量计费时，静态价目表说不清价格，定价计算器让访客先拖动两个滑块，再看到推荐计划与按用量算出的月费。",
+    "推荐结果不是硬编码：席位与流量落在不同区间时自动切换 Starter、Growth 或 Scale，并给出一句为什么推荐。",
+    "明细逐行列出席位与流量的计费方式，年付时叠加 20% 折扣并显示划线原价，试用按钮不进入支付。"
+  ],
+  "whenToUse": [
+    "计划按席位加用量计费、价格随使用变化时。",
+    "希望在定价页直接给出推荐计划而不是让访客自己判断时。",
+    "需要同时展示月付与年付的折算方式时。"
+  ],
+  "whenNotToUse": [
+    "固定档位的简单价目表时，用 plan-comparison。",
+    "已经登录、要看自己的账单与发票时，用 usage-billing 或 billing-overview。",
+    "只需要把计划横向对比、不涉及用量计算时，用 comparison-table。"
+  ],
+  "variants": [
+    { "key": "layout-calculator", "label": "计算器布局", "note": "左滑块与推荐卡，右侧 Break 明细" },
+    { "key": "variant-plan-card", "label": "推荐计划", "note": "Recommended 徽章、动态价格与特性清单" },
+    { "key": "variant-breakdown", "label": "Breakdown", "note": "计划基价、席位、流量与年付折扣逐行列出" },
+    { "key": "variant-billing-period", "label": "计费周期", "note": "Monthly / Yearly 分段控件，年付显示划线价" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "slider", "note": "席位与流量用滑块调整，价格随之重算" },
+    { "type": "uses", "target": "billing-toggle", "note": "月付与年付用计费周期开关切换" },
+    { "type": "uses", "target": "badge", "note": "Recommended 用强调色徽章标出" },
+    { "type": "uses", "target": "button", "note": "开始试用与查看明细都是按钮" },
+    { "type": "alternative", "target": "plan-comparison", "note": "固定档位、只做横向对比时，改用 plan-comparison" }
+  ],
+  "contrasts": [
+    {
+      "target": "plan-comparison",
+      "title": "Usage pricing 与 Plan comparison",
+      "rows": [
+        { "dimension": "计价模型", "self": "席位加流量，随用量变化", "other": "固定档位，价格不变" },
+        { "dimension": "交互", "self": "滑块实时重算并推荐计划", "other": "静态表格横向对照" },
+        { "dimension": "适合规模", "self": "用量差异大的基础设施类产品", "other": "三到四个清晰档位的 SaaS" },
+        { "dimension": "结果表达", "self": "一个推荐计划加按量明细", "other": "全部档位的功能矩阵" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "计算器骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,28,420\">\n  <StackPanel Spacing=\"18\">\n    <TextBlock Text=\"Find your plan\" Classes=\"arc-subtitle\" />\n    <TextBlock Text=\"Seats\" Classes=\"arc-label\" />\n    <arc:ArcSlider Minimum=\"1\" Maximum=\"50\" />\n    <TextBlock Text=\"Traffic, GB\" Classes=\"arc-label\" />\n    <arc:ArcSlider Minimum=\"0\" Maximum=\"5000\" />\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"10\">\n    <arc:ArcBadge Content=\"Recommended\" Tone=\"Accent\" />\n    <arc:ArcBillingPrice Currency=\"$\" Period=\"/month\" />\n    <arc:ArcBillingToggle />\n    <TextBlock Text=\"Breakdown\" Classes=\"arc-label\" />\n    <!-- 计划基价 / 席位 / 流量 / 年付折扣 -->\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

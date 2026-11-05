@@ -16,6 +16,11 @@ public sealed class DotGridPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-lens", "variant-field", "variant-falloff"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A landing page hero that should feel alive without shipping a video.",

@@ -23,6 +23,13 @@ public sealed class KnowledgeBasePage : ArcItemPage
 {
     public override string ItemSlug => "knowledge-base";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-sources",
+        "variant-search",
+        "variant-results"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -11,6 +11,12 @@ public sealed class ReasoningTreePage : ArcItemPage
 {
     public override string ItemSlug => "reasoning-tree";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-solved",
+        "variant-question", "variant-candidates", "variant-pruned", "variant-path", "variant-beam-pills"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Explainers that teach tree of thoughts, beam search or test time search.",

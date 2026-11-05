@@ -12,6 +12,11 @@ public sealed class PhotoGridPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-grid", "variant-zoom-pill", "variant-favorite", "variant-caption", "variant-hint"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A browsable photo library or album where people zoom between column counts.",

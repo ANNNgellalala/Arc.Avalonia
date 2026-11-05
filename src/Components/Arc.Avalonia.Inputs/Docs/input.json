@@ -1,0 +1,95 @@
+{
+  "slug": "input",
+  "nameZh": "输入框",
+  "summary": "单行文本字段：带可见标签、帮助与错误文案，支持前置/后置图标、清除按钮与三档尺寸。",
+  "purpose": [
+    "把任意单行文本值收进一个与表单栅格对齐的字段里。控件内部仍是原生 TextBox，焦点、选区、输入法组合与粘贴行为保持系统原生，你只需要关心外层的标签、图标、清除按钮与状态色。",
+    "字段外壳提供标签、帮助文案与错误文案三条信息带：错误文案出现时替换同一行的帮助文案而不是另起一行；尺寸只改外壳高度、内边距与字号，宽度仍由调用方的布局决定。",
+    "它是文本家族的基础形态——textarea、password-field、search-field、number-field 都复用同一套字段外壳、尺寸与状态类，所以换用同族控件时对齐与间距不需要重新调。"
+  ],
+  "whenToUse": [
+    "姓名、公司名、邮箱、URL、邀请地址等单行文本值。",
+    "需要可见标签与就地改写的帮助/错误文案，而不是提交后弹窗报错的表单。",
+    "需要用前置图标提示字段含义（邮箱、工作区、货币），或用后置图标补充单位与状态的输入。"
+  ],
+  "whenNotToUse": [
+    "需要多行输入备注、描述或发布说明时，改用 textarea，它才有 Rows、AutoGrow 与字数计数。",
+    "密码、验证码等敏感文本改用 password-field，避免明文输入并拿到 reveal 控件。",
+    "值只能是固定短列表中的一项时改用 select；长列表且需要输入过滤时改用 combobox。",
+    "数值有上下界、希望用户用步进按钮微调时，改用 number-field。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑表单与工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型单一字段" },
+    { "key": "state-default", "label": "Default", "note": "空值、placeholder 与帮助文案" },
+    { "key": "state-filled", "label": "Filled", "note": "有值时右侧出现清除按钮" },
+    { "key": "state-error", "label": "Error", "note": "危险色边框，错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "值只读并降低不透明度" },
+    { "key": "variant-leading-icon", "label": "Leading icon", "note": "左侧 Lucide 图标提示字段含义" },
+    { "key": "variant-trailing-icon", "label": "Trailing icon", "note": "右侧图标补充单位或状态" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "textarea", "note": "需要多行输入时改用 textarea" },
+    { "type": "alternative", "target": "password-field", "note": "敏感文本改用 password field" },
+    { "type": "alternative", "target": "search-field", "note": "检索入口改用 search field" },
+    { "type": "alternative", "target": "number-field", "note": "带上下界的数字改用 number field" },
+    { "type": "alternative", "target": "inline-edit", "note": "展示态文字就地改名改用 inline edit" },
+    { "type": "complement", "target": "button", "note": "字段通常与提交按钮成组出现，按钮负责行动、字段负责值" }
+  ],
+  "contrasts": [
+    {
+      "target": "textarea",
+      "title": "Input 与 Textarea",
+      "rows": [
+        { "dimension": "行数", "self": "单行，高度由 Sm/Md/Lg 三档固定", "other": "多行，按 Rows 或 AutoGrow 增长" },
+        { "dimension": "换行与计数", "self": "回车不换行，没有字数计数", "other": "保留换行，可配 ShowCounter 与 MaxLength" },
+        { "dimension": "典型值", "self": "邮箱、姓名、URL、邀请地址", "other": "备注、描述、发布说明" }
+      ]
+    },
+    {
+      "target": "number-field",
+      "title": "Input 与 Number field",
+      "rows": [
+        { "dimension": "值类型", "self": "任意文本，Value 是 string", "other": "有界数值，Value 是数值" },
+        { "dimension": "调整方式", "self": "逐字键入", "other": "键入之外还有步进按钮与方向键" },
+        { "dimension": "边界校验", "self": "由 Error 文案自行判断", "other": "Min/Max/Step 内建约束" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcInput Label=\"邮箱\"\n                Placeholder=\"you@acme.com\"\n                Description=\"只用于接收收据。\"\n                Value=\"{Binding Email, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "错误态与图标",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcInput Label=\"邀请邮箱\"\n                Value=\"{Binding InviteEmail, Mode=TwoWay}\"\n                LeadingIcon=\"mail\"\n                Error=\"请输入有效的邮箱地址。\" />\n</Window>"
+    },
+    {
+      "title": "监听输入变化",
+      "language": "csharp",
+      "code": "var input = new ArcInput\n{\n    Label = \"工作区\",\n    Placeholder = \"Northwind\",\n    LeadingIcon = \"briefcase\"\n};\n\ninput.ValueChanged += (_, _) => Validate(input.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前文本，双向绑定到内部 TextBox",
+      "Placeholder": "空值时显示的占位文案",
+      "Label": "可见标签，同时作为内部输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时字段进入错误态、边框取危险色",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm 36 / Md 44 / Lg 50，默认 Md",
+      "LeadingIcon": "前置 Lucide 图标名，例如 \"mail\"",
+      "TrailingIcon": "后置 Lucide 图标名，例如 \"users\"",
+      "ShowClearButton": "有文本时是否显示清除按钮，默认 true",
+      "IsInputFocused": "只读，内部 TextBox 是否持有焦点",
+      "ValueChanged": "用户每次编辑或清除后触发，此时 Value 已更新"
+    }
+  }
+}

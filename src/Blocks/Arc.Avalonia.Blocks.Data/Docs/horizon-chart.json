@@ -1,0 +1,56 @@
+{
+  "slug": "horizon-chart",
+  "nameZh": "地平线图",
+  "summary": "十四条市场日序列各自相对秋季均值的偏差，折进几条紧凑色带：越深表示离基准越远，一次切换就能把每行折叠或展开。",
+  "purpose": [
+    "当行数多、屏幕高度又有限时，用 horizon chart：每条序列以自身基准为零线，把正负偏差折成数层色带，十四行也能在一屏里对齐比较。",
+    "排序（名称 / 峰值 / 最新）决定行的顺序；色带层数切换会同时折叠所有行，层数越多越精细。图例解释正负方向与颜色深浅，十字线在悬停或聚焦时读出同一天所有市场。",
+    "它和 small-multiples 都在解决「很多条序列」的问题：小倍数用面板给每条完整的形状，地平线图用折叠换取密度。"
+  ],
+  "whenToUse": [
+    "行数超过十行、垂直空间非常紧张时。",
+    "要比较各序列相对自身基准的偏差、而不是绝对值时。",
+    "需要一次切换所有行的折叠层数时。"
+  ],
+  "whenNotToUse": [
+    "需要看每条序列的绝对水平时，用 line-chart 或小倍数。",
+    "需要逐格精确读数时，用数据表格。",
+    "只有两三条序列时，用 line-chart。"
+  ],
+  "variants": [
+    { "key": "layout-horizon", "label": "整体布局", "note": "十四行色带、排序与图例并置" },
+    { "key": "variant-folded-rows", "label": "Rows", "note": "每行以自身基准折叠的正负色带" },
+    { "key": "variant-bands", "label": "Bands", "note": "三层的色带折叠，切换后所有行同步变化" },
+    { "key": "variant-sort", "label": "Sort", "note": "按峰值排序的行顺序" },
+    { "key": "variant-legend", "label": "Legend", "note": "正负方向与深浅含义的图例" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "排序与色带层数用分段控件切换" },
+    { "type": "uses", "target": "sparkline", "note": "每行是一条压缩的迷你走势" },
+    { "type": "uses", "target": "card", "note": "整张图装在卡片里" },
+    { "type": "alternative", "target": "small-multiples", "note": "需要每格完整形状时，改用小倍数图" }
+  ],
+  "contrasts": [
+    {
+      "target": "small-multiples",
+      "title": "Horizon chart 与小倍数图",
+      "rows": [
+        { "dimension": "密度", "self": "十四行折进一屏，非常紧凑", "other": "十二个面板，每题一张完整小图" },
+        { "dimension": "编码", "self": "相对自身基准的偏差与色带深浅", "other": "绝对值的折线形状" },
+        { "dimension": "读数", "self": "悬停十字线读同一天所有市场", "other": "同步十字线读每个面板" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <arc:ArcSegmentedControl SelectedValue=\"peak\" />\n  <charts:ArcHorizonChart Height=\"360\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：行与层数",
+      "language": "csharp",
+      "code": "var chart = new ArcHorizonChart(series, labels);\n\nchart.Sort = \"peak\"; // name / peak / latest\nchart.Bands = 3;      // 色带层数，切换后所有行同步折叠"
+    }
+  ]
+}

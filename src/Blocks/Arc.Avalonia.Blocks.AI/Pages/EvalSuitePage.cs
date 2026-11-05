@@ -23,6 +23,14 @@ public sealed class EvalSuitePage : ArcItemPage
 {
     public override string ItemSlug => "eval-suite";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-summary",
+        "variant-category-grid",
+        "variant-regressions",
+        "variant-filters"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

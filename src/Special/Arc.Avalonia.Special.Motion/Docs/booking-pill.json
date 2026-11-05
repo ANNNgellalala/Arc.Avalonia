@@ -1,0 +1,72 @@
+{
+  "slug": "booking-pill",
+  "nameZh": "订座药丸",
+  "summary": "一枚会随步骤变形的订座药丸：人数、日期、时间、确认票据依次在其中展开，最后变成订座成功的确认卡。",
+  "purpose": [
+    "当订座、预约或选时段是页面唯一的主行动时，用 booking pill：全部流程收在一枚贴底的药丸里，每一步只显示当下需要的控件，药丸自己按新尺寸弹簧变形。",
+    "步骤是有顺序的：人数 → 日期 → 时间 → 确认票据；内容比形状晚一拍、按行进方向滑入，退回时反向。日期是一条可拖拽的横条，时间是按可用性禁用的格子（示例规则：六人以上 20:00 后不可订）。",
+    "票据步骤把日期、时间与人数汇总成三行，加一句免费取消说明与确认按钮；确认后药丸变成订座成功的确认卡，并给出已发送取件的提示。"
+  ],
+  "whenToUse": [
+    "餐厅、场馆或服务页的订座 / 预约，且是页面唯一的主行动。",
+    "移动优先、希望用一枚贴底药丸引导用户走完人数、日期与时间时。",
+    "步骤样式需要在同一条表面内连续变化，而不是一页一表单时。"
+  ],
+  "whenNotToUse": [
+    "普通表单里的日期或时间字段，用 date-picker 与 time-picker。",
+    "流程更长、字段更多的预订，用 stepper 或分步表单。",
+    "需要同时展示多天多个时段的完整日历，用 calendar。"
+  ],
+  "variants": [
+    { "key": "state-party", "label": "Party", "note": "人数步骤：加减圆钮、大号人数与 Continue" },
+    { "key": "state-date", "label": "Date", "note": "日期步骤：可拖拽的日期横条与 Continue" },
+    { "key": "state-time", "label": "Time", "note": "时间步骤：12 个时段格子，不可用时段变灰" },
+    { "key": "state-review", "label": "Review", "note": "票据步骤：日期 / 时间 / 人数三行与 Confirm booking" },
+    { "key": "state-booked", "label": "Booked", "note": "订座成功：成功勾、Table booked 与 Done" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "date-picker", "note": "常规表单里的日期字段用 date picker" },
+    { "type": "alternative", "target": "time-picker", "note": "只选时间、不带上下文时用 time picker" },
+    { "type": "alternative", "target": "dialog", "note": "流程更长、需要模态专注时放进对话框" },
+    { "type": "complement", "target": "stepper", "note": "步骤较多的预订可以用 Stepper 作为进度骨架" }
+  ],
+  "contrasts": [
+    {
+      "target": "date-picker",
+      "title": "Booking pill 与 Date picker",
+      "rows": [
+        { "dimension": "形态", "self": "一枚药丸依次变形经过所有步骤", "other": "独立字段与弹出的日历" },
+        { "dimension": "步进", "self": "引导式：确认当前步再前进", "other": "并行填写，随时修改" },
+        { "dimension": "场景", "self": "订座 / 预约等单一主行动", "other": "表单中的通用日期字段" }
+      ]
+    },
+    {
+      "target": "time-picker",
+      "title": "Booking pill 与 Time picker",
+      "rows": [
+        { "dimension": "上下文", "self": "时间受人数与日期约束，不可用时段被禁用", "other": "只关心时间本身" },
+        { "dimension": "确认", "self": "选完继续到票据步骤再统一确认", "other": "选定即写入字段" },
+        { "dimension": "布局", "self": "时段格子带日期与人数说明", "other": "独立的时钟或时间列表" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcBookingPill xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                   Step=\"Review\"\n                   HorizontalAlignment=\"Center\"\n                   VerticalAlignment=\"Bottom\" />"
+    },
+    {
+      "title": "代码切换步骤",
+      "language": "csharp",
+      "code": "var pill = new ArcBookingPill { Step = ArcBookingStep.Party };\n\n// 每一步完成后由页面推进；Escape 或返回键回退。\npill.Step = ArcBookingStep.Date;\npill.Step = ArcBookingStep.Time;\npill.Step = ArcBookingStep.Review;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcBookingPill",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Step": "当前步骤：Start / Party / Date / Time / Review / Booked，设置后药丸按新尺寸变形"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "slug": "wallet-stack",
+  "nameZh": "钱包卡片堆",
+  "summary": "几张支付卡、通行证或会员卡的卡片堆：悬停时向上扇开，选中一张后把它从卡片堆里抬起，展示余额与最近交易；方向键切换卡片，Enter 打开或收回。",
+  "purpose": [
+    "当几张卡需要被管理与切换时用它：支付卡、通行证、会员卡。收起时是扇形卡堆，打开一张后展示它的余额与最近交易，其余卡片收进口袋。",
+    "每张卡的变换都是「堆叠位置 + 打开量 + 扇开量」的同一个函数，所以悬停、拖拽与选中都沿同一形状移动；前卡还会随指针倾斜并带一层高光。",
+    "键盘与指针同一套模型：关闭时上下左右在卡片间循环、Home/End 跳到首尾；Enter/空格抬起或收回，Esc 收回，抬起的卡可以向下拖回。"
+  ],
+  "whenToUse": [
+    "几张支付卡、通行证或会员卡，需要查看余额与最近交易时。",
+    "金融或钱包界面，需要接近实物的卡面材质与扇开手感时。",
+    "卡片数量在三到五张、可以在一个堆里切换时。"
+  ],
+  "whenNotToUse": [
+    "只有一张会员卡时用 holo-card，不需要堆叠与切换。",
+    "卡片之间需要横向浏览图片时用 card-stack 或 carousel，钱包卡片堆以支付语义为主。",
+    "需要对比多张卡的字段时用表格或列表，卡片堆不适合精确比较。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "前卡抬起，显示余额与最近交易" },
+    { "key": "variant-balance", "label": "Balance", "note": "余额标题与金额，例如 Available $2,480.50" },
+    { "key": "variant-transactions", "label": "Transactions", "note": "收入与支出两种交易行，金额带正负号" },
+    { "key": "variant-avatar", "label": "Avatar row", "note": "交易对手是人时用头像代替图标" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "wallet-card", "note": "单张银行卡展示用 wallet card 区块，多张管理用钱包卡片堆" },
+    { "type": "alternative", "target": "card-stack", "note": "浏览图片卡片用 card stack，管理支付卡用钱包卡片堆" }
+  ],
+  "contrasts": [
+    {
+      "target": "wallet-card",
+      "title": "Wallet stack 与 Wallet card",
+      "rows": [
+        { "dimension": "卡片数量", "self": "多张卡堆叠，可扇开与切换", "other": "单张卡面展示" },
+        { "dimension": "信息", "self": "余额与最近交易在同一面板", "other": "以卡面信息为主" },
+        { "dimension": "交互", "self": "悬停扇开、选中抬起、方向键切换", "other": "通常静态展示" }
+      ]
+    },
+    {
+      "target": "card-stack",
+      "title": "Wallet stack 与 Card stack",
+      "rows": [
+        { "dimension": "内容", "self": "支付卡与金融数据", "other": "图片或内容卡片" },
+        { "dimension": "材质", "self": "metal / black / glass / color 四种材质", "other": "照片与普通表面" },
+        { "dimension": "选中后", "self": "抬起并展示余额与交易", "other": "翻出或放大一张图片" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明卡片堆",
+      "language": "xaml",
+      "code": "<gl:ArcWalletStack xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                    Label=\"Wallet\"\n                    CurrencySymbol=\"$\"\n                    FrontIndex=\"0\"\n                    IsOpen=\"True\" />"
+    },
+    {
+      "title": "卡片、交易与选中回调",
+      "language": "csharp",
+      "code": "var wallet = new ArcWalletStack\n{\n    Label = \"Wallet\",\n    FrontIndex = 0,\n    IsOpen = true,\n    Cards = new List<ArcWalletCardData>\n    {\n        new()\n        {\n            Id = \"debit\",\n            Issuer = \"Northbank\",\n            Product = \"Everyday debit\",\n            LastFour = \"4821\",\n            Holder = \"Ada Lovelace\",\n            Expires = \"09/29\",\n            Variant = \"metal\",\n            Balance = 2480.50,\n            BalanceLabel = \"Available\",\n            Transactions = new List<ArcWalletTransaction>\n            {\n                new() { Merchant = \"Blue Bottle\", Detail = \"Coffee · Today\", Amount = -6.50, Icon = \"circle-dot\" },\n                new() { Merchant = \"Ana Ruiz\", Detail = \"Dinner split · Yesterday\", Amount = 32.00, Avatar = \"Ana Ruiz\" }\n            }\n        }\n    }\n};\n\nwallet.SelectedChanged += (_, card) =>\n    Console.WriteLine(card is null ? \"closed\" : card.Product);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcWalletStack",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Cards": "卡片数据；每张包含 Issuer、Product、LastFour、Holder、Expires、Variant、Balance、BalanceLabel 与 Transactions",
+      "Label": "卡片堆的无障碍名称，默认 Wallet",
+      "CurrencySymbol": "余额与交易的货币符号，默认 $",
+      "FrontIndex": "当前在前的卡片索引",
+      "IsOpen": "是否抬起一张卡并显示余额与交易",
+      "SelectedChanged": "选中的卡片变化时触发；null 表示收回卡片堆"
+    }
+  }
+}

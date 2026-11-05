@@ -34,6 +34,11 @@ public sealed class ProjectBoardPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-four-stage-columns", "variant-task-card", "state-sprint-progress"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A compact kanban with a handful of tasks across fixed stages.",

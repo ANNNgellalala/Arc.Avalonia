@@ -11,6 +11,12 @@ public sealed class SpeculativeDecodingPage : ArcItemPage
 {
     public override string ItemSlug => "speculative-decoding";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-verifying",
+        "variant-draft", "variant-target", "variant-answer", "variant-compare", "variant-draft-length", "variant-stats"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Explaining why a product answers faster: docs, model pages and latency write-ups.",
@@ -43,9 +49,14 @@ public sealed class SpeculativeDecodingPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcSpeculativeDecoding
+    // The draft-length pills reach 852 px; scale the figure into the 860 px docs column so nothing is clipped.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 400,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcSpeculativeDecoding
+        {
+            Width = 900,
+            Height = 400,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

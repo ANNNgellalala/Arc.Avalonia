@@ -12,6 +12,11 @@ public sealed class CardToArticlePage : ArcItemPage
 {
     public override string ItemSlug => "card-to-article";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-meta", "variant-progress"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

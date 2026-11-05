@@ -1,0 +1,67 @@
+{
+  "slug": "webhooks",
+  "nameZh": "Webhook 管理",
+  "summary": "Webhook 端点与投递记录区块：端点摘要、成功率、投递历史与 payload/headers 检查器，失败投递可直接重试。",
+  "purpose": [
+    "Webhook 的调试发生在“这次投递到底收到了什么”。区块左侧列端点摘要与投递历史，右侧是选中投递的 payload 与 headers 代码面板，选中行即可定位。",
+    "投递行显示事件名、状态码徽章（200 / 500）、耗时与时间；失败行用危险色徽章，但状态码文字本身已经说明问题。",
+    "右侧检查器带 Payload / Headers 分段切换、复制按钮与可滚动的等宽代码块；重试失败投递后状态变为 Retrying，成功率随之更新。",
+    "头部摘要显示端点 URL、订阅事件与 99.2% 成功率，掩码签名密钥说明这里不暴露完整 secret。"
+  ],
+  "whenToUse": [
+    "开发者设置页需要查看 webhook 投递历史与失败原因时。",
+    "需要检查某次投递的 payload 与 headers 时。",
+    "需要重试失败投递、并看到成功率变化时。"
+  ],
+  "whenNotToUse": [
+    "管理调用 API 的密钥时改用 api-keys。",
+    "查看账号内的用户操作记录时改用 timeline 或日志页面。",
+    "只需要一个事件列表、不涉及端点与重试时用普通列表即可。"
+  ],
+  "variants": [
+    { "key": "variant-endpoint-summary", "label": "端点摘要", "note": "端点 URL、订阅事件与成功率" },
+    { "key": "variant-delivery-history", "label": "投递历史", "note": "事件名、状态码、耗时与时间" },
+    { "key": "state-failed-delivery", "label": "失败投递", "note": "500 行用危险色徽章，可重试" },
+    { "key": "variant-payload-inspector", "label": "Payload 检查器", "note": "等宽代码块、复制与 Payload/Headers 切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "copy-button", "note": "复制选中投递的 payload" },
+    { "type": "uses", "target": "segmented-control", "note": "Payload 与 Headers 用分段控件切换" },
+    { "type": "uses", "target": "badge", "note": "200 / 500 状态码用不同色调的徽章" },
+    { "type": "uses", "target": "button", "note": "重试与事件筛选按钮使用 ArcButton" },
+    { "type": "alternative", "target": "api-keys", "note": "管理入站密钥时用 api keys" }
+  ],
+  "contrasts": [
+    {
+      "target": "api-keys",
+      "title": "Webhooks 与 API keys",
+      "rows": [
+        { "dimension": "方向", "self": "出站事件通知", "other": "入站调用凭证" },
+        { "dimension": "调试对象", "self": "投递状态码、耗时与 payload", "other": "密钥作用域与最后使用时间" },
+        { "dimension": "安全信息", "self": "掩码签名密钥", "other": "一次性 secret 与显示/隐藏" },
+        { "dimension": "失败处理", "self": "失败投递可重试并重算成功率", "other": "撤销后请求立即失败" }
+      ]
+    },
+    {
+      "target": "copy-button",
+      "title": "Webhooks 与 Copy button",
+      "rows": [
+        { "dimension": "职责", "self": "端点、投递记录与检查器组合", "other": "只复制一段文本" },
+        { "dimension": "数据", "self": "事件、状态码、耗时与 payload", "other": "单个值" },
+        { "dimension": "交互", "self": "选择投递、切换 tab、重试", "other": "复制成功反馈" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "状态徽章与 payload 复制",
+      "language": "csharp",
+      "code": "var success = new ArcBadge { Content = \"200\", Tone = ArcBadgeTone.Success };\nvar failed = new ArcBadge { Content = \"500\", Tone = ArcBadgeTone.Danger };\nvar inspector = new ArcSegmentedControl\n{\n    Label = \"Inspector\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"payload\", \"Payload\"),\n        new ArcSegmentOption(\"headers\", \"Headers\")\n    },\n    Value = \"payload\"\n};\nvar copy = new ArcCopyButton { Value = payloadJson, Label = \"Copy payload\", IconOnly = true };\nvar retry = new ArcButton { Content = \"Retry\", Variant = ArcButtonVariant.Secondary, Size = ArcButtonSize.Sm };"
+    },
+    {
+      "title": "列表与检查器的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,Auto\">\n  <StackPanel Spacing=\"12\">\n    <TextBlock Text=\"Endpoint\" Classes=\"arc-label\" />\n    <TextBlock Text=\"https://northwind.co/hooks/billing · 99.2% success\" Classes=\"arc-caption\" />\n    <StackPanel Spacing=\"4\">\n      <!-- 投递行：事件名 + ArcBadge 状态码 + 耗时 -->\n    </StackPanel>\n  </StackPanel>\n  <StackPanel Grid.Column=\"1\" Width=\"420\" Spacing=\"8\">\n    <arc:ArcSegmentedControl />\n    <Border Padding=\"12\" CornerRadius=\"12\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n      <TextBlock Text=\"{\\&quot;type\\&quot;: \\&quot;invoice.paid\\&quot;}\" Classes=\"arc-mono\" />\n    </Border>\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

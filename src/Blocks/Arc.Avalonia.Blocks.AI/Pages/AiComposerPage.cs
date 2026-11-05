@@ -24,6 +24,15 @@ public sealed class AiComposerPage : ArcItemPage
 {
     public override string ItemSlug => "ai-composer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-thread",
+        "variant-composer",
+        "variant-toolbar",
+        "variant-starters",
+        "state-send-disabled"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

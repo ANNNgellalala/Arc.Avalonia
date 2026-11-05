@@ -1,0 +1,62 @@
+{
+  "slug": "reorderable-list",
+  "nameZh": "可重排列表",
+  "summary": "短小的用户自定义顺序列表：每行 36px 抓手支持指针拖动，方向键移动、空格提起/放下、Esc 取消；相邻行以 FLIP 变形跟随，禁用行保留位置但不能被移动。",
+  "purpose": [
+    "当顺序本身是用户的选择时用它：发布优先级、播放列表、队列、看板里的一列。每行是 ArcReorderItem，包含 Id、Title、Detail 与可选的 Disabled。",
+    "指针拖动与键盘走同一套模型：抓手提起行、上下移动、放下；邻居行用 FLIP 变换平滑让位，所以重排看起来是连续的移动而不是跳变。",
+    "禁用行不会被提起，也不会被其他行挤走；顺序变化后 OrderChanged 把新的列表交回你的代码。"
+  ],
+  "whenToUse": [
+    "用户可以自己决定一个短列表的顺序，且行数在十行以内时。",
+    "需要同时照顾指针拖动与键盘操作（空格提起、方向键移动、Esc 取消）时。",
+    "某些行需要锁定位置、不能被拖动时。"
+  ],
+  "whenNotToUse": [
+    "需要在多个列之间搬运卡片、或状态即列时用 kanban-board。",
+    "只是展示有序内容、顺序不可改时用普通列表，不需要抓手与拖动。",
+    "行数很多、需要虚拟滚动时，拖动重排的体验会很差，改用带排序字段的表格。"
+  ],
+  "variants": [
+    { "key": "variant-default", "label": "Default", "note": "普通可拖动行，带标题与说明" },
+    { "key": "variant-disabled", "label": "Disabled row", "note": "Disabled=true 的行保留原位并显示徽标" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "kanban-board", "note": "单一列表排序用可重排列表，多列搬运用看板" },
+    { "type": "uses", "target": "button", "note": "每行的 36px 抓手就是 ArcButton，键盘与指针操作都由它承担" },
+    { "type": "uses", "target": "badge", "note": "禁用行用 ArcBadge 标出 Disabled" }
+  ],
+  "contrasts": [
+    {
+      "target": "kanban-board",
+      "title": "Reorderable list 与 Kanban board",
+      "rows": [
+        { "dimension": "结构", "self": "单列，行只能上下移动", "other": "多列，卡片可以在列之间搬运" },
+        { "dimension": "状态", "self": "没有状态列，顺序就是全部信息", "other": "列本身代表状态，移动即改状态" },
+        { "dimension": "规模", "self": "十个以内的短列表", "other": "多列多卡片的项目板" },
+        { "dimension": "键盘", "self": "空格提起、方向键移动、Esc 取消", "other": "每列独立的重排与跨列移动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明列表",
+      "language": "xaml",
+      "code": "<arc:ArcReorderableList xmlns:arc=\"clr-namespace:Arc.Avalonia.Content.Controls;assembly=Arc.Avalonia.Content\"\n                      Label=\"Release priorities\"\n                      Width=\"560\" />"
+    },
+    {
+      "title": "条目与顺序回调",
+      "language": "csharp",
+      "code": "var list = new ArcReorderableList\n{\n    Label = \"Release priorities\",\n    Items = new List<ArcReorderItem>\n    {\n        new() { Id = \"pricing\", Title = \"Ship pricing page\", Detail = \"Due Friday\" },\n        new() { Id = \"login\", Title = \"Fix login redirect\", Detail = \"Blocked by SSO\" },\n        new() { Id = \"changelog\", Title = \"Write changelog\", Detail = \"Draft ready\" },\n        new() { Id = \"email\", Title = \"Refresh onboarding email\", Detail = \"Waiting on brand\", Disabled = true }\n    }\n};\n\nlist.OrderChanged += (_, items) => Save(items.Select(item => item.Id).ToArray());"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Content.Controls.ArcReorderableList",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "列表条目；控件会随拖动更新这个列表的顺序。每项包含 Id、Title、Detail 与 Disabled",
+      "Label": "列表的无障碍名称，默认 Reorder items",
+      "OrderChanged": "拖动、方向键移动或键盘放下后触发，参数是新的顺序"
+    }
+  }
+}

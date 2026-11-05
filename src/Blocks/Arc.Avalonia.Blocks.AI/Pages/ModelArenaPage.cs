@@ -21,6 +21,14 @@ public sealed class ModelArenaPage : ArcItemPage
 {
     public override string ItemSlug => "model-arena";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-prompt",
+        "variant-answers",
+        "variant-blind-switch",
+        "variant-vote"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

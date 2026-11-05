@@ -19,6 +19,11 @@ public sealed class ActivityTerrainPage : ArcItemPage
 {
     public override string ItemSlug => "activity-terrain";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-terrain", "variant-terrain", "variant-metric-switch", "variant-peak-tiles"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

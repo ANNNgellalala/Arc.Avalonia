@@ -12,6 +12,12 @@ public sealed class CoverFlowPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-front-card", "variant-depth-rail", "variant-reflection",
+        "variant-position-ticks", "variant-caption"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Six to twelve visual items where looking at one at a time is the point, such as albums, places or collections.",

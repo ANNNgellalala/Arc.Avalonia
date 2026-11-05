@@ -1,0 +1,82 @@
+{
+  "slug": "calendar",
+  "nameZh": "月历",
+  "summary": "紧凑的月历：选中日戴着滑动的胶囊、区间铺一层淡色，方向键、Home/End 与 PageUp/PageDown 都在月内移动。",
+  "purpose": [
+    "当日期本身是页面主体（日程、预约、报表区间）时，calendar 直接展示整月，哪一天被选中、哪一段被圈出都一眼可见。",
+    "它是单个焦点控件：方向键逐日移动，Home 与 End 到周首尾，PageUp/PageDown 按月翻页（按 Shift 按年），Enter 或 Space 选中。",
+    "RangeStart 与 RangeEnd 给出一段连续的淡色区间；MinDate、MaxDate 与 DisabledDates 决定哪些日子可选，不可选的日子渲染为禁用。"
+  ],
+  "whenToUse": [
+    "日期是页面主体、需要一直看到整月时。",
+    "需要一次选出一段连续日期时。",
+    "需要在页面里直接浏览上个月与下个月的日期分布时。"
+  ],
+  "whenNotToUse": [
+    "表单里只需要输入一个日期时，改用 date-picker 把月历收进字段。",
+    "需要起止两个端点、还要预设快捷项时，改用 date-range-picker。",
+    "只需要选时间而不是日期时，改用 time-picker。"
+  ],
+  "variants": [
+    { "key": "variant-single", "label": "单选", "note": "选中日戴滑动的胶囊" },
+    { "key": "variant-range", "label": "区间", "note": "RangeStart 与 RangeEnd 之间铺淡色" },
+    { "key": "state-today", "label": "今天", "note": "ShowToday 打开时头部出现 Today 动作" },
+    { "key": "state-constrained", "label": "受限范围", "note": "MinDate、MaxDate 与禁用日一起生效" },
+    { "key": "variant-monday", "label": "周一起始", "note": "WeekStartsOn=Monday 的 ISO 周" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "date-picker", "note": "只需要一个日期、且不必一直看到月历时，用收进字段的 date-picker" },
+    { "type": "alternative", "target": "date-range-picker", "note": "需要起止两个端点与预设快捷项时，改用 range picker" }
+  ],
+  "contrasts": [
+    {
+      "target": "date-picker",
+      "title": "Calendar 与 Date picker",
+      "rows": [
+        { "dimension": "可见性", "self": "月历始终可见，占一整块区域", "other": "默认收起，点击字段才展开" },
+        { "dimension": "页面占用", "self": "常驻时至少占一张月历的宽高", "other": "收起时只占一行字段的高度" },
+        { "dimension": "适用场景", "self": "日程、预约等以日期为主体的页面", "other": "表单、筛选条件、设置面板" },
+        { "dimension": "选择反馈", "self": "选中后就地保留月历，方便连续浏览", "other": "选中后收起面板，把焦点还给字段" }
+      ]
+    },
+    {
+      "target": "date-range-picker",
+      "title": "Calendar 与 Date range picker",
+      "rows": [
+        { "dimension": "选择粒度", "self": "单日或一段高亮区间", "other": "起止两个端点组成的草稿区间" },
+        { "dimension": "确认方式", "self": "点中即生效", "other": "先选草稿，按 Apply 才提交" },
+        { "dimension": "面板结构", "self": "一个月的网格", "other": "预设栏加一到两个月" },
+        { "dimension": "周围内容", "self": "通常直接放在页面里", "other": "通常收在一个字段的弹层里" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放一张内联月历",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcCalendar DisplayMonth=\"{Binding Month}\"\n                       SelectedDate=\"{Binding Day}\"\n                       MinDate=\"{Binding Today}\"\n                       ShowToday=\"True\"\n                       WeekStartsOn=\"Monday\" />\n</Window>"
+    },
+    {
+      "title": "用代码做一段区间高亮",
+      "language": "csharp",
+      "code": "var calendar = new ArcCalendar\n{\n    DisplayMonth = new DateTime(today.Year, today.Month, 1),\n    RangeStart = today.AddDays(-6),\n    RangeEnd = today,\n    ShowToday = true\n};\n\ncalendar.SelectedDateChanged += (_, date) => statusText.Text = date.ToString(\"yyyy-MM-dd\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcCalendar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "SelectedDate": "选中的日期；null 表示没有选中",
+      "RangeStart": "高亮区间的第一天，与 RangeEnd 一起铺淡色",
+      "RangeEnd": "高亮区间的最后一天",
+      "DisplayMonth": "显示的月份，取该月第一天；翻月时控件更新它",
+      "MinDate": "可选范围的下界，更早的日子禁用",
+      "MaxDate": "可选范围的上界，更晚的日子禁用",
+      "DisabledDates": "返回 true 的日子被禁用，可用来排除周末",
+      "ShowToday": "在头部显示 Today 动作，默认 false",
+      "WeekStartsOn": "一周从周几开始，默认 Sunday；ISO 周用 Monday",
+      "SelectedDateChanged": "选中某一天时触发",
+      "DisplayMonthChanged": "翻到另一个月时触发"
+    }
+  }
+}

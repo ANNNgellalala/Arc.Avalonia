@@ -1,0 +1,78 @@
+{
+  "slug": "money-input",
+  "nameZh": "金额输入",
+  "summary": "按货币格式化的金额字段：键入时实时分组、值以最小单位暴露、方向键与快捷金额按整主单位加减。",
+  "purpose": [
+    "把金额收进表单而不引入浮点误差：Value 是 long? 的最小单位（USD 为分，JPY 为元），Major 与 Formatted 只用于展示。",
+    "输入即格式化：键入数字后立刻按货币符号与千分位重排，光标落到末尾；货币为 JPY 时不保留小数位，CHF 的分组符使用窄空格。",
+    "快捷金额与键盘都能按整主单位调整：Up/Down 步进一个主单位（Shift 为十个），PageUp/PageDown 为十个，QuickAdd 提供 +$10 / +$50 这类常用加量。"
+  ],
+  "whenToUse": [
+    "价格、预算、发票金额、订阅费用等需要精确到最小单位的金额输入。",
+    "需要按币种变化显示符号、小数位与分组符时。",
+    "希望用户用「+$10 / +$50」这类快捷按钮快速累加金额的场景。"
+  ],
+  "whenNotToUse": [
+    "只是无单位的普通数字（座位数、百分比）改用 number-field，避免货币格式带来的歧义。",
+    "金额的币种由页面同一个设置决定、且不需要用户切换时，可以考虑用 input 加固定前缀，但会失去最小单位存储。",
+    "需要在连续区间里挑选价格时改用 range-histogram-slider，金额字段用于精确录入。"
+  ],
+  "variants": [
+    { "key": "variant-usd", "label": "USD", "note": "$ 符号与两位小数" },
+    { "key": "variant-eur", "label": "EUR", "note": "€ 符号，欧元分组" },
+    { "key": "variant-jpy", "label": "JPY", "note": "¥ 且不保留小数位" },
+    { "key": "variant-quick-add", "label": "Quick add", "note": "下方 +$10 / +$50 快捷金额" },
+    { "key": "state-empty", "label": "Empty", "note": "空值，占位为 $0.00" },
+    { "key": "state-filled", "label": "Filled", "note": "有值，实时千分位分组" },
+    { "key": "state-error", "label": "Error", "note": "外部错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "只读展示当前金额" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "number-field", "note": "无单位的普通数字改用 number field" },
+    { "type": "alternative", "target": "input", "note": "不需要货币格式时可用 input 加固定前缀" },
+    { "type": "complement", "target": "select", "note": "币种通常由旁边的 select 选择后传入 Currency" },
+    { "type": "uses", "target": "button", "note": "快捷金额 chip 复用 button 与 ArcChipTheme" }
+  ],
+  "contrasts": [
+    {
+      "target": "number-field",
+      "title": "Money input 与 Number field",
+      "rows": [
+        { "dimension": "值类型", "self": "long? 最小单位，Major 为 decimal", "other": "double 数值" },
+        { "dimension": "格式化", "self": "按 Currency 决定符号、小数位与分组符", "other": "按 Step 决定小数位" },
+        { "dimension": "调整单位", "self": "方向键加减整主单位", "other": "方向键按 Step 加减" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcMoneyInput Label=\"金额\"\n                     Currency=\"USD\"\n                     Min=\"100\"\n                     Value=\"{Binding Amount, Mode=TwoWay}\"\n                     Description=\"以最小单位存储，125000 表示 $1,250.00。\" />\n</Window>"
+    },
+    {
+      "title": "快捷金额与读值",
+      "language": "csharp",
+      "code": "var budget = new ArcMoneyInput\n{\n    Label = \"预算\",\n    Currency = \"CHF\",\n    QuickAdd = new[] { 100, 500 },\n    Value = 12_345_678\n};\n\nbudget.ValueChanged += (_, e) =>\n{\n    Total = e.Major ?? 0m;\n    Summary.Text = e.Formatted;\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcMoneyInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "金额的最小单位值（USD 为分）；null 表示空",
+      "Currency": "ISO 4217 币种代码，决定符号、小数位与分组符，默认 USD",
+      "Min": "允许的最小值（最小单位）；失焦时低于它会被抬回",
+      "Max": "允许的最大值（最小单位）；超出时还原并提示",
+      "Step": "方向键的单步距离（最小单位），默认一个主单位",
+      "QuickAdd": "以主单位表示的快捷加量，如 [10, 50]；空则隐藏该行",
+      "HideLabel": "标签只提供给读屏，不绘制",
+      "Major": "只读，展示用的主单位金额",
+      "Formatted": "只读，带货币符号与千分位的完整文本",
+      "Label": "可见标签与无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖",
+      "Error": "错误文案；有值时字段进入错误态",
+      "ValueChanged": "值变化时触发，参数含 Value、Currency、Major、Formatted"
+    }
+  }
+}

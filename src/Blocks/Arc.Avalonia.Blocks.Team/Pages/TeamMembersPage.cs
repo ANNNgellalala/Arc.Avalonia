@@ -28,6 +28,11 @@ public sealed class TeamMembersPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-member-rows", "variant-pending-invites", "variant-invite-composer", "state-seat-limit"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "The team or workspace settings page of a SaaS app.",

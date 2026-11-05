@@ -1,0 +1,101 @@
+{
+  "slug": "confirm-morph",
+  "nameZh": "确认变形按钮",
+  "summary": "破坏性按钮就地把问题问出来：确认后变 spinner，再变成带撤销的结果，全程同一枚药丸、只有宽度走弹簧。",
+  "purpose": [
+    "当删除、撤销权限这类不可逆操作必须让用户停一下时，用 confirm morph 把确认过程放在按钮内部，而不是弹一个对话框：问题就出现在用户刚才点的地方。",
+    "状态机是 Idle → Confirming → Pending → Done（或 Error）：Confirming 显示问题与两个答案，Escape 或外部按压可取消；Done 可以附带 Undo，Error 自带 Retry。",
+    "ConfirmMode 为 Countdown 时，确认会先进入倒计时，期间仍可取消，适合「删除 3 个文件」这类需要一点缓冲的高风险操作；Tone 决定确认答案取危险色还是主色。"
+  ],
+  "whenToUse": [
+    "不可逆、但发生频率不足以单独弹窗的破坏性操作。",
+    "希望问题与原始按钮在同一位置、避免视线跳转时。",
+    "删除后需要立刻提供 Undo 的列表项、卡片行。"
+  ],
+  "whenNotToUse": [
+    "操作可逆且没有风险：直接用 button。",
+    "只关心异步进度与成功态、不涉及确认：改用 action-button。",
+    "希望用手势确认（长按或滑动）：改用 hold-to-confirm。"
+  ],
+  "variants": [
+    { "key": "state-idle", "label": "Idle", "note": "待命面，点击后才提问" },
+    { "key": "state-confirming", "label": "Confirming", "note": "问题与确认 / 取消两个答案" },
+    { "key": "tone-neutral", "label": "Neutral", "note": "确认答案取主色而非危险色" },
+    { "key": "state-pending", "label": "Pending", "note": "spinner 表示操作进行中" },
+    { "key": "state-done", "label": "Done", "note": "勾选加过去式，可附带 Undo" },
+    { "key": "state-error", "label": "Error", "note": "警示图标加 Retry" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "button", "note": "可逆操作不需要确认时用 Button" },
+    { "type": "alternative", "target": "action-button", "note": "只需要异步进度、没有确认问题时用它" },
+    { "type": "alternative", "target": "hold-to-confirm", "note": "希望用手势型确认时用它" }
+  ],
+  "contrasts": [
+    {
+      "target": "action-button",
+      "title": "Confirm morph 与 Action button",
+      "rows": [
+        { "dimension": "确认步骤", "self": "先就地提问，再执行", "other": "按下即执行" },
+        { "dimension": "失败面", "self": "Error 面自带 Retry", "other": "回到 Idle 并回调 OnActionError" },
+        { "dimension": "适用操作", "self": "不可逆的删除、撤销权限", "other": "可逆的发布、保存" }
+      ]
+    },
+    {
+      "target": "hold-to-confirm",
+      "title": "Confirm morph 与 Hold to confirm",
+      "rows": [
+        { "dimension": "确认方式", "self": "点击后出现确认按钮，再点一次", "other": "按住按钮直到进度走满" },
+        { "dimension": "操作节奏", "self": "两步点击，读屏与键盘都自然", "other": "持续按压更适合触屏与指针" },
+        { "dimension": "取消", "self": "Escape 或外部按压取消", "other": "松手即取消" }
+      ]
+    },
+    {
+      "target": "button",
+      "title": "Confirm morph 与 Button",
+      "rows": [
+        { "dimension": "风险等级", "self": "面向不可逆的破坏性操作", "other": "面向普通单次行动" },
+        { "dimension": "状态机", "self": "Idle / Confirming / Pending / Done / Error 五态", "other": "只有按下与禁用" },
+        { "dimension": "结果处理", "self": "成功面可带 Undo，失败面带 Retry", "other": "结果由你在页面其他区域处理" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "删除项目",
+      "language": "csharp",
+      "code": "var delete = new ArcConfirmMorph\n{\n    Label = \"Delete project\",\n    Icon = \"trash-2\",\n    Prompt = \"Delete 3 files?\",\n    ConfirmLabel = \"Delete\",\n    DoneLabel = \"Deleted\",\n    Tone = ArcConfirmTone.Danger,\n    Confirm = () => DeleteAsync(),\n    Undo = () => RestoreAsync()\n};\ndelete.Cancelled += (_, _) => Status.Text = \"已取消\";"
+    },
+    {
+      "title": "倒计时确认",
+      "language": "xaml",
+      "code": "<arc:ArcConfirmMorph Label=\"Remove member\" Icon=\"ban\" ConfirmMode=\"Countdown\" Countdown=\"3\" Tone=\"Danger\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcConfirmMorph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "待命文案与可访问名称",
+      "Icon": "待命面与确认面的前置图标",
+      "Prompt": "确认时的问句，默认是 Label 加问号",
+      "ConfirmLabel": "确认答案文案，默认 Delete",
+      "CancelLabel": "取消答案文案，默认 Cancel",
+      "PendingLabel": "进行中文案，默认 Deleting",
+      "DoneLabel": "成功文案，默认 Deleted",
+      "ErrorLabel": "失败文案，默认 Could not finish",
+      "RetryLabel": "失败面的重试文案，默认 Retry",
+      "UndoLabel": "Done 面撤销文案，默认 Undo",
+      "Tone": "确认答案配色：Danger / Neutral",
+      "ConfirmMode": "Press 单击执行；Countdown 先倒计时再执行",
+      "Countdown": "Countdown 模式的秒数，默认 3",
+      "ConfirmTimeout": "问题无人回答时回 Idle 的毫秒数，0 关闭",
+      "ResultTimeout": "结果面停留毫秒数，0 表示停留不返回",
+      "CancelOnOutsidePress": "外部按压是否取消确认",
+      "State": "当前面：Idle / Confirming / Pending / Done / Error，可设置以便静态展示",
+      "Confirm": "确认后执行的异步操作，抛错进入 Error 面",
+      "Undo": "非空时在 Done 面显示 Undo",
+      "Cancelled": "用户取消确认时触发",
+      "StateChanged": "面切换时触发，参数是新状态"
+    }
+  }
+}

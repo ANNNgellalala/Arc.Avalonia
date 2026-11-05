@@ -1,0 +1,83 @@
+{
+  "slug": "user-menu",
+  "nameZh": "用户菜单",
+  "summary": "头像背后的账号面板：身份头部、三四个目的地、内联浅色/深色/系统切换与危险色退出登录，面板在页面里渲染而不是弹窗。",
+  "purpose": [
+    "应用顶栏右上角唯一的账号入口：一个带头像的按钮，点开是身份头部（头像、姓名、邮箱，可选 Plan 徽章）、一行一个目的地的动作列表、内联主题切换和分隔后的退出登录。",
+    "身份信息直接来自 UserName / Email / Plan；Status 在头像上显示在线、忙碌或离开，并且不只是换颜色——忙碌是横杠、离开是空心，色觉不同的用户也能区分。",
+    "主题切换是三段的内联控件，Left / Right 键切换并触发 ThemeChanged，由应用决定是否真的应用；OnSignOut 返回 Task 时退出行显示 spinner 直到完成。IsOpen 支持页面控制，预览可以静态展示打开态。"
+  ],
+  "whenToUse": [
+    "应用顶栏右上角、所有账号级入口的唯一位置。",
+    "需要同时提供身份信息、设置入口与退出登录。",
+    "需要内联的浅色 / 深色 / 系统偏好切换，而不是跳到设置页。"
+  ],
+  "whenNotToUse": [
+    "菜单内容与当前对象相关（文件、评论、选中项）时，改用 dropdown-menu 或 context-menu。",
+    "页面没有账号体系、只需要一个设置齿轮时，直接用图标按钮加 dropdown-menu。",
+    "需要展示完整个人资料页时，用专门的页面或 drawer。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "账号面板展开：身份头部、动作列表、主题切换与退出登录" },
+    { "key": "state-closed", "label": "Closed", "note": "只有圆形头像入口，没有姓名" },
+    { "key": "variant-name", "label": "With name", "note": "头像旁显示姓名与 chevron" },
+    { "key": "variant-presence-busy", "label": "Busy presence", "note": "忙碌用横杠标记，不只靠颜色区分" },
+    { "key": "variant-plan-badge", "label": "Plan badge", "note": "身份头部在姓名旁显示 Plan 徽章" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dropdown-menu", "note": "通用动作列表用 dropdown menu，账号专属菜单用 user menu" },
+    { "type": "alternative", "target": "context-menu", "note": "动作跟对象走时用 context menu" },
+    { "type": "complement", "target": "avatar", "note": "触发入口本身就是一个 avatar，状态点与首字母来自同一份身份信息" }
+  ],
+  "contrasts": [
+    {
+      "target": "dropdown-menu",
+      "title": "User menu 与 Dropdown menu",
+      "rows": [
+        { "dimension": "内容", "self": "身份头部、账号目的地、主题偏好与退出登录", "other": "一组通用动作" },
+        { "dimension": "结构", "self": "固定三段，内联主题开关与带 spinner 的退出行", "other": "只有列表，可用分隔线与勾选态分组" },
+        { "dimension": "放置位置", "self": "顶栏右上角的固定入口", "other": "任何需要动作的地方" }
+      ]
+    },
+    {
+      "target": "context-menu",
+      "title": "User menu 与 Context menu",
+      "rows": [
+        { "dimension": "作用域", "self": "当前账号：身份、偏好与退出登录", "other": "当前对象：文件、行、画布元素" },
+        { "dimension": "触发", "self": "点击顶栏右上角的头像", "other": "右键、长按或键盘快捷键" },
+        { "dimension": "可发现性", "self": "一直可见的头像，符合账号入口的惯例", "other": "藏在次级手势后，需要用户知道可以右键" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "顶栏中的账号入口",
+      "language": "csharp",
+      "code": "var menu = new ArcUserMenu\n{\n    UserName = \"Maya Chen\",\n    Email = \"maya@acme.com\",\n    Plan = \"Pro\",\n    Status = ArcUserMenuStatus.Available,\n    ShowName = false,\n    SignOutShortcut = \"⇧⌘Q\",\n    Items = new List<ArcUserMenuItem>\n    {\n        new() { Label = \"Profile\", Icon = \"user\" },\n        new() { Label = \"Settings\", Icon = \"settings\", Shortcut = \"⌘,\" },\n        new() { Label = \"Billing\", Icon = \"credit-card\" }\n    },\n    OnSignOut = async () => await SignOutAsync()\n};\n\nmenu.ThemeChanged += (_, theme) => ApplyTheme(theme);"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:actions=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\">\n  <actions:ArcUserMenu UserName=\"Maya Chen\"\n                       Email=\"maya@acme.com\"\n                       Plan=\"Pro\"\n                       Status=\"Available\"\n                       ShowName=\"False\">\n    <actions:ArcUserMenu.Items>\n      <actions:ArcUserMenuItem Label=\"Profile\" Icon=\"user\" />\n      <actions:ArcUserMenuItem Label=\"Settings\" Icon=\"settings\" Shortcut=\"⌘,\" />\n    </actions:ArcUserMenu.Items>\n  </actions:ArcUserMenu>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcUserMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "UserName": "身份头部的姓名，同时用于首字母头像与无障碍名称",
+      "Email": "身份头部的邮箱，过长时截断并带 tooltip",
+      "Plan": "可选的 Plan 或角色徽章，为空时不显示",
+      "Status": "在线状态：Available / Busy / Away，形状与颜色同时区分",
+      "ShowName": "头像旁是否显示姓名与 chevron",
+      "ShowTheme": "是否显示内联的主题切换，默认 true",
+      "ThemePreference": "主题偏好的当前值：Light / Dark / System",
+      "Align": "面板相对头像的对齐：Start / Center / End",
+      "Items": "账号目的地，建议三到四个",
+      "OnSignOut": "退出登录处理；返回 Task 时退出行显示 spinner 直到完成",
+      "SignOutShortcut": "退出登录行尾的快捷键提示",
+      "IsOpen": "账号面板是否打开，可由页面驱动",
+      "ThemeChanged": "用户选择新的主题偏好时触发，携带所选的 ArcUserMenuTheme"
+    }
+  }
+}

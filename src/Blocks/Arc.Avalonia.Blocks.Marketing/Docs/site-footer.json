@@ -1,0 +1,54 @@
+{
+  "slug": "site-footer",
+  "nameZh": "站点页脚",
+  "summary": "营销站的收尾区块：链接列与订阅表单并排，下面是一行版权与状态；另有单行精简版和一块渐隐的大号品牌字。",
+  "purpose": [
+    "它是页面的最后一块：左边品牌与一句定位，右边订阅表单，中间是四列链接，底部是版权、系统状态与社交入口。整块随页面流排布，不吸底。",
+    "订阅表单在本地校验后原地变成确认条，表单宽度不变；底部状态点与文字成对出现，不只靠颜色表达。",
+    "组成依赖清楚：邮箱字段用 input，Subscribe 与 Use another address 用 button，系统状态用 badge；精简版只保留品牌、版权与社交图标，适合应用外壳与文档站。"
+  ],
+  "whenToUse": [
+    "营销站、文档站或产品站的收尾区块，需要链接列与订阅入口时。",
+    "需要让页脚同时承担导航、订阅与信任信息（系统状态、版权）时。",
+    "应用外壳或文档站只需要一行页脚，用精简版即可。"
+  ],
+  "whenNotToUse": [
+    "页面需要一个明确的收尾行动而不只是链接时，改用 cta-section。",
+    "只需要订阅、不需要全站导航时，改用 newsletter-signup。",
+    "应用内部的侧栏导航不要重复放进页脚，用 workspace-sidebar 承担导航。"
+  ],
+  "variants": [
+    { "key": "variant-full", "label": "Full", "note": "品牌、订阅、四列链接、版权与状态" },
+    { "key": "variant-mark", "label": "Fading mark", "note": "底部大号品牌字渐隐，作为收尾的视觉重量" },
+    { "key": "variant-minimal", "label": "Minimal", "note": "单行：品牌、版权、法律链接与社交图标" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "订阅表单的邮箱字段用 ArcInput，并复用它的错误文案" },
+    { "type": "uses", "target": "button", "note": "Subscribe、Use another address 与社交图标都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "底部系统状态用带点的成功徽标，文字与颜色成对" },
+    { "type": "alternative", "target": "cta-section", "note": "需要收尾行动而不是链接与订阅时改用 cta section" }
+  ],
+  "contrasts": [
+    {
+      "target": "cta-section",
+      "title": "Site footer 与 CTA section",
+      "rows": [
+        { "dimension": "位置", "self": "页面最底部，全站重复", "other": "正文末尾的一块行动区域" },
+        { "dimension": "内容", "self": "链接列、订阅、版权与状态", "other": "一句主标题、两个行动与信任要点" },
+        { "dimension": "目标", "self": "导航与留存", "other": "推动一次转化" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页脚骨架",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"16\" Margin=\"28,26,28,10\">\n    <Grid ColumnDefinitions=\"*,Auto\">\n      <StackPanel Spacing=\"8\">\n        <TextBlock Text=\"Acme\" Classes=\"arc-label\" />\n        <TextBlock Text=\"Scheduling for small clinics, without the noise.\"\n                   Classes=\"arc-body-sm arc-secondary\"\n                   MaxWidth=\"250\" TextWrapping=\"Wrap\" />\n      </StackPanel>\n      <StackPanel Grid.Column=\"1\" Spacing=\"6\">\n        <TextBlock Text=\"Get the changelog\" Classes=\"arc-label\" />\n        <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n          <c:ArcInput Width=\"226\" Placeholder=\"you@company.com\" LeadingIcon=\"mail\" />\n          <c:ArcButton Content=\"Subscribe\" />\n        </StackPanel>\n      </StackPanel>\n    </Grid>\n    <c:ArcBadge Content=\"All systems normal\" Tone=\"Success\" Dot=\"True\" />\n  </StackPanel>\n</Window>"
+    },
+    {
+      "title": "订阅确认在本地完成",
+      "language": "csharp",
+      "code": "subscribe.Click += (_, _) =>\n{\n    var address = (email.Value ?? string.Empty).Trim();\n    if (!address.Contains('@'))\n    {\n        email.Error = \"Enter a valid email address.\";\n        return;\n    }\n\n    email.Error = null;\n    form.IsVisible = false;\n    confirmedAddress.Text = address;\n    confirmedHost.IsVisible = true;\n};"
+    }
+  ]
+}

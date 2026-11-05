@@ -21,6 +21,14 @@ public sealed class AgentRunPage : ArcItemPage
 {
     public override string ItemSlug => "agent-run";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-header",
+        "variant-steps",
+        "variant-approval",
+        "variant-diff"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

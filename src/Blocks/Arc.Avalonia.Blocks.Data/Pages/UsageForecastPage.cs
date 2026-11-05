@@ -22,6 +22,11 @@ public sealed class UsageForecastPage : ArcItemPage
 {
     public override string ItemSlug => "usage-forecast";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-forecast", "variant-cone", "variant-budget-line", "variant-alert-rules", "variant-summary"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

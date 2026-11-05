@@ -1,0 +1,79 @@
+{
+  "slug": "alert",
+  "nameZh": "提示条",
+  "summary": "页面流里的持久提示：一个色调图标、标题与说明，可选一个行动与一个关闭按钮。",
+  "purpose": [
+    "告诉用户「有一件事需要知道，而且它不会自己消失」：Tone 决定图标与底色，Title 是一句结论，Content 放说明文字或列表。",
+    "ActionLabel 有值时右侧出现一个幽灵按钮，用来执行修复动作（更新卡、重试、查看详情）；IsDismissible 控制关闭按钮是否出现。",
+    "它随页面流排布、不覆盖内容，所以可以放在表单顶部、卡片里或设置页中，让用户在需要时回看。"
+  ],
+  "whenToUse": [
+    "需要用户持续看到、直到自行处理的提示（卡即将过期、权限不足）。",
+    "表单提交后的错误摘要，或需要附一个修复按钮的失败结果。",
+    "页面某块内容降级时给出解释，而不是整页报错。"
+  ],
+  "whenNotToUse": [
+    "操作刚完成、几秒后就可以消失的确认，改用 toast。",
+    "面向全站的公告或促销，改用 announcement-bar。",
+    "只是字段级错误时，用 input 的 Error 文案，不要为每个字段放一条提示条。"
+  ],
+  "variants": [
+    { "key": "tone-info", "label": "Info", "note": "信息图标与强调色底" },
+    { "key": "tone-success", "label": "Success", "note": "对勾图标与成功色底" },
+    { "key": "tone-warning", "label": "Warning", "note": "三角图标与警告色底" },
+    { "key": "tone-danger", "label": "Danger", "note": "圆形警告图标与危险色底，读屏用 assertive 播报" },
+    { "key": "variant-action", "label": "Action", "note": "右侧一个修复动作按钮" },
+    { "key": "state-dismissible", "label": "Dismissible", "note": "右上角关闭按钮，关闭后触发 Dismissed" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "toast", "note": "短暂的确认改用 toast" },
+    { "type": "alternative", "target": "announcement-bar", "note": "全站公告改用 announcement bar" },
+    { "type": "complement", "target": "card", "note": "提示条常放在卡片或表单顶部" }
+  ],
+  "contrasts": [
+    {
+      "target": "toast",
+      "title": "Alert 与 Toast",
+      "rows": [
+        { "dimension": "生命周期", "self": "一直留在页面里，直到被关闭或问题解决", "other": "几秒后自动消失" },
+        { "dimension": "位置", "self": "随页面流排布，不覆盖内容", "other": "浮在右下角，覆盖页面" },
+        { "dimension": "适合内容", "self": "需要回看的说明与修复动作", "other": "一句确认加一个撤销" }
+      ]
+    },
+    {
+      "target": "announcement-bar",
+      "title": "Alert 与 Announcement bar",
+      "rows": [
+        { "dimension": "范围", "self": "页面内某块内容", "other": "站点级，横跨所有页面" },
+        { "dimension": "内容结构", "self": "标题、说明、一个行动", "other": "可轮播多条消息，可带倒计时" },
+        { "dimension": "位置", "self": "内容流中", "other": "页面最顶部" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带修复动作的警告",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:ac=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\">\n  <ac:ArcAlert Title=\"Your card expires next month\"\n               Tone=\"Warning\"\n               ActionLabel=\"Update card\">\n    <TextBlock Text=\"Invoices after 12 April will fail until a new card is added.\"\n               Classes=\"arc-body-sm\"\n               TextWrapping=\"Wrap\" />\n  </ac:ArcAlert>\n</Window>"
+    },
+    {
+      "title": "处理关闭与行动",
+      "language": "csharp",
+      "code": "var alert = new ArcAlert\n{\n    Title = \"Upload failed\",\n    Tone = ArcAlertTone.Danger,\n    ActionLabel = \"Try again\",\n    Action = () => RetryUpload()\n};\n\nalert.Dismissed += (_, _) => LogDismissed();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcAlert",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "一行结论，加粗显示在提示条顶部",
+      "Tone": "色调：Info（默认）/ Success / Warning / Danger，决定图标与底色",
+      "IsOpen": "false 时整条隐藏，默认 true",
+      "IsDismissible": "是否显示关闭按钮，默认 true",
+      "ActionLabel": "行动按钮文案；为空时不显示按钮",
+      "Content": "说明内容，可以是文字、列表或任意控件",
+      "Action": "行动按钮点击时执行的回调",
+      "Dismissed": "点击关闭按钮后触发"
+    }
+  }
+}

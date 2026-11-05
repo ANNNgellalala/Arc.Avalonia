@@ -1,0 +1,81 @@
+{
+  "slug": "donut-chart",
+  "nameZh": "环形图",
+  "summary": "部分与整体的环形图：圆环从十二点方向顺时针铺开，中心显示合计，悬停的扇区会压暗其余部分并与图例联动。",
+  "purpose": [
+    "把一个整体拆成三到六个部分，让读者先看到合计、再看各部分的份额。中心的大数字比散落的标签更容易被读到，因此它常被放在指标卡或小面板的中央。",
+    "环形从十二点方向顺时针开始，扇区颜色来自 Arc 系列令牌，图例按顺序列出名称与百分比；悬停圆环或图例任意一侧，另一侧同步高亮。",
+    "RingThickness 控制圆环粗细：细环让中心数字更突出，粗环让各段颜色更醒目；Unit 与 ValueFormat 负责中心数值的单位与格式。",
+    "零值与负值会被自动排除，避免出现看不见却占位的扇区。"
+  ],
+  "whenToUse": [
+    "想展示三到六个部分占整体的份额，并同时强调合计时。",
+    "中心需要放一个关键数字（总量、访客数、预算），周围展示构成时。",
+    "各部分之间没有时间维度，只是同一个整体的拆分时。",
+    "份额差异足够大、相邻扇区的角度肉眼可辨时。"
+  ],
+  "whenNotToUse": [
+    "只有一个 100% 的构成条、想强调线性比例时改用 split-bar。",
+    "小份额很多、或者要比较相近的百分比时改用 waffle-chart，单位格更容易数清。",
+    "类别有层级（大区里再分城市）时改用 treemap 或 sunburst。",
+    "数据随时间变化、要看趋势时改用 line-chart 或 streamgraph。"
+  ],
+  "variants": [
+    { "key": "variant-default", "label": "默认环形", "note": "图例 + 中心合计，环宽 22" },
+    { "key": "variant-thin-ring", "label": "细环", "note": "RingThickness=12，中心数字更突出" },
+    { "key": "variant-thick-ring", "label": "粗环", "note": "RingThickness=34，颜色块更醒目" },
+    { "key": "state-no-legend", "label": "无图例", "note": "ShowLegend=false，只留圆环与中心合计" },
+    { "key": "state-empty", "label": "空数据", "note": "Segments 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "split-bar", "note": "只需要一条 100% 构成条时，split bar 更紧凑" },
+    { "type": "alternative", "target": "waffle-chart", "note": "小份额多、需要逐格数数时，waffle chart 更清楚" },
+    { "type": "alternative", "target": "treemap", "note": "类别带层级或数量更多时，treemap 用面积替代角度" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡里的构成小图常是 donut chart" }
+  ],
+  "contrasts": [
+    {
+      "target": "split-bar",
+      "title": "Donut chart 与 Split bar",
+      "rows": [
+        { "dimension": "形状", "self": "圆环，扇区角度对应份额", "other": "一条水平 100% 构成条" },
+        { "dimension": "中心信息", "self": "中心可放合计与单位，是视觉焦点", "other": "没有中心，读数放在条的上方" },
+        { "dimension": "占用空间", "self": "接近正方形，适合卡片中央", "other": "扁长，适合嵌在列表或窄栏里" },
+        { "dimension": "多段可读性", "self": "超过六段后角度难辨", "other": "段数多时每段变窄，但比例关系仍线性" }
+      ]
+    },
+    {
+      "target": "waffle-chart",
+      "title": "Donut chart 与 Waffle chart",
+      "rows": [
+        { "dimension": "读数精度", "self": "靠角度估计，适合粗看份额", "other": "每格代表 1%，可以逐格数" },
+        { "dimension": "小份额", "self": "低于 3% 的扇区几乎看不见", "other": "小份额仍会占到若干格" },
+        { "dimension": "中心数字", "self": "可放合计与说明", "other": "没有中心位置，合计放在图例" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "访客来源构成",
+      "language": "csharp",
+      "code": "var chart = new ArcDonutChart\n{\n    Segments = new[]\n    {\n        new ChartValue(\"Search\", 4210),\n        new ChartValue(\"Direct\", 2380),\n        new ChartValue(\"Social\", 1190),\n        new ChartValue(\"Email\", 640)\n    },\n    CenterLabel = \"Total\",\n    Unit = \"visits\",\n    RingThickness = 22,\n    ValueFormat = value => value.ToString(\"N0\")\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcDonutChart x:Name=\"Sources\"\n                        Height=\"208\"\n                        CenterLabel=\"Total\"\n                        Unit=\"visits\"\n                        RingThickness=\"22\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcDonutChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Segments": "按绘制顺序排列的各部分；零值与负值会被忽略",
+      "ShowLegend": "在圆环旁显示色块、名称与百分比，默认 true",
+      "CenterLabel": "静止时圆环中心上方的标签，默认 Total",
+      "Unit": "中心数值下方的单位，例如 visits",
+      "RingThickness": "圆环厚度（px），默认 22",
+      "ValueFormat": "自定义中心数值格式"
+    }
+  }
+}

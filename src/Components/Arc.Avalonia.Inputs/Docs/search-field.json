@@ -1,0 +1,83 @@
+{
+  "slug": "search-field",
+  "nameZh": "搜索字段",
+  "summary": "常驻的搜索入口：前置搜索图标、为清除按钮预留的固定槽位与可选的快捷键提示，Escape 清空查询。",
+  "purpose": [
+    "让搜索框在工具栏或列表页里一直可见。清除槽位是预留的：有查询时才出现按钮，但宽度始终占着，所以输入与清除不会导致周围的控件跳动。",
+    "快捷键提示（ShortcutHint）用一枚小圆角标签贴在尾部，只在字段为空时显示；一旦有输入就让位给清除按钮，避免两个提示同时争抢同一位置。",
+    "它复用 input 的外壳与状态体系，尺寸、错误文案和帮助文案与其它文本字段一致，因此搜索区与表单可以共用同一套网格。"
+  ],
+  "whenToUse": [
+    "列表页、数据表、命令面板等需要常驻搜索入口的地方。",
+    "希望告诉用户全局快捷键（如 ⌘K）时，用 ShortcutHint 展示提示而不自己拼标签。",
+    "过滤本地集合、并且用 Escape 清空查询符合桌面软件习惯的场景。"
+  ],
+  "whenNotToUse": [
+    "页面空间只够放一个图标按钮时改用 expanding-search，点开后才是输入框。",
+    "普通表单文本值改用 input，搜索图标会误导用户。",
+    "需要从长列表里选一个值而不是过滤内容时改用 combobox。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，页面级搜索" },
+    { "key": "state-empty", "label": "Empty", "note": "占位文案，清除槽位空置" },
+    { "key": "state-filled", "label": "Filled", "note": "有查询，出现清除按钮" },
+    { "key": "variant-shortcut", "label": "Shortcut hint", "note": "尾部显示 ⌘K，输入后让位给清除按钮" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可输入，保留搜索图标" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "expanding-search", "note": "空间只够一个图标时改用 expanding search" },
+    { "type": "alternative", "target": "input", "note": "普通表单文本值改用 input" },
+    { "type": "alternative", "target": "combobox", "note": "从长列表里选值而非过滤内容时改用 combobox" },
+    { "type": "uses", "target": "button", "note": "清除动作复用 button 的图标按钮形态" }
+  ],
+  "contrasts": [
+    {
+      "target": "expanding-search",
+      "title": "Search field 与 Expanding search",
+      "rows": [
+        { "dimension": "常驻形态", "self": "字段始终展开，宽度固定", "other": "折叠为图标，点击后在宽度弹簧上展开" },
+        { "dimension": "结果展示", "self": "不展示结果，由调用方渲染列表", "other": "自带上方的最近项/匹配项面板" },
+        { "dimension": "适用位置", "self": "列表页顶栏、有稳定横向空间的工具栏", "other": "头部空间紧张、只能用一枚图标的场景" }
+      ]
+    },
+    {
+      "target": "input",
+      "title": "Search field 与 Input",
+      "rows": [
+        { "dimension": "默认装饰", "self": "前置搜索图标，清除槽位始终预留", "other": "可选前/后置图标，无预留槽位" },
+        { "dimension": "键盘习惯", "self": "Escape 清空查询", "other": "Escape 不改变值" },
+        { "dimension": "语义", "self": "过滤当前视图的查询", "other": "表单里的值" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcSearchField Label=\"搜索成员\"\n                      Placeholder=\"姓名或邮箱\"\n                      ShortcutHint=\"⌘K\"\n                      Value=\"{Binding Query, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "过滤本地集合",
+      "language": "csharp",
+      "code": "var search = new ArcSearchField\n{\n    Label = \"搜索发票\",\n    Placeholder = \"发票号或客户名\",\n    ShortcutHint = \"Ctrl+K\"\n};\n\nsearch.ValueChanged += (_, _) =>\n{\n    Results.ItemsSource = invoices.Where(item =>\n        item.Title.Contains(search.Value ?? string.Empty, StringComparison.OrdinalIgnoreCase));\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcSearchField",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前查询文本，双向绑定到内部 TextBox",
+      "Placeholder": "空值时显示的占位文案",
+      "Label": "可见标签，同时作为输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时字段进入错误态",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "ShortcutHint": "尾部快捷键提示，如 ⌘K；只在字段为空时显示",
+      "ShowClearButton": "有文本时是否显示清除按钮，默认 true",
+      "IsInputFocused": "只读，内部 TextBox 是否持有焦点",
+      "ValueChanged": "用户编辑或按 Escape 清空后触发"
+    }
+  }
+}

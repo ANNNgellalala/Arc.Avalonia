@@ -1,0 +1,72 @@
+{
+  "slug": "keycap-keyboard",
+  "nameZh": "机械键帽键盘",
+  "summary": "一块雕塑感的机械键盘：按下哪个键，对应键帽就沉入键座、键座下方亮起一层光，上方的输入行同步增长。",
+  "purpose": [
+    "当落地页、开发者工具或快捷入门页需要一块「可以真的敲」的键盘时，用 keycap keyboard：键帽分两段圆角绘制出厚度，按下时下沉、松开回弹并略微过冲。",
+    "真实键盘输入与指针点击都会驱动同一套按键模型；上方有一块会换行的输入行，用来显示刚敲下的文字，光标只在聚焦后出现并闪烁。",
+    "键帽下方有一层很淡的强调色光，按键后约 700ms 才退去，快速连打会留下光的拖尾；Shift、Tab、Caps 会点亮键帽但不会输入字符。"
+  ],
+  "whenToUse": [
+    "键盘优先产品与开发者工具的落地页。",
+    "教用户记快捷键的入门页，可以配合提示点亮对应的键。",
+    "需要一点玩心的空状态或发布页彩蛋。",
+    "展示打字过程比展示最终文本更重要的场景。"
+  ],
+  "whenNotToUse": [
+    "真正的表单输入，用 text-field。",
+    "无障碍需求下的屏幕键盘，用平台自带实现。",
+    "只需要展示一段可复制命令，用 code-block。"
+  ],
+  "variants": [
+    { "key": "state-typed", "label": "Typed", "note": "输入行显示 hello, arc，并随内容换行" },
+    { "key": "state-lit", "label": "Lit", "note": "截图帧保留 a、r、c 三颗刚按下的键帽亮光" },
+    { "key": "variant-legend", "label": "Legend", "note": "字母与数字键帽上的等宽图例" },
+    { "key": "variant-modifier", "label": "Modifier", "note": "shift / enter / backspace 等宽键与词形图例" },
+    { "key": "variant-housing", "label": "Housing", "note": "键帽下方的键座与雕塑感的分层圆角" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "code-block", "note": "需要可复制的代码或命令时用代码块" },
+    { "type": "alternative", "target": "shortcut-recorder", "note": "要录制快捷键时用 shortcut recorder" },
+    { "type": "complement", "target": "typewriter-terminal", "note": "键盘展示输入过程，终端展示输入的结果" }
+  ],
+  "contrasts": [
+    {
+      "target": "code-block",
+      "title": "Keycap keyboard 与 Code block",
+      "rows": [
+        { "dimension": "内容", "self": "可敲击的键盘与输入行", "other": "可复制的静态代码文本" },
+        { "dimension": "目的", "self": "展示按键与输入的过程", "other": "让人阅读与带走代码" },
+        { "dimension": "适用位置", "self": "落地页、入门页的氛围区块", "other": "文档与教程的正文" }
+      ]
+    },
+    {
+      "target": "shortcut-recorder",
+      "title": "Keycap keyboard 与 Shortcut recorder",
+      "rows": [
+        { "dimension": "方向", "self": "把按键演示给用户看", "other": "从用户那里捕获一组组合键" },
+        { "dimension": "输出", "self": "只有发光与输入行，没有数据", "other": "输出可保存的键位字符串" },
+        { "dimension": "输入源", "self": "真实键盘或指针点击键帽", "other": "真实键盘，且会等待完整组合" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcKeycapKeyboard xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                       Text=\"hello, arc\"\n                       HorizontalAlignment=\"Center\" />"
+    },
+    {
+      "title": "代码构建",
+      "language": "csharp",
+      "code": "var board = new ArcKeycapKeyboard { Text = \"hello, arc\" };\n\n// 点击键盘后即可用真实键盘输入；清空时回到 Start typing 占位。\nboard.Text = string.Empty;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcKeycapKeyboard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "键帽上方输入行的文字；为空时显示 Start typing 占位"
+    }
+  }
+}

@@ -23,6 +23,11 @@ public sealed class CheckoutLivePage : ArcItemPage
 {
     public override string ItemSlug => "checkout-live";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-checkout", "variant-plan-seats", "variant-addons", "variant-coupon", "variant-tax"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,49 @@
+{
+  "slug": "cta-section",
+  "nameZh": "行动召唤",
+  "summary": "页面收尾的行动区：可关闭的发布横幅叠在居中的收尾文案上，横幅关闭后可以撤销。",
+  "purpose": [
+    "在页面把道理讲完之后给一个明确的下一步：居中的一句主标题、两个行动按钮，以及三条信任要点（无需卡、免费席位、合规）。",
+    "上方可以叠一条可关闭的发布横幅；关闭后横幅从布局里折出，留下一条「Banner dismissed.」与 Undo，误关也能恢复。",
+    "组成依赖：横幅是 announcement-bar（关闭状态与减少动效分支来自组件），行动按钮是 button，行动的信任徽标用 badge 标记「14 days free」。"
+  ],
+  "whenToUse": [
+    "落地页或定价页的收尾，需要在讲完论证后推动一次转化时。",
+    "需要在页面顶部顺带宣布一次发布、但不打断阅读时。",
+    "希望行动旁边列出风险逆转要点（免卡、免费席位、合规）时。"
+  ],
+  "whenNotToUse": [
+    "行动应该出现在页面顶部、首屏就要收集邮箱时，改用 hero-signup。",
+    "需要用户先做决定、必须打断当前流程时，用 dialog。",
+    "页面只是一个订阅入口、没有完整论证时，改用 newsletter-signup。"
+  ],
+  "variants": [
+    { "key": "variant-banner", "label": "Banner", "note": "收尾区上方的可关闭发布横幅" },
+    { "key": "variant-closing", "label": "Closing", "note": "居中主标题、两个行动与信任要点" },
+    { "key": "state-dismissed", "label": "Dismissed", "note": "横幅关闭后留下说明与 Undo" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "announcement-bar", "note": "发布横幅是共享的 announcement bar，关闭与撤销来自组件" },
+    { "type": "uses", "target": "button", "note": "Start free、Talk to sales 与 Undo 都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "标题上方的 14 days free 用 ArcBadge 标出" },
+    { "type": "alternative", "target": "newsletter-signup", "note": "只想要低承诺订阅时改用 newsletter signup" }
+  ],
+  "contrasts": [
+    {
+      "target": "newsletter-signup",
+      "title": "CTA section 与 Newsletter signup",
+      "rows": [
+        { "dimension": "承诺", "self": "开始试用或联系销售，需要更多信息", "other": "只留一个邮箱，低承诺" },
+        { "dimension": "内容", "self": "标题、两个行动与三条信任要点", "other": "一个字段、往期内容与订阅确认" },
+        { "dimension": "位置", "self": "页面收尾，可带发布横幅", "other": "并排展示往期，适合博客与更新日志" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "收尾区骨架",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:e=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <StackPanel Spacing=\"12\">\n    <e:ArcAnnouncementBar Dismissible=\"True\" AutoPlay=\"False\" Label=\"Product announcement\" />\n    <StackPanel Spacing=\"16\" Margin=\"32,40,32,40\" HorizontalAlignment=\"Center\">\n      <c:ArcBadge Content=\"14 days free\" Tone=\"Accent\" />\n      <TextBlock Text=\"Start building today.\" Classes=\"arc-title-sm\" TextAlignment=\"Center\" />\n      <TextBlock Text=\"Fourteen days, no card, and a workspace you can keep.\"\n                 Classes=\"arc-body-sm arc-secondary\" TextAlignment=\"Center\" />\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"10\" HorizontalAlignment=\"Center\">\n        <c:ArcButton Content=\"Start free\" Size=\"Lg\" />\n        <c:ArcButton Content=\"Talk to sales\" Variant=\"Secondary\" Size=\"Lg\" />\n      </StackPanel>\n    </StackPanel>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

@@ -21,6 +21,11 @@ public sealed class SelectionToolbarPage : ArcItemPage
 {
     public override string ItemSlug => "selection-toolbar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-selected", "variant-selection-count", "variant-bulk-actions", "variant-table"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

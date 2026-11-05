@@ -1,0 +1,82 @@
+{
+  "slug": "bar-chart",
+  "nameZh": "柱状图",
+  "summary": "单一度量的柱状图：圆顶柱、安静的值轴、可选的均值参考线，以及悬停或聚焦时出现的精确读数。",
+  "purpose": [
+    "把同一个度量在若干离散类别上并列比较：一周七天、各渠道、各套餐。柱子的长度比折线角度更容易读出差距，适合作为仪表板里最基础的一张图。",
+    "它只画一组数值，因此不必处理图例与多序列；均值参考线用一条虚线点出整体水平，读者不需要自己心算。",
+    "柱色默认取 Arc 系列令牌的第一支，也可以用 BarBrush 换成任意画刷；超出可用宽度的类别标签会自动抽稀，不会挤成一片。",
+    "指针移到柱子上、或用方向键聚焦后，柱子高亮并弹出该类别的精确数值；离开后恢复安静。"
+  ],
+  "whenToUse": [
+    "比较离散类别之间的高低，比如周一至周日的活跃分钟数、各渠道的转化数。",
+    "需要同时看到每个类别的值与整体平均值时。",
+    "类别数量在 5 到 12 个之间、且标签能横向放下时。",
+    "想用单色强调一个度量、避免多条线互相缠绕时。"
+  ],
+  "whenNotToUse": [
+    "数据是随时间连续采样的序列时改用 line-chart，趋势的连续性比逐点高低更重要。",
+    "目标是展示各部分的占比（100% 构成）时改用 split-bar 或 donut-chart，长度分段比并排柱子更直观。",
+    "类别会随时间改变排名时改用 race-bar-chart。",
+    "类别超过十几个、标签必须旋转或滚动时，考虑 activity-heatmap 或 data-grid 的表格呈现。"
+  ],
+  "variants": [
+    { "key": "variant-columns", "label": "默认柱列", "note": "网格、平均值虚线、柱间留白都在" },
+    { "key": "state-no-average", "label": "关闭平均线", "note": "ShowAverage=false，只保留网格与柱子" },
+    { "key": "state-no-grid", "label": "关闭网格", "note": "ShowGrid=false，只留轴线与类别标签" },
+    { "key": "state-custom-brush", "label": "自定义柱色", "note": "BarBrush 覆盖默认系列色" },
+    { "key": "state-empty", "label": "空数据", "note": "Values 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "连续时间的趋势交给 line chart，柱状图只负责离散类别" },
+    { "type": "alternative", "target": "split-bar", "note": "要看各部分占整体的比例时改用 split bar" },
+    { "type": "alternative", "target": "race-bar-chart", "note": "类别排名会随时间变化时改用 race bar chart" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡常把关键数字和一张 mini bar chart 放在一起" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Bar chart 与 Line chart",
+      "rows": [
+        { "dimension": "数据形状", "self": "离散类别，一个类别一根柱", "other": "连续序列，点与点之间连线" },
+        { "dimension": "适合回答", "self": "各类别之间谁高谁低", "other": "随时间怎么变" },
+        { "dimension": "多序列", "self": "单组数值，可用并排柱表示分组", "other": "多条折线共用同一值轴" },
+        { "dimension": "读数方式", "self": "悬停或聚焦单根柱读取数值", "other": "十字准线吸附到最近的点" }
+      ]
+    },
+    {
+      "target": "split-bar",
+      "title": "Bar chart 与 Split bar",
+      "rows": [
+        { "dimension": "度量关系", "self": "各类别互相独立，不要求合计有意义", "other": "各段合起来正好是百分之百" },
+        { "dimension": "视觉编码", "self": "柱长对应值，拥有独立值轴", "other": "一整条按比例切段，没有值轴" },
+        { "dimension": "类别数量", "self": "5 到 12 个类别都清楚", "other": "适合 2 到 6 段，太多段就太窄" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础柱状图",
+      "language": "csharp",
+      "code": "var chart = new ArcBarChart\n{\n    Values = new double[] { 32, 48, 27, 54, 41, 62, 35 },\n    Labels = new[] { \"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\" },\n    ValueSuffix = \" min\",\n    ShowGrid = true,\n    ShowAverage = true\n};"
+    },
+    {
+      "title": "在 XAML 中放一张柱状图",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcBarChart x:Name=\"Minutes\"\n                      Height=\"176\"\n                      ValueSuffix=\" min\"\n                      ShowAverage=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcBarChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Values": "按显示顺序排列的柱高；空列表会画出 No data",
+      "Labels": "柱子下方的类别标签，与 Values 一一对应",
+      "ShowGrid": "绘制水平网格线与值轴刻度，默认 true",
+      "ShowAverage": "用一条虚线标出所有值的平均值，默认 true",
+      "BarBrush": "柱子颜色，默认取系列令牌的第一支",
+      "ValueSuffix": "追加在数值后的单位，例如 \" min\"",
+      "ValueFormat": "自定义数值格式，用于值标签与悬停读数"
+    }
+  }
+}

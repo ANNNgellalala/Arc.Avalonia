@@ -1,0 +1,78 @@
+{
+  "slug": "hover-card",
+  "nameZh": "悬停卡片",
+  "summary": "悬停或键盘聚焦时出现的只读预览卡片：人物、链接或任意内容的摘要，指针可以移进卡片，Escape 或短暂宽限后关闭。",
+  "purpose": [
+    "当一个人名、@提及或链接值得先看一眼资料、但不该跳走页面时，hover card 在悬停或聚焦后弹出只读预览。",
+    "出现时机是克制的：默认 500ms 后才出现（OpenDelay），指针离开后留 140ms 宽限（CloseDelay），让指针可以移进卡片继续读。",
+    "内置的 ArcHoverProfile 渲染头像、姓名、角色、简介、统计与页脚；也可以直接放任意内容做链接或卡片预览。Side 与 Align 决定它相对触发器的位置。"
+  ],
+  "whenToUse": [
+    "@提及、作者署名、团队头像旁需要快速预览资料时。",
+    "链接需要显示标题、描述与来源的摘要时。",
+    "预览是只读的、不需要在卡片里做操作时。"
+  ],
+  "whenNotToUse": [
+    "只有一行文字说明时，改用更轻的 tooltip。",
+    "预览里需要按钮或其他可交互内容时，改用 popover。",
+    "人物资料需要在页面上长期停留时，改成详情页或 drawer。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "卡片锚定在触发器旁显示" },
+    { "key": "side-right", "label": "右侧", "note": "卡片出现在触发器右边" },
+    { "key": "side-bottom", "label": "下方", "note": "默认方向，出现在触发器下方" },
+    { "key": "variant-profile", "label": "人物资料", "note": "头像、姓名、角色、简介与统计" },
+    { "key": "variant-custom", "label": "自定义内容", "note": "链接摘要等任意只读内容" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tooltip", "note": "只需要一行说明时，用更轻的 tooltip" },
+    { "type": "alternative", "target": "popover", "note": "预览里需要可交互内容时，改用点击打开的 popover" },
+    { "type": "complement", "target": "avatar", "note": "头像与 @提及是最常见的触发器，悬停即可展开资料预览" }
+  ],
+  "contrasts": [
+    {
+      "target": "tooltip",
+      "title": "Hover card 与 Tooltip",
+      "rows": [
+        { "dimension": "体量", "self": "头像、姓名、角色、简介与统计", "other": "一行短文字" },
+        { "dimension": "触发", "self": "悬停或键盘聚焦，指针可移入卡片", "other": "悬停或聚焦，指针不必停留" },
+        { "dimension": "关闭", "self": "Escape、移出卡片后的宽限或失焦", "other": "移开指针或失焦立即消失" },
+        { "dimension": "内容来源", "self": "内置资料模型或任意只读内容", "other": "一段纯文本" }
+      ]
+    },
+    {
+      "target": "popover",
+      "title": "Hover card 与 Popover",
+      "rows": [
+        { "dimension": "交互", "self": "只读预览，卡片里没有操作", "other": "可交互的控件、菜单或表单" },
+        { "dimension": "打开方式", "self": "悬停或键盘聚焦，带出现延迟", "other": "点击触发器" },
+        { "dimension": "关闭方式", "self": "Escape、宽限计时或失焦", "other": "点击外部、Escape 或再次点击触发器" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "用代码展示一个人物预览",
+      "language": "csharp",
+      "code": "var card = new ArcHoverCard\n{\n    Side = ArcHoverCardSide.Right,\n    Align = ArcHoverCardAlign.Center,\n    OpenDelay = 120,\n    Trigger = new ArcButton { Content = \"@maya\", Variant = ArcButtonVariant.Ghost, Size = ArcButtonSize.Sm },\n    Content = new ArcHoverProfile\n    {\n        Name = \"Maya Chen\",\n        Role = \"Product designer, Payments\",\n        Bio = \"Checkout and pricing.\",\n        Stats = new[]\n        {\n            new ArcHoverStat { Label = \"Projects\", Value = \"12\" },\n            new ArcHoverStat { Label = \"Reviews\", Value = \"48\" }\n        }\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中锚定一个链接预览",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcHoverCard Side=\"Bottom\" Align=\"Start\" OpenDelay=\"300\" IsOpen=\"{Binding IsPreviewOpen}\">\n    <effects:ArcHoverCard.Trigger>\n      <TextBlock Text=\"Q3 launch plan\" Classes=\"arc-link\" />\n    </effects:ArcHoverCard.Trigger>\n    <StackPanel Spacing=\"4\" Width=\"260\">\n      <TextBlock Text=\"Q3 launch plan\" Classes=\"arc-label\" />\n      <TextBlock Text=\"acme.com/docs/q3-launch\" Classes=\"arc-caption\" />\n    </StackPanel>\n  </effects:ArcHoverCard>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcHoverCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Trigger": "触发器内容，例如 @提及按钮或链接文字；它必须可聚焦",
+      "IsOpen": "卡片是否显示；可赋值以便静态展示打开态",
+      "Side": "相对触发器的方向：Bottom（默认）、Top、Left、Right",
+      "Align": "沿触发器边缘的对齐：Start、Center、End",
+      "OpenDelay": "悬停多久后出现，默认 500ms",
+      "CloseDelay": "指针离开后的宽限毫秒数，默认 140",
+      "Content": "卡片内容；传 ArcHoverProfile 时渲染标准人物资料"
+    }
+  }
+}

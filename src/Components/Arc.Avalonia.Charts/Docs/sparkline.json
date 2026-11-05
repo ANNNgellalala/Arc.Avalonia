@@ -1,0 +1,85 @@
+{
+  "slug": "sparkline",
+  "nameZh": "迷你趋势线",
+  "summary": "紧凑的趋势线或面积块：没有坐标轴与图例，末端一个点锚定最新值，可以带语义色和一行标题数字。",
+  "purpose": [
+    "当趋势只是数字的注脚——指标卡、列表行、表格单元格——时，迷你趋势线用几十像素高度就把方向说清楚，不打断阅读。",
+    "默认画一条带面积填充的线，并在最后一个点放一个圆点；ShowArea 与 ShowLastPoint 可以分别关掉这两层。",
+    "Tone 把线条换成成功、警告或危险色，让「涨还是跌」在颜色上可读；Stroke 可以覆盖成任意画刷。",
+    "Value 与 Change 是可选的标题行：把当前值和变化幅度印在趋势上方，就可以省掉外层再排一次版。"
+  ],
+  "whenToUse": [
+    "指标卡、列表行或表格单元格里需要一条很小的趋势，不要求精确读数。",
+    "要在一个数字旁边暗示方向（上升/下降），又不希望引入坐标轴与图例时。",
+    "需要按语义色（成功/警告/危险）表达趋势含义时。",
+    "空间只够放下几十像素高的图形时。"
+  ],
+  "whenNotToUse": [
+    "读者需要读取具体数值或比较多个时点时改用 line-chart。",
+    "只有单个数字、不需要趋势时改用 animated-counter 或 metric-card。",
+    "要做时间范围缩放或事件标注时改用 brush-chart。",
+    "要比较多个类别的构成时改用 bar-chart 或 waffle-chart。"
+  ],
+  "variants": [
+    { "key": "variant-trend", "label": "纯趋势", "note": "面积 + 末端点，没有标题数字" },
+    { "key": "variant-headline", "label": "带标题数字", "note": "Value=48、Change=+26%，趋势在数字下方" },
+    { "key": "variant-success", "label": "成功色", "note": "Tone=Success，表示正向变化" },
+    { "key": "variant-danger", "label": "危险色", "note": "Tone=Danger，表示负向变化" },
+    { "key": "state-no-area", "label": "无面积", "note": "ShowArea=false，只剩一条线" },
+    { "key": "state-no-last-point", "label": "无端点", "note": "ShowLastPoint=false，不画末端圆点" },
+    { "key": "state-empty", "label": "空数据", "note": "Values 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "需要坐标轴、图例与精确读数时用 line chart" },
+    { "type": "alternative", "target": "animated-counter", "note": "只要数字、不要趋势时用 animated counter" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡内部常把数字和 sparkline 组合在一起" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Sparkline 与 Line chart",
+      "rows": [
+        { "dimension": "尺寸", "self": "默认 64 px 高，嵌在行内", "other": "通常 200 px 以上，作为主图" },
+        { "dimension": "坐标轴", "self": "没有坐标轴、图例与类别标签", "other": "有值轴刻度、类别标签和图例" },
+        { "dimension": "交互", "self": "最多在末端高亮，不提供完整十字准线", "other": "十字准线、图例开关、键盘逐点" },
+        { "dimension": "精确读数", "self": "读方向，不读数值", "other": "可读每个点的值" }
+      ]
+    },
+    {
+      "target": "animated-counter",
+      "title": "Sparkline 与 Animated counter",
+      "rows": [
+        { "dimension": "表达内容", "self": "一段时间的趋势形状", "other": "单个数值本身" },
+        { "dimension": "是否需要序列", "self": "需要一组按时间排列的值", "other": "只需要一个值" },
+        { "dimension": "适用位置", "self": "数值旁的窄条区域", "other": "指标卡中央的大数字" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "指标卡里的迷你趋势",
+      "language": "csharp",
+      "code": "var spark = new ArcSparkline\n{\n    Values = new double[] { 12, 18, 15, 22, 30, 27, 34, 26, 38, 34, 41, 48 },\n    Height = 64,\n    Value = \"48\",\n    Change = \"+26%\",\n    Tone = ChartTone.Success\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcSparkline x:Name=\"Signups\"\n                       Height=\"64\"\n                       ShowArea=\"True\"\n                       ShowLastPoint=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcSparkline",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Values": "按时间顺序排列的点，最早的在前",
+      "Labels": "可选的时间标签，仅在悬停读数时出现",
+      "ShowArea": "在趋势线下方填充柔和面积，默认 true",
+      "ShowLastPoint": "在最新一点画圆点，默认 true",
+      "Tone": "线条语义色；默认强调色，也支持成功、警告、危险",
+      "Stroke": "显式画刷，设置后覆盖 Tone",
+      "Value": "可选的标题数字，显示在趋势上方",
+      "Change": "标题数字旁的变化说明，例如 +26%",
+      "ValueFormat": "悬停读数时使用的数值格式"
+    }
+  }
+}

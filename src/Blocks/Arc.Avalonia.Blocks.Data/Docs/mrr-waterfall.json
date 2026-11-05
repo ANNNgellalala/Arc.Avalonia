@@ -1,0 +1,55 @@
+{
+  "slug": "mrr-waterfall",
+  "nameZh": "MRR 瀑布",
+  "summary": "把期初到期末的 MRR 画成浮动柱桥：新签、扩展、流失逐段叠加，选中某一段时右侧列出这段变动背后的账户。",
+  "purpose": [
+    "当董事会或财务要回答「MRR 为什么从 148k 变成 156k」时，用 MRR waterfall：每一段浮动柱代表一项变动，柱子的落点就是下一段的起点，桥的末端与期末 MRR 对齐。",
+    "周期切换（本月 / 上月 / 上季）会重建整座桥；点选任一段，右侧面板列出贡献这笔变动的账户及其计划与席位，把汇总数字还原成人能核对的名字。",
+    "它和收入探索器的分工很清楚：explorer 看趋势与窗口，waterfall 解释单期变动的构成，预算差异页则比较预算与实际。"
+  ],
+  "whenToUse": [
+    "需要解释单期 MRR 变动来自新签、扩展还是流失时。",
+    "要让汇总数字可追溯到具体账户时。",
+    "财务或董事材料里需要一张桥形汇总时。"
+  ],
+  "whenNotToUse": [
+    "看长期趋势与任意窗口时，用 revenue-explorer。",
+    "比较预算与实际支出时，用 budget-variance。",
+    "只需要一个总数与变化时，用 metric-card。"
+  ],
+  "variants": [
+    { "key": "layout-waterfall", "label": "整体布局", "note": "瀑布桥、周期切换与账户面板并置" },
+    { "key": "variant-bridge", "label": "Bridge", "note": "从期初到期末的浮动柱与连接落点" },
+    { "key": "variant-period-switch", "label": "Period", "note": "本月 / 上月 / 上季的周期切换" },
+    { "key": "variant-account-panel", "label": "Accounts", "note": "所选变动背后的账户列表与计划、席位" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "周期与账户行操作由按钮承担" },
+    { "type": "uses", "target": "segmented-control", "note": "周期切换用分段控件" },
+    { "type": "uses", "target": "card", "note": "桥图与账户面板各用一张卡片承载" },
+    { "type": "alternative", "target": "revenue-explorer", "note": "看长期趋势与任意窗口时，改用 revenue explorer" }
+  ],
+  "contrasts": [
+    {
+      "target": "revenue-explorer",
+      "title": "MRR waterfall 与 Revenue explorer",
+      "rows": [
+        { "dimension": "回答的问题", "self": "这一期的变动由什么组成", "other": "任意窗口里的趋势与环比" },
+        { "dimension": "时间跨度", "self": "单期桥形汇总", "other": "二十四个月可刷选历史" },
+        { "dimension": "可追溯性", "self": "点选变动可下钻到账户", "other": "以月为单位聚合，不下钻到账户" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,300\">\n  <charts:ArcWaterfallBars Height=\"300\" />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：桥与选中段",
+      "language": "csharp",
+      "code": "var bars = new List<WaterfallBar>\n{\n    new(\"Starting MRR\", 148_000),\n    new(\"New\", 12_400),\n    new(\"Expansion\", 6_100),\n    new(\"Churn\", -4_900),\n    new(\"Ending MRR\", 161_600)\n};\n\nbridge.Selected = 1; // 默认选中第一段变动"
+    }
+  ]
+}

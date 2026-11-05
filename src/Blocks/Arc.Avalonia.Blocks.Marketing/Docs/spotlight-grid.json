@@ -1,0 +1,49 @@
+{
+  "slug": "spotlight-grid",
+  "nameZh": "聚光灯网格",
+  "summary": "跟随指针打光的六格功能网格：每张卡里跑一段真实小演示，点击后卡片原位展开详情。",
+  "purpose": [
+    "用 2×3 的卡片网格展示功能：指针进入哪张卡，光就在那张卡里跟随；卡片本身可聚焦，键盘也能打开详情。",
+    "每张卡里不是静态插图，而是一小段能自己动的产品界面（开关、进度条、迷你趋势），让功能被「演」出来而不是被描述。",
+    "组成依赖：卡片里的小演示用 button、badge、sparkline 与 switch；详情面板在页面内展开，不打开弹窗。"
+  ],
+  "whenToUse": [
+    "功能数量在 4–8 个、希望每项都能被演示的产品区块。",
+    "需要在网格里保持视觉节奏、同时让每个单元有信息量时。",
+    "想用轻量悬停反馈代替整块视频或大图时。"
+  ],
+  "whenNotToUse": [
+    "功能之间有先后顺序时，改用 scroll-story。",
+    "功能数量很少、每个都值得一整屏时，用交替的两栏区块。",
+    "内容以文章为主时，改用 blog-grid。"
+  ],
+  "variants": [
+    { "key": "variant-grid", "label": "Grid", "note": "2×3 卡片网格与跟随指针的高光" },
+    { "key": "variant-live-demos", "label": "Live demos", "note": "卡片内可交互的小演示（开关、进度、趋势）" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "卡片内的演示动作与详情入口都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "卡片状态与标签用 ArcBadge" },
+    { "type": "uses", "target": "sparkline", "note": "演示里的趋势条用 shared sparkline" },
+    { "type": "uses", "target": "switch", "note": "演示里的开关状态用 ArcSwitch" },
+    { "type": "alternative", "target": "feature-bento", "note": "需要不同尺寸的便当格布局时改用 feature bento" }
+  ],
+  "contrasts": [
+    {
+      "target": "feature-bento",
+      "title": "Spotlight grid 与 Feature bento",
+      "rows": [
+        { "dimension": "布局", "self": "整齐的 2×3 等宽网格", "other": "大小不一的六格便当布局" },
+        { "dimension": "交互", "self": "高光跟随指针，点击展开详情", "other": "悬停触发格内演示的状态变化" },
+        { "dimension": "节奏", "self": "每格同等重要", "other": "用尺寸差强调主功能" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "网格与详情宿主",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"16\" Margin=\"24,22,24,22\">\n    <Grid ColumnDefinitions=\"*,*,*\" RowDefinitions=\"Auto,Auto\">\n      <c:ArcCard Margin=\"0,0,12,12\">\n        <StackPanel Spacing=\"8\">\n          <c:ArcBadge Content=\"New\" Tone=\"Accent\" />\n          <TextBlock Text=\"Live insights\" Classes=\"arc-label\" />\n          <TextBlock Text=\"Dashboards that answer the question you asked.\"\n                     Classes=\"arc-caption\" TextWrapping=\"Wrap\" />\n        </StackPanel>\n      </c:ArcCard>\n      <c:ArcCard Grid.Column=\"1\" Margin=\"0,0,12,12\">\n        <c:ArcButton Content=\"Try it\" Variant=\"Secondary\" Size=\"Sm\" HorizontalAlignment=\"Left\" />\n      </c:ArcCard>\n    </Grid>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

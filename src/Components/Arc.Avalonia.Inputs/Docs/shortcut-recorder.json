@@ -1,0 +1,76 @@
+{
+  "slug": "shortcut-recorder",
+  "nameZh": "快捷键录制",
+  "summary": "把按键组合录成键帽的字段：点击后进入录制，Escape 取消，Delete 清除，遇到已被占用或系统保留的组合会先询问。",
+  "purpose": [
+    "为设置页的「改键」设计：控件把按下的组合规范化为 Ctrl+Shift+K 这样的字符串，并渲染成一排键帽，用户一眼能看出录了什么。",
+    "录制时控件独占键盘：Enter / Space / 点击开始，Escape 取消，Backspace 或 Delete 清除；只按修饰键不会提交，RequireModifier 为 true 时还要求组合里至少含 Ctrl、Alt 或 Windows 键（功能键例外）。",
+    "冲突处理内建：Bindings 描述已被占用的组合，WarnReserved 还会拦下 Ctrl+W、Ctrl+C 这类系统快捷键；发生冲突时不直接写入，而是停在「Use anyway」确认，确认后才触发 GestureChanged。"
+  ],
+  "whenToUse": [
+    "设置页里让用户自定义快捷键，需要录制而不是手输字符串的场景。",
+    "需要把组合显示成键帽、让用户确认自己按对了键时。",
+    "需要检测组合冲突并在抢占已有快捷键前询问时。"
+  ],
+  "whenNotToUse": [
+    "只需要用户输入一个普通文本值（如命令名、别名）时改用 input。",
+    "快捷键由产品固定、不允许用户修改时不要用录制控件，改用 tooltip 或帮助文本说明。",
+    "需要在行内直接编辑已有文本值时改用 inline-edit。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "Empty", "note": "未录制，显示占位文案" },
+    { "key": "state-recorded", "label": "Recorded", "note": "已录制组合，渲染为键帽" },
+    { "key": "state-recording", "label": "Recording", "note": "录制中，显示录制指示与 Listening…" },
+    { "key": "variant-hide-label", "label": "Hide label", "note": "标签只提供给读屏，不绘制" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可录制，禁止清除" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "收集普通文本值改用 input" },
+    { "type": "alternative", "target": "inline-edit", "note": "在行内直接改写文本值改用 inline edit" },
+    { "type": "uses", "target": "button", "note": "清除、Use anyway 与取消复用 button" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Shortcut recorder 与 Input",
+      "rows": [
+        { "dimension": "输入内容", "self": "按键组合，规范化为 Ctrl+Shift+K", "other": "任意文本字符串" },
+        { "dimension": "键盘行为", "self": "录制期间独占键盘，Escape 取消、Delete 清除", "other": "正常编辑文本，方向键移动光标" },
+        { "dimension": "校验", "self": "检查修饰键要求、已有绑定与系统保留组合", "other": "通常只校验非空与格式" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcShortcutRecorder Label=\"打开搜索\"\n                           Gesture=\"Ctrl+K\"\n                           Placeholder=\"按下组合键\"\n                           Description=\"Escape 取消，Delete 清除。\"\n                           GestureChanged=\"OnShortcutChanged\" />\n</Window>"
+    },
+    {
+      "title": "已有绑定与冲突保护",
+      "language": "csharp",
+      "code": "var recorder = new ArcShortcutRecorder\n{\n    Label = \"切换侧栏\",\n    Gesture = \"Ctrl+Shift+K\",\n    Bindings = new List<ArcShortcutBinding>\n    {\n        new(\"Ctrl+K\", \"打开搜索\"),\n        new(\"Ctrl+P\", \"打印\")\n    },\n    WarnReserved = true\n};\n\nrecorder.GestureChanged += (_, e) =>\n{\n    ShortcutMap.Assign(\"toggle-sidebar\", e.Gesture, e.Replaced);\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcShortcutRecorder",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "可见标签与无障碍名称",
+      "HideLabel": "标签只给读屏，不绘制",
+      "Gesture": "规范化后的组合字符串，如 Ctrl+Shift+K；null 表示未录制",
+      "ResetValue": "重置目标值，保留给页面在清除后恢复；控件本身不绘制重置按钮",
+      "Bindings": "已被占用的组合列表，录制到相同组合时先询问",
+      "WarnReserved": "拦下 Ctrl+W、Ctrl+C 等系统保留组合，默认 true",
+      "RequireModifier": "要求组合至少含 Ctrl、Alt 或 Windows 键（功能键除外），默认 true",
+      "Platform": "平台显示差异 Other / Mac",
+      "Placeholder": "未录制时的占位文案，默认 Record shortcut",
+      "Description": "帮助文案",
+      "IsRecording": "只读，是否处于录制态",
+      "GestureChanged": "组合变为新值或清除时触发，参数含 Gesture 与被替换的绑定",
+      "BeginRecording": "开始录制，如同点击或按 Enter",
+      "CancelRecording": "取消录制且不改变现有组合",
+      "Clear": "清除已录制的组合"
+    }
+  }
+}

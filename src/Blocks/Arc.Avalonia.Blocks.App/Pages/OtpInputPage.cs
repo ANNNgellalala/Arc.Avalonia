@@ -18,6 +18,11 @@ public sealed class OtpInputPage : ArcItemPage
 {
     public override string ItemSlug => "otp-input";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-filled", "variant-six-slots", "variant-verify-action", "variant-guidance"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

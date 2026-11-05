@@ -1,0 +1,66 @@
+{
+  "slug": "countdown",
+  "nameZh": "倒计时",
+  "summary": "面向固定时刻的倒计时：大号数字带单位标签，目标过去后换成实时状态文案与一个脉动圆点。",
+  "purpose": [
+    "把「离某个时刻还有多久」变成一组会自己走的数字：Days、Hours、Minutes、Seconds 按 Units 的顺序排列，最大单位吸收其余部分（例如 2 天 4 小时后只显示天数）。",
+    "目标时间过去后不再显示 00:00:00，而是换成 CompleteLabel 与一个实时圆点，明确表示「已经开始」而不是「还剩零秒」。",
+    "时钟来源可以通过 Clock 注入，测试与截图可以用固定的时间函数，不依赖机器真实时间。"
+  ],
+  "whenToUse": [
+    "发布、开播、促销结束等有明确时刻、用户在等待的场景。",
+    "需要把剩余时间嵌进行头、公告条或卡片时；Countdown 自带单位与标签排版。",
+    "状态会从「等待」翻转为「已开始」，且翻转需要被看见的流程。"
+  ],
+  "whenNotToUse": [
+    "展示已经过去的时长（评论发布于 2 小时前）时，直接用相对时间文本，不需要这个控件。",
+    "表达任务完成比例而不是剩余时间时，改用 progress。",
+    "需要多步骤流程的位置时，改用 stepper。"
+  ],
+  "variants": [
+    { "key": "variant-large", "label": "Large", "note": "大号数字组，适合页头与卡片主信息" },
+    { "key": "variant-compact", "label": "Compact", "note": "紧凑行内版，常与公告条或工具栏并排" },
+    { "key": "state-complete", "label": "Complete", "note": "目标过去后显示 CompleteLabel 与实时圆点" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "announcement-bar", "note": "促销类公告条常把倒计时放在消息语句后" },
+    { "type": "alternative", "target": "progress", "note": "关心完成比例而不是剩余时间时改用 progress" },
+    { "type": "alternative", "target": "stepper", "note": "关心流程位置而不是时间时改用 stepper" }
+  ],
+  "contrasts": [
+    {
+      "target": "progress",
+      "title": "Countdown 与 Progress",
+      "rows": [
+        { "dimension": "计量对象", "self": "到固定时刻的剩余时间", "other": "已完成量与任务总量的比例" },
+        { "dimension": "数据来源", "self": "Target 加上一个时钟", "other": "Value 与 Max" },
+        { "dimension": "结束表现", "self": "换成 CompleteLabel 与实时圆点", "other": "停在 100% 与对勾" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "大号倒计时",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcCountdown Label=\"Keynote starts in\"\n                   Target=\"{Binding KeynoteStart}\"\n                   CompleteLabel=\"Live now\" />\n</Window>"
+    },
+    {
+      "title": "紧凑版，只显示时分秒",
+      "language": "csharp",
+      "code": "var countdown = new ArcCountdown\n{\n    Label = \"Sale ends in\",\n    Target = DateTimeOffset.Now.AddHours(6),\n    Variant = ArcCountdownVariant.Compact,\n    Units = new[]\n    {\n        ArcCountdownUnit.Hours,\n        ArcCountdownUnit.Minutes,\n        ArcCountdownUnit.Seconds\n    },\n    CompleteLabel = \"Sale ended\"\n};\n\ncountdown.Completed += (_, _) => ReloadOffers();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcCountdown",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Target": "要倒数的时刻，所有单位都由它推算",
+      "Units": "显示的单位序列（Days / Hours / Minutes / Seconds），默认天、时、分、秒",
+      "Variant": "Large 大号数字组；Compact 紧凑行内版",
+      "CompleteLabel": "目标过去后替换数字显示的文案，例如 Live now",
+      "Label": "数字前的说明文字，同时作为无障碍名称",
+      "Clock": "时钟来源，返回 epoch 毫秒；默认系统时钟，测试可注入固定值",
+      "Completed": "倒计时到达零时触发一次"
+    }
+  }
+}

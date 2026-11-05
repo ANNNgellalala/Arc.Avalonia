@@ -1,0 +1,57 @@
+{
+  "slug": "mcp-servers",
+  "nameZh": "MCP 服务器",
+  "summary": "智能体可调用的工具服务器清单：每台服务器给出连接状态、传输方式、工具数量与 token 成本，展开后可逐个开关工具，顶部一条预算条显示工具定义占了多少上下文。",
+  "purpose": [
+    "它管理「agent 能用哪些工具」：GitHub、Linear、Postgres 等服务器逐行列出，状态写得明确（GitHub 与 Linear 已连接，Postgres 需要重试），右侧给出传输方式、工具数与这些定义要占的 token。",
+    "工具定义是上下文成本：顶部预算条把已启用工具的 token 汇总成一根进度条并标出 Budget，开一个工具条就变长——这让「多接一台服务器」的代价可见。",
+    "展开一台服务器会列出它的工具，每个工具一行开关；开关只改变本页的启用集合与预算，不会真的建立连接。目录、授权与发现流程用状态行说明，避免在静态区块里假装有一个完整连接向导。",
+    "Add server 与设置入口在头部：前者打开目录（本页用状态行表示），后者管理服务器与默认启用策略；这些都是示例数据。"
+  ],
+  "whenToUse": [
+    "agent 平台需要让用户管理可调用的工具服务器与逐个工具权限时。",
+    "工具定义会占用上下文、需要显示预算与已用 token 时。",
+    "需要呈现连接状态（已连接 / 需要重试）与传输方式（stdio / http）时。"
+  ],
+  "whenNotToUse": [
+    "审批一次具体的工具调用时，用 agent-approvals，那里有理由、参数与放行决定。",
+    "要展示每次调用的入参与输出时，用 tool-call。",
+    "要管理的是知识库来源而不是工具时，用 knowledge-base。"
+  ],
+  "variants": [
+    { "key": "variant-server-row", "label": "Server row", "note": "服务器行：连接状态、传输、工具数与 token 成本" },
+    { "key": "variant-tools", "label": "Tools", "note": "展开服务器后的工具列表与逐个开关" },
+    { "key": "variant-context-meter", "label": "Context meter", "note": "顶部预算条与已用 token 汇总" },
+    { "key": "variant-directory", "label": "Directory", "note": "Add server 与设置入口、连接状态行" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Add server、Retry、Sign in、Remove 与服务器行都是 ArcButton" },
+    { "type": "uses", "target": "switch", "note": "每个工具一行的启用开关是 ArcSwitch" },
+    { "type": "uses", "target": "segmented-control", "note": "按传输方式或启用状态筛选服务器用 ArcSegmentedControl" },
+    { "type": "alternative", "target": "knowledge-base", "note": "管理知识来源而不是工具时改用 knowledge base" }
+  ],
+  "contrasts": [
+    {
+      "target": "knowledge-base",
+      "title": "MCP servers 与 Knowledge base",
+      "rows": [
+        { "dimension": "接入对象", "self": "可调用的工具服务器", "other": "被检索的文档来源" },
+        { "dimension": "上下文占用", "self": "工具定义本身占 token，预算条可见", "other": "按 chunk 召回，占用随问题变化" },
+        { "dimension": "权限", "self": "逐个工具开关与连接状态", "other": "来源级摄入与重排设置" },
+        { "dimension": "失败形态", "self": "连接失败需要授权或重试", "other": "解析 / 索引失败需要重跑" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "服务器清单与预算条",
+      "language": "csharp",
+      "code": "var content = K.Stack(8,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(3, K.Text(\"MCP servers\", \"arc-heading\"),\n                K.Caption(\"Tool definitions count against the agent's context\")),\n            K.Row(4, addServer, K.IconBtn(\"settings\", \"MCP settings\"))\n        }\n    },\n    new Border\n    {\n        CornerRadius = new CornerRadius(12),\n        Padding = new Thickness(11, 8, 11, 9),\n        Child = K.Stack(6,\n            K.Row(6, meterLabel, K.Caption($\"Budget {budget / 1000.0:0.0}k\")),\n            meterHost)      // ArcProgress：已启用工具的 token 汇总\n    },\n    list,                   // 服务器行\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 860 }, new Thickness(18, 10, 18, 10));"
+    },
+    {
+      "title": "展开服务器后逐个开关工具",
+      "language": "csharp",
+      "code": "void RenderTools(Server item)\n{\n    foreach (var tool in item.Tools)\n    {\n        var toggle = K.Toggle(tool.Name, tool.Enabled, on =>\n        {\n            tool.Enabled = on;\n            RefreshMeter();       // 预算条与合计随之变化\n            status.Text = $\"{tool.Name} {(on ? \"enabled\" : \"disabled\")} for {item.Name}. Simulated.\";\n        });\n        toolRows.Children.Add(K.Row(8, toggle, K.Caption(tool.Description)));\n    }\n}\n\nvar serverRow = K.Panel(K.Stack(6,\n    K.Row(7,\n        K.Disc(\"plug\", 24, accent: item.Status == \"Connected\"),\n        K.Text(item.Name, \"arc-label\"),\n        K.Pill(item.Status, item.Status == \"Connected\" ? ArcBadgeTone.Success : ArcBadgeTone.Warning)),\n    K.Row(6, K.Caption(item.Transport), K.Caption($\"{item.Tools.Count} tools\"), K.Caption($\"{item.Tokens} tokens\"))),\n    12);"
+    }
+  ]
+}

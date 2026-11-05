@@ -1,0 +1,75 @@
+{
+  "slug": "product-gallery",
+  "nameZh": "商品画廊",
+  "summary": "商品详情页的主图区：悬停放大镜、会滑动的缩略图轨、可切换颜色的色板与尺码，以及一个从主图展开的放大查看器。",
+  "purpose": [
+    "把「看商品」这件事收进一块自绘表面：左侧是主图与缩略图轨，右侧是标题、价格、颜色、尺码与加购按钮。悬停主图时出现 2.4× 的放大镜，镜头跟着指针移动，离开后在主图上留一个固定的静帧位置，所以截图里也能看到放大效果。",
+    "颜色切换会给同一组照片重新着色，并交叉淡入下一张；某个颜色缺货时，对应尺码会做删除线并自动清空选择，加购按钮退化为「Select a size」。整块表面只有一次焦点停靠，上下切换分组、左右在组内移动、Enter 激活当前项。",
+    "照片与商品内容都由代码绘制（示例图、色相与文案全在控件内），预览不带任何图片资源；真实项目里替换 SampleArt 的数据源即可，布局、焦点与键盘模型保持不变。"
+  ],
+  "whenToUse": [
+    "商品详情页需要主图、缩略图、颜色与尺码在同屏完成选择时。",
+    "服装、家居等需要放大查看面料、纹理或小字的商品。",
+    "同一件商品有多种颜色，希望切换颜色时所有照片一起换色而不是逐张替换时。"
+  ],
+  "whenNotToUse": [
+    "只需要看大图、不需要色板与尺码时，改用 lightbox-gallery，交互更轻。",
+    "照片数量多、需要按网格浏览与缩放时，改用 photo-grid。",
+    "商品是纯数字内容、没有可放大的细节时，普通主图加说明文字就够。"
+  ],
+  "variants": [
+    { "key": "state-default", "label": "Default", "note": "默认商品页：Olive / Front / M，Add to bag 可用" },
+    { "key": "state-magnifier", "label": "Magnifier", "note": "静止镜头：放大镜停在主图上，带 2.4× 徽标" },
+    { "key": "variant-thumbnails", "label": "Thumbnails", "note": "四张缩略图与滑动的选中指示条" },
+    { "key": "variant-colorways", "label": "Colourways", "note": "三个色板：Olive 选中，另两个为 Clay / Indigo" },
+    { "key": "variant-size-grid", "label": "Sizes", "note": "S / M / L 三档，M 选中，缺货尺码带删除线" },
+    { "key": "variant-add-to-bag", "label": "Add to bag", "note": "主行动按钮，已加购时显示 check 与 Added to bag" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "lightbox-gallery", "note": "只需要看大图与切换照片时用 lightbox gallery" },
+    { "type": "alternative", "target": "photo-grid", "note": "照片多、需要网格浏览与缩放时用 photo grid" },
+    { "type": "complement", "target": "button", "note": "加购与放大查看沿用 button 的行动与焦点语义" }
+  ],
+  "contrasts": [
+    {
+      "target": "lightbox-gallery",
+      "title": "Product gallery 与 Lightbox gallery",
+      "rows": [
+        { "dimension": "核心任务", "self": "选颜色与尺码，把商品放进购物袋", "other": "浏览一组照片，把某一张放大看" },
+        { "dimension": "主图交互", "self": "悬停出现放大镜，点击进入全屏查看器", "other": "点击格子把照片飞入查看器" },
+        { "dimension": "附属信息", "self": "标题、价格、色板、尺码与加购按钮", "other": "只有照片与标题说明，没有商品选项" }
+      ]
+    },
+    {
+      "target": "photo-grid",
+      "title": "Product gallery 与 Photo grid",
+      "rows": [
+        { "dimension": "布局", "self": "一张主图加一条缩略图轨", "other": "多列等宽网格，可切换列数" },
+        { "dimension": "目标对象", "self": "一件商品的多个视角与颜色", "other": "一个相册里的多张照片" },
+        { "dimension": "选择行为", "self": "切换照片、颜色与尺码并加购", "other": "收藏、缩放与在查看器中翻页" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放进商品页",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcProductGallery Width=\"840\" Height=\"452\"\n                             HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘模型：上下换组、左右换项",
+      "language": "csharp",
+      "code": "// 整块表面只有一个焦点停靠：\n// Up / Down 在 主图 → 缩略图 → 色板 → 尺码 → 加购 之间切换分组，\n// Left / Right 在当前分组内移动，Enter 或 Space 激活。\n// 主图分组上按 Enter 打开全屏查看器，Escape 关闭。\nvar gallery = new ArcProductGallery\n{\n    Width = 840,\n    Height = 452,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcProductGallery",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "整个商品表面的宽度；默认按 840 设计，放大镜与查看器按当前尺寸重排",
+      "Height": "整个商品表面的高度；默认按 460 设计",
+      "IsEnabled": "禁用后不再响应指针与键盘，视觉保持原样",
+      "IsVisible": "隐藏后同时停止内部帧时钟"
+    }
+  }
+}

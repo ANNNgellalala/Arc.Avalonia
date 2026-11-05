@@ -20,6 +20,11 @@ public sealed class ContactSectionPage : ArcItemPage
 {
     public override string ItemSlug => "contact-section";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-form", "state-confirmation", "variant-support", "variant-offices"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -148,7 +153,21 @@ public sealed class ContactSectionPage : ArcItemPage
         Grid.SetColumn(side, 1);
         root.Children.Add(side);
 
-        return Mk.Surface(new Border { Padding = new Thickness(26, 24, 26, 24), Child = root });
+        // The sent state only appears after a valid submit; a static copy keeps it in the preview.
+        var confirmationSpecimen = Mk.Surface(new Border
+        {
+            Padding = new Thickness(26, 24, 26, 24),
+            Child = Mk.Stack(12,
+                Mk.Disc("circle-check", 44, 20, accent: true),
+                Mk.Heading("Message sent", 320),
+                Mk.Body("Thanks. A person from the team will reply to that address within one business day.", 360),
+                Mk.Btn("Send another message", ArcButtonVariant.Secondary))
+        });
+
+        return Mk.Stack(16,
+            Mk.Surface(new Border { Padding = new Thickness(26, 24, 26, 24), Child = root }),
+            Mk.Caption("After sending: the form is replaced by the confirmation"),
+            confirmationSpecimen);
     }
 
     private static Control SideColumn()

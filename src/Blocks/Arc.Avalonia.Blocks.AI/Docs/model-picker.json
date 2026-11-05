@@ -1,0 +1,57 @@
+{
+  "slug": "model-picker",
+  "nameZh": "模型选择器",
+  "summary": "一枚安静的模型 pill 加它展开的菜单：菜单里是四个 Featured 模型、Effort 段与按供应商列出的其余模型，pill 下方的复核行给出上下文、输出上限与价格。",
+  "purpose": [
+    "它是「默认用哪个模型」这一项设置：左侧只有一枚 pill，写着当前模型与 effort（Opus 5.5 · high），旁边是展开状态下的菜单，两者并排展示，便于一次看全。",
+    "菜单按三层组织：Featured 四个常用模型（每个带一句适用说明）、Effort 段（low / medium / high 三枚 chip 与 Reasoning 开关）、More models 按供应商列出其余模型；选中哪个，pill 与复核行同时更新。",
+    "复核行是可选的：它把 Context、Max output、Input、Output 四个数字与一句描述摊开，让用户在选择前就能看到代价；不需要时整块可以省掉，只留 pill。",
+    "所有状态都写在状态行里：换模型、换 effort 都会在底部说明发生了什么；价格是示例值，菜单也不会真的打开浮层——本页直接把它画在 pill 旁边。"
+  ],
+  "whenToUse": [
+    "为聊天、agent 或 playground 选择模型与 effort。",
+    "默认模型设置需要顺带展示上下文长度、输出上限与价格时。",
+    "只想把选择器塞进 composer 工具栏、不需要复核区时（去掉 review 即可）。"
+  ],
+  "whenNotToUse": [
+    "要盲测两个模型的回答、由投票决定优劣时，用 model-arena。",
+    "模型选择只是整个对话的一部分、用户不关心参数时，用 ai-chat 头部的模型 chip 即可。",
+    "要比较模型在评测集上的分数与回归时，用 eval-suite。"
+  ],
+  "variants": [
+    { "key": "variant-pill", "label": "Pill", "note": "当前模型与 effort 的安静 pill，宽度跟着标签走" },
+    { "key": "variant-menu", "label": "Menu", "note": "Featured 模型行、Effort 段与 More models" },
+    { "key": "variant-effort-row", "label": "Effort", "note": "low / medium / high 三枚 chip 与 Reasoning 开关" },
+    { "key": "variant-review", "label": "Review", "note": "Context / Max output / Input / Output 四个数字" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "模型 pill、effort chip、菜单行与 History 都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "菜单里的 Featured 分组标题用徽标标出" },
+    { "type": "uses", "target": "switch", "note": "复核行的 Reasoning 开关表达该模型是否默认深度推理" },
+    { "type": "alternative", "target": "model-arena", "note": "要盲测两个模型的答案时改用 model arena" }
+  ],
+  "contrasts": [
+    {
+      "target": "model-arena",
+      "title": "Model picker 与 Model arena",
+      "rows": [
+        { "dimension": "目的", "self": "为接下来的会话挑一个模型", "other": "对同一题的两个回答做盲投" },
+        { "dimension": "信息", "self": "上下文、输出上限、价格与 effort", "other": "两段答案、耗时与成本" },
+        { "dimension": "交互", "self": "选完即更新 pill 与复核行", "other": "投票后才揭示两个模型是谁" },
+        { "dimension": "常驻位置", "self": "设置页或 composer 的工具行", "other": "评测页或演示页的主体" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "pill 与复核行",
+      "language": "csharp",
+      "code": "var pill = new K.ModelChip(K.Model(\"claude-opus-5-5\"), showEffort: true, effort: \"high\");\n\nvar review = new Border\n{\n    BorderThickness = new Thickness(1),\n    CornerRadius = new CornerRadius(18),\n    Padding = new Thickness(14, 12, 14, 12),\n    Child = K.Stack(10,\n        description,\n        K.Columns(\"*,*\",\n            K.Stack(1, K.Caption(\"Context\"), contextValue),\n            K.Stack(1, K.Caption(\"Max output\"), outputValue),\n            K.Stack(1, K.Caption(\"Input\"), priceInValue),\n            K.Stack(1, K.Caption(\"Output\"), priceOutValue)),\n        K.Divider(),\n        K.Row(8, K.Stack(1, K.Caption(\"Effort\"), effortValue), K.Toggle(\"Reasoning\", true)))\n};\n\nvar left = K.Stack(10,\n    K.Caption(\"Default model\"),\n    new Border { Child = pill.Button, HorizontalAlignment = HorizontalAlignment.Left },\n    review);"
+    },
+    {
+      "title": "菜单：Featured、Effort 与其余模型",
+      "language": "csharp",
+      "code": "var featured = new StackPanel { Spacing = 1 };\nfeatured.Children.Add(K.Pill(\"Featured\", ArcBadgeTone.Neutral));\nforeach (var spec in Specs.Take(4))\n{\n    featured.Children.Add(MenuRow(spec, featured: true));\n}\n\nfeatured.Children.Add(K.Divider(6));\nfeatured.Children.Add(K.Caption(\"Effort\"));\nfeatured.Children.Add(effortRow); // low / medium / high 的 K.Chip\nfeatured.Children.Add(K.Divider(6));\nfeatured.Children.Add(K.Caption(\"More models\"));\n\nvar menu = new Border\n{\n    Width = 340,\n    BorderThickness = new Thickness(1),\n    CornerRadius = new CornerRadius(16),\n    Padding = new Thickness(10),\n    Child = featured\n};"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "slug": "ai-chat",
+  "nameZh": "AI 会话",
+  "summary": "完整的会话卡：用户与助手交替的消息线程、可折叠的推理行、工具调用 chip、引用来源卡与消息操作（复制、评分、版本），底部固定输入区。",
+  "purpose": [
+    "它是产品里「一段真实对话」的样子：线程在固定高度里滚动，用户消息靠右、助手回复靠左，头部给出会话名、轮数与模型 chip，输入区固定在底部。",
+    "助手回复不是一段纯文本：顶部一行是模型名、Thought for 4s 与展开按钮，正文走 Markdown 子集（加粗、行内代码、列表），接着是工具调用 chip（Searched 6 sites / Read 3 files / 2 sources）与引用来源卡。",
+    "消息操作放在回复底部：复制、重试、好评、差评，加一个 2 / 2 的版本切换；这些动作只改变页面状态，不会真的调用模型。",
+    "底部输入区用同一个发送逻辑：Enter 发送、Shift+Enter 换行，发送后把自己的消息与一段脚本化回复追加到线程并滚到底部，状态行说明「回复 6 秒完成」这类事实。"
+  ],
+  "whenToUse": [
+    "产品页面、侧栏或仪表盘卡片里的多轮助手，需要流式回答与引用来源。",
+    "用户会重试、编辑或评分回答，并可能在对话中途切换模型的场景。",
+    "原型阶段验证 LLM 功能：脚本化的线程足以把交互流程演完。"
+  ],
+  "whenNotToUse": [
+    "只需要提示输入框时，用 ai-composer，不必铺开整个线程。",
+    "只需要一条长的、带引用的答案时，用 ai-answer，它把答案当文章排版。",
+    "助手需要停在文档旁并就地对页面提改动时，用 ai-side-panel。"
+  ],
+  "variants": [
+    { "key": "variant-thread", "label": "Thread", "note": "用户与助手交替的消息线程，固定高度滚动" },
+    { "key": "variant-reasoning-row", "label": "Reasoning row", "note": "模型名、Thought for 4s 与展开/折叠按钮" },
+    { "key": "variant-tool-chip", "label": "Tool chips", "note": "Searched 6 sites / Read 3 files / 2 sources" },
+    { "key": "variant-sources", "label": "Sources", "note": "引用来源卡：编号、标题、域名与阅读状态" },
+    { "key": "variant-message-actions", "label": "Message actions", "note": "复制、重试、好评差评与 2 / 2 版本切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "消息操作、工具 chip、模型 chip 与发送键都是 ArcButton" },
+    { "type": "uses", "target": "textarea", "note": "底部输入区是 ArcTextarea：Enter 发送、Shift+Enter 换行" },
+    { "type": "uses", "target": "badge", "note": "会话头部的 Simulated 徽标说明回复由页面脚本生成" },
+    { "type": "alternative", "target": "ai-composer", "note": "只需要提示输入器时改用 ai composer" }
+  ],
+  "contrasts": [
+    {
+      "target": "ai-composer",
+      "title": "AI chat 与 AI composer",
+      "rows": [
+        { "dimension": "覆盖范围", "self": "完整的会话卡：长线程、推理与来源", "other": "输入器加一段简短的线程预览" },
+        { "dimension": "常驻位置", "self": "聊天页主体，输入只占底部一行", "other": "新会话页或已有对话的底部" },
+        { "dimension": "附件与工具", "self": "工具与来源附着在单条回复上", "other": "附件 chip 与工具开关就在输入卡片里" },
+        { "dimension": "历史", "self": "多轮历史、版本与评分", "other": "只保留当前这一轮" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "会话卡：头部、线程与输入区",
+      "language": "csharp",
+      "code": "var thread = new StackPanel { Spacing = 14 };\nvar scroller = K.Scroller(thread, 320);\nvar composer = new ArcTextarea\n{\n    Label = \"Message\",\n    Placeholder = \"Reply to Claude\",\n    Rows = 2,\n    Height = 60\n};\n\nvar header = K.Row(6,\n    K.Text(\"Checkout latency spike\", \"arc-label\"),\n    K.Caption(\"Sarah Chen · 12 turns\"),\n    K.Pill(\"Simulated\", ArcBadgeTone.Neutral));\n\nvar composerRow = K.Row(4,\n    composer,\n    K.IconBtn(\"plus\", \"Attach files\"),\n    K.IconBtn(\"arrow-up\", \"Send message\", variant: ArcButtonVariant.Primary));\n\nreturn K.Surface(K.Stack(10, header, K.Divider(), scroller, K.Divider(), composerRow, status));"
+    },
+    {
+      "title": "一条带推理、工具与来源的助手回复",
+      "language": "csharp",
+      "code": "var reasoningBody = new Border\n{\n    IsVisible = false, // 由「Show reasoning」按钮展开\n    Child = K.Text(\"I checked the queue depth, the timeout configuration and the deploy log.\", \"arc-caption\", 640)\n};\n\nvar reply = K.Stack(8,\n    K.Row(7,\n        K.Disc(\"sparkles\", 22, true, 12),\n        K.Text(\"Claude Sonnet 5.5\", \"arc-caption\"),\n        K.Dot(ArcTokens.BorderStrong, 3),\n        K.Caption(\"Thought for 4s\"),\n        K.IconBtn(\"chevron-right\", \"Show reasoning\", size: 12)),\n    reasoningBody,\n    K.Markdown(\"The retry queue was capped too low for the slow **authorization** call. [1]\", maxWidth: 660),\n    K.Row(6,\n        K.Chip(\"Searched 6 sites\", icon: \"globe\"),\n        K.Chip(\"Read 3 files\", icon: \"file\"),\n        K.Chip(\"2 sources\", icon: \"link\")),\n    K.RowWrap(6,\n        K.SourceCard(1, \"Queue depth dashboard\", \"grafana.acme.dev\", \"G\"),\n        K.SourceCard(2, \"Payment retry policy\", \"docs.acme.dev\", \"D\")),\n    K.Row(4,\n        K.IconBtn(\"copy\", \"Copy answer\"),\n        K.IconBtn(\"refresh-cw\", \"Retry answer\"),\n        K.IconBtn(\"thumbs-up\", \"Good response\"),\n        K.Caption(\"2 / 2\")));"
+    }
+  ]
+}

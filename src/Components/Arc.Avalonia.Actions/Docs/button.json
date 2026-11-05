@@ -1,0 +1,84 @@
+{
+  "slug": "button",
+  "nameZh": "按钮",
+  "summary": "触发单一行动的按钮：按压缩放、异步时在按钮内显示 loading，标签可以就地变化而不跳动。",
+  "purpose": [
+    "页面、表单与对话框里最主要的行动入口。默认是 primary，同一个视觉表面上通常只应出现一个 primary。",
+    "所有状态切换都走弹簧过渡：按下时轻微缩小，加载时在原位显示 spinner 并保留键盘焦点，标签变化时宽度弹性过渡而不是跳变。",
+    "它是行动层最基础的组合单位：按钮组、split button、对话框底栏都直接复用它。"
+  ],
+  "whenToUse": [
+    "任何单次行动，尤其是标签会就地变化（保存 → 已保存）而宽度应当弹性过渡的提交。",
+    "短异步操作只需按钮内 spinner、且焦点不能中断的场景。",
+    "需要一个明确、可聚焦、可被读屏命名的行动入口时。"
+  ],
+  "whenNotToUse": [
+    "需要按钮自己承担 pending → success → retry 全流程时，改用 action-button。",
+    "一个主行动外加多个备选时，改用 split-button，避免并排堆叠多个同级按钮。",
+    "删除、付款等需要用户停下来深思的高风险操作，改用 hold-to-confirm。"
+  ],
+  "variants": [
+    { "key": "variant-primary", "label": "Primary", "note": "主要行动" },
+    { "key": "variant-secondary", "label": "Secondary", "note": "次要行动" },
+    { "key": "variant-ghost", "label": "Ghost", "note": "低强调，工具栏与行内" },
+    { "key": "variant-danger", "label": "Danger", "note": "破坏性行动" },
+    { "key": "size-sm", "label": "Small", "note": "紧凑工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "size-lg", "label": "Large", "note": "对话框主行动" },
+    { "key": "state-loading", "label": "Loading", "note": "原位 spinner，保留焦点" },
+    { "key": "state-disabled", "label": "Disabled", "note": "按变体区分禁用表现" },
+    { "key": "state-icon", "label": "Icon", "note": "Compact 方形图标按钮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "action-button", "note": "需要内置异步状态机时选 action button" },
+    { "type": "alternative", "target": "split-button", "note": "一个主行动带备选时选 split button" },
+    { "type": "alternative", "target": "hold-to-confirm", "note": "删除等高风险操作改用长按确认" },
+    { "type": "complement", "target": "button-group", "note": "多个同级行动可以拼成一个 button group 共享表面" }
+  ],
+  "contrasts": [
+    {
+      "target": "action-button",
+      "title": "Button 与 Action button",
+      "rows": [
+        { "dimension": "异步反馈", "self": "按钮内 spinner，状态由调用方驱动", "other": "内置 pending → success → retry 状态机" },
+        { "dimension": "主要用途", "self": "通用行动入口", "other": "频繁出现的工具栏操作" },
+        { "dimension": "失败处理", "self": "由调用方在外部处理", "other": "按钮自身展示重试" }
+      ]
+    },
+    {
+      "target": "split-button",
+      "title": "Button 与 Split button",
+      "rows": [
+        { "dimension": "行动数量", "self": "一个按钮一个行动", "other": "主行动加一个备选菜单" },
+        { "dimension": "视觉结构", "self": "单一表面", "other": "主段与菜单段以发丝线分隔" },
+        { "dimension": "适用场景", "self": "绝大多数行动", "other": "备选不常出现、但必须可达" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<arc:ArcButton Content=\"保存\" Variant=\"Primary\" Click=\"OnSave\" />"
+    },
+    {
+      "title": "异步提交：保留焦点",
+      "language": "csharp",
+      "code": "var button = new ArcButton { Content = \"保存\", Variant = ArcButtonVariant.Primary };\nbutton.Click += async (_, _) =>\n{\n    button.Loading = true;\n    try\n    {\n        await SaveAsync();\n    }\n    finally\n    {\n        button.Loading = false;\n    }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Controls.ArcButton",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Variant": "视觉层级：Primary / Secondary / Ghost / Danger，默认 Primary",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "Loading": "显示 spinner、吞掉点击但保留键盘焦点",
+      "Compact": "方形内边距，用于纯图标按钮",
+      "Content": "按钮内容，通常是文字或图标加文字",
+      "Command": "绑定的命令，与 Click 二选一即可",
+      "IsEnabled": "禁用后按变体区分表现，仍保留边框",
+      "Click": "主要行动回调；Loading 为 true 时不会触发"
+    }
+  }
+}

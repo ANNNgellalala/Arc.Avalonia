@@ -1,0 +1,50 @@
+{
+  "slug": "faq-section",
+  "nameZh": "常见问题",
+  "summary": "带主题筛选与搜索的 FAQ：一次只展开一个答案，匹配数就地更新，没有结果时给出明确的空态。",
+  "purpose": [
+    "把售前最常问的问题收成一块可扫读的区域：上方是主题 chip 与搜索框，右侧显示当前匹配数，下面是手风琴列表，一次只展开一个答案。",
+    "筛选完全在本地完成：切换主题或输入关键词会重建列表并同步计数；没有匹配时不再显示空白手风琴，而是一块说明「换个主题或缩短搜索」的空态。",
+    "组成依赖：问答列表是 accordion，主题筛选是 chip-group，搜索框是 search-field，三者共享同一份问题数据。"
+  ],
+  "whenToUse": [
+    "购买或试用之前的答疑区，问题在 5–15 条之间。",
+    "定价页、文档页等需要按主题筛选而不是长滚动的地方。",
+    "需要用户输入关键词快速定位答案的场景。"
+  ],
+  "whenNotToUse": [
+    "问题很少、一屏就能读完时，直接排成正文段落更轻。",
+    "用户需要的是与人对话而不是读答案时，改用 contact-section。",
+    "内容是有顺序的步骤说明时，用 stepper 或 onboarding-checklist。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Answer open", "note": "第一问默认展开，其余收起" },
+    { "key": "variant-topic-filter", "label": "Topic filter", "note": "主题 chip 行，当前主题高亮" },
+    { "key": "variant-search", "label": "Search", "note": "关键词搜索框，边输入边过滤" },
+    { "key": "state-empty", "label": "Empty result", "note": "没有匹配时给出解释与建议" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "accordion", "note": "问答列表用 ArcAccordion，单开行为与键盘移动来自组件" },
+    { "type": "uses", "target": "chip-group", "note": "主题筛选行用 chip group" },
+    { "type": "uses", "target": "search-field", "note": "搜索框用 search field，输入即过滤" },
+    { "type": "alternative", "target": "contact-section", "note": "需要人回答时改用 contact section" }
+  ],
+  "contrasts": [
+    {
+      "target": "contact-section",
+      "title": "FAQ section 与 Contact section",
+      "rows": [
+        { "dimension": "交互方式", "self": "自助阅读与筛选", "other": "填写表单并等待回复" },
+        { "dimension": "内容结构", "self": "主题加问答列表", "other": "表单、支持渠道与办公室" },
+        { "dimension": "适用问题", "self": "重复出现、答案稳定的问题", "other": "售前咨询与个案问题" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "筛选区与手风琴",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:a=\"using:Arc.Avalonia.Actions.Controls\"\n        xmlns:i=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <StackPanel Spacing=\"18\" Margin=\"24,22,24,20\">\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n      <c:ArcChipGroup Label=\"Topics\" Multiple=\"False\" />\n      <i:ArcSearchField Width=\"280\" Placeholder=\"Search questions\" />\n      <TextBlock Text=\"5 questions\" Classes=\"arc-caption\" VerticalAlignment=\"Center\" />\n    </StackPanel>\n    <c:ArcAccordion Label=\"Frequently asked questions\" DefaultOpen=\"0\" />\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

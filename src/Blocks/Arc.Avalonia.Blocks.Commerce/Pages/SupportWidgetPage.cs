@@ -24,6 +24,11 @@ public sealed class SupportWidgetPage : ArcItemPage
 {
     public override string ItemSlug => "support-widget";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-panel-open", "layout-home", "variant-app-shell", "variant-chat-entry"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

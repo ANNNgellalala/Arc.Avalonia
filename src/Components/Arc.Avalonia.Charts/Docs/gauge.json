@@ -1,0 +1,85 @@
+{
+  "slug": "gauge",
+  "nameZh": "仪表盘",
+  "summary": "二百七十度的单值仪表：一个值落在已知区间里的位置，阈值会改变圆环色调并把区间名写成文字，目标值则以刻度标记。",
+  "purpose": [
+    "当你要表达「这个值离上限还有多远」时，仪表盘比进度条更有区间感：圆环、刻度与阈值一起说明当前处于健康、吃紧还是危险。",
+    "Thresholds 按起始值定义区间，最高命中的那个区间同时决定圆环颜色与文字标签——含义从不只靠颜色传达，色弱读者也能读懂。",
+    "Target 会在同一尺度上画一条径向标记，并标出 target 字样；Minimum 与 Maximum 可以不是 0 和 100，例如温度、延迟这类有自由端点的度量。",
+    "它是静态读数，不承担趋势；历史变化应该放在同页的 line-chart 或 sparkline 里。"
+  ],
+  "whenToUse": [
+    "要展示一个值在已知区间中的位置，例如存储占用、可用额度、健康分数。",
+    "存在明确的健康/警告/危险区间，需要把档位名直接写出来时。",
+    "有一个目标值或合规线，需要在同一尺度上标出时。",
+    "读数不需要时间维度，只需要「现在如何」时。"
+  ],
+  "whenNotToUse": [
+    "要看这个值随时间怎么变时改用 line-chart 或 sparkline。",
+    "要展示整体的构成比例时改用 donut-chart 或 split-bar。",
+    "相对区间的进度、没有阈值与目标时用普通进度条更轻。",
+    "需要并排比较多个同量纲的值时改用 bar-chart。"
+  ],
+  "variants": [
+    { "key": "variant-percent", "label": "百分比与阈值", "note": "72%，含三档阈值与 85% 目标" },
+    { "key": "variant-range", "label": "自由区间", "note": "0–500 GB 的存储占用，目标 425 GB" },
+    { "key": "variant-tone", "label": "单一语义色", "note": "没有阈值时由 Tone 决定圆环颜色" },
+    { "key": "state-no-target", "label": "无目标", "note": "Target 为 null，不画目标刻度" },
+    { "key": "state-min-max", "label": "自定义最小最大", "note": "Minimum=-10、Maximum=50 的温度区间" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "split-bar", "note": "要看整体构成比例时用 split bar 或 donut chart" },
+    { "type": "alternative", "target": "donut-chart", "note": "环形表达部分与整体，仪表只表达单值区间" },
+    { "type": "alternative", "target": "bar-chart", "note": "需要并排比较多个值时用 bar chart" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡里常放一个 gauge 表示「已用/上限」" }
+  ],
+  "contrasts": [
+    {
+      "target": "donut-chart",
+      "title": "Gauge 与 Donut chart",
+      "rows": [
+        { "dimension": "表达对象", "self": "单个值在区间中的位置", "other": "多个部分占整体的份额" },
+        { "dimension": "刻度", "self": "有 Minimum / Maximum 与阈值分区", "other": "没有区间，只按比例切分" },
+        { "dimension": "文字含义", "self": "阈值可把档位名写成文字", "other": "靠图例列出各类别" },
+        { "dimension": "目标标记", "self": "可画 target 径向标记", "other": "没有目标概念" }
+      ]
+    },
+    {
+      "target": "split-bar",
+      "title": "Gauge 与 Split bar",
+      "rows": [
+        { "dimension": "形状", "self": "二百七十度圆环，读数居中", "other": "一条水平 100% 构成条" },
+        { "dimension": "适用度量", "self": "单值对区间，可含目标与阈值", "other": "若干部分合成整体" },
+        { "dimension": "文字信息", "self": "档位名、单位、目标值", "other": "各段名称与百分比" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "存储占用与阈值",
+      "language": "csharp",
+      "code": "var gauge = new ArcGauge\n{\n    Value = 72,\n    Minimum = 0,\n    Maximum = 100,\n    Label = \"Storage used\",\n    Detail = \"360 of 500 GB\",\n    Target = 85,\n    ValueSuffix = \"%\",\n    Thresholds = new[]\n    {\n        new GaugeThreshold(0, ChartTone.Success, \"Healthy\"),\n        new GaugeThreshold(70, ChartTone.Warning, \"Filling up\"),\n        new GaugeThreshold(90, ChartTone.Danger, \"Critical\")\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcGauge x:Name=\"Storage\"\n                   Height=\"200\"\n                   Label=\"Storage used\"\n                   Maximum=\"100\"\n                   Target=\"85\"\n                   ValueSuffix=\"%\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcGauge",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前值，会被夹到 Minimum 与 Maximum 之间",
+      "Minimum": "区间下界，默认 0",
+      "Maximum": "区间上界，默认 100",
+      "Label": "圆心上方说明「在测什么」",
+      "Detail": "数值下方的次要说明",
+      "Tone": "没有命中阈值时圆环使用的语义色",
+      "Thresholds": "按起始值划分的区间，最高命中的区间决定颜色与文字",
+      "Target": "可选的目标值，画成径向标记",
+      "ValueSuffix": "数值后的单位，例如 %",
+      "ValueFormat": "自定义中心数值格式"
+    }
+  }
+}

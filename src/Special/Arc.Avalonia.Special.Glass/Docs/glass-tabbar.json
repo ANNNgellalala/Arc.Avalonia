@@ -1,0 +1,76 @@
+{
+  "slug": "glass-tabbar",
+  "nameZh": "玻璃标签栏",
+  "summary": "浮在内容流上的 Liquid Glass 标签栏：镜头在标签下滑动、抬起、拉长并放大下面的图标，可拖拽跨标签；向下滚动时整条栏收起为图标，向上滚动再展开，旁边还可以挂一个圆形的全局行动。",
+  "purpose": [
+    "移动端 Web 应用与 PWA 的顶层分区导航：三到五个分区加一个全局行动（例如搜索），栏浮在内容流底部而不是占一行。",
+    "选中标签由玻璃镜头表达：镜头在标签间滑动，速度让它抬起与拉伸，经过的图标被放大；拖住选中标签可以把镜头拖到别处，松手吸附到最近的标签。",
+    "滚动方向决定展开或收起：向下滚动收起为纯图标（Compact），向上滚动恢复图标加文字；徽标在收起时仍保留计数。"
+  ],
+  "whenToUse": [
+    "移动端 Web 应用或 PWA 的三到五个顶层分区，以及一个搜索这类全局行动。",
+    "内容流页面，希望标签栏在阅读时让位、滚动回来时恢复。",
+    "需要玻璃质感与镜头跟随、但仍保持真实按钮语义的底部导航。"
+  ],
+  "whenNotToUse": [
+    "桌面端或页面内的同级视图切换用 tabs，不需要浮动的底部栏。",
+    "分区超过五个时用侧边导航（如 sidebar-rail），标签栏会挤到放不下。",
+    "只需要一个返回或关闭按钮时用普通按钮，不必引入整条栏。"
+  ],
+  "variants": [
+    { "key": "state-full", "label": "Full bar", "note": "图标 + 文字 + 徽标 + 搜索行动" },
+    { "key": "state-compact", "label": "Compact", "note": "收起为纯图标，徽标仍在" },
+    { "key": "variant-badge", "label": "Badge", "note": "Saved 标签带计数徽标 3" },
+    { "key": "variant-action", "label": "Action bubble", "note": "栏外独立的圆形 Search 行动" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tabs", "note": "页面内的分区切换用 tabs，移动端顶层分区用玻璃标签栏" },
+    { "type": "alternative", "target": "liquid-tab-bar", "note": "需要更强液体形变时选 liquid tab bar，玻璃标签栏更克制" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Glass tab bar 与 Tabs",
+      "rows": [
+        { "dimension": "位置", "self": "浮在内容底部，不占文档流", "other": "嵌在页面内容里的一行" },
+        { "dimension": "交互", "self": "镜头滑动、可拖拽、滚动收放", "other": "点击或方向键切换标签" },
+        { "dimension": "响应式", "self": "按滚动方向在完整与纯图标之间切换", "other": "标签通常始终显示文字" },
+        { "dimension": "适用", "self": "移动端顶层分区与全局行动", "other": "页面内的视图切换" }
+      ]
+    },
+    {
+      "target": "liquid-tab-bar",
+      "title": "Glass tab bar 与 Liquid tab bar",
+      "rows": [
+        { "dimension": "形变", "self": "镜头滑过时抬起、拉伸、放大图标", "other": "更强烈的液体拉伸与回弹" },
+        { "dimension": "收起", "self": "滚动时可收起为纯图标", "other": "通常保持完整尺寸" },
+        { "dimension": "行动位", "self": "栏外可挂一个圆形全局行动", "other": "行动通常并入标签行" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明标签栏",
+      "language": "xaml",
+      "code": "<gl:ArcGlassTabBar xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                   Label=\"Sections\"\n                   Value=\"home\"\n                   Compact=\"False\" />"
+    },
+    {
+      "title": "标签、徽标、行动与收起",
+      "language": "csharp",
+      "code": "var bar = new ArcGlassTabBar\n{\n    Label = \"Sections\",\n    Value = \"home\",\n    Items = new List<ArcGlassTabBarItem>\n    {\n        new() { Value = \"home\", Label = \"Home\", Icon = \"layout-dashboard\" },\n        new() { Value = \"explore\", Label = \"Explore\", Icon = \"compass\" },\n        new() { Value = \"saved\", Label = \"Saved\", Icon = \"bookmark\", Badge = \"3\" },\n        new() { Value = \"profile\", Label = \"Profile\", Icon = \"user\" }\n    },\n    Action = new ArcGlassTabBarItem { Value = \"search\", Label = \"Search\", Icon = \"search\" }\n};\n\nbar.ValueChanged += (_, value) => Navigate(value);\n\n// 向下滚动收起为图标，向上滚动展开\nbar.Compact = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcGlassTabBar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "标签条目；每项包含 Value、Label、可选 Icon 与 Badge",
+      "Value": "当前选中的标签值；变化时触发 ValueChanged",
+      "Action": "栏外独立的圆形行动，例如 Search",
+      "Compact": "收起为纯图标；滚动方向由页面或宿主决定，默认 false",
+      "Label": "标签栏的无障碍名称，默认 Tabs",
+      "ValueChanged": "选中标签变化时触发，参数是新的值",
+      "CompactChanged": "收起或展开时触发"
+    }
+  }
+}

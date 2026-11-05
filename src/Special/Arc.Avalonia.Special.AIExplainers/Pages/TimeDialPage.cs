@@ -11,6 +11,12 @@ public sealed class TimeDialPage : ArcItemPage
 {
     public override string ItemSlug => "time-dial";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-default",
+        "variant-dial", "variant-working-band", "variant-centre", "variant-city-rows"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Planning a moment across two to five cities: calls, releases or handovers.",

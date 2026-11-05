@@ -1,0 +1,51 @@
+{
+  "slug": "docs-sidebar",
+  "nameZh": "文档侧栏",
+  "summary": "文档站布局：可过滤的导航树、版本切换器、带代码示例的文章正文，以及跟随所选标题的「本页」大纲；示例内容是参考材料。",
+  "purpose": [
+    "把文档站的三个区域一次排好：左侧是可过滤的导航树与版本切换器，中间是文章正文，右侧是「On this page」大纲。",
+    "导航树按分组折叠，过滤框输入时即时缩小范围并播报匹配数；切换标题时右侧大纲同步标记当前项，大纲跟随文章里的标题选择。",
+    "它是布局区块而不是组件：文章内容、版本号都是样本材料，使用时替换成你自己的文档数据；帧内不发生滚动，因此移植版没有滚动监听。"
+  ],
+  "whenToUse": [
+    "产品文档或 API 文档需要导航树加页面大纲时。",
+    "文档需要版本切换器、并且导航可以按关键词过滤时。",
+    "教程或参考页需要在正文里内嵌代码示例时。"
+  ],
+  "whenNotToUse": [
+    "只有纯层级、没有文档正文时用 tree-view，文档布局的骨架用不上。",
+    "产品导航（非文档）用 sidebar-rail 或 workspace-sidebar。",
+    "只有一篇文章、没有多个章节时，简单的文章页加锚点即可，不需要三栏。"
+  ],
+  "variants": [
+    { "key": "variant-nav-tree", "label": "Nav tree", "note": "按分组折叠的导航树，当前页高亮" },
+    { "key": "variant-version-switcher", "label": "Version switcher", "note": "导航顶部的版本按钮，当前版本为 1.4" },
+    { "key": "variant-on-this-page", "label": "On this page", "note": "右侧大纲，跟随所选标题" },
+    { "key": "variant-article", "label": "Article", "note": "正文、代码示例与「Live sample」徽标" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "导航顶部的过滤框缩小页面树" },
+    { "type": "uses", "target": "button", "note": "导航行、版本切换与返回链接都是按钮" },
+    { "type": "uses", "target": "badge", "note": "当前版本与示例状态用徽标标出" },
+    { "type": "alternative", "target": "inbox-sidebar", "note": "三栏文档布局与三栏邮件布局结构相似但职责不同" }
+  ],
+  "contrasts": [
+    {
+      "target": "inbox-sidebar",
+      "title": "Docs sidebar 与 Inbox sidebar",
+      "rows": [
+        { "dimension": "中栏", "self": "文章正文，可含代码与大纲", "other": "消息列表，按文件夹筛选" },
+        { "dimension": "右栏", "self": "页面大纲，跟随标题", "other": "阅读面板，显示当前邮件" },
+        { "dimension": "导航", "self": "折叠的文档树加版本切换", "other": "邮箱文件夹与标签" },
+        { "dimension": "适用", "self": "产品与 API 文档", "other": "邮件与消息客户端" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三栏骨架",
+      "language": "xaml",
+      "code": "<Grid xmlns=\"https://github.com/avaloniaui\" ColumnDefinitions=\"208,*,196\">\n  <Border Grid.Column=\"0\" Padding=\"10\">\n    <StackPanel Spacing=\"8\">\n      <TextBox Watermark=\"Filter pages\" />\n      <StackPanel Spacing=\"2\" />\n    </StackPanel>\n  </Border>\n  <ScrollViewer Grid.Column=\"1\" Padding=\"24\">\n    <StackPanel Spacing=\"9\" />\n  </ScrollViewer>\n  <Border Grid.Column=\"2\" Padding=\"16\">\n    <StackPanel Spacing=\"2\" />\n  </Border>\n</Grid>"
+    }
+  ]
+}

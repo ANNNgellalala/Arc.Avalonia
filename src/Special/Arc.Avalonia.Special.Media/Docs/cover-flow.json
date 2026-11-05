@@ -1,0 +1,74 @@
+{
+  "slug": "cover-flow",
+  "nameZh": "封面流",
+  "summary": "有纵深的封面轨道：前卡完整呈现、两侧卡片缩小变暗并向中心倾斜，每张卡片带落地阴影与倒影，可以拖动、甩动或滚轮切换。",
+  "purpose": [
+    "为「从一小组视觉内容里挑一张」设计：前卡最大、最亮，两侧的卡片按与当前索引的距离缩小、变暗、向中心倾斜，图片在卡片内部轻微漂移，光影随深度衰减。",
+    "交互是连续的：拖动时轨道跟手、松手后按动量落到最近或更远的一张；快速甩动至少前进一张；滚轮或触控板横向滚动同样驱动轨道，到两端会橡皮筋回弹。方向键、Home / End 与点击卡片也都能定位。",
+    "Avalonia 没有 CSS 3D 变换，所以透视是二维模拟的：侧卡水平压缩、略微上移并降低对比度，倒影用镜像绘制加渐变遮罩；阻尼来自一条欠阻尼弹簧，因此甩动有真实的惯性，而降级动效时直接切换并只保留短淡入。"
+  ],
+  "whenToUse": [
+    "六到十二个视觉条目、希望一次突出一张的展示，例如专辑、地点或作品集。",
+    "希望轨道能响应拖动、甩动与触控板横向滚动，而不只是左右按钮。",
+    "需要在平面界面上获得一点纵深与空间感，但不想引入 WebGL 的场景。"
+  ],
+  "whenNotToUse": [
+    "照片数量很多、需要网格浏览时，改用 photo-grid 或 lightbox-gallery。",
+    "内容不是图片、只是普通的卡片或页面时，改用 carousel，不必承担纵深与倒影的成本。",
+    "需要精确定位到某一项、频繁跳转时，用列表或网格比一条水平轨道更快。"
+  ],
+  "variants": [
+    { "key": "state-front-card", "label": "Front card", "note": "当前前卡完整呈现：Pine shelter · Sierra · 12 km" },
+    { "key": "variant-depth-rail", "label": "Depth rail", "note": "两侧卡片按距离缩小、变暗并向中心倾斜" },
+    { "key": "variant-reflection", "label": "Reflection", "note": "卡片下方的镜像倒影与落地阴影" },
+    { "key": "variant-position-ticks", "label": "Ticks", "note": "底部位置刻度，当前项拉长为强调色" },
+    { "key": "variant-caption", "label": "Caption", "note": "前卡标题与「地点 · 里程」副标题" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "carousel", "note": "普通幻灯片与内容卡片用 carousel，不需要纵深与倒影" },
+    { "type": "alternative", "target": "photo-grid", "note": "照片多、需要网格浏览时用 photo grid" },
+    { "type": "complement", "target": "now-playing", "note": "音乐或视频应用里封面流常与正在播放配套：轨道挑内容，播放器展示当前项" }
+  ],
+  "contrasts": [
+    {
+      "target": "carousel",
+      "title": "Cover flow 与 Carousel",
+      "rows": [
+        { "dimension": "视觉结构", "self": "带纵深与倒影的轨道，侧卡压缩倾斜", "other": "平面的幻灯片行，卡片等大" },
+        { "dimension": "切换方式", "self": "拖动、甩动、滚轮、方向键与点击数", "other": "左右按钮、点状指示器与自动播放" },
+        { "dimension": "适合内容", "self": "六到十二个视觉条目", "other": "任意数量的幻灯片或内容卡片" }
+      ]
+    },
+    {
+      "target": "photo-grid",
+      "title": "Cover flow 与 Photo grid",
+      "rows": [
+        { "dimension": "焦点", "self": "一次聚焦一张，其余退到两侧", "other": "全部照片同屏可见" },
+        { "dimension": "空间", "self": "水平深度轨道", "other": "多列网格，可切换列数" },
+        { "dimension": "适用数量", "self": "精选少量", "other": "整个相册" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一条封面轨道",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcCoverFlow Width=\"980\" Height=\"440\"\n                       HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘与指针行为",
+      "language": "csharp",
+      "code": "// 方向键左右各移动一张，Home / End 跳到两端；\n// 拖动轨道后松手按动量落位，快速甩动至少前进一张；\n// 触控板横向滚动与滚轮同样驱动轨道，两端会回弹。\nvar rail = new ArcCoverFlow\n{\n    Width = 980,\n    Height = 440,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcCoverFlow",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "轨道宽度；侧卡可见数量与间距由它决定",
+      "Height": "轨道高度，前卡与倒影都按它布局",
+      "IsEnabled": "禁用后不再响应拖动与键盘",
+      "IsVisible": "隐藏后停止惯性动画"
+    }
+  }
+}

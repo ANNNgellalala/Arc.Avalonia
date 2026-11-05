@@ -11,6 +11,12 @@ public sealed class PaymentFlowPage : ArcItemPage
 {
     public override string ItemSlug => "payment-flow";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-settling",
+        "variant-nodes", "variant-approval-lane", "variant-settlement-rail", "variant-balance", "variant-steps"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A payments or checkout section that explains authorization and settlement.",
@@ -42,9 +48,15 @@ public sealed class PaymentFlowPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcPaymentFlow
+    // The figure is drawn for a 1068 px gallery column; the docs preview is 860 px wide, so scale it to fit
+    // rather than clipping the issuing-bank node on the right.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 390,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcPaymentFlow
+        {
+            Width = 960,
+            Height = 390,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

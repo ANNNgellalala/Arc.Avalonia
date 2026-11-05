@@ -21,6 +21,14 @@ public sealed class ModelPickerPage : ArcItemPage
 {
     public override string ItemSlug => "model-picker";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-pill",
+        "variant-menu",
+        "variant-effort-row",
+        "variant-review"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -176,7 +184,7 @@ public sealed class ModelPickerPage : ArcItemPage
         }
 
         var featured = new StackPanel { Spacing = 1 };
-        featured.Children.Add(K.Caption("Featured"));
+        featured.Children.Add(K.Pill("Featured", ArcBadgeTone.Neutral));
         foreach (var spec in Specs.Take(4))
         {
             featured.Children.Add(MenuRow(spec, true));
@@ -211,7 +219,7 @@ public sealed class ModelPickerPage : ArcItemPage
 
         var effortReview = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         effortReview.Children.Add(K.Stack(1, K.Caption("Effort"), effortValue));
-        var reasoning = K.Caption("Reasoning on");
+        var reasoning = K.Toggle("Reasoning", true);
         Grid.SetColumn(reasoning, 1);
         effortReview.Children.Add(reasoning);
 

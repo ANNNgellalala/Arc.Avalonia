@@ -1,0 +1,71 @@
+{
+  "slug": "sand-text",
+  "nameZh": "沙粒文字",
+  "summary": "用沙粒堆出来的标题：颗粒像倒进罐子一样自下而上填满字母，指针划过会把沙挖走，静止后缺口再慢慢补回。",
+  "purpose": [
+    "当 hero 标题或分区标题应该「可触摸」时，用 sand text：文字不是排版出来的，而是由一块沙粒网格组成的，首次出现时从下往上倒进字母里。",
+    "指针在文字上滑过会挖开一条沟，沙粒按指针速度飞溅、翻滚并淡出；指针离开后，缺掉的沙粒按同一套确定性规则重新倒回，字重新长满。",
+    "Grain 决定沙粒大小与网格分辨率，DigRadius 决定挖掘半径；因为逐帧只更新一张小位图，所以即使在整块 hero 上也保持流畅。"
+  ],
+  "whenToUse": [
+    "整块 hero 只有一行标题、需要一点互动趣味时。",
+    "短词（产品名、主题名）会随选择切换、每次都要重新倾倒时。",
+    "发布页里希望一行字就能承担互动。"
+  ],
+  "whenNotToUse": [
+    "正文或长标题，用 text-reveal 或 in-view-title。",
+    "用户需要在文字附近工作时（表单标签等），不要用会消失的沙粒。"
+  ],
+  "variants": [
+    { "key": "state-formed", "label": "Formed", "note": "沙粒已填满字母，DUNES 完整可读" },
+    { "key": "variant-grain-fine", "label": "Fine grain", "note": "Grain 2.4：细沙，边缘更平滑，适合大字" },
+    { "key": "variant-grain-coarse", "label": "Coarse grain", "note": "Grain 4.2：粗粒，颗粒感更明显，适合小字" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "text-reveal", "note": "一次性揭示动画用 text reveal" },
+    { "type": "alternative", "target": "in-view-title", "note": "随滚动入场的标题用 in-view title" },
+    { "type": "alternative", "target": "text-shimmer", "note": "只想要光带扫过的效果时用 shimmer" }
+  ],
+  "contrasts": [
+    {
+      "target": "text-reveal",
+      "title": "Sand text 与 Text reveal",
+      "rows": [
+        { "dimension": "交互", "self": "指针可以挖走沙粒，文字会被破坏再自愈", "other": "只播放一次揭示动画" },
+        { "dimension": "渲染", "self": "确定性沙粒网格栅格化成小位图", "other": "遮罩或位移揭示排版文本" },
+        { "dimension": "适用", "self": "可玩的 hero 标题", "other": "稳定的入场标题" }
+      ]
+    },
+    {
+      "target": "in-view-title",
+      "title": "Sand text 与 In-view title",
+      "rows": [
+        { "dimension": "触发", "self": "首次渲染倾倒，之后由指针互动", "other": "滚动进入视口时播放入场" },
+        { "dimension": "可重复", "self": "可以反复挖与补", "other": "通常只播一次" },
+        { "dimension": "阅读性", "self": "沙粒会短暂改变字形，仍保留真实文本名称", "other": "文本始终完整可读" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcSandText xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                Text=\"DUNES\"\n                Grain=\"2.4\"\n                DigRadius=\"20\" />"
+    },
+    {
+      "title": "代码重新倾倒",
+      "language": "csharp",
+      "code": "var sand = new ArcSandText\n{\n    Text = \"DUNES\",\n    Grain = 2.4,\n    DigRadius = 20\n};\n\nsand.Text = \"ARC\"; // 换词会收拢旧字并重新倾倒\nsand.Reveal();      // 同一句重新倒一遍"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcSandText",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "一行短文字，默认 DUNES；换词会重新倾倒",
+      "Grain": "沙粒大小与网格分辨率，默认 2.4",
+      "DigRadius": "指针挖掘半径，默认 18",
+      "Reveal": "把当前文字重新倾倒一遍"
+    }
+  }
+}

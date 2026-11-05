@@ -1,0 +1,48 @@
+{
+  "slug": "stats-band",
+  "nameZh": "数据带",
+  "summary": "证明用的关键数字带：四个会走进度动画的指标，各自配一条迷你趋势与一句悬停说明，可带发丝线网格。",
+  "purpose": [
+    "用四个数字替代一段形容词：每个数字有标签、数值、带符号的变化量、一条迷你趋势，以及鼠标悬停时出现的一句语境。",
+    "数字进入视口时滚动到最终值，并保证落点精确；首帧就显示最终值，所以截图与「减少动效」偏好下看到的是同一个画面。",
+    "组成依赖：整块装在 card 里，迷你趋势用 sparkline，普通与发丝线两种排布之间用 switch 切换，变化量的方向同时用箭头与文字表达。"
+  ],
+  "whenToUse": [
+    "首屏之下的证明带，四个数字就能讲清规模与增长。",
+    "发布页或投资人页面，需要规模感但不需要完整图表时。",
+    "用结果收尾，而不是再罗列功能时。"
+  ],
+  "whenNotToUse": [
+    "需要看趋势细节或多序列对比时，改用 line-chart 等图表组件。",
+    "单个关键数字加环比时，改用 metric-card。",
+    "数字需要用配额与上限表达时，改用 usage-meter。"
+  ],
+  "variants": [
+    { "key": "state-hairline", "label": "Hairline grid", "note": "默认：列之间用一条发丝线分隔" },
+    { "key": "state-plain", "label": "Plain", "note": "去掉分隔线，只靠间距分组" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "card", "note": "整块数据带装在 ArcCard 里" },
+    { "type": "uses", "target": "sparkline", "note": "每个数字下的迷你趋势用 sparkline" },
+    { "type": "uses", "target": "switch", "note": "发丝线与普通排布的切换用 ArcSwitch" },
+    { "type": "alternative", "target": "logo-marquee", "note": "用客户标志而不是数字做证明时改用 logo marquee" }
+  ],
+  "contrasts": [
+    {
+      "target": "logo-marquee",
+      "title": "Stats band 与 Logo marquee",
+      "rows": [
+        { "dimension": "证明方式", "self": "四个带趋势的数字", "other": "一排客户标志与名称" },
+        { "dimension": "动效", "self": "数字滚动、趋势静态展示", "other": "标志持续平移，可暂停" },
+        { "dimension": "阅读成本", "self": "需要读标签、数值与变化", "other": "一眼扫过即可" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "四个数字与发丝线开关",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <c:ArcCard Padding=\"24,18,24,16\">\n    <StackPanel Spacing=\"14\">\n      <Grid ColumnDefinitions=\"*,Auto\">\n        <TextBlock Text=\"Figures are sample data for the last 12 months.\" Classes=\"arc-caption\" />\n        <c:ArcSwitch Grid.Column=\"1\" Label=\"Hairline grid\" Checked=\"True\" />\n      </Grid>\n      <Grid ColumnDefinitions=\"*,*,*,*\">\n        <StackPanel Spacing=\"8\">\n          <TextBlock Text=\"Revenue growth\" Classes=\"arc-caption\" />\n          <TextBlock Text=\"$4.28M\" Classes=\"arc-heading\" />\n          <TextBlock Text=\"+24.6%\" Classes=\"arc-caption\" />\n        </StackPanel>\n      </Grid>\n    </StackPanel>\n  </c:ArcCard>\n</Window>"
+    }
+  ]
+}

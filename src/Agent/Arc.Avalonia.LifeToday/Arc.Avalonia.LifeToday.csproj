@@ -11,4 +11,8 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\*.json" />
+  </ItemGroup>
 </Project>

@@ -14,6 +14,11 @@ public sealed class ShareSheetPage : ArcItemPage
 {
     public override string ItemSlug => "share-sheet";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-access", "variant-people-chip", "variant-channels"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -15,4 +15,8 @@
     <!-- Demo portraits for the avatar components; loaded through avares:// URIs. -->
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\*.json" />
+  </ItemGroup>
 </Project>

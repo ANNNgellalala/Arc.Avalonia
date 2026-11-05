@@ -1,0 +1,65 @@
+{
+  "slug": "tree-view",
+  "nameZh": "树形视图",
+  "summary": "文件夹与文件的层级导航：展开箭头、18px 缩进、滑动的选中底纹，以及完整的键盘树导航（方向键、Home/End、Enter/Space）。",
+  "purpose": [
+    "当层级本身是导航结构、不需要多列比较时用它：文件浏览器、文档目录、分类选择。节点是 ArcTreeNode，子节点放在 Children 里。",
+    "展开集合默认由组件自己维护（DefaultExpandedIds 设初值），也可以传 ExpandedIds 变成受控；SelectedId 控制当前项，选中底纹在两个节点之间滑动。",
+    "方向键上下移动、右箭头展开或进入、左箭头收起或回到父节点，Home/End 跳到首尾，Enter/Space 选中并切换展开。"
+  ],
+  "whenToUse": [
+    "需要浏览或选择层级中的一项，而不是比较每一行的多个字段时。",
+    "层级深度在二到四层、节点数量在几十到几百之间。",
+    "希望键盘用户不碰鼠标也能完整展开、收起与选择时。"
+  ],
+  "whenNotToUse": [
+    "每一行还需要展示多个字段或按列排序时用 tree-table。",
+    "层级数据需要横向的列比较、或者需要三态选择时用 tree-table。",
+    "只是平铺的一组选项时用 select 或 radio-group，树会引入不必要的层级。"
+  ],
+  "variants": [
+    { "key": "variant-expanded", "label": "Expanded", "note": "DefaultExpandedIds 打开若干文件夹" },
+    { "key": "variant-collapsed", "label": "Collapsed", "note": "只显示根节点" },
+    { "key": "state-selected", "label": "Selected", "note": "SelectedId 落在叶子节点上" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tree-table", "note": "只需要导航与单选用 tree view，需要多列与三态选择用 tree table" }
+  ],
+  "contrasts": [
+    {
+      "target": "tree-table",
+      "title": "Tree view 与 Tree table",
+      "rows": [
+        { "dimension": "列", "self": "每行一个标签", "other": "每行多列，可排序" },
+        { "dimension": "选择", "self": "单选当前节点", "other": "三态选择，父子级联" },
+        { "dimension": "数据模型", "self": "ArcTreeNode.Children", "other": "ArcTreeTableRow.Values + Children" },
+        { "dimension": "典型用途", "self": "文件树、目录、分类导航", "other": "带列的层级记录，例如预算表" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明树",
+      "language": "xaml",
+      "code": "<arc:ArcTreeView xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n               Label=\"Files\"\n               SelectedId=\"card\" />"
+    },
+    {
+      "title": "节点与受控展开",
+      "language": "csharp",
+      "code": "var tree = new ArcTreeView\n{\n    Label = \"Files\",\n    DefaultExpandedIds = new[] { \"src\", \"components\" },\n    SelectedId = \"card\",\n    Nodes = new List<ArcTreeNode>\n    {\n        new()\n        {\n            Id = \"src\",\n            Label = \"src\",\n            Children = new List<ArcTreeNode>\n            {\n                new()\n                {\n                    Id = \"components\",\n                    Label = \"components\",\n                    Children = new List<ArcTreeNode>\n                    {\n                        new() { Id = \"button\", Label = \"button.tsx\" },\n                        new() { Id = \"card\", Label = \"card.tsx\" }\n                    }\n                }\n            }\n        },\n        new() { Id = \"readme\", Label = \"README.md\" }\n    }\n};\n\ntree.Selected += (_, node) => Console.WriteLine(node.Id);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcTreeView",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Nodes": "根节点集合；子节点放在每项的 Children 里",
+      "DefaultExpandedIds": "初始展开的节点 Id 集合",
+      "ExpandedIds": "受控展开集合；设置后覆盖内部展开状态",
+      "SelectedId": "当前选中的节点 Id",
+      "Label": "树的无障碍名称，默认 File tree",
+      "Selected": "选中节点变化时触发",
+      "ExpandedChanged": "展开集合变化后触发，参数为当前展开的 Id 列表"
+    }
+  }
+}

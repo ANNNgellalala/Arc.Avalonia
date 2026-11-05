@@ -12,6 +12,12 @@ public sealed class PageCurlPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-spread", "variant-dog-ear", "variant-page-controls",
+        "variant-page-count", "variant-spine"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Editorial and brand showcases where paper is part of the story.",

@@ -1,0 +1,74 @@
+{
+  "slug": "voice-recorder",
+  "nameZh": "语音录制",
+  "summary": "聊天里的语音便签：点麦克风开始录制，停止后进入可播放、可擦洗的审听条，确认后作为语音气泡发进线程。",
+  "purpose": [
+    "语音便签的完整回路都收在一块表面里：顶部是语音气泡线程（自己与对方的交替气泡，各带时长与时间），底部是 composer。点麦克风进入录制态，波形实时滚动、计时器累加；停止后进入审听态，可以播放、拖动波形、看时长，也可以丢弃或发送。",
+    "审听态是控件的重点：播放头前的波形取强调色，播放按钮在 play / pause 之间切换，Send 把这段录音作为新气泡追加到线程末尾并把 composer 复位。Demo 默认就停在一个「已录好、待发送」的审听态，因此整条回路在一屏里可见。",
+    "录音是模拟的：波形峰值来自确定性噪声函数，所以每次运行与截图都一致；真实项目把真实的音频分块推进同一条发送路径即可。范围键在 composer 的按钮之间移动，Space / Enter 依焦点执行开始、停止、播放或发送，Escape 丢弃审听中的录音。"
+  ],
+  "whenToUse": [
+    "聊天、评论或现场记录里，说一段话比打字更快时。",
+    "需要在发送前先审听、擦洗或丢弃录音的对话场景。",
+    "线程里已经混有语音气泡，需要同一种气泡样式继续追加时。"
+  ],
+  "whenNotToUse": [
+    "实时语音对话、需要聆听/思考/说话状态时，改用 voice-orb。",
+    "音乐或长音频播放需要封面与专辑信息时，改用 now-playing。",
+    "只是想防止误触的破坏性操作、并不录音时，改用 hold-to-confirm。"
+  ],
+  "variants": [
+    { "key": "state-review", "label": "Review", "note": "审听态：播放、波形进度、时长、丢弃与 Send" },
+    { "key": "variant-thread", "label": "Thread", "note": "语音气泡线程：自己与对方交替，各带时长与时间" },
+    { "key": "variant-review-waveform", "label": "Waveform", "note": "可擦洗波形，播放头前的条取强调色" },
+    { "key": "variant-duration", "label": "Duration", "note": "右侧显示这段录音的时长，例如 0:08" },
+    { "key": "variant-composer", "label": "Composer", "note": "底部圆角 composer 表面与行动按钮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "voice-orb", "note": "实时双向语音会话用 voice orb，录一条发出去用 voice recorder" },
+    { "type": "alternative", "target": "now-playing", "note": "长音频播放与封面展示用 now playing" },
+    { "type": "complement", "target": "chat-thread", "note": "语音气泡与文字气泡落在同一条线程里，样式与时间戳保持一致" }
+  ],
+  "contrasts": [
+    {
+      "target": "voice-orb",
+      "title": "Voice recorder 与 Voice orb",
+      "rows": [
+        { "dimension": "会话形态", "self": "先录、再审听、最后发送", "other": "实时双向语音，状态持续流转" },
+        { "dimension": "主要视觉", "self": "语音气泡线程与审听波形", "other": "发光球体与状态词" },
+        { "dimension": "结束方式", "self": "发送或丢弃这一段录音", "other": "挂断整段会话" }
+      ]
+    },
+    {
+      "target": "now-playing",
+      "title": "Voice recorder 与 Now playing",
+      "rows": [
+        { "dimension": "内容来源", "self": "刚录下来的一段话", "other": "曲库里的音乐或长音频" },
+        { "dimension": "擦洗范围", "self": "只针对这一条短录音", "other": "整首曲目，带封面与总时长" },
+        { "dimension": "后续动作", "self": "发送进线程或丢弃", "other": "播放/暂停、换曲、展开收起" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放进聊天页",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcVoiceRecorder Width=\"680\" Height=\"442\"\n                           HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘回路",
+      "language": "csharp",
+      "code": "// 焦点停在 composer 的按钮上，Space / Enter 依当前阶段执行：\n// Idle → 开始录制；Recording → 停止并进入审听；Review → 播放或发送。\n// Left / Right 在按钮间移动，Escape 丢弃审听中的录音。\nvar recorder = new ArcVoiceRecorder\n{\n    Width = 680,\n    Height = 442,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcVoiceRecorder",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "整块录音表面的宽度，气泡与 composer 按它布局",
+      "Height": "整块录音表面的高度，线程与 composer 上下分区",
+      "IsEnabled": "禁用后不再开始录制或发送",
+      "IsVisible": "隐藏后停止波形与播放动画"
+    }
+  }
+}

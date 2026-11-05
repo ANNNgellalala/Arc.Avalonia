@@ -1,0 +1,67 @@
+{
+  "slug": "realtime-stream",
+  "nameZh": "实时流图",
+  "summary": "固定时间窗内不断流入的折线：一条或多条序列滚动、新读数从右侧滑入、角落有实时指示与暂停；暂停后视图冻结，可以停下来读某一点。",
+  "purpose": [
+    "当数值持续到达、你想看最近一段时间而不是完整历史时用它：API 延迟、队列长度、在线人数。",
+    "窗口大小由 WindowSize 控制，最新读数停在右边缘之前一个 Interval，所以点是一路滑入而不是突然出现。",
+    "Series 与 Values 二选一：多指标用 Series，单指标可以直接用 Values；IsLive=false 冻结视图，空格或状态点也能切换。没有 socket，直播数据由宿主定时重置 Values 或 Series 喂入。"
+  ],
+  "whenToUse": [
+    "监控面板需要展示最近一段时间的一到两条实时读数。",
+    "需要暂停并悬停读某一个具体采样点时。",
+    "数据由你自己的定时器或推送驱动、控件只负责显示滚动窗口时。"
+  ],
+  "whenNotToUse": [
+    "只看静态历史趋势时用 line-chart，它带完整坐标轴与面积、虚线等表达。",
+    "只是行内的一小段趋势装饰时用 sparkline，不需要实时滚动与窗口。",
+    "需要精确对齐多个时间序列的历史事件时，用固定的 line-chart 加明确时间轴。"
+  ],
+  "variants": [
+    { "key": "variant-two-series", "label": "Two series", "note": "Series：p95 与 p50 同时滚动" },
+    { "key": "variant-single-series", "label": "Single series", "note": "Values 快捷入口，只流传一条读数" },
+    { "key": "state-live", "label": "Live", "note": "IsLive=true，窗口前进、状态点呼吸" },
+    { "key": "state-paused", "label": "Paused", "note": "IsLive=false，视图冻结可读点" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "静态历史趋势用折线图，滚动窗口用实时流" },
+    { "type": "complement", "target": "sparkline", "note": "行内小趋势用 sparkline，面板里的滚动读数用实时流" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Realtime stream 与 Line chart",
+      "rows": [
+        { "dimension": "数据范围", "self": "固定窗口内的最近读数，旧点滑出", "other": "完整历史序列，整段可比较" },
+        { "dimension": "时间轴", "self": "相对窗口，最新点停在右边缘前", "other": "显式刻度的横轴" },
+        { "dimension": "交互", "self": "暂停 / 继续，悬停读单个采样", "other": "悬停读点，图例显隐序列" },
+        { "dimension": "典型用途", "self": "监控延迟、队列、在线人数", "other": "月度、周度趋势报告" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明滚动窗口",
+      "language": "xaml",
+      "code": "<arc:ArcRealtimeStream xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                      WindowSize=\"36\"\n                      IsLive=\"True\"\n                      ValueSuffix=\" ms\"\n                      Height=\"244\" />"
+    },
+    {
+      "title": "种子数据与单序列快捷入口",
+      "language": "csharp",
+      "code": "// 多指标：每条序列各自用给定值播种滚动缓冲\nvar stream = new ArcRealtimeStream\n{\n    Series = new[]\n    {\n        new ChartSeries(\"p95\", new double[] { 182, 176, 191, 204, 188, 172, 165, 179, 212, 196, 184, 178 }),\n        new ChartSeries(\"p50\", new double[] { 92, 88, 95, 101, 94, 87, 84, 90, 104, 98, 93, 89 })\n    },\n    WindowSize = 36,\n    Interval = TimeSpan.FromMilliseconds(500),\n    ValueSuffix = \" ms\"\n};\n\n// 单指标：Values 是 Series 的快捷入口\nvar single = new ArcRealtimeStream\n{\n    Values = new double[] { 182, 176, 191, 204, 188, 172 },\n    IsLive = false\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcRealtimeStream",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Series": "要滚动的序列，每条用自己的值播种缓冲",
+      "Values": "单序列快捷入口，等价于一条 Series",
+      "WindowSize": "窗口保留的采样数，默认 36",
+      "Interval": "期望的采样间隔，默认 500ms；最新点比右边缘慢一个间隔",
+      "IsLive": "是否滚动；空格或状态点切换，默认 true",
+      "ValueSuffix": "数值后的单位，例如 \" ms\"",
+      "ValueFormat": "自定义读数与提示中的数值格式"
+    }
+  }
+}

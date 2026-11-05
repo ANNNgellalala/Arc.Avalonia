@@ -1,0 +1,77 @@
+{
+  "slug": "sheet-stack",
+  "nameZh": "抽屉堆栈",
+  "summary": "可以一层层打开的底部抽屉：每打开一层，下面的面板缩小约 5% 并在上方露出边缘；顶层可以用拖拽（带橡皮筋）或 Escape 关闭；同一份声明在窄容器里是底部抽屉，在宽容器里变成居中对话框。",
+  "purpose": [
+    "当设置页的每一行都会打开更深一层、并且「返回」应该有空间感时用它：设置 → 通知 → 工作区。层级的位置与缩放都是深度的函数。",
+    "每层由 ArcSheetDef 描述：标题、说明、行（可带图标、开关、目标子页）与可选的页脚按钮；开关行自己维护开或关，带 TargetSheet 的行会 Push 下一层。",
+    "Mode 决定外观：Sheet 是底部抽屉，Dialog 是居中对话框；Breakpoint 让同一个堆栈在窄容器下自动变成对话框。焦点只留在顶层，关闭一层后回到打开它的行。"
+  ],
+  "whenToUse": [
+    "移动端设置、偏好或检查器，每一行都会打开更深一层时。",
+    "同一个流程需要在手机上表现为底部抽屉、在桌面表现为对话框时。",
+    "层级在三层以内、每层是若干行加一个页脚行动时。"
+  ],
+  "whenNotToUse": [
+    "只有一层、打开即完成时用 bottom-sheet 或 dialog，堆栈是多余的。",
+    "内容需要并排比较、或需要同时看到多层时，用分栏或设置页布局。",
+    "层级超过三层时，用户会迷失在堆栈里，改用导航页更清晰。"
+  ],
+  "variants": [
+    { "key": "variant-sheet", "label": "Sheet mode", "note": "窄容器里的底部抽屉，两层打开" },
+    { "key": "state-nested", "label": "Nested", "note": "下层缩小约 5%，在上方露出边缘" },
+    { "key": "variant-toggle-rows", "label": "Toggle rows", "note": "行内开关，开与关两种状态" },
+    { "key": "variant-footer", "label": "Footer", "note": "顶层页脚的 Save 行动按钮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "bottom-sheet", "note": "单层抽屉用 bottom sheet，多级导航用抽屉堆栈" },
+    { "type": "alternative", "target": "dialog", "note": "单一居中对话框用 dialog；抽屉堆栈在宽容器里也能变成对话框" }
+  ],
+  "contrasts": [
+    {
+      "target": "bottom-sheet",
+      "title": "Sheet stack 与 Bottom sheet",
+      "rows": [
+        { "dimension": "层级", "self": "可以 Push/Pop 多层，下一层会露出边缘", "other": "单层，关闭即结束" },
+        { "dimension": "返回", "self": "返回上层时保留层级与焦点位置", "other": "没有上层概念" },
+        { "dimension": "拖拽", "self": "顶层带橡皮筋的垂直拖拽关闭", "other": "通常也可以拖拽关闭" },
+        { "dimension": "适用", "self": "设置、偏好这类逐级深入的流程", "other": "单个确认或选择面板" }
+      ]
+    },
+    {
+      "target": "dialog",
+      "title": "Sheet stack 与 Dialog",
+      "rows": [
+        { "dimension": "形态", "self": "窄容器底部抽屉，宽容器居中对话框", "other": "始终居中的模态对话框" },
+        { "dimension": "层级", "self": "支持多层堆叠与返回", "other": "通常一次一个" },
+        { "dimension": "内容", "self": "行 + 开关 + 页脚行动的设置形态", "other": "自由内容与自定义按钮" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明堆栈",
+      "language": "xaml",
+      "code": "<gl:ArcSheetStack xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                   Label=\"Settings sheets\"\n                   Mode=\"Sheet\"\n                   Breakpoint=\"640\" />"
+    },
+    {
+      "title": "层、行与模式",
+      "language": "csharp",
+      "code": "var sheets = new ArcSheetStack\n{\n    Label = \"Settings sheets\",\n    Mode = ArcSheetStackMode.Sheet,\n    Breakpoint = 640,\n    InitialStack = new List<string> { \"settings\", \"notifications\" },\n    Sheets = new List<ArcSheetDef>\n    {\n        new()\n        {\n            Id = \"settings\",\n            Title = \"Settings\",\n            Rows = new List<ArcSheetRow>\n            {\n                new() { Label = \"Notifications\", Detail = \"Mentions, deploys and digest\", Icon = \"bell\", TargetSheet = \"notifications\" },\n                new() { Label = \"Quiet hours\", Detail = \"From 21:00 to 08:00\", Icon = \"moon\", Toggle = true, ToggleDefault = true }\n            }\n        },\n        new()\n        {\n            Id = \"notifications\",\n            Title = \"Notifications\",\n            FooterLabel = \"Save\",\n            Rows = new List<ArcSheetRow>\n            {\n                new() { Label = \"Mentions\", Detail = \"Always delivered\", Toggle = true, ToggleDefault = true },\n                new() { Label = \"Deploys\", Detail = \"Production only\", Toggle = true, ToggleDefault = false }\n            }\n        }\n    }\n};\n\nsheets.StackChanged += (_, stack) => Console.WriteLine(string.Join(\" > \", stack));"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcSheetStack",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Sheets": "可打开的层；每层包含 Id、Title、Description、FooterLabel 与 Rows",
+      "Mode": "Sheet、Dialog 或 Auto（默认，按 Breakpoint 自动选择）；Dialog 在居中位置以对话框形态出现",
+      "Breakpoint": "容器宽度低于该值时切换为对话框，默认 640",
+      "InitialStack": "初始打开的层 Id，从最底层到最顶层",
+      "PageContent": "抽屉后面的页面内容，用于呈现层级关系",
+      "Label": "堆栈的无障碍名称，默认 Sheets",
+      "StackChanged": "堆栈变化后触发，参数为当前打开的层",
+      "Popped": "关闭一层时触发，参数是被关闭层的 Id"
+    }
+  }
+}

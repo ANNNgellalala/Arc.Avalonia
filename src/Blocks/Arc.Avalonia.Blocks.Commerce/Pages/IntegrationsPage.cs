@@ -24,6 +24,11 @@ public sealed class IntegrationsPage : ArcItemPage
 {
     public override string ItemSlug => "integrations";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-directory", "variant-category-filters", "state-connected", "variant-settings"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

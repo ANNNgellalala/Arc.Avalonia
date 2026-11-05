@@ -11,6 +11,12 @@ public sealed class MorphNavPage : ArcItemPage
 {
     public override string ItemSlug => "morph-nav";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-panel-open", "variant-bar-items", "variant-panel-links",
+        "variant-brand", "variant-action", "state-compact"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -54,12 +60,17 @@ public sealed class MorphNavPage : ArcItemPage
         var search = SmPage.Toggle("Search", nav.OpenSearch);
         var stage = SmPage.Stage(nav, height: 380, background: ArcTokens.Background);
 
+        // A second bar pinned to the compact height, so both bar heights are visible without pressing anything.
+        var tight = new ArcMorphNav { Compact = true };
+        var tightStage = SmPage.Stage(tight, height: 300, background: ArcTokens.Background);
+
         return new StackPanel
         {
             Spacing = 12,
             Children =
             {
                 stage,
+                tightStage,
                 SmPage.Hint(
                     "Open Product to see the panel, then press Search (or /). The bar is one surface through every state.",
                     search,

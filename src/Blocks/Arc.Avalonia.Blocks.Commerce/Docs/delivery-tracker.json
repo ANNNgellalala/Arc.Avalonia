@@ -1,0 +1,53 @@
+{
+  "slug": "delivery-tracker",
+  "nameZh": "配送追踪",
+  "summary": "订单配送追踪：路线步骤条、到达窗口、快递员与快捷回复、更新历史与订单摘要。",
+  "purpose": [
+    "当买家在等一件快递时，配送追踪把路线、当前进度与预计到达放在最上方，让“到哪了”一眼可读。",
+    "步骤条横向展开四个节点并标出当前节点；右侧是快递员卡片与快捷回复入口，可以在页内发一句“放门口”而不用打电话。",
+    "下方补上按时间倒序的更新历史与本次配送的商品摘要，回应“里面有什么”与“发生了什么”。"
+  ],
+  "whenToUse": [
+    "订单状态页需要从发货一路看到送达时。",
+    "需要给快递员发一条预设消息、又不想开放完整聊天时。",
+    "客服被问到“到哪了”“什么时候到”时，可直接指向该区块。"
+  ],
+  "whenNotToUse": [
+    "需要完整对话线程与附件时，用 support-conversation。",
+    "只看历史订单列表、不需要实时路线时，用普通的订单列表。",
+    "静态的事件列表而非配送进度时，用 timeline。"
+  ],
+  "variants": [
+    { "key": "layout-tracker", "label": "整体布局", "note": "进度、到达窗口、快递员、更新与摘要" },
+    { "key": "variant-stepper", "label": "路线步骤", "note": "横向 ArcStepper，当前停在第 3 步" },
+    { "key": "variant-arrival", "label": "到达窗口", "note": "Arriving today · 2 stops away 与快递员卡" },
+    { "key": "variant-updates", "label": "更新历史", "note": "按时间倒序的四个配送事件" },
+    { "key": "variant-order-summary", "label": "订单摘要", "note": "In this delivery 的商品行与已付总额" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "stepper", "note": "配送路线用横向 stepper，Current 指向当前节点" },
+    { "type": "uses", "target": "avatar", "note": "快递员卡片用头像表示联系人" },
+    { "type": "uses", "target": "badge", "note": "节点状态与 4.9 星评分用徽章和标签" },
+    { "type": "uses", "target": "button", "note": "快捷回复、打电话与改时间都是按钮" },
+    { "type": "alternative", "target": "support-conversation", "note": "需要完整对话线程时，改用 support-conversation" }
+  ],
+  "contrasts": [
+    {
+      "target": "support-conversation",
+      "title": "Delivery tracker 与 Support conversation",
+      "rows": [
+        { "dimension": "对象", "self": "一件在途的订单", "other": "一位支持人员与一张工单" },
+        { "dimension": "主要信息", "self": "路线、到达时间、更新历史", "other": "消息线程与附件" },
+        { "dimension": "可回复程度", "self": "几个预设快捷回复", "other": "自由输入、连续多轮" },
+        { "dimension": "适用场景", "self": "物流状态与到门安排", "other": "账单、账号等售后问题" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "进度条加到达窗口",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"16\">\n  <arc:ArcStepper Compact=\"True\" Label=\"Delivery progress\" />\n  <Grid ColumnDefinitions=\"*,24,330\">\n    <StackPanel Spacing=\"8\">\n      <TextBlock Text=\"Arriving today · 2 stops away\" Classes=\"arc-caption\" />\n      <TextBlock Text=\"4:20 pm\" Classes=\"arc-title-sm\" />\n      <TextBlock Text=\"Updates\" Classes=\"arc-label\" />\n      <!-- 时间倒序的配送事件 -->\n    </StackPanel>\n    <arc:ArcCard Grid.Column=\"2\" Padding=\"16\">\n      <!-- 快递员、评分与快捷回复 -->\n    </arc:ArcCard>\n  </Grid>\n</StackPanel>"
+    }
+  ]
+}

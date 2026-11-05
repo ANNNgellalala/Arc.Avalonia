@@ -15,6 +15,11 @@ public sealed class GlassTabBarPage : ArcItemPage
 {
     public override string ItemSlug => "glass-tabbar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-full", "state-compact", "variant-badge", "variant-action"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -43,7 +48,7 @@ public sealed class GlassTabBarPage : ArcItemPage
 
     protected override Control BuildDemo(ArcDemoContext context)
     {
-        var feed = new StackPanel { Spacing = 12, Margin = new Thickness(14, 14, 14, 96) };
+        var feed = new StackPanel { Spacing = 12, Margin = new Thickness(14, 14, 14, 160) };
         feed.Children.Add(FeedCard("Weekend guide", "Twelve places to swim near Lisbon", ArcGlassScene.Coast, 0));
         feed.Children.Add(FeedCard("New in the studio", "The critique wall got a rehang", ArcGlassScene.Studio, 1));
         feed.Children.Add(FeedCard("Field notes", "A slow walk through Alfama", ArcGlassScene.Villa, 2));
@@ -57,22 +62,8 @@ public sealed class GlassTabBarPage : ArcItemPage
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
         };
 
-        var bar = new ArcGlassTabBar
-        {
-            Label = "Sections",
-            Value = "home",
-            Items = new List<ArcGlassTabBarItem>
-            {
-                new() { Value = "home", Label = "Home", Icon = "layout-dashboard" },
-                new() { Value = "explore", Label = "Explore", Icon = "compass" },
-                new() { Value = "saved", Label = "Saved", Icon = "bookmark", Badge = "3" },
-                new() { Value = "profile", Label = "Profile", Icon = "user" }
-            },
-            Action = new ArcGlassTabBarItem { Value = "search", Label = "Search", Icon = "search" }
-        };
-        bar.HorizontalAlignment = HorizontalAlignment.Center;
-        bar.VerticalAlignment = VerticalAlignment.Bottom;
-        bar.Margin = new Thickness(0, 0, 0, 20);
+        var bar = BuildBar(compact: false);
+        var compactBar = BuildBar(compact: true);
 
         var lastOffset = 0d;
         scroller.ScrollChanged += (_, _) =>
@@ -96,8 +87,11 @@ public sealed class GlassTabBarPage : ArcItemPage
         {
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 18),
-            Children = { bar }
+            Margin = new Thickness(0, 0, 0, 14),
+            Children =
+            {
+                new StackPanel { Spacing = 10, Children = { bar, compactBar } }
+            }
         });
 
         var stage = GlassDemo.Stage(layout, ArcGlassScene.Sand, 430, 0, seed: 4);
@@ -107,9 +101,30 @@ public sealed class GlassTabBarPage : ArcItemPage
             Children =
             {
                 stage,
-                GlassDemo.Hint("Scroll the feed down and the bar compacts to icons; scroll up and it grows back. Drag the selected tab to glide the lens, or use the arrow keys.")
+                GlassDemo.Hint("Both the full bar and the compact icon bar are shown at once; scrolling the feed down or up would switch between them. Drag the selected tab to glide the lens, or use the arrow keys.")
             }
         };
+    }
+
+    private static ArcGlassTabBar BuildBar(bool compact)
+    {
+        var bar = new ArcGlassTabBar
+        {
+            Label = compact ? "Sections (compact)" : "Sections",
+            Value = "home",
+            Compact = compact,
+            Items = new List<ArcGlassTabBarItem>
+            {
+                new() { Value = "home", Label = "Home", Icon = "layout-dashboard" },
+                new() { Value = "explore", Label = "Explore", Icon = "compass" },
+                new() { Value = "saved", Label = "Saved", Icon = "bookmark", Badge = "3" },
+                new() { Value = "profile", Label = "Profile", Icon = "user" }
+            },
+            Action = new ArcGlassTabBarItem { Value = "search", Label = "Search", Icon = "search" }
+        };
+
+        bar.HorizontalAlignment = HorizontalAlignment.Center;
+        return bar;
     }
 
     private static Control FeedCard(string title, string subtitle, ArcGlassScene scene, int seed)

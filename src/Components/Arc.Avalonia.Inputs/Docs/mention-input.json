@@ -1,0 +1,89 @@
+{
+  "slug": "mention-input",
+  "nameZh": "提及输入",
+  "summary": "会认 @ 与 # 的多行输入：在光标处弹出人员或频道建议，选中后成为带 id 的 mention，值可序列化为可存储的文本。",
+  "purpose": [
+    "为评论框、任务描述、聊天输入设计：键入 @ 弹出人员建议、键入 # 弹出频道建议，列表跟随光标位置，键盘上下选择、Enter 确认、Escape 关闭。",
+    "值不是纯字符串而是 ArcMentionValue：一段 Text 加一组带偏移的 ArcMention，因此提交给后端时能用 SerializeMentions 转成 <@id> / <#id>，避免昵称改名后指向错人。",
+    "输入区随内容从 MinRows 长到 MaxRows，超过后内部滚动；开启 SubmitOnEnter 时 Enter 提交并触发 Submitted，适合单行快捷评论。"
+  ],
+  "whenToUse": [
+    "评论、任务、聊天等需要 @ 人员或 # 频道的输入框。",
+    "需要把提及保存为稳定 id、而不是直接拼接显示名时。",
+    "希望建议列表出现在光标附近、并支持键盘选择的多行输入。"
+  ],
+  "whenNotToUse": [
+    "不需要提及语义的普通短文本改用 input。",
+    "需要多行纯文本、没有提及需求时改用 textarea。",
+    "需要富文本格式（粗体、列表、内联图片）时改用 rich-text-editor。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "Empty", "note": "占位文案，等待输入" },
+    { "key": "state-filled", "label": "Filled", "note": "文本中含 @ 与 # 提及" },
+    { "key": "state-suggestions", "label": "Suggestions", "note": "在光标处弹出人员建议列表" },
+    { "key": "variant-multiline", "label": "Multiline", "note": "MinRows 增大，输入区随内容长高" },
+    { "key": "variant-composer", "label": "Composer", "note": "SubmitOnEnter 的单行快捷输入" },
+    { "key": "state-disabled", "label": "Disabled", "note": "只读展示，不弹建议" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "textarea", "note": "纯文本多行输入改用 textarea" },
+    { "type": "alternative", "target": "rich-text-editor", "note": "需要富文本格式时改用 rich text editor" },
+    { "type": "complement", "target": "comment-thread", "note": "评论列表里的输入框就用 mention input 收集 @ 提及" }
+  ],
+  "contrasts": [
+    {
+      "target": "textarea",
+      "title": "Mention input 与 Textarea",
+      "rows": [
+        { "dimension": "值模型", "self": "ArcMentionValue：文本 + 带偏移的 mention 列表", "other": "纯字符串" },
+        { "dimension": "输入辅助", "self": "@ / # 触发建议列表，可键盘选择", "other": "无建议列表" },
+        { "dimension": "长高规则", "self": "MinRows → MaxRows，超出后内部滚动", "other": "Rows 固定或 AutoGrow 随内容增长" }
+      ]
+    },
+    {
+      "target": "rich-text-editor",
+      "title": "Mention input 与 Rich text editor",
+      "rows": [
+        { "dimension": "格式能力", "self": "纯文本，只识别提及令牌", "other": "粗体、斜体、列表、链接等格式" },
+        { "dimension": "提交形态", "self": "可序列化为 <@id> / <#id> 的纯文本", "other": "富文本文档模型" },
+        { "dimension": "适用场景", "self": "评论、任务描述、快捷回复", "other": "文章与带格式的正文" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcMentionInput Label=\"评论\"\n                       MinRows=\"2\"\n                       MaxRows=\"6\"\n                       Placeholder=\"写评论，输入 @ 提及成员\"\n                       People=\"{Binding People}\"\n                       Channels=\"{Binding Channels}\"\n                       Value=\"{Binding Draft, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "序列化提及并提交",
+      "language": "csharp",
+      "code": "var comment = new ArcMentionInput\n{\n    Label = \"评论\",\n    MinRows = 2,\n    People = new List<ArcMentionPerson>\n    {\n        new(\"u1\", \"Maya Chen\", \"Design lead\"),\n        new(\"u2\", \"Theo Park\", \"Engineer\")\n    },\n    Channels = new List<ArcMentionChannel>\n    {\n        new(\"c1\", \"launch\", \"Release planning\", 14)\n    }\n};\n\ncomment.Submitted += async (_, e) =>\n{\n    var body = ArcMentionInput.SerializeMentions(e.Value);\n    await api.PostCommentAsync(body);\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcMentionInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "文本与提及的复合值；mention 带 id，提交时可序列化",
+      "Label": "可见标签与无障碍名称",
+      "Placeholder": "空值时的占位文案",
+      "People": "@ 之后建议的人员集合；留空则关闭人员提及",
+      "Channels": "# 之后建议的频道集合；留空则关闭频道提及",
+      "MinRows": "输入区最少行数，默认 1",
+      "MaxRows": "输入区最多行数，超出后内部滚动，默认 8",
+      "SubmitOnEnter": "Enter 提交而不是换行，适合快捷评论",
+      "MaxSuggestions": "建议列表最多显示条数，默认 6",
+      "Placement": "建议面板位置 Auto / Top / Bottom",
+      "Description": "帮助文案",
+      "Mentions": "只读，当前文本中的 mention 及其偏移",
+      "ValueChanged": "每次编辑触发，参数为更新后的 ArcMentionValue",
+      "MentionAdded": "某个建议被确认为 mention 时触发",
+      "Submitted": "SubmitOnEnter 下按 Enter 且文本非空时触发",
+      "Insert": "在光标处插入文本，如同键入",
+      "OpenSuggestions": "在光标处键入 @ 或 # 并打开建议列表",
+      "Clear": "清空文本与提及"
+    }
+  }
+}

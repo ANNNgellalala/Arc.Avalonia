@@ -1,0 +1,73 @@
+{
+  "slug": "sticker-peel",
+  "nameZh": "贴纸剥离",
+  "summary": "点阵纸面上的一组模切贴纸：悬停会掀起最近的一条边，拖动沿真实折线卷起并露出纸背，拉过中线就能把贴纸揭下来挪到别处。",
+  "purpose": [
+    "「玩」是这类表面的目的：五张贴纸按表面比例摆放，圆形、胶囊与圆角三种模切形状各有自己的颜色与旋转角。静止时每张贴纸只有一层贴地的软阴影，像真的贴在纸上；悬停时最近的边会抬起几像素，鼠标离开后落回。",
+    "拖动时才是真正的剥离：折线由抓住的边与当前指针决定，被掀起的一半沿折线镜像绘制，露出素色纸背、一道亮折痕和落在下方纸面上的阴影。拉过中线或快速一扯，贴纸就脱离纸面被「拿在手里」，跟随指针移动，再按一次就贴回新位置。",
+    "键盘是完整替代路径：左右在贴纸间移动，Enter / Space 拿起或贴下，方向键移动被拿起的贴纸（Shift 每次 40px），Escape 放回原位。Avalonia 没有 3D 变换，折页用多边形裁剪与镜像模拟；位置用表面的比例表示，所以换尺寸时排布等比缩放。"
+  ],
+  "whenToUse": [
+    "个人主页、团队页或成就页，让人自由摆放徽章、贴纸或品牌标识时。",
+    "发布会、奖励或彩蛋时刻，希望用户主动动手玩一下产品视觉时。",
+    "需要比静态徽章更有触感、但仍以装饰为主、不承载关键信息的场景。"
+  ],
+  "whenNotToUse": [
+    "顺序或位置有业务含义的界面（看板、排序列表）不要用贴纸表面。",
+    "密集工作界面里要避免这种玩味交互，改用 badge 之类的静态标记。",
+    "需要用同一手势表达取舍（留下/跳过）时，改用 card-stack。"
+  ],
+  "variants": [
+    { "key": "state-peeling", "label": "Peeling", "note": "一张贴纸处于半剥状态：纸背、亮折痕与纸下阴影" },
+    { "key": "variant-stuck", "label": "Stuck", "note": "其余贴纸平贴纸面，只带一层贴地软阴影" },
+    { "key": "variant-shapes", "label": "Shapes", "note": "圆形、胶囊与圆角三种模切形状" },
+    { "key": "variant-surface", "label": "Surface", "note": "点阵纸面与顶部渐隐的纸纹" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "card-stack", "note": "用同一手势做取舍时用 card stack，摆放装饰用 sticker peel" },
+    { "type": "alternative", "target": "gravity-well", "note": "都是玩味表面：贴纸让人摆放，引力井让人拨动" },
+    { "type": "complement", "target": "badge", "note": "贴纸承载品牌与成就，badge 承载同一枚标记的状态与计数" }
+  ],
+  "contrasts": [
+    {
+      "target": "card-stack",
+      "title": "Sticker peel 与 Card stack",
+      "rows": [
+        { "dimension": "手势含义", "self": "拿起、挪动与贴回，位置由用户决定", "other": "滑左右做出保留或跳过" },
+        { "dimension": "结果", "self": "装饰位置发生变化，随时可以再挪", "other": "卡片离开牌堆并产生一条决策" },
+        { "dimension": "适合内容", "self": "装饰型贴纸与品牌标记", "other": "需要逐个决策的候选项" }
+      ]
+    },
+    {
+      "target": "gravity-well",
+      "title": "Sticker peel 与 Gravity well",
+      "rows": [
+        { "dimension": "表面", "self": "点阵纸面上的散落贴纸", "other": "规则网格排列的图片瓦片" },
+        { "dimension": "玩法", "self": "拿起、折起、贴回", "other": "拨动指针让整面墙向井弯折" },
+        { "dimension": "结果", "self": "单个贴纸的位置改变", "other": "整块表面的形变，位置不持久" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中铺一张贴纸纸面",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcStickerPeel Width=\"900\" Height=\"438\"\n                         HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘拿起与放下",
+      "language": "csharp",
+      "code": "// Left / Right 在贴纸间移动，Enter / Space 拿起或贴下；\n// 拿起后方向键移动，Shift 每次 40px，Escape 放回原位。\nvar stickers = new ArcStickerPeel\n{\n    Width = 900,\n    Height = 438,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcStickerPeel",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "纸面宽度；贴纸位置用表面比例表示，因此换尺寸时等比缩放",
+      "Height": "纸面高度",
+      "IsEnabled": "禁用后不再拿起贴纸",
+      "IsVisible": "隐藏后停止剥离弹簧"
+    }
+  }
+}

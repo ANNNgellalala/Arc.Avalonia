@@ -22,6 +22,14 @@ public sealed class AgentRoutinesPage : ArcItemPage
 {
     public override string ItemSlug => "agent-routines";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-sentence-row",
+        "variant-toggle",
+        "variant-connectors",
+        "variant-run-controls"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

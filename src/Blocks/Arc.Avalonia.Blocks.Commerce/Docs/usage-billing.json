@@ -1,0 +1,53 @@
+{
+  "slug": "usage-billing",
+  "nameZh": "用量账单",
+  "summary": "用量计费产品的账单页：每日支出折线带投影、预算与限额进度、三级花费提醒、发票历史，以及可升级的计划卡。",
+  "purpose": [
+    "当账单随用量波动时，财务需要看到花费怎么来的：每日支出折线、七天均值投影到期末，以及与预算的对比。",
+    "限额与预算各自用进度条给出百分比，超过 100% 时切换成警告色；提醒规则列表说明在 80%、100% 与更高阈值时通知谁。",
+    "发票历史与计划卡同页：当前计划列出月费与额度，升级按钮在卡片内展开成确认，确认后额度翻倍。"
+  ],
+  "whenToUse": [
+    "基础设施或 API 类产品，按用量计费并需要预算控制时。",
+    "财务与管理员需要在同一页看到花费、限额、提醒与发票时。",
+    "升级计划应当直接改变额度而不是跳到营销页时。"
+  ],
+  "whenNotToUse": [
+    "固定席位收费、没有用量的 SaaS 时，用 billing-overview。",
+    "公开定价、面向未登录访客时，用 usage-pricing。",
+    "只需要一句支出总额时，用 metric-card。"
+  ],
+  "variants": [
+    { "key": "layout-usage-billing", "label": "整体布局", "note": "支出图、限额、提醒、发票与计划卡同页" },
+    { "key": "variant-spend-chart", "label": "支出折线", "note": "每日支出加七天均值的虚线投影" },
+    { "key": "variant-meters", "label": "限额进度", "note": "API requests 等用量对计划的额度条" },
+    { "key": "variant-alerts", "label": "花费提醒", "note": "80% 与 100% 两条规则及邮件/Slack 渠道" },
+    { "key": "variant-invoices", "label": "发票列表", "note": "三张历史发票，含 Paid 状态与下载" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "每日支出与七天均值投影用折线图叠两条序列" },
+    { "type": "uses", "target": "progress", "note": "预算与各项限额用进度条表达百分比" },
+    { "type": "uses", "target": "button", "note": "下载发票、升级计划与取消升级都是按钮" },
+    { "type": "uses", "target": "badge", "note": "发票与计划状态用徽章标出" },
+    { "type": "alternative", "target": "usage-pricing", "note": "面向访客比较用量价格时，改用 usage-pricing" }
+  ],
+  "contrasts": [
+    {
+      "target": "usage-pricing",
+      "title": "Usage billing 与 Usage pricing",
+      "rows": [
+        { "dimension": "面向对象", "self": "已登录的账单管理员", "other": "未登录的定价访客" },
+        { "dimension": "数据", "self": "真实发生的支出、限额与发票", "other": "假设的席位与流量" },
+        { "dimension": "主要动作", "self": "看预算、加提醒、下载发票、升级", "other": "拖动滑块、比较、开始试用" },
+        { "dimension": "形态", "self": "多卡片的账单页", "other": "一个计算器加推荐卡" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "支出图、限额与提醒三块",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"16\">\n  <arc:ArcCard Padding=\"20\">\n    <StackPanel Spacing=\"10\">\n      <TextBlock Text=\"Daily spend\" Classes=\"arc-label\" />\n      <charts:ArcLineChart Height=\"150\" /> <!-- 实际支出 + 七天均值虚线 -->\n      <arc:ArcProgress Value=\"6.4\" Maximum=\"10\" />\n    </StackPanel>\n  </arc:ArcCard>\n  <arc:ArcCard Padding=\"20\">\n    <StackPanel Spacing=\"8\">\n      <TextBlock Text=\"Spend alerts\" Classes=\"arc-label\" />\n      <!-- 80% / 100% 规则 -->\n      <arc:ArcButton Content=\"Add alert rule\" Variant=\"Ghost\" />\n    </StackPanel>\n  </arc:ArcCard>\n</StackPanel>"
+    }
+  ]
+}

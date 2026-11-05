@@ -1,0 +1,52 @@
+{
+  "slug": "cart-drawer",
+  "nameZh": "购物袋抽屉",
+  "summary": "店铺页里的侧边购物袋：抽屉默认打开并压暗店铺，行项目带数量与移除，另有免费配送进度、促销码与结算入口。",
+  "purpose": [
+    "当买家在浏览商品时想随时核对已选的东西，购物袋以右侧抽屉的形式停在同一页，收起后保留全部行项目。",
+    "行项目可以加减数量与移除，合计与免费配送进度实时更新；达到门槛时进度条给出已解锁提示。",
+    "底部固定促销码输入与结算按钮，结算时按钮进入处理中，成功后抽屉原地折叠成订单确认。"
+  ],
+  "whenToUse": [
+    "商品列表页希望买家多件加购、随时在侧边核对时。",
+    "需要展示免费配送门槛或促销码时。",
+    "购物袋内容较少、不必跳到独立购物车页时。"
+  ],
+  "whenNotToUse": [
+    "需要填写地址与支付信息的多步结算时，用 checkout-live。",
+    "单件商品的最终支付摘要时，用 checkout-summary。",
+    "购物袋内容很多、需要大图与详细编辑时，用完整购物车页。"
+  ],
+  "variants": [
+    { "key": "state-drawer-open", "label": "抽屉打开", "note": "右侧滑入并压暗背后的店铺" },
+    { "key": "layout-storefront", "label": "店铺背景", "note": "三列商品网格与带角标的 Bag 按钮" },
+    { "key": "variant-cart-lines", "label": "购物袋行", "note": "数量步进、移除、免费配送进度与合计" },
+    { "key": "variant-checkout-footer", "label": "结算底栏", "note": "促销码输入与 Check out 按钮" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "drawer", "note": "整个购物袋就是页面内打开的 drawer" },
+    { "type": "uses", "target": "progress", "note": "免费配送门槛用进度条表达" },
+    { "type": "uses", "target": "input", "note": "促销码在文本输入里填写" },
+    { "type": "uses", "target": "button", "note": "数量、移除、应用促销码与结算都是按钮" },
+    { "type": "alternative", "target": "checkout-summary", "note": "进入最终支付步骤时，改用 checkout-summary" }
+  ],
+  "contrasts": [
+    {
+      "target": "checkout-summary",
+      "title": "Cart drawer 与 Checkout summary",
+      "rows": [
+        { "dimension": "阶段", "self": "挑选与核对购物袋", "other": "支付前的最后一屏" },
+        { "dimension": "形态", "self": "右侧抽屉，背后是店铺", "other": "整页两栏摘要" },
+        { "dimension": "可编辑内容", "self": "数量、移除、促销码", "other": "促销码与支付按钮" },
+        { "dimension": "结局", "self": "收起后回到店铺", "other": "支付完成后显示已付" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "把购物袋挂成页面抽屉",
+      "language": "xaml",
+      "code": "<Panel>\n  <StackPanel> <!-- 商品网格与 Bag 按钮 --> </StackPanel>\n  <o:ArcDrawer Title=\"Your bag (2)\"\n               Description=\"Free returns within 30 days.\"\n               Side=\"Right\"\n               IsOpen=\"{Binding IsBagOpen}\">\n    <StackPanel Spacing=\"10\">\n      <arc:ArcProgress Value=\"1\" Maximum=\"250\" />\n      <!-- 购物袋行 -->\n    </StackPanel>\n    <o:ArcDrawer.Footer>\n      <StackPanel Spacing=\"8\">\n        <arc:ArcInput Placeholder=\"Promo code\" />\n        <arc:ArcButton Content=\"Check out\" Variant=\"Primary\" />\n      </StackPanel>\n    </o:ArcDrawer.Footer>\n  </o:ArcDrawer>\n</Panel>"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "slug": "slider",
+  "nameZh": "滑块",
+  "summary": "在轨道上拖出一个数值：强调色填充、可选刻度点、拖动时就地显示数值气泡，方向键与 Home / End 精确微调。",
+  "purpose": [
+    "用于「大致范围合适」的数值输入：音量、预算、不透明度、缩放。轨道 6 px、拇指 20 px，填充段取强调色，标签在左上、读数在右上。",
+    "拖动时拇指上方浮出数值气泡，松手即收起；键盘走另一条精确路径：方向键按 Step 微调，PageUp / PageDown 与 Shift+方向键按 LargeStep 跳，Home / End 直达两端。",
+    "Marks 只画 4 px 的小圆点作为刻度参考，不做吸附——它提示「50% 在这里」，但不阻止你把值停在 43。需要吸附与刻度标签时改用 elastic-slider。",
+    "Format 决定读数、气泡与读屏文本的格式（例如把 40 显示成 $40）；ShowValue 关闭后只保留气泡。"
+  ],
+  "whenToUse": [
+    "数值是连续的、用户不需要输入精确到个位的值（音量、亮度、预算上限）。",
+    "想要一个比数字输入框更快、更有手感的调整方式。",
+    "需要刻度参考点（0 / 50 / 100）但不需要吸附的场合。"
+  ],
+  "whenNotToUse": [
+    "需要精确键入数值时，改用 number-field 或 money-input；滑块再精细也不适合输入 1234.56。",
+    "希望拇指越过两端时有回弹、刻度会吸附时，改用 elastic-slider。",
+    "要选的是一个区间（¥80–320）时，改用 range-histogram-slider。"
+  ],
+  "variants": [
+    { "key": "state-default", "label": "Default", "note": "标签、轨道、填充与读数" },
+    { "key": "state-with-marks", "label": "With marks", "note": "轨道上的 4 px 刻度点" },
+    { "key": "variant-format", "label": "Format", "note": "Format 决定读数与气泡的格式" },
+    { "key": "variant-description", "label": "Description", "note": "轨道下方的帮助文案" },
+    { "key": "variant-without-value", "label": "No readout", "note": "ShowValue=false，只保留拖动气泡" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "elastic-slider", "note": "需要越界回弹与刻度吸附时改用 elastic slider" },
+    { "type": "alternative", "target": "range-histogram-slider", "note": "要选一个区间时改用 range histogram slider" },
+    { "type": "alternative", "target": "number-field", "note": "需要精确键入数值时改用 number field" },
+    { "type": "complement", "target": "input", "note": "滑块负责快速估选，旁边的 input 负责精确覆写" }
+  ],
+  "contrasts": [
+    {
+      "target": "elastic-slider",
+      "title": "Slider 与 Elastic slider",
+      "rows": [
+        { "dimension": "越界反馈", "self": "到端点即停，轨道不变形", "other": "越过端点时轨道被拉伸并回弹" },
+        { "dimension": "刻度", "self": "4 px 圆点，仅作参考", "other": "刻度是吸附点，可带文字标签" },
+        { "dimension": "动效", "self": "填充与拇指直接跟手", "other": "数值弹簧过渡，标签随拖拽摆动" }
+      ]
+    },
+    {
+      "target": "number-field",
+      "title": "Slider 与 Number field",
+      "rows": [
+        { "dimension": "输入方式", "self": "拖动或方向键微调", "other": "直接键入，配步进按钮" },
+        { "dimension": "精度", "self": "受像素宽度限制，适合近似值", "other": "任意精度，可校验上下界" },
+        { "dimension": "占位", "self": "一行轨道，无键盘输入焦点", "other": "一个完整字段，可复制粘贴" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcSlider Label=\"Volume\"\n                 Min=\"0\"\n                 Max=\"100\"\n                 Value=\"{Binding Volume, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "刻度、步进与格式化",
+      "language": "csharp",
+      "code": "var budget = new ArcSlider\n{\n    Label = \"Monthly budget\",\n    Min = 0,\n    Max = 100,\n    Step = 5,\n    Value = 40,\n    Marks = new[] { new ArcSliderMark(0), new ArcSliderMark(50), new ArcSliderMark(100) },\n    Format = value => $\"${value:0}\",\n    Description = \"方向键每次 5，PageUp 跳 10。\"\n};\n\nbudget.ValueChanged += (_, _) => Preview(budget.Value);\nbudget.ValueCommitted += (_, _) => Save(budget.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcSlider",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "轨道上方的可见标签，同时作为无障碍名称",
+      "Description": "轨道下方的帮助文案",
+      "Value": "当前值，默认 50",
+      "Min": "下界，默认 0",
+      "Max": "上界，默认 100",
+      "Step": "方向键与吸附的步进，默认 1",
+      "LargeStep": "PageUp / PageDown 与 Shift+方向键的步进；默认取量程的十分之一",
+      "Marks": "刻度点集合，元素是 ArcSliderMark（Value / Label）；只做参考，不吸附",
+      "ShowValue": "是否显示右上角读数，默认 true",
+      "Format": "格式化读数、气泡与读屏文本的函数",
+      "ValueChanged": "拖动或按键改变值时触发",
+      "ValueCommitted": "松手或按键确认后触发，适合保存"
+    }
+  }
+}

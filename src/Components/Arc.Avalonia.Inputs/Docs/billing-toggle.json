@@ -1,0 +1,78 @@
+{
+  "slug": "billing-toggle",
+  "nameZh": "计费周期开关",
+  "summary": "定价页专用的月/年切换：一枚拇指在两项之间滑动，年付项的节省徽标在选中后原地改写，价格随之滚动。",
+  "purpose": [
+    "普通开关只能表达开与关，分段控件只有标签——而定价页的周期切换必须额外交付「年付省多少」。billing toggle 把这条信息做进选项本身：未选中时显示 Save 20%，选中后原地改写成 You save $48 并染色。",
+    "一枚 surface 拇指在轨道上滑动，两个选项的宽度不等也不会让拇指错位；尺寸有 Md（每项 36 px）与 Lg（44 px、字号更大）两档，后者用于页面主定价。",
+    "它只负责写回周期字符串（monthly / yearly）。价格的滚动、划线原价与周期后缀由同族的 billing price 承担，两者一起放进定价卡。",
+    "键盘语义是单选组：方向键切换、Tab 只停一次，读屏名称取自 Label，帮助文本说明当前周期。"
+  ],
+  "whenToUse": [
+    "定价区块上方的月/年切换，且需要展示折扣或节省金额。",
+    "只有两个周期、但第二个要带徽标解释的场景。",
+    "希望周期变化时只改一个 Value，由外部布局去联动价格。"
+  ],
+  "whenNotToUse": [
+    "开关某个设置项（通知、自动保存）而不是选周期时，改用 switch。",
+    "2–5 个不带附加信息的视图切片时，改用 segmented-control。",
+    "选项各自带价格与说明、需要并排比较时，改用 radio-cards。"
+  ],
+  "variants": [
+    { "key": "state-monthly", "label": "Monthly", "note": "月付选中，年付项保留 Save 20% 徽标" },
+    { "key": "state-yearly", "label": "Yearly", "note": "年付选中，徽标改写为 You save $48" },
+    { "key": "variant-badge", "label": "Badge", "note": "选项上的节省徽标，选中后换文案并染色" },
+    { "key": "size-md", "label": "Medium", "note": "每项 36 px，默认" },
+    { "key": "size-lg", "label": "Large", "note": "每项 44 px，字号更大" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "segmented-control", "note": "只是视图切换、不需要徽标时改用 segmented control" },
+    { "type": "alternative", "target": "switch", "note": "翻转即生效的通用布尔设置改用 switch" },
+    { "type": "alternative", "target": "radio-cards", "note": "选项各自带价格与说明、需要并排比较时改用 radio cards" },
+    { "type": "complement", "target": "card", "note": "周期开关通常放在定价卡顶部，与价格行一起构成一张定价卡" }
+  ],
+  "contrasts": [
+    {
+      "target": "segmented-control",
+      "title": "Billing toggle 与 Segmented control",
+      "rows": [
+        { "dimension": "附加信息", "self": "选项可带节省徽标，选中后改写文案", "other": "只有标签，最多一个尾部计数" },
+        { "dimension": "Value 语义", "self": "周期字符串（monthly / yearly）", "other": "任意视图名" },
+        { "dimension": "尺寸", "self": "Md 36 / Lg 44 两档", "other": "单一高度，段内边距固定" }
+      ]
+    },
+    {
+      "target": "switch",
+      "title": "Billing toggle 与 Switch",
+      "rows": [
+        { "dimension": "语义", "self": "两个具名周期二选一", "other": "开与关的布尔值" },
+        { "dimension": "附加信息", "self": "节省徽标、可改写文案", "other": "只有标签" },
+        { "dimension": "数据", "self": "Value 是字符串", "other": "Checked 是 bool" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcBillingToggle Label=\"Billing period\"\n                        Value=\"{Binding Period, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "自定义选项、徽标与尺寸",
+      "language": "csharp",
+      "code": "var toggle = new ArcBillingToggle\n{\n    Label = \"Billing period\",\n    Size = ArcBillingToggleSize.Lg,\n    Value = \"yearly\",\n    Options = new List<ArcBillingToggleOption>\n    {\n        new(\"monthly\", \"Monthly\"),\n        new(\"yearly\", \"Yearly\", \"Save 20%\", \"You save $48\")\n    }\n};\n\ntoggle.ValueChanged += (_, _) => LoadPlan(toggle.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcBillingToggle",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前周期的 Value，例如 monthly / yearly",
+      "Options": "选项集合，元素是 ArcBillingToggleOption（Value / Label / Badge / ActiveBadge）；不给时默认月付与年付",
+      "Label": "单选组的无障碍名称，默认 Billing period",
+      "Size": "Md 每项 36 px（默认）/ Lg 每项 44 px 且字号更大",
+      "SelectedOption": "只读，当前选中的完整选项",
+      "ValueChanged": "点击或方向键切换后触发，事件参数不带值，读 Value 即可"
+    }
+  }
+}

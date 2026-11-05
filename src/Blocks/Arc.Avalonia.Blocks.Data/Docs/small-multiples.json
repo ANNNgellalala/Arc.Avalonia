@@ -1,0 +1,57 @@
+{
+  "slug": "small-multiples",
+  "nameZh": "小倍数图",
+  "summary": "十二张迷你折线排成一张网格：共用一条十字线读数，可选择共享或独立 y 轴、按任意指标排序，并压暗趋势平缓的面板。",
+  "purpose": [
+    "当要同时比较十二个渠道、又不想把它们挤进一张折线图时，用 small multiples：每格一条迷你折线，读数时十字线在所有面板上同步移动。",
+    "共享 y 轴让面板之间可以直接比高低；切到独立 y 轴则让每条序列自己的形状更清楚。排序（名称 / 峰值 / 最新）会重排网格，图例说明颜色与虚线含义。",
+    "每格背后有一条总体的虚线幽灵线，即使某个面板被压暗也能看到整体形状；平缓面板（区间小于峰值的 8%）会主动变暗，避免把噪音读成趋势。"
+  ],
+  "whenToUse": [
+    "需要并排比较十来个同构序列时。",
+    "希望在共享与独立刻度之间切换时。",
+    "要按峰值或最新值重新排序面板时。"
+  ],
+  "whenNotToUse": [
+    "只有一条序列时，用 line-chart。",
+    "序列之间存在流向与分流时，用 sankey-flow 或 journey-flow。",
+    "需要精确读某一天所有值时，用数据表格。"
+  ],
+  "variants": [
+    { "key": "layout-multiples", "label": "整体布局", "note": "十二格网格、排序与刻度开关并置" },
+    { "key": "variant-trellis", "label": "Trellis", "note": "十二张迷你折线与同步网格" },
+    { "key": "variant-ghost-total", "label": "Ghost total", "note": "每格背后表示整体的虚线" },
+    { "key": "variant-scale-shared", "label": "Scale", "note": "共享 y 轴为默认，可切独立" },
+    { "key": "variant-sort", "label": "Sort", "note": "按峰值排序的面板顺序" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "每个面板是一条迷你的折线" },
+    { "type": "uses", "target": "segmented-control", "note": "排序与刻度切换用分段控件" },
+    { "type": "uses", "target": "switch", "note": "共享 y 轴由一个开关控制" },
+    { "type": "uses", "target": "card", "note": "整张网格装在卡片里" },
+    { "type": "alternative", "target": "horizon-chart", "note": "行数更多、需要更紧凑的折叠时，改用 horizon chart" }
+  ],
+  "contrasts": [
+    {
+      "target": "horizon-chart",
+      "title": "Small multiples 与 Horizon chart",
+      "rows": [
+        { "dimension": "单元", "self": "十二块面板，每块一张完整小图", "other": "多行折叠色带，每行一条序列" },
+        { "dimension": "垂直空间", "self": "面板之间有间距，占高较大", "other": "把每个序列折进几层色带，非常紧凑" },
+        { "dimension": "刻度", "self": "可共享或独立 y 轴", "other": "以各自基准的偏差分层，不共享原始轴" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <arc:ArcSegmentedControl SelectedValue=\"peak\" />\n  <charts:ArcSmallMultiples Height=\"420\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：刻度与排序",
+      "language": "csharp",
+      "code": "var series = BuildChannels(12, 24);\nvar trellis = new ArcSmallMultiples(series, labels);\n\ntrellis.SharedScale = true; // false 时每个面板独立缩放\ntrellis.Sort = \"peak\";     // name / peak / latest"
+    }
+  ]
+}

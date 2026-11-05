@@ -1,0 +1,49 @@
+{
+  "slug": "feature-bento",
+  "nameZh": "功能便当格",
+  "summary": "六格大小不一的功能网格：每格装一小段真实产品界面，悬停时把这项功能「演」出来。",
+  "purpose": [
+    "用六格便当布局代替六段功能列表：大小不一的格子形成节奏，主功能占更大的面积，其余功能依次排开。",
+    "每格里不是插图，而是一小段真实界面：开关会翻、进度会走、行会亮起、图表会换序列；指针进入某一格时演示进入对应状态，离开后复位。",
+    "组成依赖：整块装在 card 里，状态标签与演示徽标用 badge，趋势与柱状演示用 sparkline，演示开关用 switch。"
+  ],
+  "whenToUse": [
+    "功能有主次、希望用尺寸差强调重点时。",
+    "每个功能都能用一小段界面演示清楚时。",
+    "需要在一个区块里同时展示 5–7 项能力、又不想做成三列卡片墙时。"
+  ],
+  "whenNotToUse": [
+    "所有功能同等重要、希望整齐排比时，改用 spotlight-grid。",
+    "功能有先后顺序、需要按步骤讲时，改用 scroll-story。",
+    "功能多于八项时，便当格会变得拥挤，改用分区与列表。"
+  ],
+  "variants": [
+    { "key": "variant-bento", "label": "Bento", "note": "大小不一的六格便当布局" },
+    { "key": "variant-live-demos", "label": "Live demos", "note": "格内的开关、进度与趋势演示" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "card", "note": "整块便当格装在 ArcCard 里" },
+    { "type": "uses", "target": "badge", "note": "功能状态与演示标签用 ArcBadge" },
+    { "type": "uses", "target": "sparkline", "note": "趋势与柱状演示用 shared sparkline" },
+    { "type": "uses", "target": "switch", "note": "演示里的开关状态用 ArcSwitch" },
+    { "type": "alternative", "target": "spotlight-grid", "note": "希望整齐的等宽网格时改用 spotlight grid" }
+  ],
+  "contrasts": [
+    {
+      "target": "spotlight-grid",
+      "title": "Feature bento 与 Spotlight grid",
+      "rows": [
+        { "dimension": "布局", "self": "大小不一的六格便当布局", "other": "整齐的 2×3 等宽网格" },
+        { "dimension": "强调方式", "self": "用格子尺寸强调主功能", "other": "每格同等重要" },
+        { "dimension": "交互", "self": "悬停触发格内演示", "other": "高光跟随指针，点击展开详情" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "便当格骨架",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <c:ArcCard Padding=\"10\" Width=\"880\">\n    <Grid ColumnDefinitions=\"1.4*,1*\" RowDefinitions=\"Auto,Auto,Auto\">\n      <c:ArcCard Grid.RowSpan=\"2\" Padding=\"20\" Margin=\"0,0,10,10\">\n        <StackPanel Spacing=\"8\">\n          <c:ArcBadge Content=\"Live\" Tone=\"Accent\" Dot=\"True\" />\n          <TextBlock Text=\"Insights that answer the question\" Classes=\"arc-label\" />\n          <TextBlock Text=\"Every chart traces back to an event.\"\n                     Classes=\"arc-caption\" TextWrapping=\"Wrap\" />\n        </StackPanel>\n      </c:ArcCard>\n      <c:ArcCard Grid.Column=\"1\" Padding=\"20\" Margin=\"0,0,0,10\">\n        <StackPanel Spacing=\"6\">\n          <TextBlock Text=\"Keyboard first\" Classes=\"arc-label\" />\n          <c:ArcSwitch Label=\"Command palette\" Checked=\"True\" />\n        </StackPanel>\n      </c:ArcCard>\n    </Grid>\n  </c:ArcCard>\n</Window>"
+    }
+  ]
+}

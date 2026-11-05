@@ -20,6 +20,11 @@ public sealed class CtaSectionPage : ArcItemPage
 {
     public override string ItemSlug => "cta-section";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-banner", "variant-closing", "state-dismissed"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -96,6 +101,9 @@ public sealed class CtaSectionPage : ArcItemPage
             dismissed.IsVisible = false;
         };
 
+        var trial = Mk.Pill("14 days free", ArcBadgeTone.Accent);
+        trial.HorizontalAlignment = HorizontalAlignment.Center;
+
         var title = Mk.Text("Start building today.", "arc-title-sm", 560);
         title.TextAlignment = TextAlignment.Center;
         title.HorizontalAlignment = HorizontalAlignment.Center;
@@ -126,7 +134,7 @@ public sealed class CtaSectionPage : ArcItemPage
         {
             Orientation = Orientation.Vertical,
             Spacing = 16,
-            Children = { title, body, actions, meta }
+            Children = { trial, title, body, actions, meta }
         };
 
         var section = Mk.Wash(new Border
@@ -135,10 +143,17 @@ public sealed class CtaSectionPage : ArcItemPage
             Child = closing
         }, intensity: 0.85);
 
+        // The dismissed state is otherwise only reachable by clicking the banner close button.
+        var dismissedSpecimen = Mk.Row(10,
+            Mk.Caption("Banner dismissed."),
+            Mk.Btn("Undo", ArcButtonVariant.Ghost, ArcButtonSize.Sm));
+
         return Mk.Stack(12,
             banner,
             dismissed,
-            section);
+            section,
+            Mk.Caption("After dismissing the banner"),
+            dismissedSpecimen);
     }
 }
 

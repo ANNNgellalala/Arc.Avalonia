@@ -21,6 +21,11 @@ public sealed class SignupFormPage : ArcItemPage
 {
     public override string ItemSlug => "signup-form";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-form-fields", "variant-password-strength", "variant-opt-in", "variant-aside-benefits"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

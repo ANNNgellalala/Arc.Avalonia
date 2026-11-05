@@ -22,6 +22,11 @@ public sealed class CommandPalettePage : ArcItemPage
 {
     public override string ItemSlug => "command-palette";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-grouped-commands", "variant-shortcut-hints", "state-highlight"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,73 @@
+{
+  "slug": "accordion",
+  "nameZh": "手风琴",
+  "summary": "一次只展开一行的问答列表：标题行始终可见，展开时高度与不透明度一起平滑生长，箭头随开合旋转。",
+  "purpose": [
+    "FAQ、设置分组、文档目录这些「同一类内容、一次只需要读一段」的场景，用 Accordion 把答案收在标题下面。点开新行会收起上一行，页面高度因此保持稳定，不会因为同时展开多段而把后面的内容推走。",
+    "DefaultOpen 决定初始展开的索引，-1 表示全部收起。展开时内容高度与不透明度一起走平滑弹簧，箭头同步旋转；行与行之间是一条发丝分隔线，不额外加卡片。",
+    "尺寸只影响标题行：Md 为 56px，Lg 为 68px 并放大标题字号。标题本身是按钮，Up / Down 在行间移动，Home / End 跳到首尾，Enter 或 Space 开合，所以键盘可以完整走完一组问答。"
+  ],
+  "whenToUse": [
+    "一组同构的问题与答案，读者一次只需要其中一段。",
+    "设置页把长表单拆成可折叠的分组，默认全部收起。",
+    "需要保持页面高度稳定、避免同时展开多段内容。"
+  ],
+  "whenNotToUse": [
+    "每个条目都是一张完整卡片、需要独立展开且可以同时展开多个时，改用 expandable-card。",
+    "只是一段长文本需要按行折叠时，改用 expandable-text，它自带行数限制与渐隐。",
+    "内容是并列切换、而不是逐段阅读时，改用 tabs。"
+  ],
+  "variants": [
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸，标题行 56px" },
+    { "key": "size-lg", "label": "Large", "note": "标题行 68px，标题字号与字重更大" },
+    { "key": "state-open", "label": "Open", "note": "一行展开，高度与不透明度一起生长" },
+    { "key": "state-closed", "label": "Closed", "note": "全部收起，只留标题行与分隔线" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "expandable-card", "note": "条目需要独立成卡片、可同时展开时用 expandable card" },
+    { "type": "alternative", "target": "expandable-text", "note": "只是长文本按行折叠时用 expandable text" },
+    { "type": "complement", "target": "input", "note": "设置分组展开后，具体值由 input 等字段承载" }
+  ],
+  "contrasts": [
+    {
+      "target": "expandable-card",
+      "title": "Accordion 与 Expandable card",
+      "rows": [
+        { "dimension": "展开策略", "self": "一次只开一行，打开新行会收起上一行", "other": "每张卡片独立开合，可以同时展开多个" },
+        { "dimension": "视觉形态", "self": "共用一个列表表面，行间只有发丝分隔线", "other": "每张卡片都有自己的圆角、边框与阴影" },
+        { "dimension": "适合内容", "self": "同构的问答、设置分组", "other": "彼此独立的概览卡片，展开后是明细" }
+      ]
+    },
+    {
+      "target": "expandable-text",
+      "title": "Accordion 与 Expandable text",
+      "rows": [
+        { "dimension": "结构", "self": "多行标题，每行有独立的内容区", "other": "一段连续文本，只有一个开关" },
+        { "dimension": "折叠依据", "self": "按行索引展开其中一行", "other": "按行数限制裁剪，溢出才出现开关" },
+        { "dimension": "典型场景", "self": "FAQ、设置项分组", "other": "评论、描述、变更说明" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "第一行默认展开",
+      "language": "csharp",
+      "code": "var accordion = new ArcAccordion\n{\n    Label = \"Billing questions\",\n    Size = ArcAccordionSize.Md,\n    DefaultOpen = 0,\n    Items = new List<ArcAccordionItem>\n    {\n        new(\"How is usage counted?\", \"Every request counts once, including retries.\"),\n        new(\"Can I change plan mid-cycle?\", \"Yes, the difference is prorated to the day.\"),\n        new(\"Where do invoices go?\", \"Billing contacts receive the invoice and the receipt.\")\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:actions=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\"\n        xmlns:internal=\"clr-namespace:Arc.Avalonia.Internal;assembly=Arc.Avalonia.Internal\">\n  <actions:ArcAccordion Label=\"Billing questions\" DefaultOpen=\"0\">\n    <actions:ArcAccordion.Items>\n      <internal:ArcAccordionItem Title=\"How is usage counted?\"\n                                 Content=\"Every request counts once, including retries.\" />\n      <internal:ArcAccordionItem Title=\"Can I change plan mid-cycle?\"\n                                 Content=\"Yes, the difference is prorated to the day.\" />\n    </actions:ArcAccordion.Items>\n  </actions:ArcAccordion>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcAccordion",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "问答行；每行有标题与任意内容",
+      "DefaultOpen": "初始展开的行索引，-1 表示全部收起",
+      "Size": "尺寸：Md 标题行 56px、Lg 68px",
+      "Label": "整组问答的无障碍名称"
+    }
+  }
+}

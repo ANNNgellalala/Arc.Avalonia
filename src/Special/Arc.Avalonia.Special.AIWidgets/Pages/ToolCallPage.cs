@@ -13,6 +13,11 @@ public sealed class ToolCallPage : ArcItemPage
 {
     public override string ItemSlug => "tool-call";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-expanded", "state-success", "state-running", "state-error", "state-approval", "state-denied"
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var group = new ArcToolCall
@@ -67,6 +72,14 @@ public sealed class ToolCallPage : ArcItemPage
                     ApprovalTitle = "Post a summary to #release",
                     Status = ArcToolCallStatus.Approval,
                     Message = "Allows the agent to post one message in this channel"
+                },
+                new()
+                {
+                    Id = "mail",
+                    Tool = "gmail",
+                    Title = "Emailed the release notes to 42 customers",
+                    Status = ArcToolCallStatus.Denied,
+                    Message = "Denied by you · nothing was sent"
                 }
             }
         };

@@ -1,0 +1,52 @@
+{
+  "slug": "support-conversation",
+  "nameZh": "支持对话",
+  "summary": "支持工单对话：消息线程、快捷回复、输入区与 Resolved 开关，回复到达前显示正在输入。",
+  "purpose": [
+    "当用户的问题需要连续几轮沟通时，支持对话把消息按时间排成线程，对方的头像与自己的气泡用不同底色区分。",
+    "输入区上方给三条快捷回复，点一下即以自己的名义发出；发送后线程追加消息，并短暂显示对方正在输入。",
+    "顶部的 Resolved 开关把工单状态写清楚，可以随时反悔重新打开，线程内容不会丢。"
+  ],
+  "whenToUse": [
+    "支持聊天或工单线程，需要多轮对话与快捷回复时。",
+    "要显示正在输入、附件入口与已解决状态时。",
+    "需要把对话嵌在页面里、而不是弹窗时。"
+  ],
+  "whenNotToUse": [
+    "只需要自助搜索与阅读时，用 help-center。",
+    "需要浮在应用上的帮助入口时，用 support-widget。",
+    "只想给快递员发一句预设消息时，用 delivery-tracker 的快捷回复。"
+  ],
+  "variants": [
+    { "key": "layout-thread", "label": "消息线程", "note": "头像、气泡与时间戳按时间排列" },
+    { "key": "variant-quick-replies", "label": "快捷回复", "note": "三条预设回复，点一下即发送" },
+    { "key": "variant-resolve", "label": "已解决开关", "note": "Resolved 切换工单状态，可重新打开" },
+    { "key": "variant-composer", "label": "输入区", "note": "附件、表情与 Send 组成的底部输入" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "底部输入框写消息，Enter 发送" },
+    { "type": "uses", "target": "button", "note": "快捷回复、发送与附件都是按钮" },
+    { "type": "uses", "target": "avatar", "note": "对方消息旁用头像标出说话人" },
+    { "type": "uses", "target": "switch", "note": "Resolved 用开关表达工单状态" },
+    { "type": "alternative", "target": "support-widget", "note": "只想在应用角上挂一个帮助入口时，改用 support-widget" }
+  ],
+  "contrasts": [
+    {
+      "target": "support-widget",
+      "title": "Support conversation 与 Support widget",
+      "rows": [
+        { "dimension": "布局", "self": "整块线程加输入区", "other": "角落浮层，可收起" },
+        { "dimension": "上下文", "self": "专门的工单页面", "other": "不离开当前任务" },
+        { "dimension": "功能", "self": "快捷回复、附件、解决状态", "other": "搜索、文章与聊天入口" },
+        { "dimension": "适用", "self": "需要多轮沟通的问题", "other": "快速自助或问一句" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "线程、快捷回复与输入区",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\" MaxWidth=\"720\">\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"10\">\n    <arc:ArcAvatar />\n    <StackPanel Spacing=\"1\">\n      <TextBlock Text=\"Maya Chen · Support\" Classes=\"arc-body-sm arc-medium\" />\n      <TextBlock Text=\"Typically replies in 2 minutes · ticket 4812\" Classes=\"arc-caption\" />\n    </StackPanel>\n    <arc:ArcSwitch Content=\"Resolved\" />\n  </StackPanel>\n  <ItemsControl ItemsSource=\"{Binding Messages}\"> <!-- 消息气泡 --> </ItemsControl>\n  <WrapPanel> <!-- 三条快捷回复 --> </WrapPanel>\n  <Grid ColumnDefinitions=\"Auto,*,Auto\">\n    <arc:ArcButton Content=\"Attach\" Variant=\"Ghost\" />\n    <arc:ArcInput Grid.Column=\"1\" Placeholder=\"Message support\" />\n    <arc:ArcButton Grid.Column=\"2\" Content=\"Send\" Variant=\"Primary\" />\n  </Grid>\n</StackPanel>"
+    }
+  ]
+}

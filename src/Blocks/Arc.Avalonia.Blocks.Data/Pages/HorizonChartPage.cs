@@ -19,6 +19,11 @@ public sealed class HorizonChartPage : ArcItemPage
 {
     public override string ItemSlug => "horizon-chart";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-horizon", "variant-folded-rows", "variant-bands", "variant-sort", "variant-legend"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

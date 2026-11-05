@@ -22,6 +22,11 @@ public sealed class MrrWaterfallPage : ArcItemPage
 {
     public override string ItemSlug => "mrr-waterfall";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-waterfall", "variant-bridge", "variant-period-switch", "variant-account-panel"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -23,6 +23,14 @@ public sealed class McpServersPage : ArcItemPage
 {
     public override string ItemSlug => "mcp-servers";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-server-row",
+        "variant-tools",
+        "variant-context-meter",
+        "variant-directory"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

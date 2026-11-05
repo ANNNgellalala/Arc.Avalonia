@@ -1,0 +1,74 @@
+{
+  "slug": "resizable-panels",
+  "nameZh": "可调整面板",
+  "summary": "用可拖动的分隔条在两个或多个窗格之间分配空间：按份额布局，拖动即时生效，双击复位，折叠的窗格留下可点击的恢复箭头。",
+  "purpose": [
+    "编辑器、邮件、仪表盘这类会停留很久的界面，需要同时看见两块内容，并让用户自己决定谁占更多空间。窗格尺寸用相对份额表示，所以窗口缩放时比例保持不变；每块还能设最小与最大像素。",
+    "分隔条是真正的焦点停靠点：拖动调整，方向键小幅微调、Shift 加大步长，Home / End 推到极限，Enter 折叠或展开可折叠的相邻窗格，双击恢复默认布局。",
+    "折叠的窗格不占宽度，但它的分隔条仍然可达，上面会出现一个 chevron 用来恢复；布局变化后 LayoutChanged 以百分比回报每块的实际份额，便于持久化。"
+  ],
+  "whenToUse": [
+    "需要并排显示的主从布局：文件夹 / 邮件列表 / 预览、图层 / 属性、导航 / 画布。",
+    "用户会长期放大或缩小某一侧的场景，例如代码编辑器、日志与图表并排。",
+    "需要折叠而不销毁窗格的侧栏：折叠后仍能从分隔条恢复，状态不丢。"
+  ],
+  "whenNotToUse": [
+    "内容只需在两种固定宽度之间切换时，用 tabs 或简单的开关更轻。",
+    "详情只是临时查看、需要从内容一侧滑出时，改用 drawer。",
+    "只是内容超出固定高度、需要滚动时，改用 scroll-area。"
+  ],
+  "variants": [
+    { "key": "orientation-horizontal", "label": "Horizontal", "note": "左右分栏，分隔条竖向拖动" },
+    { "key": "orientation-vertical", "label": "Vertical", "note": "上下分栏，分隔条横向拖动" },
+    { "key": "layout-three-panes", "label": "Three panes", "note": "三个窗格、两条分隔条，份额按比例分配" },
+    { "key": "state-collapsed", "label": "Collapsed", "note": "可折叠窗格收起，留下 chevron 恢复入口" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "scroll-area", "note": "两者都在固定盒子里分配空间：需要滚动用 scroll area，需要拖动分隔条用 resizable panels" },
+    { "type": "alternative", "target": "drawer", "note": "常驻并排的详情用 resizable panels，临时滑出的详情用 drawer" },
+    { "type": "complement", "target": "data-grid", "note": "表格与详情窗格并排时，表格放在可调宽度的主窗格里" }
+  ],
+  "contrasts": [
+    {
+      "target": "scroll-area",
+      "title": "Resizable panels 与 Scroll area",
+      "rows": [
+        { "dimension": "空间来源", "self": "拖动分隔条，在两块内容之间重新分配", "other": "盒子固定，超出部分滚动可达" },
+        { "dimension": "用户控制", "self": "份额、折叠与复位，偏布局配置", "other": "滚动位置，偏阅读导航" },
+        { "dimension": "典型场景", "self": "编辑器、邮件三栏、图层与属性", "other": "弹窗里的长列表、横向模板条" }
+      ]
+    },
+    {
+      "target": "drawer",
+      "title": "Resizable panels 与 Drawer",
+      "rows": [
+        { "dimension": "存在方式", "self": "始终在布局里，宽度可调", "other": "按需滑出，关闭后不占空间" },
+        { "dimension": "注意力", "self": "与主内容并排，可随时对照", "other": "短暂遮挡一部分主内容" },
+        { "dimension": "适合内容", "self": "详情、属性、预览等长期可见的次级内容", "other": "临时任务、筛选条件或表单" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三栏邮件布局",
+      "language": "csharp",
+      "code": "var panels = new ArcResizablePanels\n{\n    Label = \"Mail\",\n    Width = 720,\n    Height = 320,\n    Panes = new List<ArcResizablePane>\n    {\n        new(\"folders\", \"Folders\", 24, 120) { Collapsible = true },\n        new(\"messages\", \"Messages\", 46, 200),\n        new(\"preview\", \"Preview\", 30, 200)\n    }\n};\n\npanels.LayoutChanged += (_, shares) => SaveLayout(shares);"
+    },
+    {
+      "title": "在 XAML 中声明窗格",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcResizablePanels Label=\"Inspector\" Orientation=\"Vertical\" Height=\"300\">\n    <media:ArcResizablePanels.Panes>\n      <media:ArcResizablePane Id=\"layers\" Label=\"Layers\" DefaultSize=\"58\" MinSize=\"80\" />\n      <media:ArcResizablePane Id=\"properties\" Label=\"Properties\" DefaultSize=\"42\" MinSize=\"80\" />\n    </media:ArcResizablePanels.Panes>\n  </media:ArcResizablePanels>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcResizablePanels",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Panes": "按顺序排列的窗格，每个都带份额、最小/最大尺寸与折叠设置",
+      "Orientation": "分栏方向：Horizontal 左右、Vertical 上下",
+      "Label": "分栏组的无障碍名称",
+      "CollapseOnDoubleClick": "为 true 时双击分隔条折叠相邻窗格，否则恢复默认布局",
+      "LayoutChanged": "一次调整结束后触发，携带每个窗格的实际份额（百分比）"
+    }
+  }
+}

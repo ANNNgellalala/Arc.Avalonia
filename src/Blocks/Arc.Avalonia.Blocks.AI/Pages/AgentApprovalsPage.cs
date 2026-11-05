@@ -22,6 +22,14 @@ public sealed class AgentApprovalsPage : ArcItemPage
 {
     public override string ItemSlug => "agent-approvals";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-focus-card",
+        "variant-queue",
+        "variant-rules",
+        "variant-filter"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -92,7 +100,14 @@ public sealed class AgentApprovalsPage : ArcItemPage
         var queueHost = new StackPanel { Spacing = 3 };
         var rulesButton = K.Chip("Rules 1", icon: "shield-check");
         var resolvedLog = new StackPanel { Spacing = 3, IsVisible = false };
-        var resolvedToggle = K.Chip("Resolved 2", icon: "chevron-down");
+        var resolvedFilter = K.Segmented(
+            new[] { ("waiting", "Waiting 3"), ("resolved", "Resolved 2") },
+            "waiting",
+            value =>
+            {
+                resolvedLog.IsVisible = value == "resolved";
+                status.Text = resolvedLog.IsVisible ? "Resolved requests shown." : "Waiting requests shown.";
+            });
 
         void RenderResolved()
         {
@@ -103,17 +118,6 @@ public sealed class AgentApprovalsPage : ArcItemPage
                     new ArcIcon { Icon = "circle-check", Size = 12, Foreground = K.Brush(ArcTokens.Success) },
                     K.Caption(entry)));
             }
-
-            resolvedToggle.Content = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 6,
-                Children =
-                {
-                    new TextBlock { Text = $"Resolved {resolved.Count}", FontSize = 13 },
-                    new ArcIcon { Icon = resolvedLog.IsVisible ? "chevron-up" : "chevron-down", Size = 12 }
-                }
-            };
         }
 
         void RenderQueue()
@@ -121,7 +125,9 @@ public sealed class AgentApprovalsPage : ArcItemPage
             queueHost.Children.Clear();
             foreach (var request in pending.Skip(1))
             {
-                var token = request.Risk == "High" ? ArcTokens.Danger : request.Risk == "Medium" ? ArcTokens.Warning : ArcTokens.Success;
+                var riskTone = request.Risk == "High" ? ArcBadgeTone.Danger
+                    : request.Risk == "Medium" ? ArcBadgeTone.Warning
+                    : ArcBadgeTone.Success;
                 var row = new Border
                 {
                     Background = Brushes.Transparent,
@@ -136,9 +142,7 @@ public sealed class AgentApprovalsPage : ArcItemPage
                             K.Stack(1,
                                 K.Text(request.Title, "arc-caption"),
                                 K.Caption($"{request.Agent} · {request.Summary}")),
-                            K.Row(5,
-                                new ArcIcon { Icon = "triangle-alert", Size = 11, Foreground = K.Brush(token) },
-                                K.Caption(request.Risk))
+                            K.Pill($"{request.Risk} risk", riskTone)
                         }
                     }
                 };
@@ -283,11 +287,6 @@ public sealed class AgentApprovalsPage : ArcItemPage
         }
 
         rulesButton.Click += (_, _) => status.Text = "Rules popover opened. One rule: Vercel deploy for Deploy agent.";
-        resolvedToggle.Click += (_, _) =>
-        {
-            resolvedLog.IsVisible = !resolvedLog.IsVisible;
-            RenderResolved();
-        };
 
         RenderResolved();
         RenderFocus();
@@ -314,7 +313,7 @@ public sealed class AgentApprovalsPage : ArcItemPage
                 cardHost,
                 K.Divider(2),
                 queueHost,
-                resolvedToggle,
+                resolvedFilter,
                 resolvedLog,
                 status
             }

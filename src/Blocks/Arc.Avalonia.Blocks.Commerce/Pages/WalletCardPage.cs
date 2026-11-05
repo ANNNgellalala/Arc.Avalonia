@@ -23,6 +23,11 @@ public sealed class WalletCardPage : ArcItemPage
 {
     public override string ItemSlug => "wallet-card";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-wallet", "variant-balance-chart", "variant-actions", "variant-activity", "variant-send-form"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,80 @@
+{
+  "slug": "slope-chart",
+  "nameZh": "斜率图",
+  "summary": "两个时点的斜率图：名称在左、数值与期末排名在右，被强调的一条保留强调色，其余保持安静。",
+  "purpose": [
+    "只比较「之前」和「之后」两组值时，两点折线会把中间的过程也画出来，反而模糊重点。斜率图把两个时点并成左右两列，线的斜率就是变化的方向与幅度。",
+    "名称与起点值在左、终点值与期末排名在右，读者不用看图例就知道哪条线是谁；HighlightKey 指定的条目保留强调色，其余线条弱化。",
+    "升降排名直接印在终点值旁（ShowRanks），因此它既能表达绝对变化，也能表达名次的交换。",
+    "它最适合 4 到 8 个条目、两组时点的对比；条目太多或时点超过两个时，信息密度会超出斜率图的容量。"
+  ],
+  "whenToUse": [
+    "只有两个时点（Q3 与 Q4、改造前后、上周与本周）需要对比时。",
+    "想让读者一眼看出谁在上升、谁在下滑，以及名次如何交换时。",
+    "条目在 4 到 8 个之间、名称能放在左列时。",
+    "要在同一张图里突出一个主角条目、其余作为背景时。"
+  ],
+  "whenNotToUse": [
+    "有三个以上时点、要看完整趋势时改用 line-chart。",
+    "比较的是离散类别在同一时点的绝对值时改用 bar-chart。",
+    "要看排名随时间连续变化时改用 race-bar-chart。",
+    "需要把两个时点的构成都拆成百分比时改用 split-bar。"
+  ],
+  "variants": [
+    { "key": "variant-highlight", "label": "强调一条", "note": "HighlightKey=Email，其余线条弱化" },
+    { "key": "variant-no-highlight", "label": "不设强调", "note": "HighlightKey 为 null，所有线条同级" },
+    { "key": "state-no-ranks", "label": "隐藏排名", "note": "ShowRanks=false，只保留名称与数值" },
+    { "key": "state-empty", "label": "空数据", "note": "Items 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "时点超过两个、要看完整趋势时用 line chart" },
+    { "type": "alternative", "target": "bar-chart", "note": "同一时点的类别比较用 bar chart" },
+    { "type": "alternative", "target": "race-bar-chart", "note": "排名随时间连续变化时用 race bar chart" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡里的「改良前后」小图常用 slope chart" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Slope chart 与 Line chart",
+      "rows": [
+        { "dimension": "时点数量", "self": "固定两个时点", "other": "任意数量的连续时点" },
+        { "dimension": "阅读重点", "self": "斜率与名次变化", "other": "趋势的形状与拐点" },
+        { "dimension": "标签位置", "self": "名称在左、值在右，无需图例", "other": "依赖图例或端点标注" },
+        { "dimension": "条目数量", "self": "4 到 8 个条目最清楚", "other": "两到四条序列最舒服" }
+      ]
+    },
+    {
+      "target": "bar-chart",
+      "title": "Slope chart 与 Bar chart",
+      "rows": [
+        { "dimension": "时点", "self": "前后两个时点并排比较", "other": "同一时点的多个类别" },
+        { "dimension": "变化方向", "self": "线的斜率天然表达升降", "other": "需要两组柱或额外标注才能看出变化" },
+        { "dimension": "名次", "self": "可印出期末排名", "other": "排序后靠柱长读名次" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "渠道转化率的前后对比",
+      "language": "csharp",
+      "code": "var chart = new ArcSlopeChart\n{\n    Items = new[]\n    {\n        new SlopeItem(\"Email\", 3.1, 4.6),\n        new SlopeItem(\"Search\", 3.4, 3.6),\n        new SlopeItem(\"Direct\", 2.6, 3.1),\n        new SlopeItem(\"Social\", 1.9, 1.3),\n        new SlopeItem(\"Referral\", 1.4, 1.8)\n    },\n    StartLabel = \"Q3\",\n    EndLabel = \"Q4\",\n    HighlightKey = \"Email\",\n    ValueFormat = value => value.ToString(\"0.0\") + \"%\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcSlopeChart x:Name=\"Conversion\"\n                        Height=\"220\"\n                        StartLabel=\"Q3\"\n                        EndLabel=\"Q4\"\n                        ShowRanks=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcSlopeChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "每个条目两个时点的值与名称",
+      "StartLabel": "左列标题，默认 Before",
+      "EndLabel": "右列标题，默认 After",
+      "HighlightKey": "保留强调色的条目名称，其余线条弱化",
+      "ShowRanks": "在终点值旁显示期末排名，默认 true",
+      "ValueFormat": "自定义端点数值格式"
+    }
+  }
+}

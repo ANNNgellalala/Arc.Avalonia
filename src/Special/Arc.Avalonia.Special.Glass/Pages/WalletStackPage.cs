@@ -13,6 +13,11 @@ public sealed class WalletStackPage : ArcItemPage
 {
     public override string ItemSlug => "wallet-stack";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-balance", "variant-transactions", "variant-avatar"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

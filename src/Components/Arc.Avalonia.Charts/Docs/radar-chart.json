@@ -1,0 +1,65 @@
+{
+  "slug": "radar-chart",
+  "nameZh": "雷达图",
+  "summary": "在同一张 web 上比较多个轮廓：四条同心参考线、每个度量一条辐条、每条序列一个带浅填充与 2px 描边的多边形；移动指针会选取最近的轴并横向比较所有序列。",
+  "purpose": [
+    "当要比较两三个对象在多个度量上的「形状」时用它：城市宜居度、候选方案评分、球员六维数据；读的是轮廓差异，而不是某个点的精确值。",
+    "每条序列按轴的顺序提供数值，MaxValue 固定轴顶；ShowLegend 打开时图例悬停会把一条轮廓提到前面，点击可以隐藏它。",
+    "指针在图内移动会选中最近的轴，并在提示里并列所有序列在该轴上的数值；键盘焦点也走同一套轴选择。"
+  ],
+  "whenToUse": [
+    "两到四个对象、五到八个度量，重点是轮廓形状与强项弱项。",
+    "需要在同一张图里比较所有度量，而不是逐项做条形图时。",
+    "度量共享同一量纲与轴顶（例如满分 100）时。"
+  ],
+  "whenNotToUse": [
+    "需要精确比较具体数值时用 bar-chart，条形长度更易读。",
+    "度量之间量纲不同、无法共用同一个轴顶时，先归一化或改用分组条形图。",
+    "超过五个序列时 web 会互相遮挡，拆成两张图或改用表格。"
+  ],
+  "variants": [
+    { "key": "variant-three-profiles", "label": "Three profiles", "note": "三条序列 + 图例" },
+    { "key": "variant-single-profile", "label": "Single profile", "note": "只有一条序列，读作一张画像" },
+    { "key": "state-no-legend", "label": "No legend", "note": "ShowLegend=false，图例收起" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "bar-chart", "note": "要精确比较逐项数值用条形图，要看多维度轮廓用雷达图" },
+    { "type": "alternative", "target": "slope-chart", "note": "两个时期的前后变化用 slope chart，多维形状比较用雷达图" }
+  ],
+  "contrasts": [
+    {
+      "target": "bar-chart",
+      "title": "Radar chart 与 Bar chart",
+      "rows": [
+        { "dimension": "读的是什么", "self": "多个度量的整体轮廓与强项弱项", "other": "逐项数值的精确长短" },
+        { "dimension": "比较方式", "self": "轴共享圆心与轴顶，形状重叠比较", "other": "条并排，长度直接比较" },
+        { "dimension": "适用序列", "self": "两到四个对象", "other": "任意数量，尤其多对象" },
+        { "dimension": "可读性风险", "self": "序列多时 web 互相遮挡", "other": "数值差距小时仍可读" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明雷达图",
+      "language": "xaml",
+      "code": "<arc:ArcRadarChart xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                 MaxValue=\"100\"\n                 ShowLegend=\"True\"\n                 ValueSuffix=\" pts\"\n                 Height=\"244\" />"
+    },
+    {
+      "title": "轴、序列与固定轴顶",
+      "language": "csharp",
+      "code": "var radar = new ArcRadarChart\n{\n    Axes = new[] { \"Talent pool\", \"Affordability\", \"Transit\", \"Quality of life\", \"Tax climate\", \"Connectivity\" },\n    Series = new[]\n    {\n        new ChartSeries(\"Lisbon\", new double[] { 72, 84, 78, 81, 66, 74 }),\n        new ChartSeries(\"Berlin\", new double[] { 81, 68, 88, 74, 58, 82 }),\n        new ChartSeries(\"Austin\", new double[] { 68, 74, 62, 70, 86, 71 })\n    },\n    MaxValue = 100,\n    ValueSuffix = \" pts\"\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcRadarChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Axes": "沿 web 顺时针排列的度量名，至少三个",
+      "Series": "要比较的轮廓；每条序列按轴顺序提供一个值",
+      "MaxValue": "每个轴的顶点值；0 表示跟随数据自动定顶",
+      "ShowLegend": "在图上方显示图例，点击可隐藏一条轮廓，默认 true",
+      "ValueSuffix": "数值后的单位，例如 \" pts\"",
+      "ValueFormat": "自定义提示中的数值格式"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "slug": "pricing-calculator",
+  "nameZh": "价格计算器",
+  "summary": "席位滑块与账单开关驱动三张套餐卡：价格与总价实时更新，推荐徽标随席位数移动到更合适的卡片。",
+  "purpose": [
+    "让用户在决定之前先算一遍：拖动席位滑块或在滑块上按键，三张套餐卡的价格、总价与批量折扣实时更新，账单周期开关在月付与年付之间切换。",
+    "「Recommended」徽标不是固定的：席位数变化后，它出现在当前规则下最合适的套餐卡上，同时卡片边框与按钮层级一起变化，状态行用文字复述推荐结果。",
+    "组成依赖：席位用 slider，月付年付用 segmented-control，推荐与折扣徽标用 badge，试用行动用 button；试用是模拟的，不离开页面。"
+  ],
+  "whenToUse": [
+    "按席位计价的 SaaS，用户需要先估算再决定时。",
+    "套餐价格随用量或席位数变化、需要实时反馈时。",
+    "希望用一个区块同时完成「选套餐」与「算价格」两件事时。"
+  ],
+  "whenNotToUse": [
+    "价格是固定档位、没有变量时，用 plan-comparison 更直接。",
+    "需要展示大量功能差异矩阵时，用 plan-comparison，而不是把差异塞进卡片。",
+    "需要按 API 调用量等复杂用量计费时，pricing-calculator 只覆盖席位，复杂用量应另做估算页。"
+  ],
+  "variants": [
+    { "key": "variant-cards", "label": "Plan cards", "note": "三张套餐卡：价格、总价与行动按钮" },
+    { "key": "variant-seat-slider", "label": "Seat slider", "note": "拖动或按键调整席位，价格实时更新" },
+    { "key": "variant-billing-toggle", "label": "Billing toggle", "note": "月付与年付切换，价格滚动到新值" },
+    { "key": "state-recommended", "label": "Recommended", "note": "最合适的卡片带推荐徽标与强调边框" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "slider", "note": "席位选择用 ArcSlider，支持键盘微调" },
+    { "type": "uses", "target": "segmented-control", "note": "月付与年付切换用 segmented control" },
+    { "type": "uses", "target": "badge", "note": "Recommended 与折扣用 ArcBadge 标出" },
+    { "type": "uses", "target": "button", "note": "每张卡片的试用行动都是 ArcButton" },
+    { "type": "alternative", "target": "plan-comparison", "note": "只需要静态档位对比时改用 plan comparison" }
+  ],
+  "contrasts": [
+    {
+      "target": "plan-comparison",
+      "title": "Pricing calculator 与 Plan comparison",
+      "rows": [
+        { "dimension": "输入", "self": "拖动席位并切换账单周期", "other": "选择套餐与周期" },
+        { "dimension": "价格", "self": "按席位与用量实时计算", "other": "静态档位价" },
+        { "dimension": "推荐方式", "self": "推荐徽标随席位数移动", "other": "用户自己选定一列" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "计费输入与套餐卡",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"16\" Margin=\"24,22,24,18\">\n    <StackPanel Spacing=\"8\">\n      <TextBlock Text=\"How many seats?\" Classes=\"arc-label\" />\n      <c:ArcSlider Min=\"1\" Max=\"100\" Value=\"12\" Label=\"Seats\" />\n      <c:ArcSegmentedControl Label=\"Billing period\" />\n    </StackPanel>\n    <Grid ColumnDefinitions=\"*,*,*\">\n      <c:ArcCard Margin=\"0,0,12,0\">\n        <StackPanel Spacing=\"8\">\n          <TextBlock Text=\"Starter\" Classes=\"arc-label\" />\n          <TextBlock Text=\"$12 / seat\" Classes=\"arc-heading\" />\n          <c:ArcButton Content=\"Start trial\" Size=\"Sm\" HorizontalAlignment=\"Left\" />\n        </StackPanel>\n      </c:ArcCard>\n      <c:ArcCard Grid.Column=\"1\" Margin=\"0,0,12,0\">\n        <StackPanel Spacing=\"8\">\n          <c:ArcBadge Content=\"Recommended\" Tone=\"Accent\" />\n          <TextBlock Text=\"Team\" Classes=\"arc-label\" />\n          <TextBlock Text=\"$18 / seat\" Classes=\"arc-heading\" />\n          <c:ArcButton Content=\"Start trial\" Size=\"Sm\" HorizontalAlignment=\"Left\" />\n        </StackPanel>\n      </c:ArcCard>\n      <c:ArcCard Grid.Column=\"2\">\n        <StackPanel Spacing=\"8\">\n          <TextBlock Text=\"Scale\" Classes=\"arc-label\" />\n          <TextBlock Text=\"$29 / seat\" Classes=\"arc-heading\" />\n          <c:ArcButton Content=\"Talk to sales\" Variant=\"Secondary\" Size=\"Sm\" HorizontalAlignment=\"Left\" />\n        </StackPanel>\n      </c:ArcCard>\n    </Grid>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

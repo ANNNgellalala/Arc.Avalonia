@@ -1,0 +1,66 @@
+{
+  "slug": "glass-segmented",
+  "nameZh": "玻璃分段控件",
+  "summary": "浮在影像上的玻璃分段控件：指示器像液体一样在分段之间滑动，拖住选中段可以甩到下一段，支持图标、计数徽标与两种尺寸。",
+  "purpose": [
+    "当切换的是同一张照片、地图或媒体表面的视图时用它：Explore / Drive / Transit 这类模式切换，玻璃轨道让控件与影像共存而不抢画面。",
+    "指示器的两条边分别弹簧：朝行进方向的一边更快、另一边稍慢，所以滑块会像液体一样拉长再回落；拖住选中段松手时用速度决定落点。",
+    "键盘与指针共用一套模型：Tab 进入整个组，左右（上下）方向键切换并在两端回绕，Home/End 跳到首尾；FullWidth 让它在容器里等分宽度。"
+  ],
+  "whenToUse": [
+    "照片、地图、媒体表面上的视图切换，例如 Explore / Drive / Transit。",
+    "紧凑的影像筛选，例如 Hero 图表上的 Day / Week / Month。",
+    "需要图标、计数徽标或拖拽切换的分段控件时。"
+  ],
+  "whenNotToUse": [
+    "中性表面的普通表单里用标准 segmented-control，玻璃轨道在那里没有必要。",
+    "选项超过五个或标签很长时用 tabs 或 select，分段控件会挤成一团。",
+    "需要多选而不是单选时用 chip-group，分段控件表达的是互斥选择。"
+  ],
+  "variants": [
+    { "key": "variant-icons", "label": "Icons + badge", "note": "图标配文字，第三项带计数徽标" },
+    { "key": "variant-text", "label": "Text only", "note": "只有文字标签，无图标" },
+    { "key": "size-sm", "label": "Small", "note": "紧凑尺寸，用于次要视图切换" },
+    { "key": "variant-full-width", "label": "Full width", "note": "FullWidth 打开，分段等分容器宽度" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "segmented-control", "note": "中性表面用标准分段控件，影像上需要玻璃表面时用玻璃分段控件" },
+    { "type": "complement", "target": "glass-tabbar", "note": "同属玻璃导航：分段切换同一视图的模式，标签栏切换站点分区" }
+  ],
+  "contrasts": [
+    {
+      "target": "segmented-control",
+      "title": "Glass segmented 与 Segmented control",
+      "rows": [
+        { "dimension": "表面", "self": "分层半透明玻璃轨道，与影像共存", "other": "实心中性表面，适合表单与卡片" },
+        { "dimension": "指示器", "self": "液体指示器，两边分别弹簧并可拖拽", "other": "标准滑块，点击或键盘切换" },
+        { "dimension": "装饰能力", "self": "支持图标、计数徽标与紧凑尺寸", "other": "以纯文字标签为主" },
+        { "dimension": "适用", "self": "照片、地图、媒体表面上的视图切换", "other": "设置、表单里的二选一或三选一" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明分段控件",
+      "language": "xaml",
+      "code": "<gl:ArcGlassSegmented xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                        Label=\"Map mode\"\n                        Value=\"explore\"\n                        FullWidth=\"False\" />"
+    },
+    {
+      "title": "选项、尺寸与选择回调",
+      "language": "csharp",
+      "code": "var segmented = new ArcGlassSegmented\n{\n    Label = \"Map mode\",\n    Value = \"explore\",\n    Size = ArcGlassSegmentedSize.Md,\n    Options = new List<ArcGlassSegmentedOption>\n    {\n        new() { Value = \"explore\", Label = \"Explore\", Icon = \"compass\" },\n        new() { Value = \"drive\", Label = \"Drive\", Icon = \"navigation\" },\n        new() { Value = \"transit\", Label = \"Transit\", Icon = \"layers\", Badge = \"3\" }\n    }\n};\n\nsegmented.ValueChanged += (_, value) => LoadMode(value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcGlassSegmented",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "分段条目；每项包含 Value、Label、可选 Icon、Badge 与 Disabled",
+      "Value": "当前选中的分段值；变化时触发 ValueChanged",
+      "Size": "尺寸：Sm 或 Md，默认 Sm",
+      "FullWidth": "让分段等分容器宽度，默认 false",
+      "Label": "分段组的无障碍名称，默认 View",
+      "ValueChanged": "选中分段变化时触发，参数是新的值"
+    }
+  }
+}

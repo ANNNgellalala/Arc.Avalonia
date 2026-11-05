@@ -1,0 +1,76 @@
+{
+  "slug": "activity-rings",
+  "nameZh": "活动圆环",
+  "summary": "三个同心目标环：每天的值按比例填满环，超过 100% 时第二圈贴着内缘再走一遍，周选择器切换日期，图例给出数值、目标与达成数。",
+  "purpose": [
+    "把「几个相关的每日目标」放在一张图里：Move / Exercise / Stand 三条环同心排布，每条的填充比例就是当天完成度，中央显示当前指标（默认第一条）的百分比与「周日 · Move」这样的说明。",
+    "超过目标不会停住：填满一圈后第二条环贴着内缘再画一圈，所以「刚好达标」与「超额完成」在读图时是两件事；底部汇总行同时给出「Goals reached 2 of 3」。",
+    "周选择器是 30×28 的七个小格，选中项取强调色底；方向键切换日期、Home / End 跳首尾，切换时环与数字一起从旧值扫到新值，而不只是数字跳动。",
+    "图例是读图的第二通道：每行给指标名、当前值、目标与单位，指针掠过或回车隔离该目标，其余环变淡，中央百分比切到该目标——颜色不是唯一的信息来源。"
+  ],
+  "whenToUse": [
+    "几个每日目标会逐步填满、也允许超额，例如运动量、锻炼分钟与站立小时。",
+    "健身或习惯类看板需要一个周选择器来比较不同日期。",
+    "一张摘要卡要同时展示三个相关目标，而不想并排放三张图表。"
+  ],
+  "whenNotToUse": [
+    "只有一个数值与一个区间时，改用 progress 或 gauge，单环更省空间。",
+    "表达配额与套餐上限时，改用 usage-meter；表达连续天数时，改用 activity-heatmap。",
+    "需要精确对比多天趋势时，改用 bar-chart 或 line-chart。"
+  ],
+  "variants": [
+    { "key": "state-below-goal", "label": "Below goal", "note": "全部未达标：环有缺口，Goals reached 0 of 3" },
+    { "key": "state-mixed", "label": "Mixed", "note": "部分达标：一条环满、一条略超、一条接近" },
+    { "key": "state-exceeded", "label": "Exceeded", "note": "全部超额：第二圈贴内缘再画，Goals reached 3 of 3" },
+    { "key": "variant-week-picker", "label": "Week picker", "note": "七天选择器，选中日取强调色底" },
+    { "key": "variant-legend", "label": "Legend", "note": "图例：指标、当前值、目标与汇总达成数" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "progress", "note": "单个数值对目标用 progress，不必引入三条环" },
+    { "type": "alternative", "target": "activity-heatmap", "note": "要看长期连续记录时改用 activity heatmap" },
+    { "type": "complement", "target": "gauge", "note": "单指标占比用 gauge；一组相关目标才用圆环组合" },
+    { "type": "uses", "target": "metric-card", "note": "圆环常作为指标卡的主体，卡片负责标题与说明" }
+  ],
+  "contrasts": [
+    {
+      "target": "progress",
+      "title": "Activity rings 与 Progress",
+      "rows": [
+        { "dimension": "指标数量", "self": "同心的多条目标环", "other": "一根线性进度条" },
+        { "dimension": "超额表达", "self": "第二圈贴内缘再走一遍", "other": "封顶在 100%，不再变化" },
+        { "dimension": "信息密度", "self": "附带周选择、图例、中央读数与达成数", "other": "只有一个比例与可选标签" }
+      ]
+    },
+    {
+      "target": "activity-heatmap",
+      "title": "Activity rings 与 Activity heatmap",
+      "rows": [
+        { "dimension": "时间维度", "self": "一天之内的几个目标", "other": "跨多日、多周的连续记录" },
+        { "dimension": "粒度", "self": "每个目标一条环，可看比例与超额", "other": "每天一格，只看强弱" },
+        { "dimension": "适合问题", "self": "今天完成得怎么样", "other": "最近一个月坚持得怎么样" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：三个目标与一周数据",
+      "language": "xaml",
+      "code": "<arc:ArcActivityRings xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                    Day=\"sun\"\n                    Label=\"Move, exercise and stand\"\n                    Metrics=\"{Binding Metrics}\"\n                    Days=\"{Binding Days}\" />"
+    },
+    {
+      "title": "指标、目标与当天数值",
+      "language": "csharp",
+      "code": "var rings = new ArcActivityRings\n{\n    Day = \"sun\",\n    Label = \"Move, exercise and stand\",\n    Metrics = new List<ArcRingMetric>\n    {\n        new() { Id = \"move\", Label = \"Move\", Unit = \"kcal\", Goal = 500 },\n        new() { Id = \"exercise\", Label = \"Exercise\", Unit = \"min\", Goal = 30 },\n        new() { Id = \"stand\", Label = \"Stand\", Unit = \"hr\", Goal = 12 }\n    },\n    Days = new List<ArcRingDay>\n    {\n        new()\n        {\n            Id = \"sun\", Label = \"Sunday 18 May\", Short = \"Sun\",\n            Values = new Dictionary<string, double> { [\"move\"] = 485, [\"exercise\"] = 33, [\"stand\"] = 11 }\n        },\n        new()\n        {\n            Id = \"sat\", Label = \"Saturday 17 May\", Short = \"Sat\",\n            Values = new Dictionary<string, double> { [\"move\"] = 610, [\"exercise\"] = 48, [\"stand\"] = 14 }\n        }\n    }\n};\n\n// 切换日期：环与数字一起从旧值扫到新值\nrings.Day = \"sat\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcActivityRings",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Metrics": "目标环，元素是 ArcRingMetric（Id、Label、Unit、Goal、可选 ColorToken）",
+      "Days": "每一天的数值，元素是 ArcRingDay（Id、Label、Short、Values 字典）",
+      "Day": "当前选中的日期 Id；切换时环会扫到新值",
+      "Label": "图例上方的组名，例如 Move, exercise and stand"
+    }
+  }
+}

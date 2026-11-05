@@ -1,0 +1,65 @@
+{
+  "slug": "testimonial-stage",
+  "nameZh": "证言舞台",
+  "summary": "肖像主导的证言区块：左侧是一幅大人物插图与署名，右侧是引言、计数与人物 tab，左右箭头或 tab 切换下一位讲述者。",
+  "purpose": [
+    "客户证言如果只有一句引言，很容易被当成装饰。证言舞台把讲述者的肖像、角色、公司和一句完整的话放在同一屏，让引言有出处。",
+    "左侧是大幅肖像、姓名、角色与一段人物注释；右侧是 22px 的引言、01 / 04 计数与署名行，视觉重心明确落在文字上。",
+    "底部人物 tab 与左右箭头提供两个入口，方向键可以在 tab 之间移动并循环；quote 区域是礼貌的 live region，读屏能听到切换。",
+    "没有自动轮播：读者按自己的节奏切换，适合落地页里的三到四段深度证言。"
+  ],
+  "whenToUse": [
+    "落地页或品牌页需要三到四段带人物肖像的深度证言时。",
+    "证言需要署名到具体角色与公司、而不是只放一个 logo 时。",
+    "希望读者手动切换、不被打断时。"
+  ],
+  "whenNotToUse": [
+    "只需要一行客户引言时用普通引用排版即可，不必上整块舞台。",
+    "证言很多、每条都很短时改用 carousel。",
+    "要展示客户 logo 墙时改用 logo-marquee 区块。"
+  ],
+  "variants": [
+    { "key": "variant-portrait", "label": "人物肖像", "note": "左侧大肖像、姓名、角色与人物注释" },
+    { "key": "variant-quote-panel", "label": "引言面板", "note": "22px 引言、01 / 04 计数与署名行" },
+    { "key": "variant-people-tabs", "label": "人物 tab", "note": "底部四个 tab，第一个为选中态" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar", "note": "tab 与署名行用小头像标识讲述者" },
+    { "type": "uses", "target": "badge", "note": "页头的 Reading 状态用带圆点的徽章" },
+    { "type": "uses", "target": "button", "note": "上一条与下一条用紧凑图标按钮" },
+    { "type": "alternative", "target": "team-showcase", "note": "介绍团队本身用 team showcase，证言更聚焦客户的话" }
+  ],
+  "contrasts": [
+    {
+      "target": "team-showcase",
+      "title": "Testimonial stage 与 Team showcase",
+      "rows": [
+        { "dimension": "内容主体", "self": "客户的原话与署名", "other": "团队成员与其职责" },
+        { "dimension": "人物来源", "self": "客户或外部讲述者", "other": "本公司成员" },
+        { "dimension": "版式重心", "self": "大段引言", "other": "一组人物卡片" },
+        { "dimension": "切换方式", "self": "人物 tab 与左右箭头，一次一人", "other": "画廊/聚光布局切换" }
+      ]
+    },
+    {
+      "target": "avatar",
+      "title": "Testimonial stage 与 Avatar",
+      "rows": [
+        { "dimension": "职责", "self": "完整证言版式与人物切换", "other": "只渲染一个头像" },
+        { "dimension": "肖像尺寸", "self": "大尺寸人物插图，占左半屏", "other": "小尺寸身份标识" },
+        { "dimension": "配套信息", "self": "引言、计数、署名与注释", "other": "姓名、尺寸与状态" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "证言数据与切换",
+      "language": "csharp",
+      "code": "var stories = new[]\n{\n    new { Name = \"Maya Chen\", Role = \"Staff product designer\", Company = \"Northwind Studio\",\n        Quote = \"We removed three status meetings in the first month. The work is visible now.\" },\n    new { Name = \"Jonas Weber\", Role = \"Staff engineer\", Company = \"Northwind Studio\",\n        Quote = \"The board finally matches how a release actually feels.\" }\n};\n\nvar avatar = new ArcAvatar { DisplayName = stories[0].Name, Size = ArcAvatarSize.Sm, Status = ArcAvatarStatus.Online };\nvar live = new ArcBadge { Content = \"Reading\", Tone = ArcBadgeTone.Accent, Dot = true };"
+    },
+    {
+      "title": "左右两栏的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"382,1,*\">\n  <StackPanel Spacing=\"14\">\n    <!-- 358x316 肖像位 -->\n    <Border Width=\"358\" Height=\"316\" CornerRadius=\"20\" Background=\"{DynamicResource ArcGradientSoft}\" />\n    <TextBlock Text=\"Maya Chen\" Classes=\"arc-heading\" />\n    <TextBlock Text=\"Staff product designer · Northwind Studio\" Classes=\"arc-body-sm arc-secondary\" />\n  </StackPanel>\n  <Border Grid.Column=\"1\" Width=\"1\" Background=\"{DynamicResource ArcBorderSubtle}\" />\n  <StackPanel Grid.Column=\"2\" Spacing=\"14\" Margin=\"28,0,0,0\">\n    <TextBlock Text=\"01 / 04\" Classes=\"arc-caption\" HorizontalAlignment=\"Right\" />\n    <TextBlock Text=\"We removed three status meetings in the first month...\" FontSize=\"22\" LineHeight=\"32\" TextWrapping=\"Wrap\" />\n    <!-- 人物 tab 与左右箭头 -->\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

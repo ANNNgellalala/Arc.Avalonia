@@ -21,6 +21,11 @@ public sealed class RevenueGlobePage : ArcItemPage
 {
     public override string ItemSlug => "revenue-globe";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-globe", "variant-globe", "variant-replay", "variant-regions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -21,6 +21,11 @@ public sealed class SpotlightGridPage : ArcItemPage
 {
     public override string ItemSlug => "spotlight-grid";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-grid", "variant-live-demos"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,80 @@
+{
+  "slug": "tree-table",
+  "nameZh": "树形表格",
+  "summary": "行可以嵌套的表格：缩进行配展开箭头、父子联动的三态选择、每一层内部排序、按需加载子节点、固定表头、空态与页脚汇总。",
+  "purpose": [
+    "当层级数据同时需要列时用它：按团队拆分的预算、文件夹大小、嵌套任务清单。每一行是 ArcTreeTableRow，单元格放在按列 Key 索引的 Values 字典里。",
+    "展开、收起与排序都保留层级：排序只在兄弟之间进行，父节点永远跟着自己的子节点；三态选择向上归并，父节点在所有已知子节点选中时才是选中态。",
+    "子节点可以一次性给全，也可以只设 HasChildren 再提供 LoadChildren，让第一次展开时去取；Selectable、ShowSummary、MaxBodyHeight 决定选择列、页脚与固定表头。"
+  ],
+  "whenToUse": [
+    "记录有父子层级，同时每一层都需要多列比较时。",
+    "需要父子联动的三态选择，或需要按需加载子树时。",
+    "行数较多，希望表头固定、内容区独立滚动时。"
+  ],
+  "whenNotToUse": [
+    "行没有层级、只需要排序与选择时用 sortable-data-table，轻量得多。",
+    "层级只是导航、不需要列比较时用 tree-view，纯树更快也更省空间。",
+    "需要单元格编辑与页脚数值合计时用 data-grid，它对平表更合适。"
+  ],
+  "variants": [
+    { "key": "variant-expanded", "label": "Expanded", "note": "默认展开若干层，父子缩进与展开箭头可见" },
+    { "key": "variant-collapsed", "label": "Collapsed", "note": "DefaultExpandedIds 为空，只显示根行" },
+    { "key": "state-selected", "label": "Mixed selection", "note": "只选部分子行，父节点显示混合态" },
+    { "key": "state-no-summary", "label": "No summary", "note": "ShowSummary=false，收起页脚汇总" },
+    { "key": "variant-lazy", "label": "Lazy children", "note": "HasChildren=true 的行，展开时才请求子节点" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tree-view", "note": "需要多列比较用 tree table，只做层级导航用 tree view" },
+    { "type": "complement", "target": "filter-toolbar", "note": "筛选栏缩小数据集后再交给树形表格展示" }
+  ],
+  "contrasts": [
+    {
+      "target": "tree-view",
+      "title": "Tree table 与 Tree view",
+      "rows": [
+        { "dimension": "列", "self": "每行带多列，可按任意列排序", "other": "每行只有一个标签，没有列" },
+        { "dimension": "选择", "self": "三态选择，父节点级联子节点", "other": "单选当前节点" },
+        { "dimension": "数据量", "self": "适合需要横向比较的层级记录", "other": "适合文件树、分类树这类导航" },
+        { "dimension": "页脚", "self": "可显示行数与选中数汇总", "other": "没有汇总" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明外壳",
+      "language": "xaml",
+      "code": "<arc:ArcTreeTable xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n                Label=\"Q3 project budgets\"\n                Selectable=\"True\"\n                MaxBodyHeight=\"420\"\n                ShowSummary=\"True\" />"
+    },
+    {
+      "title": "层级行、排序与按需加载",
+      "language": "csharp",
+      "code": "var rows = new List<ArcTreeTableRow>\n{\n    new()\n    {\n        Id = \"product\",\n        Label = \"Product\",\n        [\"project\"] = \"Product\",\n        [\"budget\"] = 66750d,\n        Children =\n        {\n            new ArcTreeTableRow { Id = \"atlas\", Label = \"Atlas redesign\", [\"project\"] = \"Atlas redesign\", [\"budget\"] = 48250d },\n            new ArcTreeTableRow { Id = \"billing\", Label = \"Billing migration\", [\"project\"] = \"Billing migration\", [\"budget\"] = 18500d }\n        }\n    },\n    new() { Id = \"cloud-archive\", Label = \"Cloud archive\", HasChildren = true }\n};\n\nvar table = new ArcTreeTable\n{\n    Rows = rows,\n    Label = \"Q3 project budgets\",\n    Selectable = true,\n    DefaultExpandedIds = new[] { \"product\" },\n    DefaultSelectedIds = new[] { \"atlas\" },\n    DefaultSort = new ArcTreeTableSort { Key = \"budget\", Descending = true },\n    Columns = new List<ArcTreeTableColumn>\n    {\n        new() { Key = \"project\", Header = \"Project\", Width = 0, MinWidth = 240 },\n        new() { Key = \"budget\", Header = \"Budget\", Width = 140, Align = ArcTreeTableAlign.Right }\n    },\n    LoadChildren = async row =>\n    {\n        await Task.Delay(200);\n        return new[] { new ArcTreeTableRow { Id = \"archive-2025\", Label = \"2025 archive\" } };\n    }\n};\n\ntable.RowActivated += (_, row) => Console.WriteLine(row.Id);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcTreeTable",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Columns": "列定义；第一列承载缩进、展开箭头与行标签",
+      "Rows": "根行集合；子行放在每行的 Children 里",
+      "Label": "表格的无障碍名称，默认 Tree table",
+      "Selectable": "显示三态复选框列与页脚计数，默认 false",
+      "DefaultExpandedIds": "初始展开的行 Id 集合",
+      "ExpandedIds": "受控展开集合；设置后覆盖内部状态",
+      "DefaultSelectedIds": "初始选中的行 Id 集合",
+      "SelectedIds": "受控选中集合，响应选择变化",
+      "DefaultSort": "初始排序；只在兄弟之间生效",
+      "LoadChildren": "HasChildren 为 true 的行首次展开时调用，返回子行",
+      "RowLabel": "自定义行的无障碍名称与类型提示",
+      "MaxBodyHeight": "内容区最大高度（px），默认 420；0 表示不限制",
+      "EmptyMessage": "空态主标题",
+      "EmptyDescription": "空态说明文字",
+      "ShowSummary": "显示页脚的行数与选中数汇总，默认 true",
+      "SortChanged": "排序变化后触发，参数为当前排序",
+      "SelectionChanged": "选择变化后触发，参数为选中行 Id",
+      "ExpandedChanged": "展开集合变化后触发",
+      "RowActivated": "按 Enter 或点击叶子行时触发"
+    }
+  }
+}

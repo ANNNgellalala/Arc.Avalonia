@@ -1,0 +1,69 @@
+{
+  "slug": "cohort-retention",
+  "nameZh": "同期留存",
+  "summary": "留存分析区块：八期 × 八个月的同期留存三角、KPI 行与分段筛选，可切换成留存曲线，鼠标或键盘都能读取某个格子。",
+  "purpose": [
+    "增长与客户成功团队需要回答“每一批注册用户在之后的每个月还剩多少”。同期留存区块用三角网格把队列放在行、月龄放在列，颜色深浅表示留存率。",
+    "顶部三项 KPI 分别为月三留存、最佳月六与月六平均，数值由当前可见的格子推导，不是另外维护的一组数字；切换分段时 KPI 与配色一起更新。",
+    "分段筛选（All signups / Pro / Team）与 Triangle / Curves 视图切换放在页头；曲线模式复用同一份数据，只改变呈现方式。",
+    "方向键可以在格子间移动、Home/End 在队列内跳转、Escape 清除光标，读屏会播报当前队列、月份与留存率。"
+  ],
+  "whenToUse": [
+    "增长或客户成功看板，需要比较不同注册队列的月留存时。",
+    "同一份数据需要三角热力与留存曲线两种视图时。",
+    "需要按套餐或团队类型筛选留存表现时。"
+  ],
+  "whenNotToUse": [
+    "要看单次旅程在漏斗各步的流失时改用 journey-flow。",
+    "要按天看活动密度时改用 activity-heatmap。",
+    "只需要一条整体留存趋势线时用 line-chart 即可。"
+  ],
+  "variants": [
+    { "key": "variant-cohort-triangle", "label": "留存三角", "note": "八期队列 × 八个月，颜色表示留存率" },
+    { "key": "variant-curves", "label": "留存曲线", "note": "同一数据的曲线视图，作为静态样本展示" },
+    { "key": "variant-kpi-row", "label": "KPI 行", "note": "月三留存、最佳月六与月六平均" },
+    { "key": "variant-segment-chips", "label": "分段筛选", "note": "All signups / Pro / Team 三段" },
+    { "key": "variant-cohort-badge", "label": "队列徽章", "note": "页头 8 cohorts 与视图模式徽章" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "chip-group", "note": "分段筛选用 chip group 在 All / Pro / Team 间切换" },
+    { "type": "uses", "target": "segmented-control", "note": "Triangle 与 Curves 两种视图用分段控件切换" },
+    { "type": "uses", "target": "badge", "note": "页头的队列数与视图模式用徽章标明" },
+    { "type": "alternative", "target": "journey-flow", "note": "要看单次旅程的漏斗流失时用 journey flow" },
+    { "type": "alternative", "target": "activity-heatmap", "note": "要按天看活跃密度时用 activity heatmap" }
+  ],
+  "contrasts": [
+    {
+      "target": "journey-flow",
+      "title": "Cohort retention 与 Journey flow",
+      "rows": [
+        { "dimension": "时间结构", "self": "按注册队列 × 月龄展开", "other": "按一次旅程的步骤展开" },
+        { "dimension": "回答的问题", "self": "各批用户之后还剩多少", "other": "用户在哪一步流失" },
+        { "dimension": "数据形态", "self": "二维三角网格与曲线", "other": "步骤间的流向与转化率" },
+        { "dimension": "适用团队", "self": "增长与客户成功", "other": "产品与转化优化" }
+      ]
+    },
+    {
+      "target": "activity-heatmap",
+      "title": "Cohort retention 与 Activity heatmap",
+      "rows": [
+        { "dimension": "横轴", "self": "月龄（注册后第几个月）", "other": "日历周" },
+        { "dimension": "纵轴", "self": "注册队列", "other": "星期几" },
+        { "dimension": "数值含义", "self": "留存率", "other": "当天活动次数" },
+        { "dimension": "阅读方式", "self": "沿对角线比较衰减", "other": "看密度与空档" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "分段与视图切换",
+      "language": "csharp",
+      "code": "var segments = new ArcChipGroup\n{\n    Label = \"Segment\",\n    Multiple = false,\n    Options = new[]\n    {\n        new ArcChipOption(\"all\", \"All signups\"),\n        new ArcChipOption(\"pro\", \"Pro\"),\n        new ArcChipOption(\"team\", \"Team\")\n    },\n    Value = new[] { \"all\" }\n};\nvar mode = new ArcSegmentedControl\n{\n    Label = \"View\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"grid\", \"Triangle\"),\n        new ArcSegmentOption(\"curves\", \"Curves\")\n    },\n    Value = \"grid\"\n};\nvar cohorts = new ArcBadge { Content = \"8 cohorts\", Tone = ArcBadgeTone.Neutral };"
+    },
+    {
+      "title": "留存区块的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <Grid ColumnDefinitions=\"*,Auto\">\n    <StackPanel Spacing=\"3\">\n      <TextBlock Text=\"Cohort retention\" Classes=\"arc-heading\" />\n      <TextBlock Text=\"Monthly signup cohorts · Nov 2025 – Jun 2026\" Classes=\"arc-caption\" />\n    </StackPanel>\n    <StackPanel Grid.Column=\"1\" Orientation=\"Horizontal\" Spacing=\"10\">\n      <arc:ArcBadge Content=\"8 cohorts\" />\n      <arc:ArcSegmentedControl />\n    </StackPanel>\n  </Grid>\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"12\">\n    <arc:ArcChipGroup Label=\"Segment\" />\n    <TextBlock Text=\"Cell colour is the share of the cohort still active.\" Classes=\"arc-caption\" />\n  </StackPanel>\n  <!-- KPI 行：月三留存 / 最佳月六 / 月六平均 -->\n  <!-- 留存三角或曲线 -->\n</StackPanel>"
+    }
+  ]
+}

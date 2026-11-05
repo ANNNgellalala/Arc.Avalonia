@@ -1,0 +1,69 @@
+{
+  "slug": "release-readiness",
+  "nameZh": "发布就绪",
+  "summary": "发布门禁区块：分组检查清单、就绪进度条与最后一个发布按钮，全部阻断项完成前按钮保持禁用，并附通知开关。",
+  "purpose": [
+    "上线前需要确认的清单往往散在多个工具里。发布就绪区块把“已完成的证据”和“还差什么”放在同一张卡：左侧按工程与上市两组排列检查项，右侧汇总就绪进度与发布动作。",
+    "每项检查都是真实复选框，勾选后右侧的完成数与进度条同步变化；未完成时右侧显示“2 blocking”警告徽章，发布按钮禁用并解释原因。",
+    "全部完成后徽章变成“Ready to ship”，发布按钮解锁；发布后按钮变为已发布态，状态行说明是否通知了团队。",
+    "通知开关控制是否在发布时广播到 #release，切换会即时更新按钮旁的状态说明，即使未发布也能看到当前选择。"
+  ],
+  "whenToUse": [
+    "上线、交接或发布前的门禁检查表。",
+    "多个前置条件都完成后才允许一个最终动作时。",
+    "需要为每个检查项指定负责人、并让团队看到还差哪几项时。"
+  ],
+  "whenNotToUse": [
+    "面向终端用户的新手任务清单用 onboarding-checklist。",
+    "只是展示总体进度、没有阻断逻辑时用 progress。",
+    "需要逐条审批与签核流程时用专门的审批或工作流组件。"
+  ],
+  "variants": [
+    { "key": "variant-checklist", "label": "检查清单", "note": "Engineering 与 Go to market 两组检查项" },
+    { "key": "state-blocking", "label": "阻断状态", "note": "2 blocking 徽章与禁用的发布按钮" },
+    { "key": "state-readiness-meter", "label": "就绪进度", "note": "3 of 5 checks 与进度条" },
+    { "key": "state-notify-toggle", "label": "通知开关", "note": "Notify the team on release 默认开启" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "checkbox", "note": "每个前置检查是一个真实复选框，带说明与负责人" },
+    { "type": "uses", "target": "switch", "note": "发布时是否通知团队用开关控制" },
+    { "type": "uses", "target": "progress", "note": "就绪进度条显示已完成检查的占比" },
+    { "type": "uses", "target": "avatar", "note": "每项检查右侧显示负责人头像" },
+    { "type": "uses", "target": "badge", "note": "Ready to ship 与 blocking 用不同色调的徽章" },
+    { "type": "uses", "target": "button", "note": "Release 按钮在就绪后才可用" },
+    { "type": "alternative", "target": "onboarding-checklist", "note": "用户自助上手任务用 onboarding checklist，发布门禁更严格" }
+  ],
+  "contrasts": [
+    {
+      "target": "onboarding-checklist",
+      "title": "Release readiness 与 Onboarding checklist",
+      "rows": [
+        { "dimension": "使用对象", "self": "发布负责人与团队", "other": "首次使用的普通用户" },
+        { "dimension": "完成后果", "self": "解锁一个不可逆的发布动作", "other": "逐步熟悉产品，无阻断" },
+        { "dimension": "组织结构", "self": "按工程/上市分组，每项有负责人", "other": "按上手顺序排列" },
+        { "dimension": "状态提示", "self": "blocking 徽章与就绪进度", "other": "已完成数量与鼓励文案" }
+      ]
+    },
+    {
+      "target": "checkbox",
+      "title": "Release readiness 与 Checkbox",
+      "rows": [
+        { "dimension": "职责", "self": "清单、就绪判定与发布动作的组合", "other": "只渲染一个可勾选项" },
+        { "dimension": "规则", "self": "阻断项未清零时禁用发布", "other": "不感知业务规则" },
+        { "dimension": "数据", "self": "检查项、负责人、进度与通知偏好", "other": "勾选状态" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "检查项与就绪进度",
+      "language": "csharp",
+      "code": "var smoke = new ArcCheckbox\n{\n    Label = \"Production smoke test passed\",\n    Description = \"Checkout, billing and invites on prod\",\n    Checked = true\n};\nvar migration = new ArcCheckbox\n{\n    Label = \"Migration dry run finished\",\n    Description = \"Run 2026_11_09 on a production copy\",\n    Checked = false\n};\nvar readiness = new ArcProgressTrack { Fraction = 3d / 5, Thickness = 8 };\nvar blocking = new ArcBadge { Content = \"2 blocking\", Tone = ArcBadgeTone.Warning, Dot = true };\nvar notify = new ArcSwitch { Label = \"Notify the team on release\", Checked = true };"
+    },
+    {
+      "title": "清单与汇总的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,320\">\n  <StackPanel Spacing=\"12\">\n    <TextBlock Text=\"Engineering\" Classes=\"arc-label\" />\n    <arc:ArcCheckbox Label=\"Production smoke test passed\" />\n    <arc:ArcCheckbox Label=\"Migration dry run finished\" />\n    <TextBlock Text=\"Go to market\" Classes=\"arc-label\" />\n    <arc:ArcCheckbox Label=\"Support macros updated\" />\n  </StackPanel>\n  <StackPanel Grid.Column=\"1\" Spacing=\"12\">\n    <TextBlock Text=\"3 of 5 checks\" Classes=\"arc-heading\" />\n    <arc:ArcProgressTrack />\n    <arc:ArcBadge Content=\"2 blocking\" Tone=\"Warning\" Dot=\"True\" />\n    <arc:ArcButton Content=\"Release v2.4\" Variant=\"Primary\" IsEnabled=\"False\" />\n    <arc:ArcSwitch Label=\"Notify the team on release\" IsChecked=\"True\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

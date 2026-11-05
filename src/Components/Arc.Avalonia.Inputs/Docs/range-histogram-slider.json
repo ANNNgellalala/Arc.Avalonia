@@ -1,0 +1,84 @@
+{
+  "slug": "range-histogram-slider",
+  "nameZh": "直方图区间滑块",
+  "summary": "叠在数据直方图上的双拇指区间滑块：范围内柱条点亮，松手时拇指吸附到柱边，读数显示区间两端。",
+  "purpose": [
+    "用于价格、面积、距离这类「区间过滤」：轨道上方先画出数据的真实分布，用户能看见结果集中在哪里，再决定把区间放在哪。",
+    "两个拇指共享一条轨道，区间内的柱条取强调色、区间外的保持轨道色，中间用一条强调色段连接；读数以「起 – 止」的形式显示在标题行右侧。",
+    "释放拇指时，如果 SnapToBins 打开，它会吸附到最近的柱边——这让「从 ¥80 到 ¥320」在视觉上正好框住若干柱，而不是停在半根柱子上。",
+    "Min / Max 留空（NaN）时会从 Data 推导，Value 留空时默认铺满整个量程；Bins 控制柱数（内部限制在 4–60 之间），MinStepsBetweenThumbs 保证两拇指不会重合。"
+  ],
+  "whenToUse": [
+    "价格、面积、距离等有明确数值量程的区间筛选，且有一批数据可以画出分布。",
+    "希望用户看见「大部分结果落在哪一段」再决定区间，而不是盲填两个数字。",
+    "需要区间两端都可键控微调（Tab 在两端之间切换拇指）。"
+  ],
+  "whenNotToUse": [
+    "只选单个数值时，改用 elastic-slider 或 slider，双拇指在这里只会多一个要理解的对象。",
+    "没有数据、只需要一个区间输入时，改用两个 number-field，更省空间也更好键入。",
+    "区间不是数值而是日期时，改用 calendar 的区间模式或 date-picker。"
+  ],
+  "variants": [
+    { "key": "state-range", "label": "Range", "note": "选定区间，范围内柱条点亮" },
+    { "key": "state-full-range", "label": "Full range", "note": "未设 Value 时默认铺满整个量程" },
+    { "key": "state-collapsed", "label": "Collapsed", "note": "两端贴在一起，区间接近为零" },
+    { "key": "variant-bins", "label": "Bins", "note": "柱数疏密不同，直方图分辨率随之变化" },
+    { "key": "variant-format", "label": "Format", "note": "Format 决定读数两端的格式" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "slider", "note": "只需要单个数值时改用 slider" },
+    { "type": "alternative", "target": "elastic-slider", "note": "需要弹性手感与吸附刻度时改用 elastic slider" },
+    { "type": "complement", "target": "data-grid", "note": "区间滑块收窄条件，结果在表格里逐行呈现" }
+  ],
+  "contrasts": [
+    {
+      "target": "slider",
+      "title": "Range histogram slider 与 Slider",
+      "rows": [
+        { "dimension": "取值", "self": "一段区间（Start 与 End）", "other": "单个数值" },
+        { "dimension": "视觉主体", "self": "数据直方图加两个拇指", "other": "一条轨道、一段填充与一个拇指" },
+        { "dimension": "数据依赖", "self": "需要原始 Data 才能画出分布", "other": "不依赖数据，只需 Min / Max" }
+      ]
+    },
+    {
+      "target": "elastic-slider",
+      "title": "Range histogram slider 与 Elastic slider",
+      "rows": [
+        { "dimension": "取值", "self": "区间，两个拇指", "other": "单个数值，一个拇指" },
+        { "dimension": "吸附行为", "self": "释放时吸附到柱边", "other": "刻度在 7 px 内吸附" },
+        { "dimension": "典型场景", "self": "结果集的区间过滤", "other": "单一设置项的手感调节" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcRangeHistogramSlider Label=\"Price per night\"\n                               Data=\"{Binding Prices}\"\n                               Min=\"0\"\n                               Max=\"500\"\n                               Bins=\"28\"\n                               Value=\"{Binding PriceRange, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "吸附、区间与格式化",
+      "language": "csharp",
+      "code": "var price = new ArcRangeHistogramSlider\n{\n    Width = 420,\n    Label = \"Price per night\",\n    Data = prices,\n    Min = 0,\n    Max = 500,\n    Step = 5,\n    Bins = 28,\n    SnapToBins = true,\n    Value = new ArcRange(80, 320),\n    ThumbLabels = new List<string> { \"Minimum\", \"Maximum\" },\n    Format = value => \"$\" + value.ToString(\"0\")\n};\n\nprice.ValueCommitted += (_, e) => Filter(e.Value.Start, e.Value.End);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcRangeHistogramSlider",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "标题行左侧的可见标签，同时作为无障碍名称前缀",
+      "Data": "直方图统计的原始数值，例如每条房源的价格",
+      "Value": "当前区间（ArcRange 的 Start / End）；两端为 NaN 时铺满整个量程",
+      "Min": "量程下界；NaN 时从 Data 推导",
+      "Max": "量程上界；NaN 时从 Data 推导",
+      "Step": "键盘微调步进与取值对齐粒度，默认 1",
+      "Bins": "柱数，内部限制在 4–60，默认 32",
+      "SnapToBins": "释放拇指时是否吸附到柱边，默认 true",
+      "MinStepsBetweenThumbs": "两拇指之间至少保留几个步进，默认 1",
+      "ThumbLabels": "两个拇指的无障碍名称，默认「标签, minimum / maximum」",
+      "Format": "格式化读数两端与读屏文本的函数",
+      "ValueChanged": "拖动或按键改变区间时触发，事件参数带 ArcRange",
+      "ValueCommitted": "松手或按键确认后触发，适合发起筛选"
+    }
+  }
+}

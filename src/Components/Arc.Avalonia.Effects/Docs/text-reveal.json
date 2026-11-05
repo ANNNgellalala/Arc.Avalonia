@@ -1,0 +1,79 @@
+{
+  "slug": "text-reveal",
+  "nameZh": "文字揭示",
+  "summary": "让一段短文案在首次出现时逐词或逐字从下方升起并淡入，总时长有上限，减少动效时直接呈现终态。",
+  "purpose": [
+    "首屏标题或开场文案如果整块突然出现，读者会错过它的层次。文字揭示把一段文字按词或按字拆开，依次从下方升起并淡入，让视线沿着句子的节奏走。",
+    "Unit 决定拆分单位：Word 按词、Character 按字符；Stagger 是单位之间的毫秒间隔，总间隔被限制在 400 ms 内，因此长文案也不会拖沓。",
+    "Trigger 指定触发时机：Immediate 在首次绘制时播放，Visible 等到文字进入视口；Replay 相当于重新挂载组件，可以再次播放。",
+    "Level 把文案映射到类型层级（H1 / H2 / H3 / Paragraph / Span），既决定字号也保持页面大纲正确；无障碍名称是完整句子，而不是被拆开的碎片。减少动效时直接显示终态、不做位移与透明度变化。"
+  ],
+  "whenToUse": [
+    "首屏主标题、空态引导语等需要一次入场、但不宜过度夸张的文案。",
+    "希望按词或按字控制阅读节奏、并让视线自然落到位时。",
+    "需要在减少动效时优雅降级为静态终态时。",
+    "文案会随路由或标签页切换而重新出现，需要可重复播放时。"
+  ],
+  "whenNotToUse": [
+    "标题在滚动到视口时才需要出现时改用 in-view-title。",
+    "文案会在“发布中 / 已发布”这类状态之间变化时改用 text-morph。",
+    "只是加载中的状态行时改用 text-shimmer。",
+    "正文段落本身很长、逐字动画会拖慢阅读时，直接用普通文本。"
+  ],
+  "variants": [
+    { "key": "variant-h1", "label": "H1 主标题", "note": "两行大标题，按词升起" },
+    { "key": "variant-h2", "label": "H2 区块标题", "note": "默认级别，单行标题" },
+    { "key": "variant-paragraph", "label": "段落", "note": "正文字号，按词依次出现" },
+    { "key": "variant-character", "label": "按字符", "note": "Unit=Character，逐字升起" },
+    { "key": "variant-multiline", "label": "多行文案", "note": "用 \\n 指定换行，行间节奏一致" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "in-view-title", "note": "触发时机是滚动进入视口时用 in-view title" },
+    { "type": "alternative", "target": "text-morph", "note": "同一位置的状态文案切换用 text morph" },
+    { "type": "complement", "target": "text-shimmer", "note": "入场后进入加载态时，两者可以接力" }
+  ],
+  "contrasts": [
+    {
+      "target": "in-view-title",
+      "title": "Text reveal 与 In-view title",
+      "rows": [
+        { "dimension": "触发时机", "self": "首次绘制或显式 Replay", "other": "滚动进入视口时" },
+        { "dimension": "样式", "self": "按词或按字升起，单一方式", "other": "五种样式：blur / word / line / tracking / wipe" },
+        { "dimension": "重复播放", "self": "调用 Replay 再次播放", "other": "Once=false 时每次进入视口都重播" }
+      ]
+    },
+    {
+      "target": "text-morph",
+      "title": "Text reveal 与 Text morph",
+      "rows": [
+        { "dimension": "触发原因", "self": "元素首次出现", "other": "Text 的值发生变化" },
+        { "dimension": "内容变化", "self": "文案不变，只是显现", "other": "旧文案退出、新文案进入" },
+        { "dimension": "宽度", "self": "布局在播放前就按终态占位", "other": "框架宽度弹性过渡到新文案" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "首屏主标题",
+      "language": "csharp",
+      "code": "var title = new ArcTextReveal\n{\n    Text = \"Ship interfaces\\nthat feel precise\",\n    Level = ArcTextLevel.H1,\n    Unit = ArcTextUnit.Word,\n    Delay = 0.1,\n    Stagger = 40,\n    Trigger = ArcRevealTrigger.Immediate\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcTextReveal x:Name=\"Hero\"\n                         Text=\"Ship interfaces that feel precise\"\n                         Level=\"H1\"\n                         Unit=\"Word\"\n                         Stagger=\"40\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcTextReveal",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "要揭示的文案；用 \\n 指定主动换行",
+      "Level": "类型层级，决定字号与语义标签，默认 H2",
+      "Trigger": "Immediate 首次绘制播放；Visible 进入视口才播放",
+      "Unit": "按词或按字符拆分，默认 Word",
+      "Delay": "第一个单位升起前的秒数",
+      "Stagger": "单位之间的毫秒间隔，总间隔上限 400 ms，默认 40"
+    }
+  }
+}

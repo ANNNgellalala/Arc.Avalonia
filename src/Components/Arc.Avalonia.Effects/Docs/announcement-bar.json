@@ -1,0 +1,85 @@
+{
+  "slug": "announcement-bar",
+  "nameZh": "公告条",
+  "summary": "站点顶部的一行公告：可轮播多条消息、内嵌倒计时与行动，点关闭后整条收起。",
+  "purpose": [
+    "在站点最顶部放一条瘦长的公告条，适合促销、维护窗口与新功能发布；Messages 里可以排多条，Index 决定当前显示哪一条。",
+    "AutoPlay 打开时按 Interval 自动轮播，Controls 打开且消息多于一条时显示上一条/下一条与暂停按钮，底部还有一条进度线。",
+    "每条消息可以带 ArcAnnouncementAction 行动与 ArcAnnouncementCountdown 倒计时；Dismissible 为 true 时右侧出现关闭按钮，关闭后 Open 变为 false 并触发 Dismissed。"
+  ],
+  "whenToUse": [
+    "全站或整个产品区域内都需要知道的一条消息（维护、促销、发布）。",
+    "需要轮播多条公告、由用户手动切换或自动播放时。",
+    "公告需要带倒计时（距结束还有多久）或一个行动入口时。"
+  ],
+  "whenNotToUse": [
+    "只影响当前页面某块内容时，改用 alert。",
+    "需要用户做出同意或选择（Cookie、条款）时，改用 cookie-consent。",
+    "消息会频繁变化且需要历史记录时，用通知中心或 toast-stack，而不是常驻横条。"
+  ],
+  "variants": [
+    { "key": "tone-neutral", "label": "Neutral", "note": "默认表面色，适合常规公告" },
+    { "key": "tone-inverted", "label": "Inverted", "note": "反色表面，适合需要更强存在的公告" },
+    { "key": "variant-countdown", "label": "Countdown", "note": "消息里嵌一条到截止时刻的倒计时" },
+    { "key": "variant-controls", "label": "Controls", "note": "多条消息时的上一条、暂停与下一条，以及进度线" },
+    { "key": "variant-dismissible", "label": "Dismissible", "note": "右侧关闭按钮，关闭后整条收起" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "alert", "note": "页面内的持久提示改用 alert" },
+    { "type": "complement", "target": "countdown", "note": "公告消息里可以内嵌倒计时" },
+    { "type": "complement", "target": "cookie-consent", "note": "同属页面级消息，常同时出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "alert",
+      "title": "Announcement bar 与 Alert",
+      "rows": [
+        { "dimension": "范围", "self": "站点级，横跨页面顶部", "other": "页面内某块内容旁边" },
+        { "dimension": "内容结构", "self": "一行消息，可轮播多条，可带倒计时", "other": "标题、说明与一个行动" },
+        { "dimension": "关闭行为", "self": "整条收起并记住关闭", "other": "只隐藏这一条提示" }
+      ]
+    },
+    {
+      "target": "cookie-consent",
+      "title": "Announcement bar 与 Cookie consent",
+      "rows": [
+        { "dimension": "目的", "self": "告知与推广", "other": "收集并保存同意偏好" },
+        { "dimension": "交互", "self": "阅读、切换、关闭", "other": "接受、拒绝、逐项自定义" },
+        { "dimension": "状态", "self": "没有需要持久保存的选择", "other": "按 StorageKey 与 Version 记住选择" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "两条公告，带倒计时与行动",
+      "language": "csharp",
+      "code": "var bar = new ArcAnnouncementBar\n{\n    Id = \"fall-sale\",\n    Controls = true,\n    AutoPlay = false,\n    Messages = new[]\n    {\n        new ArcAnnouncement\n        {\n            Id = \"sale\",\n            Message = \"Fall sale: 30% off\",\n            Countdown = new ArcAnnouncementCountdown\n            {\n                To = DateTimeOffset.Now.AddDays(3),\n                Label = \"Ends in\"\n            },\n            Action = new ArcAnnouncementAction { Label = \"See plans\" }\n        },\n        new ArcAnnouncement { Id = \"beta\", Message = \"Workflows are now in beta\" }\n    }\n};\n\nbar.ActionInvoked += (_, message) => Track(message.Id);"
+    },
+    {
+      "title": "反色、不可关闭的单条公告",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:ef=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <ef:ArcAnnouncementBar Tone=\"Inverted\"\n                         Dismissible=\"False\"\n                         Messages=\"{Binding MaintenanceMessages}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcAnnouncementBar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Messages": "公告列表，元素是 ArcAnnouncement（Id / Message / Action / Countdown）",
+      "Id": "公告条标识，用于记录关闭状态",
+      "Open": "false 时整条收起，默认 true",
+      "Index": "当前显示的消息下标",
+      "Interval": "自动轮播间隔毫秒数，默认 6000",
+      "AutoPlay": "是否自动轮播，默认 true",
+      "Controls": "是否显示上一条、暂停、下一条与进度线，消息多于一条时生效",
+      "Dismissible": "是否显示关闭按钮，默认 true",
+      "Tone": "Neutral 默认表面；Inverted 反色表面",
+      "Label": "公告条的无障碍名称，默认 Announcements",
+      "Dismissed": "点击关闭时触发",
+      "OpenChanged": "展开状态变化时触发",
+      "IndexChanged": "当前消息变化时触发",
+      "ActionInvoked": "消息里的行动被点击时触发，参数是该条公告",
+      "CountdownEnded": "消息内的倒计时归零时触发"
+    }
+  }
+}

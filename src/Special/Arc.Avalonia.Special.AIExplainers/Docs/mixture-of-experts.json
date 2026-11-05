@@ -1,0 +1,67 @@
+{
+  "slug": "mixture-of-experts",
+  "nameZh": "混合专家插画",
+  "summary": "解释 MoE 路由的插画：每个 token 先被 Router 打分，只送往得分最高的若干专家，专家输出再合并成这个 token 的结果。",
+  "purpose": [
+    "把「模型有 8 个专家，但每个 token 只跑其中 1–2 个」画成流水线：左侧进来一个 token，Router 给出 8 条 gate 权重，被选中的专家亮起并连线到合并点，右侧输出这个 token 的合并结果。",
+    "底部两行统计说明稀疏的收益与代价：Active parameters 只有 671B 中的一部分，同时给出最忙专家的负载，超过容量时用警示色标出 full。",
+    "开启减弱动效时停在第 5 个 token 的路由帧（相位 0.62）：Router 已打分、Top 2 专家亮起、输出卡写着 2 experts merged。预览展示这一帧，声明的变体都是帧内同时可见的元素。"
+  ],
+  "whenToUse": [
+    "AI 模型或推理服务的产品页需要解释稀疏激活与专家并行。",
+    "文档页介绍 router、gate 权重、专家容量与负载均衡等概念时，需要一张结构化示意图。",
+    "需要说明「为什么参数量很大但每个 token 只算一小部分」。"
+  ],
+  "whenNotToUse": [
+    "需要展示真实流量占比或权重数据时，改用 split-bar 或 sankey-flow。",
+    "只需要一个模型参数量的数字时，用 metric-card 更直接。",
+    "需要解释训练或微调流程时，改用 agent-loop 之类的流程插画。"
+  ],
+  "variants": [
+    { "key": "state-merged", "label": "Merged", "note": "默认帧：第 5 个 token（共 8 个）由 Top 2 专家合并输出" },
+    { "key": "variant-input", "label": "Input", "note": "左侧当前 token 输入卡与稀疏路由说明" },
+    { "key": "variant-router", "label": "Router", "note": "Router 面板与 8 条 gate 权重条及数值" },
+    { "key": "variant-experts", "label": "Experts", "note": "Experts 面板：每个专家的名称、图标、负载与容量标记" },
+    { "key": "variant-output", "label": "Output", "note": "合并结果卡：当前 token 与 1 expert ran / 2 experts merged" },
+    { "key": "variant-top-k", "label": "Top K", "note": "Top 1 / Top 2 选择器，影响容量与合并文案" },
+    { "key": "variant-footer", "label": "Footer", "note": "Active parameters 与最宽 expert 负载两行统计" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "split-bar", "note": "需要真实占比数据时改用 split bar" },
+    { "type": "alternative", "target": "speculative-decoding", "note": "同为推理加速解释：一个讲稀疏路由，一个讲草稿校验" },
+    { "type": "complement", "target": "sankey-flow", "note": "用桑基图补充真实的 token 经专家流向" }
+  ],
+  "contrasts": [
+    {
+      "target": "speculative-decoding",
+      "title": "Mixture of experts 与 Speculative decoding",
+      "rows": [
+        { "dimension": "加速来源", "self": "每个 token 只激活部分专家", "other": "用小模型起草、大模型一次校验" },
+        { "dimension": "画面焦点", "self": "Router、专家负载与合并结果", "other": "草稿 token、校验格与已接受的答案" },
+        { "dimension": "可调项", "self": "Top 1 / Top 2 路由宽度", "other": "Draft length 草稿长度与对比开关" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcMixtureOfExperts Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "暂停并嵌入产品页",
+      "language": "csharp",
+      "code": "var mix = new ArcMixtureOfExperts\n{\n    Height = 400,\n    HorizontalAlignment = HorizontalAlignment.Stretch\n};\n\n// 与「Top 1 / Top 2」讲解配合时可暂停在某一帧。\nmix.SetPaused(true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcMixtureOfExperts",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停后画面停在当前帧",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

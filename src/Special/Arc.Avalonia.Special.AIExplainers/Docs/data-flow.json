@@ -1,0 +1,66 @@
+{
+  "slug": "data-flow",
+  "nameZh": "数据流插画",
+  "summary": "解释数据如何流动的插画：左侧三个来源汇入中间 Transform 核心，再把处理后的记录分发到右侧三个目的地。",
+  "purpose": [
+    "用一张图解释「数据从哪来、经过什么处理、到哪去」。原始记录以空心圆点离开来源，在核心里变成实心方块，再沿各自的曲线飞向目的地；底部计数持续累加已处理条数。",
+    "所有几何都按控件边界计算：两侧节点固定 186×56，核心居中，连线用带弧度的三次曲线。插画本身不是可交互的业务组件，而是可嵌进营销页、文档页或产品引导页的说明图。",
+    "故事只有一个归一化相位，任意时刻的画面都是该相位的纯函数，因此循环无接缝；开启减弱动效时定格在海报帧（相位 0.30）。预览展示的就是这一静态帧，下面的变体都是帧内同时可见的元素。"
+  ],
+  "whenToUse": [
+    "营销首页或功能区块需要一段「数据如何进入系统」的视觉说明。",
+    "文档页在引入采集、转换、路由概念时，需要一张能一眼看懂方向的示意图。",
+    "集成页展示哪些来源喂给哪些下游系统，且不需要展示真实流量数值。"
+  ],
+  "whenNotToUse": [
+    "需要展示真实流量体积与阶段占比时，改用 sankey-flow（桑基图）。",
+    "需要展示任务或流水线的实时运行状态时，改用 progress 或活动类组件，而不是插画。",
+    "只需要一个静态架构图、不需要动画叙事时，用普通的图表或文本更轻。"
+  ],
+  "variants": [
+    { "key": "state-mid-flow", "label": "Mid flow", "note": "默认帧：记录正处在来源、核心与目的地之间的某一段" },
+    { "key": "variant-sources", "label": "Sources", "note": "左侧 App / Database / Events 三个来源节点，带副标题与系列色" },
+    { "key": "variant-core", "label": "Transform core", "note": "中间核心：旋转虚线环、layers 图标与已处理条数" },
+    { "key": "variant-destinations", "label": "Destinations", "note": "右侧 Warehouse / Dashboard / Alerts 三个目的地节点" },
+    { "key": "variant-records", "label": "Records", "note": "空心原始记录点与实心处理后记录块沿曲线移动" },
+    { "key": "variant-legend", "label": "Legend", "note": "底部图例：空心为原始记录、实心为处理后记录，并说明 Alerts 约收每三条中的一条" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "sankey-flow", "note": "需要按真实流量绘制阶段占比时改用 sankey flow" },
+    { "type": "complement", "target": "line-chart", "note": "插画解释概念、图表给出真实数值，两者常在同一个功能页里配对" },
+    { "type": "complement", "target": "vector-search", "note": "同属 AI explainers：一个讲数据搬运，一个讲检索命中" }
+  ],
+  "contrasts": [
+    {
+      "target": "sankey-flow",
+      "title": "Data flow 与 Sankey flow",
+      "rows": [
+        { "dimension": "数据来源", "self": "固定的示例记录，叙事用", "other": "真实数据集的流量与占比" },
+        { "dimension": "能否读取数值", "self": "只有底部累计计数，不是图表轴", "other": "节点与连线宽度即数值，可读具体量" },
+        { "dimension": "适用场景", "self": "营销与文档里的概念说明", "other": "数据分析页面里的真实流向分析" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcDataFlow Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "暂停与继续",
+      "language": "csharp",
+      "code": "var flow = new ArcDataFlow { Height = 400 };\n\n// 页面离开视口时暂停，回来时继续；减弱动效下没有任何效果。\nflow.SetPaused(true);\nflow.SetPaused(false);\n\n// 或者按一次 Space 的等价逻辑切换播放。\nflow.TogglePlay();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcDataFlow",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸，所有几何按实际边界计算",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续时钟；暂停后画面停在当前帧，减弱动效下无效果",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

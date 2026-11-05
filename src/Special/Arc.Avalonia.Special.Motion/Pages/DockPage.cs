@@ -11,6 +11,12 @@ public sealed class DockPage : ArcItemPage
 {
     public override string ItemSlug => "dock";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-selected", "state-tray-open", "state-member",
+        "variant-badge", "variant-label", "variant-chevron"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

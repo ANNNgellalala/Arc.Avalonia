@@ -11,6 +11,12 @@ public sealed class VectorSearchPage : ArcItemPage
 {
     public override string ItemSlug => "vector-search";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-ranked",
+        "variant-plane", "variant-clusters", "variant-index-links", "variant-matches", "variant-ranked-list", "variant-stage-pills"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A feature section on semantic search, AI answers or retrieval over a team's docs.",

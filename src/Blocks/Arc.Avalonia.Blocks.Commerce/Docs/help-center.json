@@ -1,0 +1,51 @@
+{
+  "slug": "help-center",
+  "nameZh": "帮助中心",
+  "summary": "自助帮助中心：即时搜索、主题卡与热门文章，阅读文章时有目录与“这篇有帮助吗”的反馈。",
+  "purpose": [
+    "当用户更愿意自己找答案时，帮助中心先给一个大搜索框，再用主题卡把知识库分成账单、团队、集成等入口。",
+    "搜索在内存里即时过滤标题与摘要，结果列表只保留前几条；下方热门文章给最常见的几个问题一条快捷路径。",
+    "点进文章后切成阅读视图：左侧目录、正文与底部的帮助反馈，返回后回到首页状态。"
+  ],
+  "whenToUse": [
+    "公开的帮助中心或知识库入口。",
+    "产品内需要可搜索的文章与主题分类时。",
+    "希望用户在联系支持前先自助解决时。"
+  ],
+  "whenNotToUse": [
+    "需要与支持人员实时对话时，用 support-conversation 或 support-widget。",
+    "只有一个帮助入口按钮、不需要内容时，用 support-widget。",
+    "需要展示更新日志而不是帮助文章时，用 changelog-feed。"
+  ],
+  "variants": [
+    { "key": "layout-help-home", "label": "首页布局", "note": "搜索、主题卡与热门文章" },
+    { "key": "variant-search", "label": "即时搜索", "note": "搜索框带 ⌘K 提示，输入即过滤结果" },
+    { "key": "variant-topics", "label": "主题卡", "note": "账单、团队、集成等分类入口" },
+    { "key": "variant-popular", "label": "热门文章", "note": "三条常见问题与右侧箭头" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "顶部与阅读视图都用搜索框过滤文章" },
+    { "type": "uses", "target": "button", "note": "主题卡、热门文章行与反馈按钮都是按钮" },
+    { "type": "uses", "target": "card", "note": "主题与文章区块用卡片分组" },
+    { "type": "alternative", "target": "support-conversation", "note": "自助找不到答案、需要人工对话时，改用 support-conversation" }
+  ],
+  "contrasts": [
+    {
+      "target": "support-conversation",
+      "title": "Help center 与 Support conversation",
+      "rows": [
+        { "dimension": "解决方式", "self": "自助搜索与阅读", "other": "与支持人员实时对话" },
+        { "dimension": "内容形态", "self": "结构化的文章与主题", "other": "线性消息线程" },
+        { "dimension": "反馈", "self": "文章有帮助 / 没帮助的投票", "other": "已解决 / 未解决的工单状态" },
+        { "dimension": "适用", "self": "常见问题与文档", "other": "账户、账单等个体问题" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "搜索、主题卡与热门文章",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"18\" MaxWidth=\"900\">\n  <Grid ColumnDefinitions=\"Auto,*,Auto\">\n    <TextBlock Text=\"Northwind help\" Classes=\"arc-body-sm arc-medium\" />\n    <arc:ArcSearchField Grid.Column=\"1\" Placeholder=\"Search help\" />\n    <arc:ArcButton Grid.Column=\"2\" Content=\"Contact support\" Variant=\"Secondary\" />\n  </Grid>\n  <TextBlock Text=\"Browse topics\" Classes=\"arc-label\" />\n  <ItemsControl ItemsSource=\"{Binding Topics}\"> <!-- 主题卡 --> </ItemsControl>\n  <TextBlock Text=\"Popular articles\" Classes=\"arc-label\" />\n  <ItemsControl ItemsSource=\"{Binding Articles}\"> <!-- 文章行 --> </ItemsControl>\n</StackPanel>"
+    }
+  ]
+}

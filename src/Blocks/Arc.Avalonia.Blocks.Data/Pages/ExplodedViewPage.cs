@@ -19,6 +19,11 @@ public sealed class ExplodedViewPage : ArcItemPage
 {
     public override string ItemSlug => "exploded-view";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-exploded", "variant-layers", "variant-labels", "variant-separation", "variant-detail-panel"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

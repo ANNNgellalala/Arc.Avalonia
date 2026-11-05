@@ -1,0 +1,79 @@
+{
+  "slug": "onboarding-checklist",
+  "nameZh": "上手清单",
+  "summary": "可勾选的入门清单：环形进度显示完成了几步，当前步骤带标记与行动按钮，全部完成后收起为完成态。",
+  "purpose": [
+    "把「还差哪几步才能开始用」摊在桌面上：每一步有勾选按钮、标题与可选行动按钮，第一个未完成步骤自动高亮为「Current」。",
+    "头部用环形进度加 done/total 计数，展开某一步可以在原位读到说明并直接完成它；全部完成后标题换成 DoneTitle，环形变成对勾。",
+    "清单本身可以隐藏或直接关闭，适合放在控制台首屏或新建工作区的欢迎卡片里，完成后再撤走。"
+  ],
+  "whenToUse": [
+    "新工作区、新账户需要引导完成 3–6 个松散步骤时。",
+    "步骤之间没有严格顺序、可以任意先做哪一步时。",
+    "希望进度一直可见、完成后再自动退场的侧栏或首屏卡片。"
+  ],
+  "whenNotToUse": [
+    "步骤有严格先后、要做完上一步才能进入下一步时，改用 stepper。",
+    "只需要一个百分比进度、没有可勾选的步骤时，改用 progress。",
+    "引导内容需要分屏讲解、每屏讲一个功能时，改用专门的引导流程页面，而不是清单。"
+  ],
+  "variants": [
+    { "key": "variant-in-progress", "label": "In progress", "note": "环形计数、Current 标记与行动按钮" },
+    { "key": "variant-expanded", "label": "Expanded step", "note": "展开某一步后显示说明与完成入口" },
+    { "key": "state-complete", "label": "Complete", "note": "标题换成 DoneTitle，环形变成对勾" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "stepper", "note": "有严格顺序的流程改写 stepper" },
+    { "type": "alternative", "target": "progress", "note": "只要总完成比例时改用 progress" },
+    { "type": "complement", "target": "card", "note": "清单通常装在一张卡片里放在首屏" }
+  ],
+  "contrasts": [
+    {
+      "target": "stepper",
+      "title": "Onboarding checklist 与 Stepper",
+      "rows": [
+        { "dimension": "顺序", "self": "松散步骤，可以任意先做哪一步", "other": "严格顺序，必须先完成前一步" },
+        { "dimension": "交互", "self": "直接勾选步骤或点行动按钮", "other": "以上一步、下一步推进为主" },
+        { "dimension": "结束表现", "self": "标题换成完成文案并可以关闭", "other": "显示 CompleteLabel，流程继续" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "Onboarding checklist 与 Progress",
+      "rows": [
+        { "dimension": "可操作性", "self": "每一步都能勾选或跳转处理", "other": "只读的完成比例" },
+        { "dimension": "信息密度", "self": "步骤标题、说明与行动按钮", "other": "一行标签加一条填充" },
+        { "dimension": "适合场景", "self": "新用户上手引导", "other": "上传、导入等后台任务" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "新建工作区的清单",
+      "language": "csharp",
+      "code": "var checklist = new ArcOnboardingChecklist\n{\n    Title = \"Set up your workspace\",\n    DoneTitle = \"Workspace ready\",\n    DefaultCompleted = new[] { \"profile\" },\n    Steps = new List<ArcChecklistStep>\n    {\n        new() { Id = \"profile\", Title = \"Add your profile photo\" },\n        new()\n        {\n            Id = \"invite\",\n            Title = \"Invite your team\",\n            Description = \"Bring the people who will review and ship with you.\",\n            ActionLabel = \"Invite\"\n        },\n        new() { Id = \"connect\", Title = \"Connect GitHub\", ActionLabel = \"Connect\" }\n    }\n};\n\nchecklist.StepInvoked += (_, step) => OpenStep(step.Id);"
+    },
+    {
+      "title": "在 XAML 中绑定步骤",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:cn=\"clr-namespace:Arc.Avalonia.Content.Controls;assembly=Arc.Avalonia.Content\">\n  <cn:ArcOnboardingChecklist Title=\"Set up your workspace\"\n                             DoneTitle=\"Workspace ready\"\n                             Steps=\"{Binding SetupSteps}\"\n                             DefaultCompleted=\"{Binding CompletedSteps}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Content.Controls.ArcOnboardingChecklist",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "未完成时的标题",
+      "DoneTitle": "全部完成后的标题",
+      "Steps": "步骤集合，元素是 ArcChecklistStep（Id / Title / Description / ActionLabel）",
+      "Completed": "已完成步骤 id 的显式列表，设置后为受控模式",
+      "DefaultCompleted": "非受控模式下的初始已完成步骤 id",
+      "DefaultHidden": "非受控模式下的初始隐藏状态",
+      "Dismissed": "true 时整张清单收起，不再占位",
+      "StepInvoked": "点击步骤行动按钮时触发，参数是该步骤",
+      "CompletedChanged": "勾选状态变化时触发，参数是已完成 id 列表",
+      "DismissedChanged": "关闭状态变化时触发",
+      "HiddenChanged": "隐藏状态变化时触发"
+    }
+  }
+}

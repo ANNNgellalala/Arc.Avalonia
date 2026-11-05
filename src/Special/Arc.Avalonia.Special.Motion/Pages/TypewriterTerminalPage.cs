@@ -11,6 +11,12 @@ public sealed class TypewriterTerminalPage : ArcItemPage
 {
     public override string ItemSlug => "typewriter-terminal";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-finished", "variant-titlebar", "variant-command",
+        "variant-success", "variant-progress", "variant-scrubber"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

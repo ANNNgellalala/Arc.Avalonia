@@ -1,0 +1,65 @@
+{
+  "slug": "sankey-flow",
+  "nameZh": "桑基图",
+  "summary": "用节点与带状连线表达流向：节点分列、连线粗细即流量；悬停节点或连线会把整条路径打开，其余部分变暗，节点还可以在列内拖动排序。",
+  "purpose": [
+    "当数据不是趋势而是流向时用它：注册来源如何分成激活与未激活、预算如何从部门流向项目、流量如何在渠道间重新分配。",
+    "列由 Links 自动推断（也可以给节点指定 Column），同一列的节点共享一套比例尺，所以一条带子从起点到终点保持同样的厚度。",
+    "悬停节点或连线会把与它相关的整条路径提亮；AllowNodeDrag 允许在列内上下拖动节点，让布局更好读。"
+  ],
+  "whenToUse": [
+    "需要展示「从哪里来、到哪里去」，并且存在分流或合流时。",
+    "想同时比较流量大小与路径结构，例如渠道 → 激活 → 套餐。",
+    "节点可以按列自然分组、且数量在十几到二十个以内时。"
+  ],
+  "whenNotToUse": [
+    "数据是严格线性的一次转化、没有分流合流时用 funnel-chart，收窄的漏斗更好读。",
+    "只是要讲解一个固定流程或概念时用 data-flow，桑基图的带宽需要真实数值。",
+    "节点很多、连线交叉严重时先聚合数据；桑基图在密集图上会失去可读性。"
+  ],
+  "variants": [
+    { "key": "variant-journey", "label": "Journey", "note": "分流与合流：来源 → 激活 → 套餐" },
+    { "key": "variant-chain", "label": "Pipeline", "note": "每列一个节点的单链管道" },
+    { "key": "state-no-labels", "label": "No labels", "note": "ShowLabels=false，节点名收起" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "funnel-chart", "note": "分流合流用桑基图，严格线性的逐级转化用漏斗图" },
+    { "type": "alternative", "target": "data-flow", "note": "真实数值流向用桑基图，讲解固定步骤的数据流用 data flow" }
+  ],
+  "contrasts": [
+    {
+      "target": "funnel-chart",
+      "title": "Sankey flow 与 Funnel chart",
+      "rows": [
+        { "dimension": "结构", "self": "多列多节点，可以分流与合流", "other": "严格线性的一列步骤，每段是上一段的子集" },
+        { "dimension": "带宽", "self": "连线粗细同时编码起点与终点的流量", "other": "只编码每一级相对上一级留下的比例" },
+        { "dimension": "交互", "self": "悬停节点追踪整条路径，节点可在列内拖动", "other": "悬停某一段看该级数量与占比" },
+        { "dimension": "典型数据", "self": "注册来源、预算流向、能量分配", "other": "结账、注册等固定步骤的转化" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明图表外壳",
+      "language": "xaml",
+      "code": "<arc:ArcSankeyFlow xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                ShowLabels=\"True\"\n                AllowNodeDrag=\"True\"\n                ValueSuffix=\" people\"\n                Height=\"244\" />"
+    },
+    {
+      "title": "节点、连线与单位",
+      "language": "csharp",
+      "code": "var flow = new ArcSankeyFlow\n{\n    Nodes = new[]\n    {\n        new ArcSankeyNode(\"organic\", \"Organic\"),\n        new ArcSankeyNode(\"paid\", \"Paid\"),\n        new ArcSankeyNode(\"activated\", \"Activated\"),\n        new ArcSankeyNode(\"inactive\", \"Not activated\"),\n        new ArcSankeyNode(\"free\", \"Free plan\"),\n        new ArcSankeyNode(\"pro\", \"Pro plan\")\n    },\n    Links = new[]\n    {\n        new ArcSankeyLink(\"organic\", \"activated\", 3380),\n        new ArcSankeyLink(\"organic\", \"inactive\", 1820),\n        new ArcSankeyLink(\"paid\", \"activated\", 1990),\n        new ArcSankeyLink(\"paid\", \"inactive\", 1910),\n        new ArcSankeyLink(\"activated\", \"free\", 3860),\n        new ArcSankeyLink(\"activated\", \"pro\", 1510)\n    },\n    ValueSuffix = \" people\"\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcSankeyFlow",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Nodes": "节点列表，顺序决定同一列内的堆叠顺序；Column 留空则由连线推断列",
+      "Links": "带流向的数值；节点值取流入与流出的较大者",
+      "ShowLabels": "在节点旁打印名称与数值，默认 true",
+      "AllowNodeDrag": "允许在列内上下拖动节点以调整顺序，默认 true",
+      "ValueSuffix": "数值后的单位，例如 \" people\"",
+      "ValueFormat": "自定义数值格式，用于标签与悬停读数"
+    }
+  }
+}

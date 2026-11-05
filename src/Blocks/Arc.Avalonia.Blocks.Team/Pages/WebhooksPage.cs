@@ -35,6 +35,11 @@ public sealed class WebhooksPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-endpoint-summary", "variant-delivery-history", "state-failed-delivery", "variant-payload-inspector"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A developer settings page for webhook endpoints, delivery history and retries.",

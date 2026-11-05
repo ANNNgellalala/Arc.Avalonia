@@ -1,0 +1,66 @@
+{
+  "slug": "payment-flow",
+  "nameZh": "支付流程插画",
+  "summary": "解释一次刷卡如何走完授权与结算的插画：金额 chip 依次穿过收单方、卡组织与发卡行，再沿回程车道带回批准并结算到商户余额。",
+  "purpose": [
+    "把支付链路讲清楚：Checkout 的 $42.50 先到处理器 Stripe，再到卡组织 Mastercard 与发卡行 Chase；每个节点在故事推进时点亮并写出自己的状态行，避免只靠颜色表达状态。",
+    "授权沿下方虚线车道回传，出现 Approved 标记；结算走第二条轨道，处理器留下 $1.53 手续费，净额落到右侧 Your balance 余额卡并让步骤行逐条打勾。",
+    "画面由归一化相位驱动，所以循环无缝；开启减弱动效时定格在海报帧（相位 0.78，也就是「已批准、结算进行中」的代表瞬间）。预览展示这一帧，声明的变体都是帧内同时可见的元素。"
+  ],
+  "whenToUse": [
+    "支付、结账或金融产品的营销页需要解释资金链路与授权/结算的区别。",
+    "文档页介绍手续费、净额、授权与结算等概念时，需要一张带状态行的流程图。",
+    "需要向非支付背景的读者说明「为什么到账金额小于支付金额」。"
+  ],
+  "whenNotToUse": [
+    "需要展示转化漏斗或各步骤流失率时，改用 funnel-chart。",
+    "需要真实录入金额或展示金额格式时，改用 money-input。",
+    "只需要步骤进度、不需要资金流向叙事时，改用 stepper。"
+  ],
+  "variants": [
+    { "key": "state-settling", "label": "Settling", "note": "默认帧：授权已完成，净额正在结算轨上移动" },
+    { "key": "variant-nodes", "label": "Chain nodes", "note": "Checkout → Stripe → Mastercard → Chase 四个节点与各自状态行" },
+    { "key": "variant-approval-lane", "label": "Approval lane", "note": "下方虚线回程车道与 Approved 回传标记" },
+    { "key": "variant-settlement-rail", "label": "Settlement rail", "note": "第二条结算轨、-$1.53 fee 与净额 chip" },
+    { "key": "variant-balance", "label": "Balance", "note": "Your balance 余额卡、本次净额与累计计数" },
+    { "key": "variant-steps", "label": "Steps", "note": "底部授权与结算的步骤行，完成项打勾" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "funnel-chart", "note": "关注转化与流失时改用 funnel chart" },
+    { "type": "complement", "target": "money-input", "note": "插画里的金额在真实表单中由 money input 录入" },
+    { "type": "complement", "target": "multi-region-failover", "note": "同为流程叙事插画：一条讲支付链路，一条讲基础设施故障转移" }
+  ],
+  "contrasts": [
+    {
+      "target": "funnel-chart",
+      "title": "Payment flow 与 Funnel chart",
+      "rows": [
+        { "dimension": "目标", "self": "解释链路与资金角色，不统计用户行为", "other": "统计每个阶段的转化与流失" },
+        { "dimension": "数据来源", "self": "固定示例金额与状态文案", "other": "真实分阶段计数" },
+        { "dimension": "阅读重点", "self": "谁收钱、谁扣费、什么时候到账", "other": "哪一步流失最多" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcPaymentFlow Height=\"390\" />\n</Window>"
+    },
+    {
+      "title": "随页面可见性暂停",
+      "language": "csharp",
+      "code": "var flow = new ArcPaymentFlow { Height = 390 };\n\n// 页面离开屏幕时暂停，回来后继续。\nflow.AttachedToVisualTree += (_, _) => flow.SetPaused(false);\nflow.DetachedFromVisualTree += (_, _) => flow.SetPaused(true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcPaymentFlow",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 390，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停后画面停在当前帧",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "slug": "revenue-globe",
+  "nameZh": "收入地球",
+  "summary": "点阵地球上的收入回放：当天的付款沿弧线飞回总部，回放时钟逐小时揭开各市场，右侧给出地区与城市明细。",
+  "purpose": [
+    "当需要展示「钱从世界哪里来」时，用 revenue globe：点阵地球缓慢自转，已经开盘的市场被点亮，付款城市向总部画出一条弧线。",
+    "回放时钟（当前停在第 14 时）逐小时揭开市场，已捕获金额与市场数量随之增长；右侧按地区与城市列出收入与占比，全部用文字与数值表达，不只靠颜色。",
+    "它是地理视角的收入叙事页；要按地区比较数值时用 choropleth-explorer，要看时间趋势时用 revenue-explorer。"
+  ],
+  "whenToUse": [
+    "展示全球收入分布与总部回流的叙事页。",
+    "希望用回放时钟讲「一天如何展开」时。",
+    "需要地区与城市两级明细作补充时。"
+  ],
+  "whenNotToUse": [
+    "按地区比较数值、需要精确读色阶时，用 choropleth-explorer。",
+    "看收入随时间的趋势时，用 revenue-explorer。",
+    "只有一个地区的收入时，用 metric-card。"
+  ],
+  "variants": [
+    { "key": "layout-globe", "label": "整体布局", "note": "地球、回放时钟、地区与城市明细并置" },
+    { "key": "variant-globe", "label": "Globe", "note": "点阵地球、市场光点与飞回总部的弧线" },
+    { "key": "variant-replay", "label": "Replay", "note": "逐小时揭开市场的回放时钟，静止在第 14 时" },
+    { "key": "variant-regions", "label": "Breakdown", "note": "地区与城市的收入与占比明细" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "badge", "note": "Live 与市场状态用徽章标出" },
+    { "type": "uses", "target": "slider", "note": "回放时钟用滑块逐小时推进" },
+    { "type": "uses", "target": "card", "note": "地球与明细面板由卡片承载" },
+    { "type": "alternative", "target": "choropleth-explorer", "note": "要按地区精确比较数值时，改用 choropleth explorer" }
+  ],
+  "contrasts": [
+    {
+      "target": "choropleth-explorer",
+      "title": "Revenue globe 与 Choropleth explorer",
+      "rows": [
+        { "dimension": "视角", "self": "三维地球上的城市光点与总部弧线", "other": "平面等面积瓦片地图，逐区域着色" },
+        { "dimension": "时间", "self": "回放时钟逐小时揭开市场", "other": "静态快照，按国家与指标切换" },
+        { "dimension": "读数", "self": "看方向与叙事，数值在右侧明细", "other": "色阶直接对应数值，可精确比较" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,300\">\n  <charts:ArcDotGlobe Height=\"380\" />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：回放与明细",
+      "language": "csharp",
+      "code": "var hour = 14;\nvar globe = new ArcDotGlobe(Cities, hour);\n\nslider.ValueChanged += (_, value) =>\n{\n    var next = (int)Math.Round(value);\n    globe.Hour = next;\n    regions.Text = BuildRegions(next); // 明细只统计已揭开的市场\n};"
+    }
+  ]
+}

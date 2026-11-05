@@ -1,0 +1,52 @@
+{
+  "slug": "product-detail",
+  "nameZh": "商品详情页",
+  "summary": "商品详情页：相册、颜色与尺码变体、按变体库存、数量步进、加入购物袋、评价摘要与参数手风琴。",
+  "purpose": [
+    "当买家已经锁定一件商品、需要看清材质、尺寸与库存时，详情页把相册放在左侧，变体、价格与购买动作放在右侧。",
+    "颜色与尺码决定库存：切换变体会刷新库存提示与加入按钮，售罄时给通知入口而不是一个死按钮。",
+    "购买动作下方是配送与退货承诺、评价摘要，以及可展开的材料、护理与物流参数。"
+  ],
+  "whenToUse": [
+    "商品有几种颜色或尺码，且库存按变体区分时。",
+    "买家需要看图、看评价与看参数才能决定购买时。",
+    "需要把售罄变体变成通知请求而不是直接隐藏时。"
+  ],
+  "whenNotToUse": [
+    "正在浏览多个商品、先要筛选时，用 product-listing。",
+    "只需要快速加购、不需要详情时，用列表页的快速加购。",
+    "需要多件商品一起结算时，用 cart-drawer 或 checkout-summary。"
+  ],
+  "variants": [
+    { "key": "layout-gallery", "label": "相册", "note": "主图加缩略图，前后按钮切换四张照片" },
+    { "key": "variant-finish-size", "label": "变体选择", "note": "Finish 色板与 Size chips，切换时刷新库存" },
+    { "key": "variant-details-accordion", "label": "参数手风琴", "note": "Product details / Materials / Care / Shipping" },
+    { "key": "variant-reviews-summary", "label": "评价摘要", "note": "星级、126 条评价与查看全部的入口" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "accordion", "note": "参数与物流说明收在手风琴里" },
+    { "type": "uses", "target": "button", "note": "变体、数量、加入购物袋与相册按钮都复用它" },
+    { "type": "uses", "target": "progress", "note": "库存与售罄程度用进度条表达" },
+    { "type": "uses", "target": "badge", "note": "新品、促销与售罄用徽章标出" },
+    { "type": "alternative", "target": "product-listing", "note": "要同时比较多个商品时，改用 product-listing" }
+  ],
+  "contrasts": [
+    {
+      "target": "product-listing",
+      "title": "Product detail 与 Product listing",
+      "rows": [
+        { "dimension": "浏览范围", "self": "一件商品的完整信息", "other": "多件商品并列比较" },
+        { "dimension": "变体", "self": "颜色与尺码逐项选择，库存跟着变", "other": "卡片只显示价格与徽章" },
+        { "dimension": "内容", "self": "相册、参数、评价、配送承诺", "other": "照片、名称、价格、快速加购" },
+        { "dimension": "下一步", "self": "加入购物袋并继续浏览", "other": "回到筛选、比较后进入详情" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "左相册右购买列",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"398,28,*\">\n  <StackPanel Spacing=\"10\">\n    <Border Height=\"360\" CornerRadius=\"20\" ClipToBounds=\"True\">\n      <blocks:PhotoTile Icon=\"circle-dot\" />\n    </Border>\n    <WrapPanel> <!-- 四个缩略图按钮 --> </WrapPanel>\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"14\">\n    <TextBlock Text=\"Halo table lamp\" Classes=\"arc-heading\" />\n    <TextBlock Text=\"Finish\" Classes=\"arc-label\" />\n    <WrapPanel> <!-- 色板按钮 --> </WrapPanel>\n    <TextBlock Text=\"Size\" Classes=\"arc-label\" />\n    <WrapPanel> <!-- 尺码 chips --> </WrapPanel>\n    <arc:ArcButton Content=\"Add to bag\" Variant=\"Primary\" />\n    <arc:ArcAccordion />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

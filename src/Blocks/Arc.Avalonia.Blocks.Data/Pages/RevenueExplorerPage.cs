@@ -21,6 +21,11 @@ public sealed class RevenueExplorerPage : ArcItemPage
 {
     public override string ItemSlug => "revenue-explorer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-explorer", "variant-brush", "variant-comparison", "variant-composition", "variant-totals"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

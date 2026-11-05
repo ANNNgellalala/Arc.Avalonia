@@ -1,0 +1,49 @@
+{
+  "slug": "login-immersive",
+  "nameZh": "沉浸式登录页",
+  "summary": "沉浸式登录页：魔法链接卡片浮在黄昏渐变上；发送后表单折成信封状态并显示重发倒计时，背景负责品牌氛围。",
+  "purpose": [
+    "当登录页需要承担品牌情绪时用它：整页是令牌绘制的黄昏渐变与光晕，玻璃卡片浮在上面，不依赖摄影图或插画资源。",
+    "表单是魔法链接：填写工作邮箱、点击发送，卡片折成信封状态并开始重发倒计时；同一块卡片在两种状态间切换，不跳页。",
+    "顶部保留一层轻量的品牌与返回操作，卡片只放一个输入框与一个主按钮，路径短、噪音少。"
+  ],
+  "whenToUse": [
+    "魔法链接登录，且登录页需要强烈的品牌氛围时。",
+    "消费类或创意产品，希望登录页像一张海报而不是表单时。",
+    "只需要工作邮箱一个输入、发送后等待用户去邮箱点链接时。"
+  ],
+  "whenNotToUse": [
+    "需要 passkey 优先与验证码步骤时用 login-centered。",
+    "需要密码字段与品牌图并排时用 login-split。",
+    "登录卡嵌在应用内部页面里时用 sign-in，整页沉浸背景不再适用。"
+  ],
+  "variants": [
+    { "key": "state-form", "label": "Form", "note": "未发送：邮箱输入与发送按钮" },
+    { "key": "variant-dusk-backdrop", "label": "Dusk backdrop", "note": "令牌绘制的黄昏渐变与光晕" },
+    { "key": "variant-top-bar", "label": "Top bar", "note": "顶部品牌与返回操作" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "填写工作邮箱的输入框" },
+    { "type": "uses", "target": "button", "note": "发送魔法链接的主按钮与提供方按钮" },
+    { "type": "uses", "target": "card", "note": "表单与信封状态都收在同一张卡片表面内" },
+    { "type": "alternative", "target": "otp-input", "note": "魔法链接与验证码是两种不同的无密码验证体验" }
+  ],
+  "contrasts": [
+    {
+      "target": "otp-input",
+      "title": "Login immersive 与 OTP input",
+      "rows": [
+        { "dimension": "验证方式", "self": "点击邮件里的链接，不在页面输码", "other": "在页面输入六位验证码" },
+        { "dimension": "页面", "self": "整页品牌背景加一张玻璃卡", "other": "验证码卡片加说明侧栏" },
+        { "dimension": "状态", "self": "表单折成信封与重发倒计时", "other": "插槽填充、错误与成功反馈" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "魔法链接卡片",
+      "language": "csharp",
+      "code": "var card = new Border\n{\n    Width = 360,\n    Padding = new Thickness(22),\n    CornerRadius = new CornerRadius(22),\n    Background = AppKit.Brush(ArcTokens.Surface),\n    BoxShadow = AppKit.Shadow(ArcTokens.ShadowRaised),\n    Child = new StackPanel\n    {\n        Spacing = 12,\n        Children =\n        {\n            AppKit.Disc(\"mail\", 36, 17, true),\n            new TextBlock { Text = \"Sign in with a magic link\", Classes = { \"arc-subtitle\" } },\n            AppKit.Body(\"We will email you a link that signs you in. No password needed.\", 290),\n            AppKit.Field(\"Work email\", AppKit.Input(\"you@company.com\", email, value => email = value)),\n            AppKit.Btn(\"Email me a link\", ArcButtonVariant.Primary, ArcButtonSize.Md, Send, height: 40, stretch: true),\n            AppKit.Row(5, AppKit.Caption(\"New here?\"), AppKit.Link(\"Create an account\", () => { }))\n        }\n    }\n};\n\nvar layer = new Panel { Children = { AppKit.Wash(ArcGlassScene.Dusk), new Border { Child = card } } };\nreturn AppKit.Screen(layer, 500);"
+    }
+  ]
+}

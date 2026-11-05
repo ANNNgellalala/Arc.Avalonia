@@ -23,6 +23,15 @@ public sealed class AiAnswerPage : ArcItemPage
 {
     public override string ItemSlug => "ai-answer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-question",
+        "variant-answer",
+        "variant-sources",
+        "variant-actions",
+        "variant-related"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -216,7 +225,8 @@ public sealed class AiAnswerPage : ArcItemPage
         var topBar = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         topBar.Children.Add(K.Row(6,
             K.Text("Passkey rollout", "arc-label"),
-            K.Caption("Today · 1 question")));
+            K.Caption("Today · 1 question"),
+            K.Pill("Simulated", ArcBadgeTone.Neutral)));
         var topRight = K.Row(4, K.Chip("New thread", icon: "plus"), share);
         topRight.HorizontalAlignment = HorizontalAlignment.Right;
         Grid.SetColumn(topRight, 1);

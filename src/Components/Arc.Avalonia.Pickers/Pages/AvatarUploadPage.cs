@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -5,129 +7,97 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Pickers.Controls;
-using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Pickers.Pages;
 
 /// <summary>
-/// Pickers, part six: the avatar upload. Every state is shown at once (empty, photo, uploading, success,
-/// failure, drag-over and the square silhouette) plus a live cropper, so the in-place crop and the progress
-/// ring can be inspected without touching the file system.
+/// Avatar upload's completeness preview: every state is shown at once (empty, photo, uploading, success,
+/// failure, drag-over and the square silhouette) plus the in-place cropper. Declared state keys match
+/// Docs/avatar-upload.json so the audit can compare the two. All states share one generated sample portrait,
+/// so the preview is deterministic and never touches the file system.
 /// </summary>
-public sealed class AvatarUploadPage : ArcPage
+public sealed class AvatarUploadPage : ArcItemPage
 {
-    public override string Title => "Avatar upload";
+    public override string ItemSlug => "avatar-upload";
 
-    public override string Group => "Pickers";
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-ready", "state-photo", "state-uploading", "state-success",
+        "state-error", "state-drag-over", "state-cropping", "variant-square"
+    };
 
-    public override int Order => 506;
-
-    public override string Description =>
-        "Click or drop a photo onto the avatar to crop it in place with drag and zoom. It uploads through a " +
-        "progress ring and settles, with clear errors and retry.";
-
-    public override Control Build(ArcDemoContext context)
+    protected override Control BuildDemo(ArcDemoContext context)
     {
         var photo = ArcSamplePhoto.Create(640);
 
-        var empty = CreateControl(null, "Ada Lovelace");
-        var filled = CreateControl(photo, "Ada Lovelace");
-        var uploading = CreateControl(photo, "Ada Lovelace");
+        var panel = new StackPanel { Spacing = 16, HorizontalAlignment = HorizontalAlignment.Left };
+
+        panel.Children.Add(Row(
+            Card("空态", "没有照片时显示姓名首字母与上传提示", Create(null, "Ada Lovelace")),
+            Card("已有照片", "显示照片以及 Replace 与 Remove", Create(photo, "Ada Lovelace"))));
+
+        var uploading = Create(photo, "Ada Lovelace");
         uploading.Status = ArcAvatarUploadStatus.Uploading;
         uploading.Progress = 0.62;
 
-        var success = CreateControl(photo, "Ada Lovelace");
+        var success = Create(photo, "Ada Lovelace");
         success.Status = ArcAvatarUploadStatus.Success;
 
-        var failed = CreateControl(photo, "Ada Lovelace");
+        panel.Children.Add(Row(
+            Card("上传中", "Status=Uploading，Progress=0.62", uploading),
+            Card("成功", "Status=Success，头像外圈与角标落定", success)));
+
+        var failed = Create(photo, "Ada Lovelace");
         failed.Status = ArcAvatarUploadStatus.Error;
         failed.Progress = 0.62;
         failed.ErrorMessage = "The connection dropped at 62%. Your photo is unchanged.";
 
-        var dragging = CreateControl(photo, "Ada Lovelace");
+        var dragging = Create(photo, "Ada Lovelace");
         dragging.IsDragOver = true;
 
-        var crop = CreateControl(photo, "Ada Lovelace");
-        crop.Width = 640;
+        panel.Children.Add(Row(
+            Card("失败", "Status=Error，保留照片并给出错误与重试", failed),
+            Card("拖拽悬停", "IsDragOver=true，头像显示投放提示", dragging)));
+
+        var square = Create(photo, "Ada Lovelace");
+        square.Shape = ArcAvatarShape.Square;
+
+        panel.Children.Add(Row(
+            Card("方形剪影", "Shape=Square，用于工作区 Logo", square)));
+
+        var crop = Create(photo, "Ada Lovelace");
         crop.BeginCrop(photo);
         crop.CropZoom = 1.35;
 
-        var states = DemoUi.Row(
-            State("Empty, initials fallback", empty),
-            State("Photo, with Replace and Remove", filled),
-            State("Uploading, 62% reported", uploading),
-            State("Success, settled", success),
-            State("Error, keep the crop and retry", failed),
-            State("Drag over, drop to replace", dragging));
+        panel.Children.Add(Card("裁剪中", "BeginCrop 后展开 248 px 裁剪台与缩放控制", crop, width: 640));
 
-        var cropNote = new StackPanel
-        {
-            Spacing = 8,
-            Width = 280,
-            Children =
-            {
-                new TextBlock { Text = "While cropping", Classes = { "arc-label" } },
-                Note("The avatar grows into a 248 px stage with a 184 px circular mask; the overflow is dimmed and brightens while you drag."),
-                Note("Drag pans the photo. The wheel zooms towards the pointer, and the plus and minus buttons step the zoom."),
-                Note("Arrow keys nudge by 2% of the circle, Shift makes it 10%, 0 resets, Enter saves and Escape cancels."),
-                Note("Desktop Avalonia has no pinch gesture, so pinch zoom is the wheel and the buttons. The zoom slider of the original is replaced by the same pair."),
-                Note("Saving renders the circle to a 512 px square through RenderTargetBitmap, then runs the upload."),
-                Note("Shape=\"Square\" swaps the circle for a 26 px panel radius, for workspace logos.")
-            }
-        };
-
-        var cropBlock = new StackPanel
-        {
-            Spacing = 10,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Children =
-            {
-                crop,
-                DemoUi.Caption("Live: press Save photo and the deterministic 14-step upload runs around the avatar.")
-            }
-        };
-
-        return new StackPanel
-        {
-            Children =
-            {
-                DemoUi.Section(
-                    "Avatar upload",
-                    "For profile and team settings, where a person sets a photo and should see the crop and the upload " +
-                    "in place. All states share one generated sample portrait; pick or drop a real PNG, JPG or WebP to " +
-                    "crop your own.",
-                    states),
-
-                DemoUi.Section(
-                    "Crop in place",
-                    "The avatar becomes the crop stage, so the photo never leaves the place it will live. Saving crops " +
-                    "through a RenderTargetBitmap, then the progress ring fills around the avatar.",
-                    DemoUi.Row(cropBlock, cropNote))
-            }
-        };
-    }
-
-    private static ArcAvatarUpload CreateControl(IImage? source, string name) => new()
-    {
-        Source = source,
-        DisplayName = name,
-        Width = 300,
-        HorizontalAlignment = HorizontalAlignment.Left
-    };
-
-    private static Control State(string caption, Control content)
-    {
-        var panel = new StackPanel { Spacing = 8, Width = 300, HorizontalAlignment = HorizontalAlignment.Left };
-        panel.Children.Add(DemoUi.Caption(caption));
-        panel.Children.Add(content);
         return panel;
     }
 
-    private static Control Note(string text) => new TextBlock
+    private static Control Row(params Control[] cards)
     {
-        Text = "\u00b7 " + text,
-        Classes = { "arc-caption" },
-        TextWrapping = TextWrapping.Wrap
+        var row = new WrapPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Left };
+        foreach (var card in cards)
+        {
+            card.Margin = new Thickness(0, 0, 16, 0);
+            row.Children.Add(card);
+        }
+
+        return row;
+    }
+
+    private static Control Card(string title, string note, ArcAvatarUpload upload, double width = 380)
+    {
+        upload.Width = width;
+        upload.HorizontalAlignment = HorizontalAlignment.Left;
+        return DemoUi.Card(title, note, upload);
+    }
+
+    private static ArcAvatarUpload Create(IImage? source, string name) => new()
+    {
+        Source = source,
+        DisplayName = name,
+        Label = "Profile photo",
+        Hint = "PNG, JPG or WebP, up to 8 MB"
     };
 }
-

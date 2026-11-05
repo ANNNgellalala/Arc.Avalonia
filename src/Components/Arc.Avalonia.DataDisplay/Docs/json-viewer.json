@@ -1,0 +1,78 @@
+{
+  "slug": "json-viewer",
+  "nameZh": "JSON 查看器",
+  "summary": "可折叠的 JSON 树：按类型着色、搜索自动展开命中的分支、长数组分页、逐行复制值或路径；用于检查 API 负载与 Webhook 事件。",
+  "purpose": [
+    "当用户需要看懂一段 JSON 而不只是看原文时用它：Webhook 事件、API 响应、配置对象。Data 接受任意 JSON 字符串或对象，RootName 决定路径的前缀。",
+    "DefaultExpandDepth 控制初始展开层数；Query 会在树中搜索并自动展开匹配分支，匹配行高亮；Searchable=false 可以去掉搜索框。",
+    "PageSize 给长数组分页，底部按钮翻页；Copyable 打开时每行可以复制值或完整路径，ShowPath 在底部显示当前行的路径，ScrollHeight 控制树区高度。"
+  ],
+  "whenToUse": [
+    "需要检查 API 负载或事件对象的结构与字段时。",
+    "JSON 较大、需要搜索字段名或值来定位时。",
+    "需要把某个字段的值或路径复制出来贴到别处时。"
+  ],
+  "whenNotToUse": [
+    "只需要展示一段原始文本（不论是不是 JSON）时用 code-block，树形结构反而多一层操作。",
+    "要编辑 JSON 时用 rich-text-editor 或专门的表单，查看器是只读的。",
+    "只是两三个字段的小对象时用定义列表或 badge 展示，不必引入树。"
+  ],
+  "variants": [
+    { "key": "variant-payload", "label": "Payload", "note": "展开两层，带路径条与复制" },
+    { "key": "state-search", "label": "Search", "note": "Query 命中后自动展开并高亮" },
+    { "key": "state-no-path", "label": "No path strip", "note": "ShowPath=false，收起底部路径" },
+    { "key": "variant-paged", "label": "Paged array", "note": "PageSize=3，长数组分页显示" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "code-block", "note": "看结构化 JSON 用 viewer，看源码原文用 code block" },
+    { "type": "alternative", "target": "data-grid", "note": "同构记录用表格比较，嵌套负载用 JSON 树" }
+  ],
+  "contrasts": [
+    {
+      "target": "code-block",
+      "title": "JSON viewer 与 Code block",
+      "rows": [
+        { "dimension": "展示对象", "self": "JSON 数据的树形结构", "other": "任意语言的源码原文" },
+        { "dimension": "交互", "self": "分支展开、搜索、分页、复制路径", "other": "整段复制与 Show all 折叠" },
+        { "dimension": "适用", "self": "API 负载、事件对象", "other": "文档示例、安装命令" }
+      ]
+    },
+    {
+      "target": "data-grid",
+      "title": "JSON viewer 与 Data grid",
+      "rows": [
+        { "dimension": "数据形状", "self": "任意嵌套的 JSON 树", "other": "同构的二维记录" },
+        { "dimension": "比较方式", "self": "逐层展开、看单个字段", "other": "按列并排比较、排序与合计" },
+        { "dimension": "编辑", "self": "只读", "other": "支持内联编辑" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明查看器",
+      "language": "xaml",
+      "code": "<arc:ArcJsonViewer xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n                  Label=\"Webhook payload\"\n                  RootName=\"event\"\n                  DefaultExpandDepth=\"2\"\n                  PageSize=\"3\"\n                  ShowPath=\"True\" />"
+    },
+    {
+      "title": "负载、搜索与复制",
+      "language": "csharp",
+      "code": "var viewer = new ArcJsonViewer\n{\n    Data = \"\"\"\n        {\n          \"event\": \"invoice.paid\",\n          \"data\": {\n            \"amount\": 4200,\n            \"customer\": { \"id\": \"cus_N4x\", \"name\": \"Maya Chen\" },\n            \"lines\": [\n              { \"description\": \"Seat\", \"quantity\": 12 },\n              { \"description\": \"Storage\", \"quantity\": 1 }\n            ]\n          }\n        }\n        \"\"\",\n    RootName = \"event\",\n    DefaultExpandDepth = 2,\n    Query = \"maya\",\n    PageSize = 3,\n    ScrollHeight = 260,\n    Label = \"Webhook payload\"\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcJsonViewer",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Data": "任意 JSON 字符串或对象；字符串会先被解析",
+      "RootName": "路径里根节点的名字，例如 event.data.customer.name",
+      "DefaultExpandDepth": "初始展开的层级，默认 1（打开根节点）",
+      "Searchable": "显示搜索框，默认 true",
+      "Query": "搜索文本；命中分支会自动展开并高亮",
+      "PageSize": "长数组或对象每页显示的子项数，默认 50",
+      "Copyable": "显示复制值 / 复制路径操作，默认 true",
+      "ShowPath": "在树下方显示当前行的路径，默认 true",
+      "Label": "查看器的无障碍名称，默认 JSON",
+      "ScrollHeight": "树区滚动高度（px），默认 420；0 表示不限制"
+    }
+  }
+}

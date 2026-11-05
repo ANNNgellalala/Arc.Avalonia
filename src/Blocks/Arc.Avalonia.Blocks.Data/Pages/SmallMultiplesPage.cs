@@ -20,6 +20,11 @@ public sealed class SmallMultiplesPage : ArcItemPage
 {
     public override string ItemSlug => "small-multiples";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-multiples", "variant-trellis", "variant-ghost-total", "variant-scale-shared", "variant-sort"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

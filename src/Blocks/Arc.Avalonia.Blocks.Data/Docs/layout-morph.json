@@ -1,0 +1,57 @@
+{
+  "slug": "layout-morph",
+  "nameZh": "布局变形画廊",
+  "summary": "同一组二十四张指标卡在六种布局之间飞行：网格、瀑布、列表、扇形、轮播与螺旋，切换时卡片按矩形插值移动到新位置。",
+  "purpose": [
+    "当同一组卡片需要在不同阅读方式之间切换时，用 layout morph：网格适合扫读、列表适合逐条细读、扇形与螺旋适合展示与讲述。",
+    "卡片在两种布局的矩形列表之间做插值，而不是让布局引擎重排，因此飞行途中每张卡的内容都不会跳动；切换由一枚分段控件驱动。",
+    "它是 showcase 性质的区块：把「同一份内容可以有多种排布」直接演给人看；如果卡片承载的是需要比较的表格数据，请改用数据表格。"
+  ],
+  "whenToUse": [
+    "画廊或仪表盘需要让同一组卡片在多种排布之间切换时。",
+    "展示页要演示布局过渡本身时。",
+    "卡片内容固定、只是排布会变时。"
+  ],
+  "whenNotToUse": [
+    "卡片承载可比较的表格数值时，用 data-grid。",
+    "排布永远不变时，用普通网格即可，动效只会增加成本。",
+    "需要拖拽重排卡片时，用 reorderable-list。"
+  ],
+  "variants": [
+    { "key": "layout-grid", "label": "Grid", "note": "默认的六列网格排布" },
+    { "key": "layout-masonry", "label": "Masonry", "note": "按高度错落的瀑布流排布" },
+    { "key": "layout-list", "label": "List", "note": "单列列表，逐条阅读" },
+    { "key": "layout-fan", "label": "Fan", "note": "扇形摊开，卡片按角度错位" },
+    { "key": "layout-carousel", "label": "Carousel", "note": "轮播排布，中间一张最突出" },
+    { "key": "layout-helix", "label": "Helix", "note": "螺旋排布，卡片沿纵深旋转错位" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "六种布局由分段控件切换" },
+    { "type": "uses", "target": "metric-card", "note": "每张卡片是指标卡表面，展示一个数值与标签" },
+    { "type": "uses", "target": "card", "note": "画廊本身装在一张卡片里" },
+    { "type": "alternative", "target": "product-gallery", "note": "需要图片画廊式的浏览与灯箱时，改用 product gallery" }
+  ],
+  "contrasts": [
+    {
+      "target": "product-gallery",
+      "title": "Layout morph 与 Product gallery",
+      "rows": [
+        { "dimension": "内容", "self": "指标卡，强调数值与标签", "other": "商品图片与描述，强调视觉" },
+        { "dimension": "排布", "self": "六种几何排布之间飞行切换", "other": "固定网格加灯箱查看" },
+        { "dimension": "目的", "self": "演示布局过渡与阅读方式", "other": "浏览与挑选商品" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <arc:ArcSegmentedControl SelectedValue=\"grid\" />\n  <charts:ArcLayoutMorph Height=\"360\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：切换布局",
+      "language": "csharp",
+      "code": "var morph = new ArcLayoutMorph();\n\n// 六种取值：grid / masonry / list / fan / carousel / helix\nmorph.Layout = \"masonry\";\nselector.SelectionChanged += (_, key) => morph.Layout = key;"
+    }
+  ]
+}

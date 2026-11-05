@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Blocks.Team.Controls;
+using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
@@ -21,6 +22,11 @@ public sealed class CohortRetentionPage : ArcItemPage
     public override string ItemSlug => "cohort-retention";
 
     public override bool DemoOnCanvas => false;
+
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-cohort-triangle", "variant-curves", "variant-kpi-row", "variant-segment-chips", "variant-cohort-badge"
+    };
 
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
@@ -121,8 +127,11 @@ public sealed class CohortRetentionPage : ArcItemPage
                 TeamKit.Caption("Monthly signup cohorts · Nov 2025 – Jun 2026 · rates are month over month")
             }
         });
-        Grid.SetColumn(mode, 1);
-        heading.Children.Add(mode);
+        var right = TeamKit.Row(10,
+            TeamKit.Pill("8 cohorts", ArcBadgeTone.Neutral),
+            mode);
+        Grid.SetColumn(right, 1);
+        heading.Children.Add(right);
 
         var kpiRow = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*") };
         kpiRow.Children.Add(Kpi(kpiM3, "Month 3 retention", "Average across visible cohorts", mix));
@@ -174,7 +183,7 @@ public sealed class CohortRetentionPage : ArcItemPage
             chartPanel,
             hintRow);
 
-        return TeamKit.Root(new Border
+        var surface = new Border
         {
             Background = TeamKit.Brush(ArcTokens.Surface),
             BorderBrush = TeamKit.Brush(ArcTokens.Border),
@@ -183,7 +192,38 @@ public sealed class CohortRetentionPage : ArcItemPage
             ClipToBounds = true,
             Padding = new Thickness(20),
             Child = demo
-        });
+        };
+
+        return TeamKit.Root(TeamKit.Stack(16, surface, CurvesSample()));
+    }
+
+    /// <summary>
+    /// A static curves sample so both rendering modes are visible without switching the segmented control.
+    /// </summary>
+    private static Control CurvesSample()
+    {
+        var chart = new ArcCohortChart
+        {
+            Segment = "pro",
+            Mode = "curves",
+            Height = 180
+        };
+        AutomationProperties.SetName(chart, "Cohort retention curves, paying workspaces");
+
+        return new Border
+        {
+            Background = TeamKit.Brush(ArcTokens.Surface),
+            BorderBrush = TeamKit.Brush(ArcTokens.Border),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(26),
+            ClipToBounds = true,
+            Padding = new Thickness(20),
+            Child = TeamKit.Stack(10,
+                TeamKit.Row(10,
+                    TeamKit.Label("Curves · Pro workspaces"),
+                    TeamKit.Pill("Mode: curves", ArcBadgeTone.Accent)),
+                chart)
+        };
     }
 
     private static Control Kpi(TextBlock value, string label, string note, Control footer)

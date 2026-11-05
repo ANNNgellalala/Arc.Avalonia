@@ -23,6 +23,11 @@ public sealed class ChangelogFeedPage : ArcItemPage
 {
     public override string ItemSlug => "changelog-feed";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-feed", "variant-filters", "state-expanded", "variant-subscribe"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

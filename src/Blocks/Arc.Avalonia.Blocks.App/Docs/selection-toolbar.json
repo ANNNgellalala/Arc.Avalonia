@@ -1,0 +1,51 @@
+{
+  "slug": "selection-toolbar",
+  "nameZh": "批量选择工具栏",
+  "summary": "批量选择工具栏：可勾选的项目表格，选择后浮出批量动作条并显示选中数量，归档与删除会改动样本行并给出一次撤销。",
+  "purpose": [
+    "当表格需要批量操作时用它：勾选几条记录后，底部浮出工具栏，显示选中数量并提供归档、改负责人、删除与清除选择。",
+    "工具栏只在有选择时出现，避免常驻占用空间；动作执行后行被移走，工具栏换成「List updated」与一次撤销。",
+    "它是「表格 + 选择模型」的组合示范：表格由 sortable-data-table 承担，选择状态在块内维护，工具栏是浮层而不是表格的一部分。"
+  ],
+  "whenToUse": [
+    "表格或网格需要批量归档、删除、改负责人等动作时。",
+    "希望动作条只在选中时浮出、而不是常驻表格上方时。",
+    "需要显示选中数量、清除选择与一次撤销时。"
+  ],
+  "whenNotToUse": [
+    "逐行的动作（打开、更多菜单）用 dropdown-menu，不需要批量条。",
+    "需要单元格编辑、列宽拖拽与合计时用 data-grid，它自带选择与页脚。",
+    "只有三两条记录时，直接放行内按钮即可。"
+  ],
+  "variants": [
+    { "key": "state-selected", "label": "Selected", "note": "预选三行，底部批量工具栏可见" },
+    { "key": "variant-selection-count", "label": "Count", "note": "工具栏开头的选中数量与 Clear selection" },
+    { "key": "variant-bulk-actions", "label": "Bulk actions", "note": "归档、改负责人、删除三个批量动作" },
+    { "key": "variant-table", "label": "Table", "note": "可勾选的项目表格与表头排序" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "sortable-data-table", "note": "项目表格由可排序数据表承担，勾选列与选择模型在此之上叠加" },
+    { "type": "uses", "target": "badge", "note": "表头的项目总数用徽标显示" },
+    { "type": "uses", "target": "button", "note": "批量动作、清除选择与全选都是按钮" },
+    { "type": "alternative", "target": "data-grid", "note": "轻量批量条与自带选择、编辑与合计的数据网格是两种规模" }
+  ],
+  "contrasts": [
+    {
+      "target": "data-grid",
+      "title": "Selection toolbar 与 Data grid",
+      "rows": [
+        { "dimension": "表格能力", "self": "只读表格 + 选择与批量动作", "other": "编辑、列宽、列显隐、合计与选择" },
+        { "dimension": "批量 UI", "self": "选中后浮出的动作条", "other": "工具栏与页脚常驻在网格内" },
+        { "dimension": "数据操作", "self": "归档、删除、改负责人并撤销", "other": "就地编辑单元格并提交" },
+        { "dimension": "适用", "self": "以批量处理为主的列表", "other": "需要逐格维护的数据表" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "表格与浮动批量条",
+      "language": "csharp",
+      "code": "var table = new ArcSortableDataTable\n{\n    Rows = rows,\n    Columns = columns,\n    Caption = \"Projects\",\n    Selectable = true,\n    SelectedKeys = selected.ToList(),\n    DefaultSort = new ArcTableSort { Key = \"name\", Direction = ArcSortDirection.Asc },\n    ItemName = new ArcTableItemName { One = \"project\", Other = \"projects\" }\n};\ntable.SelectionChanged += (_, keys) =>\n{\n    selected = keys.ToList();\n    BuildBar();\n};\n\nvar content = new Grid\n{\n    RowDefinitions = new RowDefinitions(\"Auto,*,Auto\"),\n    RowSpacing = 10,\n    Children = { header, table, barHost }\n};\n\nreturn AppKit.Screen(new Border { Padding = new Thickness(18, 14, 18, 12), Child = content }, 500);"
+    }
+  ]
+}

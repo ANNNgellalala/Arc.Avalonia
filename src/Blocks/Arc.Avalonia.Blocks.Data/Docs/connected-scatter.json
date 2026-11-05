@@ -1,0 +1,57 @@
+{
+  "slug": "connected-scatter",
+  "nameZh": "连接散点",
+  "summary": "三个渠道的月度 CAC 与 LTV 按时序连成路径，沿着路径拖动的播放头给出当月比值，与 3 倍健康区对照。",
+  "purpose": [
+    "当要同时看「获取成本」与「生命周期价值」随时间如何一起移动时，用 connected scatter：每个点是一个月，点与点按时间顺序相连，路径的形状就是两者的联合轨迹。",
+    "播放头沿路径移动并显示当月 CAC、LTV 与比值；右侧或下方的读数跟随播放头。背景的 3 倍目标区把健康与不健康分开，比值低于 3 时路径会落入阴影。",
+    "渠道切换会在同一坐标系里替换路径；它和普通折线的差别在于：折线各自随时间变化，连接散点让两条指标的相互关系成为图形主体。"
+  ],
+  "whenToUse": [
+    "需要把两项指标的关系与时间顺序一起呈现时。",
+    "要判断 CAC 与 LTV 的比值是否健康时。",
+    "需要沿时间路径逐月回放时。"
+  ],
+  "whenNotToUse": [
+    "只需要看单条指标随时间变化时，用 line-chart。",
+    "要比较多个渠道的整体水平时，用 bar-chart 或 small-multiples。",
+    "需要精确读任意月份数值时，用数据表格。"
+  ],
+  "variants": [
+    { "key": "layout-scatter", "label": "整体布局", "note": "路径图、健康区、播放头与读数磁贴并置" },
+    { "key": "variant-paths", "label": "Paths", "note": "按月份连接的三个渠道轨迹" },
+    { "key": "variant-target-band", "label": "Target band", "note": "3 倍 LTV/CAC 的健康阴影区" },
+    { "key": "variant-scrubber", "label": "Playhead", "note": "停在最新月份的播放头与当月读数" },
+    { "key": "variant-channel-switch", "label": "Channel", "note": "全渠道与单渠道的切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "播放、重置与渠道按钮由按钮承担" },
+    { "type": "uses", "target": "segmented-control", "note": "渠道切换用分段控件" },
+    { "type": "uses", "target": "slider", "note": "播放头位置由滑块驱动" },
+    { "type": "uses", "target": "card", "note": "路径图与读数磁贴由卡片承载" },
+    { "type": "alternative", "target": "line-chart", "note": "只需要单条指标随时间变化时，改用折线图" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Connected scatter 与 Line chart",
+      "rows": [
+        { "dimension": "图形主体", "self": "两项指标在时间上的联合轨迹", "other": "单个指标随时间的折线" },
+        { "dimension": "健康判断", "self": "3 倍目标区直接作为背景阴影", "other": "需要另加阈值线或辅助说明" },
+        { "dimension": "回放", "self": "播放头沿路径移动、逐步回放", "other": "通常静态或带十字线读数" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <arc:ArcSegmentedControl SelectedValue=\"all\" />\n  <charts:ArcConnectedScatter Height=\"290\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：路径与播放头",
+      "language": "csharp",
+      "code": "var chart = new ArcConnectedScatter(channels, 500, 740, 1200, 2900, 3, head)\n{\n    Height = 290\n};\n\n// head 停在最新月份；拖动播放头会回报当月 CAC/LTV\nchart.HeadChanged += (_, index) => readout.Text = Format(index);"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "slug": "budget-variance",
+  "nameZh": "预算差异",
+  "summary": "按部门比较预算与实际的运营支出：对齐的子弹条同时画出预算轨道、实际条与预算刻度，可切换周期并就地展开部门的预算明细。",
+  "purpose": [
+    "当财务要按部门审视「预算用超了还是没用完」时，用 budget variance：每一行是一条子弹条，浅色轨道是预算、实心条是实际、竖线是预算刻度，超出部分立刻看得出来。",
+    "周期切换（本月 / 本季 / 年初至今）按比例重算所有数字；点击一行会在原位展开该部门更细的预算行，展开状态用左侧标记与徽章说明。",
+    "底部合计行汇总预算、实际与差异；它比较的是预算与实际，MRR 水位的变化则交给 mrr-waterfall。"
+  ],
+  "whenToUse": [
+    "按部门或成本中心比较预算与实际时。",
+    "需要一眼看出超出与剩余的差异时。",
+    "要就地展开部门明细、而不跳转到另一页时。"
+  ],
+  "whenNotToUse": [
+    "解释收入变动构成时，用 mrr-waterfall。",
+    "看长期趋势与任意窗口时，用 revenue-explorer。",
+    "只需要一个进度百分比时，用 progress。"
+  ],
+  "variants": [
+    { "key": "layout-variance", "label": "整体布局", "note": "部门子弹条、周期切换、展开明细与合计并置" },
+    { "key": "variant-bullets", "label": "Bullets", "note": "预算轨道、实际条与预算刻度的对齐条" },
+    { "key": "variant-period", "label": "Period", "note": "本月 / 本季 / 年初至今的周期切换" },
+    { "key": "variant-drilldown", "label": "Drill-down", "note": "Marketing 行就地展开的预算明细" },
+    { "key": "variant-total-row", "label": "Total", "note": "底部合计行汇总预算、实际与差异" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "badge", "note": "超支与展开状态用徽章标出" },
+    { "type": "uses", "target": "segmented-control", "note": "周期切换用分段控件" },
+    { "type": "uses", "target": "card", "note": "部门列表与明细行由卡片承载" },
+    { "type": "alternative", "target": "mrr-waterfall", "note": "解释收入变动构成时，改用 MRR waterfall" }
+  ],
+  "contrasts": [
+    {
+      "target": "mrr-waterfall",
+      "title": "Budget variance 与 MRR waterfall",
+      "rows": [
+        { "dimension": "比较对象", "self": "预算与实际支出", "other": "期初与期末 MRR 及其变动项" },
+        { "dimension": "图形", "self": "按部门的对齐子弹条", "other": "沿时间叠加的浮动柱桥" },
+        { "dimension": "展开方式", "self": "部门行就地展开预算明细", "other": "点选变动项在右侧列出账户" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <arc:ArcSegmentedControl SelectedValue=\"mtd\" />\n  <!-- 每行一条子弹条：预算轨道 + 实际条 + 预算刻度 -->\n  <arc:ArcBadge Content=\"Over budget\" Tone=\"Danger\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：周期与展开",
+      "language": "csharp",
+      "code": "var period = \"mtd\";\nvar expanded = \"Marketing\";\n\n// 周期改变按比例重算预算与实际；展开行在原位插入明细\nforeach (var department in departments)\n{\n    rows.Children.Add(Bullet(department, expanded == department.Name));\n}"
+    }
+  ]
+}

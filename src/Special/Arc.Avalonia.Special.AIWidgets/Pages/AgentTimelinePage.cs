@@ -14,6 +14,13 @@ public sealed class AgentTimelinePage : ArcItemPage
 {
     public override string ItemSlug => "agent-timeline";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-finished",
+        "variant-agent-lanes", "variant-span-kinds", "variant-failed-span",
+        "variant-retry-span", "variant-handoffs"
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var timeline = new ArcAgentTimeline
@@ -56,6 +63,11 @@ public sealed class AgentTimelinePage : ArcItemPage
                 new() { From = "review", To = "lead", At = 13.7, Label = "Numbers check out" }
             }
         };
+
+        // The preview must show the finished frame without anyone pressing Play: seek the replay to its end so
+        // every span, failure, retry and handoff is settled and visible, exactly as it looks after a run finishes.
+        // Pressing Play still restarts from zero, so the interactive demo keeps working.
+        timeline.ScrubTo(14.4);
 
         return Sv.Card(timeline, 16);
     }

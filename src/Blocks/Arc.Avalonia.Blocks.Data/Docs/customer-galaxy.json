@@ -1,0 +1,56 @@
+{
+  "slug": "customer-galaxy",
+  "nameZh": "客户星系",
+  "summary": "把上千个账户画成一片缓慢漂移的星系：按计划、地区或健康度聚类，点的大小表示 MRR，右侧 Book 面板给出每个聚类的账户数与风险。",
+  "purpose": [
+    "当客户成功或收入团队要回答「MRR 与风险集中在哪里」时，用 customer galaxy：每个账户是一个光点，位置、大小与颜色同时编码计划、MRR 与健康状况。",
+    "分组切换（Plan / Region / Health）会让账户重新聚类，星云随之旋转聚拢；点选一个聚类会压暗其余光点，右侧 Book 面板逐行列出该聚类的金额、账户数与风险数量。",
+    "底部图例解释点大小的含义，并明确说明轨道只是视觉框架而不是刻度——这点很重要，避免读者把半径当成数值。"
+  ],
+  "whenToUse": [
+    "需要在同一画面里看 MRR 与健康度的分布时。",
+    "要按计划、地区或健康度重新聚类观察时。",
+    "上千个账户、需要一种「扫一眼就有感觉」的呈现时。"
+  ],
+  "whenNotToUse": [
+    "需要查找并操作具体账户时，用 sortable-data-table。",
+    "数据是层级结构（团队、项目、任务）时，用 semantic-zoom。",
+    "只需要几个汇总数字时，用 metric-card。"
+  ],
+  "variants": [
+    { "key": "layout-galaxy", "label": "整体布局", "note": "星系画布、分组切换、Book 面板与图例并置" },
+    { "key": "variant-clusters", "label": "Clusters", "note": "按计划聚成四团的光点与漂移" },
+    { "key": "variant-grouping", "label": "Grouping", "note": "Plan / Region / Health 的分组切换" },
+    { "key": "variant-book-panel", "label": "Book panel", "note": "Book MRR、账户数与风险数，以及聚类份额行" },
+    { "key": "variant-legend", "label": "Legend", "note": "健康度颜色图例与点大小说明" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "分组维度用分段控件切换" },
+    { "type": "uses", "target": "metric-card", "note": "Book 面板的总 MRR 与账户数采用 KPI 卡片的读数层级" },
+    { "type": "uses", "target": "card", "note": "星系画布与 Book 面板各用一张卡片承载" },
+    { "type": "alternative", "target": "semantic-zoom", "note": "数据是层级结构时，改用 semantic zoom" }
+  ],
+  "contrasts": [
+    {
+      "target": "semantic-zoom",
+      "title": "Customer galaxy 与 Semantic zoom",
+      "rows": [
+        { "dimension": "数据形状", "self": "扁平的上千个账户，按维度聚类", "other": "公司 → 团队 → 项目 → 任务的嵌套层级" },
+        { "dimension": "空间关系", "self": "位置是分类与视觉框架，不是距离", "other": "位置就是嵌套关系，进入即下钻" },
+        { "dimension": "主要动作", "self": "切换分组、点选聚类看 Book", "other": "进入 / 返回层级、用面包屑导航" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,292\">\n  <charts:ArcGalaxyStage />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：分组与聚类面板",
+      "language": "csharp",
+      "code": "var accounts = BuildAccounts(2400);\nvar stage = new ArcGalaxyStage(accounts) { Grouping = \"plan\" };\n\nstage.ClusterSelected += (_, name) =>\n{\n    // 右侧按当前分组维度重建聚类份额行\n    panel.Content = BuildGroups(accounts, name);\n};"
+    }
+  ]
+}

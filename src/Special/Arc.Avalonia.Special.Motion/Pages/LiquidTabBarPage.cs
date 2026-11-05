@@ -11,6 +11,11 @@ public sealed class LiquidTabBarPage : ArcItemPage
 {
     public override string ItemSlug => "liquid-tab-bar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-selected", "state-unselected", "variant-badge", "variant-lens", "variant-content"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,70 @@
+{
+  "slug": "cookie-consent",
+  "nameZh": "Cookie 同意",
+  "summary": "带逐项偏好的 Cookie 同意：底部横条、偏好面板与收起后的小按钮三种面孔，按 StorageKey 记住选择。",
+  "purpose": [
+    "在用户做出选择前显示一条底部横条：说明文字、策略链接、全部接受、全部拒绝与自定义；Required 分类永远开启，其余按 DefaultEnabled 预置。",
+    "点自定义后同一块表面长成偏好面板，逐项开关后保存；保存结果是一个 ArcConsentValue，按 StorageKey 与 Version 记在会话内，版本不匹配时会重新询问。",
+    "做出选择后横条收起为 48 px 的小按钮（ShowReopenButton 控制是否出现），点它重新打开偏好面板；整块控件另外提供 OpenPreferences、ClosePreferences、Reset 与静态 Read。"
+  ],
+  "whenToUse": [
+    "需要按分类收集 Cookie 或跟踪偏好、并允许用户逐项调整的产品。",
+    "要求「拒绝和接受一样容易」、且选择需要被记住的合规场景。",
+    "希望同意入口在做出选择后仍可随时找到（小按钮重新打开）。"
+  ],
+  "whenNotToUse": [
+    "只是普通公告或通知，不需要收集同意时，改用 announcement-bar。",
+    "需要用户立刻处理、阻断流程的确认，用 dialog。",
+    "错误或状态提示用 alert，不要用同意条承载。"
+  ],
+  "variants": [
+    { "key": "variant-bar", "label": "Bar", "note": "未做选择时的底部横条" },
+    { "key": "variant-panel", "label": "Preferences", "note": "逐项开关的偏好面板" },
+    { "key": "variant-reopen", "label": "Reopen", "note": "做出选择后收起的 48 px 小按钮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "alert", "note": "只是普通提示时改用 alert" },
+    { "type": "complement", "target": "announcement-bar", "note": "同属页面级消息，常先后出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "alert",
+      "title": "Cookie consent 与 Alert",
+      "rows": [
+        { "dimension": "目的", "self": "收集并保存同意偏好", "other": "告知一条消息或错误" },
+        { "dimension": "交互", "self": "接受、拒绝、逐项自定义并保存", "other": "通常只有一个行动" },
+        { "dimension": "状态", "self": "选择被持久保存，可重新打开", "other": "关闭后不再出现" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "分类、策略与文案",
+      "language": "csharp",
+      "code": "var consent = new ArcCookieConsent\n{\n    StorageKey = \"acme-consent\",\n    Version = \"2\",\n    Position = ArcCookieConsentPosition.Bottom,\n    Policy = new ArcCookiePolicy { Label = \"Cookie policy\", OnClick = OpenPolicy },\n    Categories = new[]\n    {\n        new ArcCookieCategory\n        {\n            Id = \"necessary\",\n            Label = \"Necessary\",\n            Description = \"Required for sign-in and security.\",\n            Required = true\n        },\n        new ArcCookieCategory\n        {\n            Id = \"analytics\",\n            Label = \"Analytics\",\n            Description = \"Helps us understand which pages are used.\",\n            DefaultEnabled = true\n        }\n    }\n};\n\nconsent.Changed += (_, args) => ApplyConsent(args.Value);"
+    },
+    {
+      "title": "做出选择后仍可重新打开",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:ef=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <ef:ArcCookieConsent StorageKey=\"acme-consent\"\n                       Position=\"Bottom\"\n                       ShowReopenButton=\"True\"\n                       Categories=\"{Binding CookieCategories}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcCookieConsent",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Categories": "分类列表，元素是 ArcCookieCategory（Id / Label / Description / Required / DefaultEnabled）",
+      "Value": "保存的选择；null 表示用户还没决定",
+      "StorageKey": "会话内记忆选择用的键，对应 localStorage 的键名",
+      "Version": "分类或策略变更时递增，版本不匹配会重新询问，默认 1",
+      "PreferencesOpen": "true 时展示偏好面板，否则按是否已选择显示横条或小按钮",
+      "Policy": "策略链接的文案与回调（ArcCookiePolicy）",
+      "Position": "面板位置：Bottom / BottomLeft / BottomRight",
+      "ShowReopenButton": "做出选择后是否显示重新打开的小按钮，默认 true",
+      "ReopenSide": "小按钮靠左还是靠右",
+      "Labels": "全部文案（ArcCookieConsentLabels），可整体中文化",
+      "Changed": "接受、拒绝、保存或重置后触发，参数含选择、动作与时间",
+      "PreferencesOpenChanged": "偏好面板开合时触发"
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "slug": "toast",
+  "nameZh": "轻提示",
+  "summary": "后台操作后的短暂确认：标题、可选说明、一个行动与关闭按钮，几秒后自己离开。",
+  "purpose": [
+    "在操作完成后给一句确认，不打断当前页面：Title 是结论，Description 补充细节，ActionLabel 提供一个可撤销或补救的入口。",
+    "Toast 自己管理生命周期：IsOpen 为 true 时显示并按 Duration 计时，时间到或点关闭后隐藏并触发 Closed；悬停不会暂停计时，所以文案要短。",
+    "它通常由 toast-stack 的宿主统一摆放和移除，单独使用则需要自己放进合适的容器里。"
+  ],
+  "whenToUse": [
+    "保存、复制、归档等后台操作完成后的即时确认。",
+    "需要给用户一个短暂可用的「撤销」或「查看」入口。",
+    "不希望内容被弹窗打断、也不值得在页面里留一条提示时。"
+  ],
+  "whenNotToUse": [
+    "消息需要用户持续看到并处理时，改用 alert。",
+    "同一时刻可能有多条消息、需要排队堆叠时，直接用 toast-stack 的宿主。",
+    "错误需要用户立刻修正（表单校验）时，用字段级 Error 或 alert，而不是会自动消失的 toast。"
+  ],
+  "variants": [
+    { "key": "variant-title-only", "label": "Title only", "note": "只有一句结论" },
+    { "key": "variant-description", "label": "With description", "note": "标题下补一行说明" },
+    { "key": "variant-action", "label": "With action", "note": "右侧一个行动按钮，例如撤销" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "alert", "note": "需要持久提示时改用 alert" },
+    { "type": "alternative", "target": "announcement-bar", "note": "全站公告改用 announcement bar" },
+    { "type": "complement", "target": "toast-stack", "note": "多条 toast 交给 toast-stack 的宿主堆叠" }
+  ],
+  "contrasts": [
+    {
+      "target": "alert",
+      "title": "Toast 与 Alert",
+      "rows": [
+        { "dimension": "生命周期", "self": "按 Duration 自动消失，默认 4.5 秒", "other": "一直留在页面里直到被关闭" },
+        { "dimension": "位置", "self": "浮在角落，覆盖页面内容", "other": "随页面流排布" },
+        { "dimension": "内容量", "self": "标题加一行说明，必须短", "other": "可以放多段说明与列表" }
+      ]
+    },
+    {
+      "target": "toast-stack",
+      "title": "Toast 与 Toast stack",
+      "rows": [
+        { "dimension": "角色", "self": "单条消息控件", "other": "负责堆叠与移除的宿主" },
+        { "dimension": "摆放", "self": "由使用方决定放在哪个容器", "other": "固定在宿主面板的右下角依次排列" },
+        { "dimension": "使用方式", "self": "直接实例化并设置属性", "other": "调用 Show 方法按顺序添加" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带撤销的确认",
+      "language": "csharp",
+      "code": "var toast = new ArcToast\n{\n    Title = \"Changes saved\",\n    Description = \"Your billing email is updated.\",\n    ActionLabel = \"Undo\",\n    Action = () => RestorePreviousEmail(),\n    Duration = 6000\n};"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:ac=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\">\n  <ac:ArcToast Title=\"Invite sent to Sam\"\n               Description=\"They will get an email in a moment.\"\n               Duration=\"4500\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcToast",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "一句结论，加粗显示",
+      "Description": "标题下的补充说明；为空时只显示标题",
+      "ActionLabel": "行动按钮文案；为空时不显示按钮",
+      "IsOpen": "true 时显示并开始计时，默认 true",
+      "Duration": "自动关闭的毫秒数，默认 4500；设为 0 可让它一直停留",
+      "Action": "行动按钮点击时执行，随后请求关闭",
+      "Closed": "自动关闭、点关闭或点行动后触发一次"
+    }
+  }
+}

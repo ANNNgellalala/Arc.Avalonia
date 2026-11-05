@@ -24,6 +24,11 @@ public sealed class TeamDirectoryPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-search-filters", "variant-people-list", "variant-profile-pane"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "An internal directory where people search colleagues and copy contact details.",

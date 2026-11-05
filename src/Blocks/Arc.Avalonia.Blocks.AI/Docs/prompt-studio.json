@@ -1,0 +1,57 @@
+{
+  "slug": "prompt-studio",
+  "nameZh": "提示词工作台",
+  "summary": "编辑一份提示词模板、用保存的测试用例跑一遍、再把某个版本提升为生产：模板里的变量以 chip 呈现，右侧版本列表带生产指针，运行输出与耗时 token 都在同一页。",
+  "purpose": [
+    "它把提示词当成一份有版本的工程资产：顶部一行写明这是 Support reply，版本徽标标出 v4 · Production（生产正在服务的那一版），右侧是 History、复制与更多操作。",
+    "编辑区不是纯文本框，而是把模板里的 {{variable}} 渲染成彩色变量 chip（customer_name、plan、order_id 之类），变量取值在下方字段里逐项给出，因此「模板长什么样」一眼可读。",
+    "跑一遍是就地发生的：选一个保存的测试用例，按 Run，右侧输出区给出 Reply 与运行元信息（1.4s · 218 tokens · $0.004），状态行说明这次运行是模拟的。",
+    "版本列表在右栏：每个版本一行，生产指针指向正在服务的那一版，Promote 把当前版本提为生产；本页的版本与运行结果都是示例数据。"
+  ],
+  "whenToUse": [
+    "团队维护多条提示词、需要版本历史与生产指针时。",
+    "模板里有变量、需要一眼看出占位符与取值时。",
+    "要在保存的测试用例上快速试跑、看输出与成本，而不是接真实模型时。"
+  ],
+  "whenNotToUse": [
+    "要跑一整套评测集、看分类得分与回归时，用 eval-suite。",
+    "只是临时写一段提示词、不需要版本与测试用例时，用普通的 textarea。",
+    "要在聊天里直接改提示词并立即看回复时，用 ai-chat 或 ai-composer。"
+  ],
+  "variants": [
+    { "key": "variant-header", "label": "Header", "note": "标题、版本徽标 v4 · Production、History 与复制" },
+    { "key": "variant-template", "label": "Template", "note": "渲染成变量 chip 的模板文本" },
+    { "key": "variant-run-output", "label": "Run output", "note": "测试用例、Run 与输出区的耗时 token 成本" },
+    { "key": "variant-versions", "label": "Versions", "note": "右栏版本列表与 Promote 动作" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Run、Promote、History、复制与模板页签都是 ArcButton 或 ArcChip" },
+    { "type": "uses", "target": "badge", "note": "模型徽标与状态徽标标出这条提示词用的模型" },
+    { "type": "uses", "target": "segmented-control", "note": "编辑区顶部的页签（编辑 / 运行）由 ArcSegmentedControl 表达" },
+    { "type": "alternative", "target": "eval-suite", "note": "要在评测集上打分时改用 eval suite" }
+  ],
+  "contrasts": [
+    {
+      "target": "eval-suite",
+      "title": "Prompt studio 与 Eval suite",
+      "rows": [
+        { "dimension": "对象", "self": "一份提示词模板及其版本", "other": "一个候选版本在一组用例上的得分" },
+        { "dimension": "动作", "self": "编辑、试跑一条用例、提升版本", "other": "跑整套评测、按分类看分数与回归" },
+        { "dimension": "输出", "self": "一条回复与单次成本", "other": "汇总分数、分类网格与回归用例列表" },
+        { "dimension": "节奏", "self": "编辑—试跑—发布的小循环", "other": "跑批—对比基线—分诊的评测循环" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "工作台骨架：编辑区与版本栏",
+      "language": "csharp",
+      "code": "var left = new StackPanel\n{\n    Spacing = 8,\n    Children = { tabs, editorPanel, fields, runRow, outputPanel }\n};\n\nvar right = K.Stack(8,\n    K.Caption(\"Versions\"),\n    versionRows,\n    promote,\n    status);\n\nvar body = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,18,250\") };\nbody.Children.Add(left);\nGrid.SetColumn(right, 2);\nbody.Children.Add(right);\n\nvar header = K.Row(9,\n    K.Text(\"Support reply\", \"arc-heading\"),\n    versionLabel,                                  // v4 · Production\n    K.Pill(\"Claude Sonnet 5.5\", ArcBadgeTone.Neutral));\n\nreturn K.Surface(K.Stack(10, header, K.Divider(), body));"
+    },
+    {
+      "title": "把 {{variable}} 渲染成变量 chip",
+      "language": "csharp",
+      "code": "static Control Template(string template, IReadOnlyDictionary<string, int> slots)\n{\n    var stack = new StackPanel { Spacing = 4 };\n    foreach (var line in template.Split('\\n'))\n    {\n        var flow = new WrapPanel { Orientation = Orientation.Horizontal };\n        // 普通文字按词排，{{name}} 换成 K.Token（按 slot 取系列色）\n        foreach (var part in line.Split(' '))\n        {\n            flow.Children.Add(part.StartsWith(\"{{\") && part.EndsWith(\"}}\")\n                ? K.Token(part.Trim('{', '}'), slots.TryGetValue(part.Trim('{', '}'), out var slot) ? slot : 0)\n                : new TextBlock { Text = part, FontFamily = K.MonoFamily, FontSize = 12 });\n        }\n\n        stack.Children.Add(flow);\n    }\n\n    return stack;\n}"
+    }
+  ]
+}

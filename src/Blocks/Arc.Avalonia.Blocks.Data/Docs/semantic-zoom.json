@@ -1,0 +1,56 @@
+{
+  "slug": "semantic-zoom",
+  "nameZh": "语义缩放地图",
+  "summary": "把公司画成可无限缩放的嵌套瓦片地图：团队、项目、任务逐层展开，面包屑记录来路，右侧面板跟随当前层级。",
+  "purpose": [
+    "当组织结构本身就是要浏览的内容时，用 semantic zoom：当前层级是一张瓦片地图，点进某个团队就飞到它的子层级，Escape 或面包屑返回上一层。",
+    "面包屑始终显示当前路径，右侧面板跟随层级更新「这一层最大的条目」与该层的人员头像；它比树形控件更有空间感，适合展示而不是精确操作。",
+    "缩放是语义的：每进入一层，画布整体换掉而不是把同一张图放大，因此每一层都能用满屏宽度呈现自己的信息。"
+  ],
+  "whenToUse": [
+    "浏览公司、团队、项目、任务这类嵌套结构时。",
+    "希望层级导航带空间感、而不是一列缩进列表时。",
+    "需要在同一画面里展示层级与人员时。"
+  ],
+  "whenNotToUse": [
+    "需要精确编辑或拖拽节点时，用 tree-view。",
+    "数据是扁平的账户或指标集合时，用 customer-galaxy。",
+    "只需要一两层导航时，用 accordion 或 breadcrumb。"
+  ],
+  "variants": [
+    { "key": "layout-zoom", "label": "整体布局", "note": "瓦片地图、面包屑与层级面板并置" },
+    { "key": "variant-tiles", "label": "Tiles", "note": "当前层级的嵌套瓦片地图" },
+    { "key": "variant-breadcrumb", "label": "Breadcrumb", "note": "记录当前路径的面包屑" },
+    { "key": "variant-level-panel", "label": "Panel", "note": "跟随层级的最大条目与人员列表" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar", "note": "层级面板里的人员用头像展示" },
+    { "type": "uses", "target": "badge", "note": "条目状态与数量用徽章标出" },
+    { "type": "uses", "target": "button", "note": "进入、返回与面包屑跳转都由按钮承担" },
+    { "type": "uses", "target": "card", "note": "地图与层级面板由卡片承载" },
+    { "type": "alternative", "target": "tree-view", "note": "需要精确操作或展开节点时，改用 tree view" }
+  ],
+  "contrasts": [
+    {
+      "target": "tree-view",
+      "title": "Semantic zoom 与 Tree view",
+      "rows": [
+        { "dimension": "导航方式", "self": "整层飞入飞出，面包屑记录路径", "other": "逐节点展开折叠，树形缩进" },
+        { "dimension": "信息密度", "self": "每层只呈现该层，空间充足", "other": "同屏见到更多层级与节点" },
+        { "dimension": "适用任务", "self": "浏览与讲述结构", "other": "精确选择、编辑与拖拽" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,300\">\n  <charts:ArcSemanticMap />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：树与路径",
+      "language": "csharp",
+      "code": "var root = BuildTree();\nvar map = new ArcSemanticMap(root);\n\n// map.Path 是当前面包屑；进入某块瓦片后整层替换\nmap.Enter(tile);\nmap.Back();"
+    }
+  ]
+}

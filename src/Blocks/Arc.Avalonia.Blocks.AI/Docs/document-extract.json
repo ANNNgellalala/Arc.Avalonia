@@ -1,0 +1,57 @@
+{
+  "slug": "document-extract",
+  "nameZh": "文档抽取",
+  "summary": "一边是原始票据、一边是抽出的字段：点某个字段就点亮它在文档里的来源，五个字段里有一个需要人工核对，Accept all 一次确认其余全部。",
+  "purpose": [
+    "它把一个抽取任务摊成两栏：左侧是原件（示例发票，含开票方、地址、发票号、日期、金额表与付款条款），右侧是抽出的五个字段，每个字段都可以点，点了会在文档里高亮它来自哪一段。",
+    "抽取结果不假装全对：头部直接写 1 of 5 need a check，可疑字段在行内给出「Inferred from the payment terms」这类说明与 Looks right 按钮，其余字段被接受后整行转为成功色。",
+    "左栏的工具栏承担视图操作：文件名、发票 · 1 of 2 pages · 100% 的进度，以及缩小、放大与 Fit；缩放在本页只改变状态文本，不真的重绘文档。",
+    "收尾动作在右栏底部：Accept all 会把五个字段一次性标为已接受（头部徽标从 Simulated 变成 Accepted），旁边是 Extract again 与本次调用的模型、token 与成本。"
+  ],
+  "whenToUse": [
+    "从发票、采购单、合同这类版式稳定的文档里抽取结构化字段，并需要人工抽查。",
+    "用户要能确认「这个值是从文档哪一段来的」，而不是盲信结果。",
+    "需要一次接受全部、或对个别字段重新抽取的工作流。"
+  ],
+  "whenNotToUse": [
+    "要把文档切块、入库并做检索问答时，用 knowledge-base。",
+    "只是上传与预览文件、不做字段抽取时，用 file-dropzone 或 product-gallery 类的上传面。",
+    "需要逐字段编辑并保存的录入表单时，用普通表单加 input，不必把原件并排。"
+  ],
+  "variants": [
+    { "key": "variant-document", "label": "Document", "note": "左侧原件与字段来源高亮" },
+    { "key": "variant-fields", "label": "Fields", "note": "右侧抽取字段、需核对标记与置信说明" },
+    { "key": "variant-toolbar", "label": "Toolbar", "note": "文件名、页码进度与缩放 / Fit" },
+    { "key": "variant-actions", "label": "Actions", "note": "Accept all、Extract again 与模型成本" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Accept all、Extract again、Looks right 与缩放 / Fit 都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "头部的 Simulated / Accepted 徽标标出抽取结果的状态" },
+    { "type": "uses", "target": "progress", "note": "字段置信度与抽取进度用 ArcProgress 表达" },
+    { "type": "alternative", "target": "knowledge-base", "note": "要把文档切块入库并做检索问答时改用 knowledge base" }
+  ],
+  "contrasts": [
+    {
+      "target": "knowledge-base",
+      "title": "Document extract 与 Knowledge base",
+      "rows": [
+        { "dimension": "目标", "self": "从一份文档里抽出结构化字段", "other": "把一批文档切块入库以便检索" },
+        { "dimension": "呈现", "self": "原件与字段并排，可追溯来源", "other": "来源列表、检索框与返回的 chunk" },
+        { "dimension": "校验", "self": "逐字段核对并接受", "other": "看相似度与重排结果" },
+        { "dimension": "规模", "self": "单份文档的抽取", "other": "多来源、多 chunk 的库" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "原件与字段两栏",
+      "language": "csharp",
+      "code": "var toolbar = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,Auto\") };\ntoolbar.Children.Add(K.Stack(2,\n    K.Text(\"larkspur-invoice-0418.pdf\", \"arc-label\"),\n    K.Caption(\"Invoice · 1 of 2 pages · 100%\")));\ntoolbar.Children.Add(K.Row(2,\n    K.IconBtn(\"zoom-out\", \"Zoom out\"),\n    K.IconBtn(\"zoom-in\", \"Zoom in\"),\n    K.Chip(\"Fit\", icon: \"maximize\")));\n\nvar left = K.Stack(7, toolbar, Document());\n\nvar right = K.Stack(7,\n    K.Row(6,\n        K.Stack(2, K.Text(\"Extracted fields\", \"arc-label\"), K.Caption(\"1 of 5 need a check\")),\n        K.Pill(\"Simulated\", ArcBadgeTone.Neutral)),\n    formRows,\n    K.Divider(),\n    K.Row(6, accept, K.IconBtn(\"refresh-cw\", \"Extract again\")),\n    K.Caption(\"Claude Haiku 5.5 · 1,840 tokens · $0.002\"),\n    status);\n\nvar columns = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,16,360\") };\ncolumns.Children.Add(left);\nGrid.SetColumn(right, 2);\ncolumns.Children.Add(right);\nreturn K.Surface(columns, new Thickness(18, 14, 18, 14));"
+    },
+    {
+      "title": "点字段点亮来源，Accept all 一次确认",
+      "language": "csharp",
+      "code": "void Select(string fieldId)\n{\n    // 只高亮这一字段在文档里的来源段落，其余字段回到常态\n    foreach (var (id, span) in FieldSpans)\n    {\n        span.Background = id == fieldId ? K.Tint(ArcTokens.Accent, 0.14) : Brushes.Transparent;\n    }\n\n    status.Text = $\"Showing where {fieldId} came from in the document.\";\n}\n\naccept = K.Btn(\"Accept all\", ArcButtonVariant.Primary, ArcButtonSize.Sm, () =>\n{\n    accepted = true;\n    foreach (var row in rows.Values)\n    {\n        row.BorderBrush = K.Brush(ArcTokens.Success);\n    }\n\n    status.Text = \"All five fields accepted. The invoice is ready to export.\";\n}, icon: \"check\");"
+    }
+  ]
+}

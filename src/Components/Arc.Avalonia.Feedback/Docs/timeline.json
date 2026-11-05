@@ -1,0 +1,67 @@
+{
+  "slug": "timeline",
+  "nameZh": "时间线",
+  "summary": "按时间倒序的活动流：分为今天/昨天等日期组，每条有节点、时间、行为与可选详情。",
+  "purpose": [
+    "把发生过的事情按时间倒序排成一条竖线：左侧是时间，中间是节点（默认圆点，可换成图标或头像），右侧是行为、元信息与可展开的详情。",
+    "事件按本地日期分组，组标题自动写成 Today、Yesterday 或具体日期；Tone 让成功与失败在节点与行为文案上同时区分。",
+    "Detail 不为空的事件右侧出现展开按钮，DefaultExpanded 可以指定初始就展开哪些事件；事件很多时用 MaxHeight 限制高度并滚动。"
+  ],
+  "whenToUse": [
+    "项目历史、审计日志、部署流水等强调顺序与时间的列表。",
+    "需要把成功、失败与普通事件放在同一条时间轴上对比时。",
+    "事件带有可供排查的详情（报错原文、diff 摘要），需要就地展开查看时。"
+  ],
+  "whenNotToUse": [
+    "内容是围绕一个对象的讨论与回复时，改用 comment-thread。",
+    "需要来回对话、输入框常驻时，改用 chat-thread。",
+    "只是展示一组带状态的行、没有时间顺序时，用普通列表加 badge。"
+  ],
+  "variants": [
+    { "key": "tone-neutral", "label": "Neutral", "note": "普通事件，默认圆点" },
+    { "key": "tone-success", "label": "Success", "note": "成功事件，成功色节点" },
+    { "key": "tone-danger", "label": "Danger", "note": "失败事件，危险色节点" },
+    { "key": "variant-icon", "label": "Icon", "note": "把节点换成图标" },
+    { "key": "variant-avatar", "label": "Avatar", "note": "把节点换成操作者头像" },
+    { "key": "state-detail", "label": "Expanded detail", "note": "详情默认展开，可就地收起" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "comment-thread", "note": "围绕一个对象的讨论改用 comment-thread" },
+    { "type": "complement", "target": "avatar", "note": "事件里的操作者头像用 avatar" },
+    { "type": "complement", "target": "badge", "note": "事件类型或结果用 badge 补充标签" }
+  ],
+  "contrasts": [
+    {
+      "target": "comment-thread",
+      "title": "Timeline 与 Comment thread",
+      "rows": [
+        { "dimension": "内容", "self": "已经发生的事件，按时间排列", "other": "围绕一个对象的讨论与回复" },
+        { "dimension": "结构", "self": "单层时间轴，按日期分组", "other": "可嵌套的回复树" },
+        { "dimension": "交互", "self": "展开事件详情", "other": "回复、表情、解决讨论" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "项目活动流",
+      "language": "csharp",
+      "code": "var now = DateTimeOffset.Now;\nvar events = new List<ArcTimelineEvent>\n{\n    new()\n    {\n        Id = \"e1\",\n        At = now.AddMinutes(-12),\n        Actor = \"Maya Chen\",\n        Title = \"merged Checkout redesign into main\",\n        Meta = \"PR #482\",\n        Tone = ArcTimelineTone.Success\n    },\n    new()\n    {\n        Id = \"e2\",\n        At = now.AddMinutes(-41),\n        Title = \"Deploy failed\",\n        Tone = ArcTimelineTone.Danger,\n        Icon = \"triangle-alert\",\n        Detail = \"error: Type 'OrderSummary' is missing properties: total, currency\"\n    }\n};\n\nvar timeline = new ArcTimeline\n{\n    Events = events,\n    Now = now,\n    Label = \"Project activity\",\n    DefaultExpanded = new[] { \"e2\" }\n};"
+    },
+    {
+      "title": "在 XAML 中绑定事件",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcTimeline Label=\"Project activity\"\n                  Events=\"{Binding ActivityEvents}\"\n                  MaxHeight=\"420\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcTimeline",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Events": "事件集合，元素是 ArcTimelineEvent（At / Actor / Title / Meta / Detail / Avatar / Icon / Tone）",
+      "Now": "判断「今天/昨天」的基准时间，默认当前时间",
+      "Label": "时间线的无障碍名称，默认 Activity",
+      "DefaultExpanded": "初始展开详情的事件 id 列表",
+      "MaxHeight": "限制高度并允许滚动；不设则完整展开"
+    }
+  }
+}

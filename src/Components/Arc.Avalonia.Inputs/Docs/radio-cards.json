@@ -1,0 +1,77 @@
+{
+  "slug": "radio-cards",
+  "nameZh": "单选卡片",
+  "summary": "用卡片承载的单选：每张卡可带图标、说明、价格与禁用原因，选中时一圈强调色描边滑到那张卡上。",
+  "purpose": [
+    "当一组选项每个都需要「标题 + 一句说明 + 价格/估算」时，把行式单选换成卡片：Grid 布局按 MinColumnWidth 自动分列，List 布局把每张卡铺成整行。",
+    "选中态是一条独立的强调色描边，它在卡片之间滑动而不是让每张卡自己闪一下，所以从 Starter 换到 Growth 时视线能跟上移动方向。",
+    "禁用卡不是简单置灰：DisabledReason 会替换掉说明文字，直接告诉用户为什么选不了（例如「Available on the enterprise plan」）。",
+    "键盘语义与原生单选一致：方向键在卡片之间移动并即时切换，Tab 只停一次，读屏名称取卡片标题。"
+  ],
+  "whenToUse": [
+    "定价方案、配送方式、套餐这类每个选项都带价格或估算的单选。",
+    "3–6 个需要说明文字才能分辨的选项，行式单选会显得拥挤。",
+    "需要把禁用选项的原因直接写在卡片上，而不是让人猜。"
+  ],
+  "whenNotToUse": [
+    "选项只有一行文字、不需要说明时，改用 radio-group，卡片会浪费纵向空间。",
+    "选项很多（超过 8 个）且需要滚动查找时，改用 select 或 combobox。",
+    "只是两三个视图之间的切换、不涉及价格说明时，改用 segmented-control。"
+  ],
+  "variants": [
+    { "key": "variant-grid", "label": "Grid", "note": "按 MinColumnWidth 自动分列" },
+    { "key": "variant-list", "label": "List", "note": "每张卡铺成整行，适合窄容器" },
+    { "key": "variant-meta", "label": "Meta", "note": "卡片右侧的价格或估算" },
+    { "key": "variant-icon", "label": "Icon", "note": "标题旁的 Lucide 图标" },
+    { "key": "variant-disabled", "label": "Disabled card", "note": "禁用原因替换说明文字" },
+    { "key": "state-selected", "label": "Selected", "note": "强调色描边滑到选中卡" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "radio-group", "note": "选项只有一行文字时改用 radio group" },
+    { "type": "alternative", "target": "select", "note": "选项多到需要滚动查找时改用 select" },
+    { "type": "alternative", "target": "segmented-control", "note": "只是视图切换、不涉及价格说明时改用 segmented control" }
+  ],
+  "contrasts": [
+    {
+      "target": "radio-group",
+      "title": "Radio cards 与 Radio group",
+      "rows": [
+        { "dimension": "选项内容", "self": "标题、说明、meta、图标与禁用原因", "other": "标题加一句可选说明" },
+        { "dimension": "排列", "self": "Grid 分列或 List 整行，卡片有边框", "other": "单列行式，控件自带圆点" },
+        { "dimension": "适用数量", "self": "3–6 个需要权衡的选项", "other": "3–8 个简单选项" }
+      ]
+    },
+    {
+      "target": "select",
+      "title": "Radio cards 与 Select",
+      "rows": [
+        { "dimension": "选项可见性", "self": "所有卡片常驻可见", "other": "选项收在浮层里，展开才可见" },
+        { "dimension": "比较成本", "self": "可并排比较价格与说明", "other": "需要反复展开才能比较" },
+        { "dimension": "适用数量", "self": "3–6 个", "other": "任何长度的固定列表" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcRadioCards Width=\"720\"\n                     MinColumnWidth=\"200\"\n                     Options=\"{Binding Plans}\"\n                     Value=\"{Binding Plan, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "图标、价格与禁用原因",
+      "language": "csharp",
+      "code": "var plans = new ArcRadioCards\n{\n    Layout = ArcRadioCardsLayout.Grid,\n    MinColumnWidth = 200,\n    Value = \"growth\",\n    Options = new List<ArcRadioCardOption>\n    {\n        new(\"starter\", \"Starter\", \"One project and community support\", \"$0\", \"zap\"),\n        new(\"growth\", \"Growth\", \"Unlimited projects, 10 seats\", \"$24\", \"sparkles\"),\n        new(\"scale\", \"Scale\", \"SSO and an audit log\", \"$96\", \"users\",\n            disabled: true, disabledReason: \"Available on the enterprise plan\")\n    }\n};\n\nplans.ValueChanged += (_, e) => SelectPlan(e.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcRadioCards",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "卡片集合，元素是 ArcRadioCardOption（Value / Label / Description / Meta / Icon / Disabled / DisabledReason）",
+      "Value": "当前选中卡的 Value",
+      "Layout": "Grid 自动分列；List 每张卡铺成整行",
+      "MinColumnWidth": "Grid 中一列的最小宽度，低于它就减少列数，默认 180",
+      "ValueChanged": "选中另一张卡后触发，事件参数带新 Value"
+    }
+  }
+}

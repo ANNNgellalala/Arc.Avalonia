@@ -1,0 +1,73 @@
+{
+  "slug": "mega-menu-morph",
+  "nameZh": "大型菜单",
+  "summary": "站点页眉：几个分区共享一个浮出的菜单面板，切换分区时面板变形、下一个菜单从来的方向滑入，强调色下划线跟着触发器滑动；窄宽度下折成手风琴式抽屉。",
+  "purpose": [
+    "当营销站或产品站的顶层导航有三到六个分区、每个分区下又有若干值得解释的目的地时，mega menu 用一个共享面板容纳它们，而不是每个分区各弹一个下拉。",
+    "切换分区时面板在平滑弹簧上改变尺寸与位置，下一个菜单以约 36px 的侧向位移淡入，强调色下划线在触发器下滑动。",
+    "悬停意图（开延迟、关延迟）与安全三角形让斜向移向面板的指针不会误切分区；ForceNarrow 或页眉窄于自身一行时，分区折进手风琴式抽屉，一次只展开一段，次要动作移到底部。"
+  ],
+  "whenToUse": [
+    "顶层导航有三到六个分区，每个分区下的目的地值得一行说明时。",
+    "希望菜单的形状本身传达分区差异（宽的两列 vs 窄的单列）时。",
+    "页眉需要在宽屏展开、窄屏折叠成同一套信息架构时。"
+  ],
+  "whenNotToUse": [
+    "只需要一层链接、没有分组说明时，用普通导航链接或 popover。",
+    "页内平级视图切换用 tabs，而不是把每个视图塞进页眉。",
+    "移动端只需要一个简单的全屏菜单时，用 drawer 承载。"
+  ],
+  "variants": [
+    { "key": "variant-wide", "label": "宽屏页眉", "note": "分区共享一个浮出的菜单面板" },
+    { "key": "variant-narrow", "label": "折叠页眉", "note": "ForceNarrow 下手风琴式抽屉" },
+    { "key": "state-open", "label": "打开", "note": "面板或抽屉展开，遮罩不出现" },
+    { "key": "state-current", "label": "当前分区", "note": "Current 指向的分区带强调色下划线" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tabs", "note": "页内平级视图切换交给 tabs，页眉导航才用 mega menu" },
+    { "type": "complement", "target": "breadcrumb", "note": "mega menu 提供全站入口，breadcrumb 说明你此刻在站点里的位置" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Mega menu 与 Tabs",
+      "rows": [
+        { "dimension": "作用范围", "self": "全站页眉导航，跨页面跳转", "other": "同一对象内的平级视图切换" },
+        { "dimension": "结构", "self": "分区加分组链接，可带图标与说明", "other": "一排标签加一个面板" },
+        { "dimension": "响应式", "self": "窄宽度折成手风琴式抽屉", "other": "窄宽度下横向滚动或换行" },
+        { "dimension": "焦点", "self": "悬停意图与安全三角形控制开合", "other": "方向键在标签之间移动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "用代码搭一个三区页眉",
+      "language": "csharp",
+      "code": "var menu = new ArcMegaMenu\n{\n    Brand = \"Tally\",\n    BrandIcon = \"layers\",\n    Label = \"Main\",\n    Current = \"developers\",\n    Sections = new[]\n    {\n        new ArcMegaMenuSection\n        {\n            Value = \"products\",\n            Label = \"Products\",\n            Groups = new[]\n            {\n                new ArcMegaMenuGroup\n                {\n                    Title = \"Payments\",\n                    Links = new[]\n                    {\n                        new ArcMegaMenuLink { Label = \"Checkout\", Description = \"Hosted pages in 46 currencies\", Icon = \"credit-card\" },\n                        new ArcMegaMenuLink { Label = \"Billing\", Description = \"Subscriptions and invoices\", Icon = \"receipt\" }\n                    }\n                }\n            },\n            Feature = new ArcMegaMenuFeature { Title = \"Tally 2.0\", Description = \"One dashboard for every currency.\", Cta = \"Read more\", Icon = \"zap\" }\n        },\n        new ArcMegaMenuSection { Value = \"pricing\", Label = \"Pricing\", Href = \"/pricing\" }\n    },\n    Actions = new[] { new ArcMegaMenuAction { Label = \"Sign in\" }, new ArcMegaMenuAction { Label = \"Start now\", Variant = ArcMegaMenuActionVariant.Primary } }\n};"
+    },
+    {
+      "title": "强制折叠布局（演示与窄宿主）",
+      "language": "csharp",
+      "code": "menu.ForceNarrow = true;\nmenu.IsOpen = true;\nmenu.ActiveSection = \"products\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Navigation.Controls.ArcMegaMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Sections": "分区列表：带 Groups 或 Feature 的分区会打开菜单，其余作为链接",
+      "Brand": "页眉左侧的品牌文字",
+      "BrandIcon": "品牌文字旁的 Lucide 图标名",
+      "Actions": "页眉右侧的动作；Quiet 动作在折叠态移进抽屉底部",
+      "IsOpen": "菜单面板是否展开",
+      "ActiveSection": "当前打开菜单的分区 Value",
+      "Current": "当前所在分区的 Value，带强调色下划线",
+      "OpenDelay": "指针停留多久后打开，默认 90ms",
+      "CloseDelay": "指针离开页眉与面板后的宽限，默认 240ms",
+      "CollapseBelow": "低于该宽度时折叠；0 表示按整行自然宽度测量",
+      "ForceNarrow": "强制使用折叠的手风琴布局，便于演示和窄宿主",
+      "IsNarrow": "当前是否处于折叠布局",
+      "Label": "页眉导航的可访问名称，默认 Main"
+    }
+  }
+}

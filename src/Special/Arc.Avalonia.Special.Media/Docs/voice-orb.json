@@ -1,0 +1,65 @@
+{
+  "slug": "voice-orb",
+  "nameZh": "语音球",
+  "summary": "实时语音会话的球体：聆听时随麦克风电平呼吸并外扩涟漪，思考时收成带光带的旋转体，说话时随语音增亮，底部是一条带计时与挂断的胶囊。",
+  "purpose": [
+    "语音模式里，用户最需要知道的是「助手现在在做什么」。Voice orb 用一个发光球体承载这件事：Listening 会写入模拟的麦克风电平并向外扩两圈涟漪；Thinking 缩小球体、把弹性压到最低，并沿边缘转一段光带；Speaking 提高亮度与波动幅度；Idle 收起胶囊，换成一个「Start voice chat」的开始按钮。",
+    "状态与文案由 State / Muted / Transcript / Elapsed 四个公开属性驱动：State 切换会重置文字揭示动画，Muted 把球体与胶囊转成中性色并给麦克风画一道斜杠，Transcript 保留两行实时转写，Elapsed 显示成 m:ss 的计时。",
+    "球体本身是 90 个点的抖动色块加径向渐变，用来替代 WebGL 着色器；麦克风电平是模拟的（画廊不采集音频）。降级动效时每个状态绘制一个固定的相位，所以四种状态都有确定、可截图的静帧。"
+  ],
+  "whenToUse": [
+    "语音模式需要让人一眼看出助手是在聆听、思考还是说话时。",
+    "免手或类通话流程需要开始、静音、计时与结束都收在一个紧凑控件里时。",
+    "希望语音界面成为页面的视觉中心、而不是一条细长的录音条时。"
+  ],
+  "whenNotToUse": [
+    "只是录一段话发给别人、不需要实时会话状态时，改用 voice-recorder。",
+    "文字聊天为主、偶尔补一条语音时，用聊天气泡里的录音按钮即可，不需要整块球体。",
+    "需要展示与会话无关的媒体播放时，改用 now-playing。"
+  ],
+  "variants": [
+    { "key": "state-listening", "label": "Listening", "note": "身体随模拟电平起伏，外扩两圈涟漪，胶囊显示计时与挂断" },
+    { "key": "state-thinking", "label": "Thinking", "note": "球体收缩到 92%，弹性最小，边缘转一段强调色光带" },
+    { "key": "state-speaking", "label": "Speaking", "note": "亮度与波动幅度提高，表示助手正在说话" },
+    { "key": "variant-muted", "label": "Muted", "note": "球体与胶囊转中性色，麦克风上画一道强调色斜杠" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "voice-recorder", "note": "录一条语音消息用 voice recorder，实时对话用 voice orb" },
+    { "type": "complement", "target": "chat-thread", "note": "语音会话的转写、历史与文字补充通常落在同一线程里" }
+  ],
+  "contrasts": [
+    {
+      "target": "voice-recorder",
+      "title": "Voice orb 与 Voice recorder",
+      "rows": [
+        { "dimension": "会话形态", "self": "实时双向语音，状态在聆听、思考、说话间流转", "other": "录一段话、审听、发送" },
+        { "dimension": "主要视觉", "self": "发光球体与涟漪", "other": "语音气泡线程与可擦洗波形" },
+        { "dimension": "结束方式", "self": "挂断按钮结束整段会话", "other": "停止、审听后发送或丢弃" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "四种状态的静态排布",
+      "language": "csharp",
+      "code": "// 一个 Voice orb 只呈现一个状态；把多个实例并排即可同时展示会话状态。\nvar listening = new ArcVoiceOrb\n{\n    Width = 540,\n    Height = 470,\n    State = ArcVoiceOrbState.Listening,\n    Elapsed = 12,\n    Transcript = \"The studio opens at nine. Shall I book a table for two?\"\n};\n\nvar thinking = new ArcVoiceOrb { State = ArcVoiceOrbState.Thinking, Transcript = \"Checking the calendar…\" };\nvar speaking = new ArcVoiceOrb { State = ArcVoiceOrbState.Speaking, Elapsed = 21 };\nvar muted = new ArcVoiceOrb { State = ArcVoiceOrbState.Listening, Muted = true, Elapsed = 34 };"
+    },
+    {
+      "title": "在 XAML 中声明聆听态",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcVoiceOrb Width=\"540\" Height=\"470\"\n                      State=\"Listening\"\n                      Elapsed=\"12\"\n                      Transcript=\"The studio opens at nine. Shall I book a table for two?\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcVoiceOrb",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "State": "会话状态：Idle / Listening / Thinking / Speaking；切换会重置转写揭示动画",
+      "Muted": "静音：球体与胶囊转中性色，麦克风画斜杠，计时旁的红点消失",
+      "Transcript": "球体下方的实时转写，最多两行",
+      "Elapsed": "会话已进行的秒数，显示为 m:ss",
+      "Width": "整个语音区域的宽度，球体与胶囊按它居中",
+      "Height": "整个语音区域的高度，默认按 470 设计"
+    }
+  }
+}

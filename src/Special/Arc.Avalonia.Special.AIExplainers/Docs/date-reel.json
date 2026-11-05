@@ -1,0 +1,75 @@
+{
+  "slug": "date-reel",
+  "nameZh": "日期滚轮",
+  "summary": "iOS 风格的四列滚轮日期时间选择器：Day、Hour、Minute、Period 在曲面透视中滚动，带惯性、吸附、选中摘要、快捷项与确认按钮。",
+  "purpose": [
+    "为「定时发送」「提醒」这类选日期加时刻的场景提供触摸友好的滚轮：四列各自滚动，条目按正弦投影上升、按余弦压缩并向外淡出，中央玻璃透镜上始终显示最清晰的一行。",
+    "一次拖动或甩动能保留动量并吸附到最近条目；右侧 Selected 面板用大字读出时间、日期与相对日（Today / Tomorrow / In N days），三个快捷项可以一键把四列一起转过去，Enter 或确认按钮完成选择。",
+    "滚轮的静止状态完全由选中索引决定，不依赖动画时钟。预览展示默认的 Tomorrow 09:00（2026-09-25），声明的变体都是这一帧里同时可见的元素。"
+  ],
+  "whenToUse": [
+    "定时发送、提醒或发帖，用户熟悉手机滚轮的场景。",
+    "触摸优先、希望用甩动而不是键入完成选时的流程。",
+    "生日或离今天较远的日期，滚轮仍能逐项拨到。"
+  ],
+  "whenNotToUse": [
+    "需要看到整月并点选日期时，改用 date-picker。",
+    "需要跨城市比较时刻时，改用 time-dial。",
+    "只需要选时刻、不需要日期时，改用 time-picker。"
+  ],
+  "variants": [
+    { "key": "state-default", "label": "Default", "note": "默认帧：Tomorrow 09:00（2026-09-25）" },
+    { "key": "variant-reels", "label": "Reels", "note": "Day / Hour / Minute / Period 四列曲面滚轮与列标题" },
+    { "key": "variant-lens", "label": "Lens", "note": "中央玻璃透镜与最清晰的选中项" },
+    { "key": "variant-summary", "label": "Summary", "note": "Selected 面板：时间、日期与相对日胶囊" },
+    { "key": "variant-presets", "label": "Presets", "note": "This evening / Tomorrow / Monday 三个快捷项" },
+    { "key": "variant-confirm", "label": "Confirm", "note": "Schedule send 确认按钮与 Enter 提示" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "date-picker", "note": "需要整月视图时改用 date picker" },
+    { "type": "alternative", "target": "time-dial", "note": "需要跨时区比较时刻时改用 time dial" },
+    { "type": "complement", "target": "calendar", "note": "先看日历确定日期，再用滚轮定具体时刻" }
+  ],
+  "contrasts": [
+    {
+      "target": "date-picker",
+      "title": "Date reel 与 Date picker",
+      "rows": [
+        { "dimension": "交互模型", "self": "四列滚轮，惯性滚动并吸附", "other": "月历网格点选，可切换月份" },
+        { "dimension": "适合设备", "self": "触摸优先，手机与平板", "other": "鼠标键盘优先，桌面表单" },
+        { "dimension": "选择范围", "self": "逐项拨动，远日期也能到", "other": "整月浏览，远日期靠翻月" }
+      ]
+    },
+    {
+      "target": "time-dial",
+      "title": "Date reel 与 Time dial",
+      "rows": [
+        { "dimension": "选择对象", "self": "具体日期加时刻的整体", "other": "一天内的小时，跨时区对比" },
+        { "dimension": "呈现", "self": "四列滚轮与玻璃透镜", "other": "环形表盘与城市指针" },
+        { "dimension": "产出", "self": "一个本地 DateTime", "other": "UTC 分钟数" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcDateReel Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "嵌入定时发送页",
+      "language": "csharp",
+      "code": "var reel = new ArcDateReel\n{\n    Height = 400,\n    HorizontalAlignment = HorizontalAlignment.Stretch\n};\n\n// 滚轮状态由选中索引决定；暂停只为与同页其它插画保持一致。\nreel.SetPaused(true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcDateReel",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；滚轮状态由选中索引决定",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

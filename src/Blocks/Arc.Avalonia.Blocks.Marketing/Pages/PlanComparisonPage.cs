@@ -23,6 +23,11 @@ public sealed class PlanComparisonPage : ArcItemPage
 {
     public override string ItemSlug => "plan-comparison";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-prices", "variant-matrix", "variant-plan-highlight"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

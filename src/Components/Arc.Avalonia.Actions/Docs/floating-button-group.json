@@ -1,0 +1,82 @@
+{
+  "slug": "floating-button-group",
+  "nameZh": "浮动按钮组",
+  "summary": "一块安静托盘里的若干独立软按钮：共享高亮在按钮之间移动而按钮不缩放，托盘尺寸始终不变。",
+  "purpose": [
+    "当工具栏悬浮在画布、选中内容或编辑器之上时，用 floating button group：每个行动是独立软按钮，整块托盘是一层浮动表面。",
+    "悬停或键盘移动时，一块高亮在按钮之间滑行（glide），按钮本身不缩放、托盘不重排，因此画布不会因为提示而抖动。",
+    "Items 支持分隔线把行动分成簇，IsPressed 表示当前模式（例如 Present），IconOnly 加 Tooltip 与 Shortcut 承载纯图标行动的可读提示；Variant 为 Floating 时托盘更浮起，Size 有 Sm 与 Md，Orientation 为 Vertical 时变成画布侧边的窄条。"
+  ],
+  "whenToUse": [
+    "画布、图表、富文本编辑器上方的浮动工具栏。",
+    "行动彼此独立、需要留白，而不是共享一个连续表面时。",
+    "需要把模式型行动（Bold、Present）与一次性行动放在同一托盘里。"
+  ],
+  "whenNotToUse": [
+    "行动属于同一个对象、希望读起来像一个整体：改用 button-group。",
+    "希望悬停时就地显示文字标签、而不是 tooltip：改用 expanding-button-group。",
+    "只有一个行动：直接用 button，不必为它套一层托盘。"
+  ],
+  "variants": [
+    { "key": "variant-muted", "label": "Muted", "note": "安静地贴在页面上的托盘" },
+    { "key": "variant-floating", "label": "Floating", "note": "浮起，用于画布与选区工具栏" },
+    { "key": "variant-icon-only", "label": "Icon only", "note": "图标加 tooltip，标签转入读屏名" },
+    { "key": "size-sm", "label": "Small", "note": "窄侧栏与紧凑托盘" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "orientation-horizontal", "label": "Horizontal", "note": "横向一排" },
+    { "key": "orientation-vertical", "label": "Vertical", "note": "纵向窄条" },
+    { "key": "state-pressed", "label": "Pressed", "note": "模式型行动，保持开启语义并播报 On" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可用但仍占位，避免托盘跳动" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "button", "note": "托盘里的每个行动都是 ArcButton 的软外观" },
+    { "type": "alternative", "target": "button-group", "note": "希望共享一块连续表面时用 Button group" },
+    { "type": "alternative", "target": "expanding-button-group", "note": "希望就地展开文字标签时用它" }
+  ],
+  "contrasts": [
+    {
+      "target": "button-group",
+      "title": "Floating button group 与 Button group",
+      "rows": [
+        { "dimension": "表面", "self": "一块浮动托盘，按钮彼此独立", "other": "所有分段共享一块表面" },
+        { "dimension": "高亮", "self": "高亮在按钮之间移动，按钮不缩放", "other": "高亮在分段之间滑行" },
+        { "dimension": "适用场景", "self": "画布、选区、编辑器上方的工具栏", "other": "同一对象的连续操作段" }
+      ]
+    },
+    {
+      "target": "expanding-button-group",
+      "title": "Floating button group 与 Expanding button group",
+      "rows": [
+        { "dimension": "标签展示", "self": "纯图标加 tooltip，悬停不改变托盘", "other": "悬停即就地展开文字标签" },
+        { "dimension": "布局稳定性", "self": "托盘尺寸固定，只有高亮移动", "other": "邻居会为展开的行动让位" },
+        { "dimension": "适用场景", "self": "悬浮在内容之上的画布工具栏", "other": "消息、文件等对象行内的行动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "画布工具栏",
+      "language": "csharp",
+      "code": "var board = new ArcFloatingButtonGroup\n{\n    Label = \"Board actions\",\n    Items = new[]\n    {\n        new ArcFloatingButtonItem { Id = \"undo\", Label = \"Undo\", Icon = \"undo-2\", IconOnly = true, Shortcut = \"Ctrl+Z\" },\n        new ArcFloatingButtonItem { Id = \"redo\", Label = \"Redo\", Icon = \"redo-2\", IconOnly = true },\n        new ArcFloatingButtonItem { IsSeparator = true },\n        new ArcFloatingButtonItem { Id = \"present\", Label = \"Present\", Icon = \"play\", IconOnly = true, IsPressed = true }\n    }\n};\nboard.ActionInvoked += (_, id) => Run(id);"
+    },
+    {
+      "title": "纵向窄条",
+      "language": "xaml",
+      "code": "<arc:ArcFloatingButtonGroup Label=\"Canvas tools\" Orientation=\"Vertical\" Size=\"Sm\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "行动与分隔线的顺序集合",
+      "Label": "工具栏的可访问名称",
+      "Variant": "Muted / Floating",
+      "Size": "Sm / Md，影响按钮高度与字号",
+      "Orientation": "Horizontal / Vertical",
+      "IconOnly": "强制所有带图标的行动只显示图标",
+      "TooltipSide": "tooltip 的固定方位，Auto 按方向推断",
+      "ActionInvoked": "行动被触发后回调，参数是 item 的 Id"
+    }
+  }
+}

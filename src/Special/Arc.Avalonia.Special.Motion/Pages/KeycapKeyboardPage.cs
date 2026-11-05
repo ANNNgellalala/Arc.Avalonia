@@ -11,6 +11,11 @@ public sealed class KeycapKeyboardPage : ArcItemPage
 {
     public override string ItemSlug => "keycap-keyboard";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-typed", "state-lit", "variant-legend", "variant-modifier", "variant-housing"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

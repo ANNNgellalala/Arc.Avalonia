@@ -22,6 +22,12 @@ public sealed class SettingsCommandPage : ArcItemPage
 {
     public override string ItemSlug => "settings-command";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-palette-open", "variant-section-nav", "variant-settings-page",
+        "variant-search-field", "variant-unsaved-bar"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

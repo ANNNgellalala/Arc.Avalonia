@@ -21,6 +21,11 @@ public sealed class ConnectedScatterPage : ArcItemPage
 {
     public override string ItemSlug => "connected-scatter";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-scatter", "variant-paths", "variant-target-band", "variant-scrubber", "variant-channel-switch"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

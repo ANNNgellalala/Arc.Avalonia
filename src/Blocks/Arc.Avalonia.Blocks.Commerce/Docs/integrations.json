@@ -1,0 +1,53 @@
+{
+  "slug": "integrations",
+  "nameZh": "集成目录",
+  "summary": "第三方集成目录：搜索、带计数的分类筛选，Connect 按钮就地变 Connected，选中已连接服务时下方出现同步频率与按住断开。",
+  "purpose": [
+    "当设置页需要管理第三方连接时，集成目录用卡片网格列出可用服务，每张卡带图标、一句用途、分类与连接状态。",
+    "搜索与分类筛选同时生效，筛选计数随连接状态变化；Connect 在卡片里就变成 Connected，不需要打开新页面。",
+    "选中一个已连接的服务，下方出现它的设置条：同步频率下拉与按住断开的危险动作，断开后该服务的状态立即回落。"
+  ],
+  "whenToUse": [
+    "设置页或市场页需要列出可连接的第三方服务时。",
+    "目录需要搜索、分类筛选与连接状态时。",
+    "断开连接需要比单击更重的确认时。"
+  ],
+  "whenNotToUse": [
+    "管理向外发送的事件端点与密钥时，用 webhooks。",
+    "只需要一个“连接 Slack”按钮时，直接放一个按钮即可。",
+    "需要 OAuth 授权详情与权限范围说明时，用专门的授权页。"
+  ],
+  "variants": [
+    { "key": "layout-directory", "label": "目录布局", "note": "搜索、分类筛选与三列服务卡片" },
+    { "key": "variant-category-filters", "label": "分类筛选", "note": "All 与各分类 chips，计数随连接变化" },
+    { "key": "state-connected", "label": "连接状态", "note": "Connected 与 Connect 两种卡片状态并存" },
+    { "key": "variant-settings", "label": "设置条", "note": "已连接服务的同步频率与 Hold to disconnect" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "目录顶部用搜索框即时过滤服务" },
+    { "type": "uses", "target": "select", "note": "同步频率用下拉选择实时、每小时或每天" },
+    { "type": "uses", "target": "hold-to-confirm", "note": "断开连接用按住确认，避免误触" },
+    { "type": "uses", "target": "button", "note": "Connect、分类 chips 与服务卡都是按钮" },
+    { "type": "uses", "target": "badge", "note": "Connected 状态与分类计数用徽章" },
+    { "type": "alternative", "target": "webhooks", "note": "管理出站事件端点与签名密钥时，改用 webhooks" }
+  ],
+  "contrasts": [
+    {
+      "target": "webhooks",
+      "title": "Integrations 与 Webhooks",
+      "rows": [
+        { "dimension": "方向", "self": "接入第三方服务、双向同步", "other": "向外推送事件，单向" },
+        { "dimension": "管理对象", "self": "目录里的服务与连接", "other": "端点地址、事件类型与密钥" },
+        { "dimension": "凭据", "self": "通过 OAuth 授权，令牌由平台保管", "other": "自己生成签名密钥并校验" },
+        { "dimension": "适用对象", "self": "普通管理员的市场页", "other": "开发者的集成配置页" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "目录与一条设置条",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <Grid ColumnDefinitions=\"*,Auto\">\n    <arc:ArcSearchField Placeholder=\"Search integrations\" />\n  </Grid>\n  <WrapPanel> <!-- All / Communication / Productivity 分类 chips --> </WrapPanel>\n  <ItemsControl ItemsSource=\"{Binding Providers}\"> <!-- 三列服务卡 --> </ItemsControl>\n  <arc:ArcCard Padding=\"12\">\n    <Grid ColumnDefinitions=\"*,Auto,Auto\">\n      <TextBlock Text=\"Slack settings\" Classes=\"arc-body-sm arc-medium\" />\n      <arc:ArcSelect Grid.Column=\"1\" />\n      <arc:ArcHoldToConfirm Grid.Column=\"2\" Label=\"Hold to disconnect\" Tone=\"Danger\" />\n    </Grid>\n  </arc:ArcCard>\n</StackPanel>"
+    }
+  ]
+}

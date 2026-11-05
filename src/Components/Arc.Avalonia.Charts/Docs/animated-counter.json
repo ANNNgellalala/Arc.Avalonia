@@ -1,0 +1,81 @@
+{
+  "slug": "animated-counter",
+  "nameZh": "动画计数器",
+  "summary": "里程表式的数字：等宽数字、小标签与前后缀，值变化时快速滚动到新值，减少动效时直接跳到终点。",
+  "purpose": [
+    "在指标卡、结算金额、实时统计里，数字变化如果瞬间跳变，读者很难察觉发生了什么；动画计数器用一次短促的滚动把「变了」传达出来。",
+    "AnimateOnLoad 让计数器第一次进入视觉树时从零滚动到当前值；之后的每次 Value 变化都会以 AnimationDuration 为时长缓动到新值。",
+    "Prefix 与 Suffix 把货币符号、百分号、单位放在数字两侧；Decimals 固定小数位，或改用 ValueFormat 完全自定义格式。",
+    "等宽数字保证同一位置的数字宽度一致，滚动时不会左右抖动；开启「减少动态效果」时所有过渡直接落在终点。"
+  ],
+  "whenToUse": [
+    "关键指标会变化，需要让读者注意到「刚刚变了」时。",
+    "金额、计数、百分比这类单个数字需要突出显示时。",
+    "数字的值会随筛选或实时数据更新而改变时。",
+    "需要货币前缀、百分号等前后缀与固定小数位时。"
+  ],
+  "whenNotToUse": [
+    "还要展示这个值的历史趋势时改用 sparkline 或 line-chart。",
+    "要在一张卡片里给出多个相关数字与上下文时改用 metric-card。",
+    "数字本身不应吸引注意力、只是正文的一部分时用普通文本。",
+    "需要把数值与区间对比（例如占上限多少）时改用 gauge。"
+  ],
+  "variants": [
+    { "key": "variant-currency", "label": "货币", "note": "Prefix=$，月度经常性收入" },
+    { "key": "variant-decimal", "label": "一位小数", "note": "Decimals=1，用于平均耗时这类连续量" },
+    { "key": "variant-percent", "label": "百分比", "note": "Suffix=%，用于可用率等比率" },
+    { "key": "variant-compact", "label": "紧凑格式", "note": "ValueFormat 把 1250000 写成 1.3M" },
+    { "key": "variant-minimal", "label": "无标签", "note": "只有数字，适合嵌在别处" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "metric-card", "note": "数字需要标签、上下文甚至趋势时用 metric card" },
+    { "type": "alternative", "target": "sparkline", "note": "数字之外还要看趋势时用 sparkline" },
+    { "type": "complement", "target": "gauge", "note": "计数器给当前值，gauge 给它在区间中的位置" }
+  ],
+  "contrasts": [
+    {
+      "target": "metric-card",
+      "title": "Animated counter 与 Metric card",
+      "rows": [
+        { "dimension": "内容范围", "self": "只有一个数字与标签", "other": "数字、标题、注解与趋势的组合容器" },
+        { "dimension": "动效", "self": "内置数值滚动", "other": "容器本身不做数字动画" },
+        { "dimension": "排版责任", "self": "调用方负责卡片与间距", "other": "自带卡片表面与内边距" }
+      ]
+    },
+    {
+      "target": "sparkline",
+      "title": "Animated counter 与 Sparkline",
+      "rows": [
+        { "dimension": "表达内容", "self": "当前数值", "other": "一段时间的趋势形状" },
+        { "dimension": "数据要求", "self": "只需要一个值", "other": "需要一组按时间排列的值" },
+        { "dimension": "与值的关系", "self": "值变化时数字滚动", "other": "值变化后线形整体位移" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "月度经常性收入",
+      "language": "csharp",
+      "code": "var counter = new ArcChartAnimatedCounter\n{\n    Value = 1284,\n    Prefix = \"$\",\n    Label = \"Monthly recurring revenue\",\n    AnimateOnLoad = true,\n    AnimationDuration = TimeSpan.FromMilliseconds(480)\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcChartAnimatedCounter x:Name=\"Mrr\"\n                                  Height=\"116\"\n                                  Prefix=\"$\"\n                                  Label=\"Monthly recurring revenue\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcChartAnimatedCounter",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "要显示的数值；变化时滚动到新值",
+      "Label": "数字上方的小标签",
+      "Prefix": "数字前的前缀，例如 $",
+      "Suffix": "数字后的后缀，例如 %",
+      "Decimals": "固定小数位；ValueFormat 存在时被忽略",
+      "AnimateOnLoad": "首次进入视觉树时从零滚动到当前值",
+      "AnimationDuration": "一次滚动动画的时长，默认 480 ms",
+      "ValueFormat": "完全自定义数值格式"
+    }
+  }
+}

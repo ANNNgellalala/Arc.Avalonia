@@ -1,0 +1,97 @@
+{
+  "slug": "avatar-upload",
+  "nameZh": "头像上传",
+  "summary": "头像即上传入口：点选或拖入照片后控件就地变成圆形裁剪台，拖动平移、滚轮缩放，保存后进度环沿头像填充。",
+  "purpose": [
+    "在个人资料与团队设置里，头像是最高频修改的一项。它把选择、裁剪与上传收进同一个头像位置：点击或拖入照片，头像原地展开成裁剪台，照片始终处在它最终会出现的地方。",
+    "裁剪阶段可以拖动平移、滚轮或加减号缩放，键盘方向键微调、Enter 保存、Escape 取消；确认后通过 RenderTargetBitmap 渲染成正方形，再交给 UploadAsync 上传。",
+    "Status 覆盖 Ready、Cropping、Uploading、Success 与 Error 五个阶段：上传时头像外圈出现进度环，失败时保留待上传照片与原裁剪结果并提供重试，Remove 回到首字母占位。",
+    "Shape 在圆形与方形之间切换，方形复用面板圆角，适合工作区 Logo；MaxSizeBytes 与 OutputSize 分别约束输入大小与输出边长。"
+  ],
+  "whenToUse": [
+    "个人资料页、团队设置里让用户设置或更换头像时。",
+    "头像需要裁成正方形/圆形、且用户应看到裁剪结果时。",
+    "上传过程需要有进度、失败重试与移除操作时。",
+    "同一套控件既要支持人像圆形，也要支持工作区方形图标时。"
+  ],
+  "whenNotToUse": [
+    "需要一次上传任意类型的多个文件时改用 file-dropzone。",
+    "只是展示头像、不需要修改时改用 avatar。",
+    "需要在裁剪前后对比两版图片时，导出后用 image-compare 展示。",
+    "需要上传非方形大图并保留完整构图时，用普通文件上传与图片查看器更合适。"
+  ],
+  "variants": [
+    { "key": "state-ready", "label": "空态", "note": "没有照片时显示姓名首字母与上传提示" },
+    { "key": "state-photo", "label": "已有照片", "note": "显示照片以及 Replace 与 Remove" },
+    { "key": "state-uploading", "label": "上传中", "note": "Status=Uploading，Progress=0.62" },
+    { "key": "state-success", "label": "成功", "note": "Status=Success，头像外圈与角标落定" },
+    { "key": "state-error", "label": "失败", "note": "Status=Error，保留照片并给出错误与重试" },
+    { "key": "state-drag-over", "label": "拖拽悬停", "note": "IsDragOver=true，头像显示投放提示" },
+    { "key": "state-cropping", "label": "裁剪中", "note": "BeginCrop 后展开 248 px 裁剪台与缩放控制" },
+    { "key": "variant-square", "label": "方形剪影", "note": "Shape=Square，用于工作区 Logo" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "file-dropzone", "note": "需要上传任意多文件时用通用 dropzone" },
+    { "type": "alternative", "target": "avatar", "note": "只展示、不修改头像时用 avatar" },
+    { "type": "complement", "target": "image-compare", "note": "需要展示裁剪前后差异时可导出后用 image compare" }
+  ],
+  "contrasts": [
+    {
+      "target": "file-dropzone",
+      "title": "Avatar upload 与 File dropzone",
+      "rows": [
+        { "dimension": "上传对象", "self": "一张头像图片", "other": "任意类型的一个或多个文件" },
+        { "dimension": "裁剪", "self": "就地展开裁剪台，拖动与缩放", "other": "不做裁剪，只显示文件行" },
+        { "dimension": "失败处理", "self": "保留照片与裁剪结果并重试", "other": "逐行标红并显示原因" },
+        { "dimension": "形态", "self": "圆形或方形剪影", "other": "整块投放区" }
+      ]
+    },
+    {
+      "target": "avatar",
+      "title": "Avatar upload 与 Avatar",
+      "rows": [
+        { "dimension": "职责", "self": "选择、裁剪并上传头像", "other": "只展示已有头像" },
+        { "dimension": "状态", "self": "Ready / Cropping / Uploading / Success / Error", "other": "一张静态图片或首字母" },
+        { "dimension": "交互", "self": "点击、拖拽、缩放与确认", "other": "无交互（除非外层加了动作）" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带上传与进度",
+      "language": "csharp",
+      "code": "var upload = new ArcAvatarUpload\n{\n    DisplayName = \"Ada Lovelace\",\n    Label = \"Profile photo\",\n    Hint = \"PNG, JPG or WebP, up to 8 MB\",\n    Size = 88,\n    Shape = ArcAvatarShape.Round,\n    MaxSizeBytes = 8 * 1024 * 1024,\n    OutputSize = 512,\n    UploadAsync = async (stream, progress, token) =>\n    {\n        var url = await Store.UploadAsync(stream, progress, token);\n        return url;\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcAvatarUpload x:Name=\"Avatar\"\n                           DisplayName=\"Ada Lovelace\"\n                           Label=\"Profile photo\"\n                           Size=\"88\"\n                           Shape=\"Round\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcAvatarUpload",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Source": "当前头像图片；为空时显示姓名首字母",
+      "DisplayName": "用于生成首字母并作为无障碍名称",
+      "Label": "头像区域的标题，默认 Profile photo",
+      "Hint": "标题下的说明，例如支持的格式与大小",
+      "Size": "头像直径（px），默认 88",
+      "Shape": "圆形或方形剪影，默认 Round",
+      "MaxSizeBytes": "允许的最大文件字节数",
+      "OutputSize": "裁剪导出正方形的边长（px）",
+      "UploadAsync": "上传回调；接收流、进度与取消令牌并返回结果",
+      "Status": "当前阶段：Ready / Cropping / Uploading / Success / Error",
+      "Progress": "上传进度，0 到 1",
+      "ErrorMessage": "失败时显示在状态行里的原因",
+      "IsDragOver": "文件悬停在头像上时高亮投放提示",
+      "CropZoom": "裁剪台的缩放倍率",
+      "CroppedImage": "最近一次裁剪结果（只读）",
+      "Initials": "由 DisplayName 生成的首字母（只读）",
+      "CropConfirmed": "确认裁剪后触发，参数是裁剪得到的图片",
+      "Uploaded": "上传成功后触发，参数是 UploadAsync 的返回值",
+      "Failed": "上传失败后触发，参数是失败原因",
+      "Removed": "移除头像后触发"
+    }
+  }
+}

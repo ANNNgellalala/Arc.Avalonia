@@ -1,0 +1,57 @@
+{
+  "slug": "journey-flow",
+  "nameZh": "旅程桑基图",
+  "summary": "试用旅程的桑基图：从访问到付费的五列阶段，条带宽度随渠道切换而变化，悬停任一步骤或条带就能追踪同一批人走完全程。",
+  "purpose": [
+    "当增长团队要解释「人是怎么从访问走到付费」时，用 journey flow：把各阶段的转化量画成桑基条带，宽度的收缩就是流失发生的位置。",
+    "顶部渠道切换（全部 / 自然 / 付费 / 推荐）会重算每一段条带；列可以拖动重排，把同一步骤挪到更靠前或靠后的位置来对照。",
+    "右侧渠道详情与顶部 KPI 磁贴给出当前渠道的总人数与各段比例；悬停时整条旅程会被点亮，帮助你确认某一批人具体流向哪里。"
+  ],
+  "whenToUse": [
+    "需要展示从访问到付费的分阶段转化与流失时。",
+    "要对比不同获取渠道在同一漏斗上的表现时。",
+    "希望条带宽度本身承担解释、而不是只给一串百分比时。"
+  ],
+  "whenNotToUse": [
+    "只需要单一漏斗的转化率时，用 funnel-chart。",
+    "要展示任意节点之间的流向而不带阶段顺序时，用 sankey-flow。",
+    "需要按用户逐条查看旅程时，用 timeline 或 chat-thread。"
+  ],
+  "variants": [
+    { "key": "layout-journey", "label": "整体布局", "note": "桑基图、渠道切换、KPI 磁贴与渠道详情并置" },
+    { "key": "variant-sankey", "label": "Sankey", "note": "五列阶段之间的条带与流量宽度" },
+    { "key": "variant-channel-switch", "label": "Channel", "note": "顶部渠道切换，当前为全部渠道" },
+    { "key": "variant-stages", "label": "Stages", "note": "Visit / Signup / Activated / Paid 等阶段列与占比" },
+    { "key": "variant-metric-tiles", "label": "Metrics", "note": "顶部总人数等 KPI 磁贴" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "sankey-flow", "note": "旅程主体是 ArcSankeyFlow 的节点与条带" },
+    { "type": "uses", "target": "segmented-control", "note": "渠道切换用分段控件" },
+    { "type": "uses", "target": "line-chart", "note": "渠道详情里用折线图补充趋势" },
+    { "type": "uses", "target": "card", "note": "旅程画布与渠道详情各用一张卡片承载" },
+    { "type": "alternative", "target": "funnel-chart", "note": "只需要单一漏斗的转化率时，改用 funnel chart" }
+  ],
+  "contrasts": [
+    {
+      "target": "funnel-chart",
+      "title": "Journey flow 与 Funnel chart",
+      "rows": [
+        { "dimension": "结构", "self": "多列节点与条带，能表达分流与汇合", "other": "单列逐级下降的漏斗" },
+        { "dimension": "渠道对比", "self": "切换渠道重算整张图", "other": "通常一次只画一条漏斗" },
+        { "dimension": "阅读重点", "self": "宽度收缩发生在哪一段", "other": "每一级的转化百分比" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <arc:ArcSegmentedControl SelectedValue=\"all\" /> <!-- 渠道 -->\n  <charts:ArcSankeyFlow Height=\"320\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：节点与条带",
+      "language": "csharp",
+      "code": "var nodes = new[]\n{\n    new ArcSankeyNode(\"visit\", \"Visit\", 0),\n    new ArcSankeyNode(\"signup\", \"Signup\", 1),\n    new ArcSankeyNode(\"activated\", \"Activated\", 2),\n    new ArcSankeyNode(\"paid\", \"Paid\", 3)\n};\n\nvar links = new[]\n{\n    new ArcSankeyLink(\"visit\", \"signup\", 42000),\n    new ArcSankeyLink(\"signup\", \"activated\", 18600),\n    new ArcSankeyLink(\"activated\", \"paid\", 7400)\n};\n\nflow.Nodes = nodes;\nflow.Links = links;"
+    }
+  ]
+}

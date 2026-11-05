@@ -1,0 +1,70 @@
+{
+  "slug": "color-picker",
+  "nameZh": "颜色选择器",
+  "summary": "色块字段：点击展开完整取色面板（饱和度/明度方块、色相与不透明度轨道、数值输入、收藏色板与黑白对比度读数），值始终以十六进制保存。",
+  "purpose": [
+    "当需要为品牌色、背景或图表序列选一个颜色时，color picker 把完整取色面板收进一个色块字段，收起时只显示色块与当前值。",
+    "展开后可以拖动方块与轨道、输入 hex、rgb() 或 hsl()、从收藏色板取色；面板保持打开，每次变化都通过 ValueChanged 报告，字段同步更新。",
+    "值始终以 #RRGGBB（不透明时带 alpha 位）保存；DefaultFormat 决定打开时数值输入框先显示哪种格式，可在 Hex、Rgb 与 Hsl 之间切换。"
+  ],
+  "whenToUse": [
+    "需要在设计工具或设置面板里精确选一个颜色时。",
+    "颜色需要保存为十六进制、并回显为色块时。",
+    "需要同时看到不透明度与黑白背景下的对比度时。"
+  ],
+  "whenNotToUse": [
+    "只需要在少量预设色之间选择时，改用 chip-group 或 radio-group，不必打开完整取色面板。",
+    "只需要输入一个颜色值、不要求可视化取色时，改用 input 加校验。",
+    "颜色只是只读展示时，用色块或文字即可，不必放一个可打开的控件。"
+  ],
+  "variants": [
+    { "key": "state-filled", "label": "已选颜色", "note": "色块与十六进制值并排显示" },
+    { "key": "state-format-rgb", "label": "RGB 格式", "note": "DefaultFormat=Rgb，数值框先显示 rgb()" },
+    { "key": "state-alpha", "label": "半透明", "note": "带 alpha 的色块与八位十六进制" },
+    { "key": "state-open", "label": "打开面板", "note": "取色方块、轨道、输入与收藏色板" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "只需要输入一个颜色值、不需要可视化取色时，用普通 input 更轻" },
+    { "type": "complement", "target": "theme-switch", "note": "外观设置里主题切换与品牌色选择常常并排出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Color picker 与 Input",
+      "rows": [
+        { "dimension": "输入方式", "self": "拖拽取色、数值输入与收藏色板三选一", "other": "只能键入文本" },
+        { "dimension": "校验", "self": "只接受合法的颜色值，非法输入会被拒绝", "other": "由调用方自行校验" },
+        { "dimension": "反馈", "self": "色块与对比度读数实时更新", "other": "只有文本本身" },
+        { "dimension": "页面占用", "self": "收起时一行，展开后是一整块面板", "other": "始终一行" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中绑定品牌色",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcColorPicker Label=\"Brand color\"\n                          Width=\"280\"\n                          Value=\"{Binding BrandColor}\"\n                          DefaultFormat=\"Hex\" />\n</Window>"
+    },
+    {
+      "title": "用代码设置颜色、格式与收藏色板",
+      "language": "csharp",
+      "code": "var picker = new ArcColorPicker\n{\n    Label = \"Brand color\",\n    Width = 280,\n    Value = Color.Parse(\"#5B6BFF\"),\n    DefaultFormat = ArcColorFormat.Rgb,\n    Swatches = new[]\n    {\n        new ArcColorSwatch(\"brand\", Color.Parse(\"#5B6BFF\")),\n        new ArcColorSwatch(\"ink\", Color.Parse(\"#111318\"))\n    }\n};\n\npicker.ValueChanged += (_, color) => statusText.Text = color.ToString();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcColorPicker",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前颜色，含 alpha；保存时写成十六进制",
+      "Swatches": "受控的收藏色板，显示在面板底部",
+      "DefaultSwatches": "非受控模式下的初始收藏色板",
+      "MaxSwatches": "最多保留几个收藏色，默认 7；超出时丢掉最早的",
+      "DefaultFormat": "数值输入框先显示的格式：Hex、Rgb 或 Hsl",
+      "ValueChanged": "颜色变化时触发，包括拖拽过程中的每一次变化",
+      "SwatchesChanged": "收藏色板变化时触发",
+      "IsDropDownOpen": "取色面板是否展开；Escape 或点击外部关闭",
+      "Label": "字段上方的标签，默认 Color",
+      "Description": "字段下方的辅助说明"
+    }
+  }
+}

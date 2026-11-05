@@ -1,0 +1,77 @@
+{
+  "slug": "expanding-button-group",
+  "nameZh": "展开式按钮组",
+  "summary": "紧凑的图标行动组：指针或焦点停在哪个行动，它就展开显示标签、邻居顺势让位，带 DoneLabel 的行动还能就地确认。",
+  "purpose": [
+    "当一行里要放 3–6 个作用于同一对象的行动，但横向空间只够图标时，用 expanding button group：静止时只有一个行动带标签，其余收起为图标。",
+    "指针或键盘进入某个行动时，它按弹簧展开、邻居平滑让位；离开后回到 DefaultExpanded 指定的行动，组宽度保持不变。",
+    "带 DoneLabel 的行动在完成后显示勾选与过去式（Archive → Archived），ConfirmDuration 之后回到静止；Tone 为 Danger 的行动在语义上标记为破坏性，IsDisabled 的行动不能点击、并在读屏里播报为不可用。"
+  ],
+  "whenToUse": [
+    "消息、文件、卡片行内的一组对象行动，空间紧张但每个行动都要可读。",
+    "希望悬停即显示文字标签、而不依赖 tooltip 时。",
+    "其中有一两个行动需要就地确认（Archive、Delete）时。"
+  ],
+  "whenNotToUse": [
+    "行动需要独立留白、悬浮在画布上方：改用 floating-button-group。",
+    "行动共享一块表面、希望一次性扫读所有标签：改用 button-group。",
+    "行动数量超过 6，或标签本身很长：改用 dropdown-menu。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "紧凑行内，高 28" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸，高 36" },
+    { "key": "tone-danger", "label": "Danger", "note": "破坏性行动的语义标记，例如 Delete" },
+    { "key": "state-expanded", "label": "Expanded", "note": "当前行动显示标签" },
+    { "key": "state-collapsed", "label": "Collapsed", "note": "邻居收起为纯图标并让位" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可点击，仍在位并播报不可用" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "button", "note": "每个展开的行动都是一个 ArcButton" },
+    { "type": "alternative", "target": "floating-button-group", "note": "纯图标加 tooltip 的浮动工具栏用它" },
+    { "type": "alternative", "target": "button-group", "note": "希望常驻显示全部标签时用 Button group" }
+  ],
+  "contrasts": [
+    {
+      "target": "floating-button-group",
+      "title": "Expanding button group 与 Floating button group",
+      "rows": [
+        { "dimension": "标签展示", "self": "悬停即就地展开文字标签", "other": "纯图标加 tooltip，悬停不改变托盘" },
+        { "dimension": "布局", "self": "邻居为展开的行动让位", "other": "托盘尺寸固定，只有高亮移动" },
+        { "dimension": "适用场景", "self": "消息、文件等对象行内的行动", "other": "悬浮在内容之上的画布工具栏" }
+      ]
+    },
+    {
+      "target": "button-group",
+      "title": "Expanding button group 与 Button group",
+      "rows": [
+        { "dimension": "密度", "self": "静止时几乎只占图标宽度", "other": "始终为每个行动的标签留出宽度" },
+        { "dimension": "标签可见性", "self": "同一时刻只展开一个标签", "other": "所有分段标签常驻" },
+        { "dimension": "确认反馈", "self": "带 DoneLabel 的行动就地显示过去式", "other": "行动本身不承载完成态" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "消息行内行动",
+      "language": "csharp",
+      "code": "var group = new ArcExpandingButtonGroup\n{\n    Label = \"Message actions\",\n    DefaultExpanded = \"reply\",\n    Items = new[]\n    {\n        new ArcExpandingButtonItem { Id = \"reply\", Label = \"Reply\", Icon = \"message-circle\" },\n        new ArcExpandingButtonItem { Id = \"forward\", Label = \"Forward\", Icon = \"send\" },\n        new ArcExpandingButtonItem { Id = \"archive\", Label = \"Archive\", Icon = \"archive\", DoneLabel = \"Archived\" },\n        new ArcExpandingButtonItem { Id = \"delete\", Label = \"Delete\", Icon = \"trash-2\", DoneLabel = \"Deleted\", Tone = ArcExpandingButtonTone.Danger }\n    }\n};\ngroup.ActionInvoked += (_, id) => Run(id);"
+    },
+    {
+      "title": "紧凑尺寸",
+      "language": "xaml",
+      "code": "<arc:ArcExpandingButtonGroup Label=\"File actions\" Size=\"Sm\" DefaultExpanded=\"open\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "行动集合，每个是一个 ArcExpandingButtonItem",
+      "Label": "工具栏的可访问名称",
+      "Size": "Sm / Md",
+      "DefaultExpanded": "静止时展开标签的行动 Id，默认第一个可用行动",
+      "ConfirmDuration": "完成确认保持的毫秒数，0 表示不自动收回",
+      "ActionInvoked": "行动被触发后回调，参数是 item 的 Id"
+    }
+  }
+}

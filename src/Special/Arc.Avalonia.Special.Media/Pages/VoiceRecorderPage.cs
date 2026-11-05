@@ -12,6 +12,12 @@ public sealed class VoiceRecorderPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-review", "variant-thread", "variant-review-waveform",
+        "variant-duration", "variant-composer"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Voice notes in chats, comments or field notes where speaking beats typing.",

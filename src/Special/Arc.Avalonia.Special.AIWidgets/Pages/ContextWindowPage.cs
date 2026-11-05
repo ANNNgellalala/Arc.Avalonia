@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Special.AIWidgets.Controls;
 
@@ -14,17 +15,24 @@ public sealed class ContextWindowPage : ArcItemPage
 {
     public override string ItemSlug => "context-window";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-comfortable", "state-near-limit", "state-compacted"
+    };
+
+    private static List<ArcContextModel> Models() => new()
+    {
+        new() { Id = "opus", Name = "Claude Opus 5.5", Window = 1_000_000, Reserve = 40_000 },
+        new() { Id = "haiku", Name = "Claude Haiku 5.5", Window = 200_000, Reserve = 16_000 }
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
-        return new ArcContextWindow
+        var comfortable = new ArcContextWindow
         {
             ModelId = "opus",
             Threshold = 0.8,
-            Models = new List<ArcContextModel>
-            {
-                new() { Id = "opus", Name = "Claude Opus 5.5", Window = 1_000_000, Reserve = 40_000 },
-                new() { Id = "haiku", Name = "Claude Haiku 5.5", Window = 200_000, Reserve = 16_000 }
-            },
+            Models = Models(),
             Items = new List<ArcContextItem>
             {
                 new() { Id = "system", Category = ArcContextCategory.System, Label = "System prompt", Tokens = 15_000 },
@@ -34,6 +42,50 @@ public sealed class ContextWindowPage : ArcItemPage
                 new() { Id = "messages", Category = ArcContextCategory.Messages, Label = "Conversation", Tokens = 375_000 }
             }
         };
+
+        var nearLimit = new ArcContextWindow
+        {
+            ModelId = "opus",
+            Threshold = 0.8,
+            Models = Models(),
+            Items = new List<ArcContextItem>
+            {
+                new() { Id = "system", Category = ArcContextCategory.System, Label = "System prompt", Tokens = 20_000 },
+                new() { Id = "tools", Category = ArcContextCategory.Tools, Label = "Tool definitions", Tokens = 60_000 },
+                new() { Id = "files", Category = ArcContextCategory.Files, Label = "attached files", Tokens = 120_000 },
+                new() { Id = "summary", Category = ArcContextCategory.Summary, Label = "Summary of 9 earlier turns", Tokens = 80_000 },
+                new() { Id = "messages", Category = ArcContextCategory.Messages, Label = "Conversation", Tokens = 570_000 }
+            }
+        };
+
+        var compacted = new ArcContextWindow
+        {
+            ModelId = "opus",
+            Threshold = 0.8,
+            Models = Models(),
+            Items = new List<ArcContextItem>
+            {
+                new() { Id = "system", Category = ArcContextCategory.System, Label = "System prompt", Tokens = 15_000 },
+                new() { Id = "tools", Category = ArcContextCategory.Tools, Label = "Tool definitions", Tokens = 45_000 },
+                new() { Id = "files", Category = ArcContextCategory.Files, Label = "attached files", Tokens = 40_000 },
+                new() { Id = "summary", Category = ArcContextCategory.Summary, Label = "Summary of 12 earlier turns", Tokens = 160_000 },
+                new() { Id = "messages", Category = ArcContextCategory.Messages, Label = "Conversation since compaction", Tokens = 40_000 }
+            }
+        };
+
+        var panel = new StackPanel { Spacing = 18, HorizontalAlignment = HorizontalAlignment.Left };
+        panel.Children.Add(WithCaption("舒适区：窗口用了一半多，离虚线还远", comfortable));
+        panel.Children.Add(WithCaption("接近阈值：填充已越过 80% 虚线，下一轮发送就会压缩", nearLimit));
+        panel.Children.Add(WithCaption("压缩后：早期对话折成摘要，占用回落，摘要块明显变大", compacted));
+        return panel;
+    }
+
+    private static Control WithCaption(string caption, Control content)
+    {
+        var stack = new StackPanel { Spacing = 6 };
+        stack.Children.Add(Sv.Caption(caption));
+        stack.Children.Add(content);
+        return stack;
     }
 
     public override IReadOnlyList<string>? WhenToUse => new[]

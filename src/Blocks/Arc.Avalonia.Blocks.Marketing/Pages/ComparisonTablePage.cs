@@ -19,6 +19,11 @@ public sealed class ComparisonTablePage : ArcItemPage
 {
     public override string ItemSlug => "comparison-table";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-full", "variant-highlight", "state-differences-only"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -62,7 +67,7 @@ public sealed class ComparisonTablePage : ArcItemPage
         var matrixHost = new ContentControl();
         var onlyDifferences = false;
 
-        void Rebuild()
+        Control BuildMatrix(bool onlyDifferences)
         {
             var rows = onlyDifferences ? new List<Row>(Rows).FindAll(row => !row.Same) : new List<Row>(Rows);
             var definitions = new RowDefinitions();
@@ -92,7 +97,7 @@ public sealed class ComparisonTablePage : ArcItemPage
             grid.Children.Add(highlight);
 
             AddCell(grid, Mk.Caption("Feature"), 0, 0, HorizontalAlignment.Left);
-            AddCell(grid, Header("Arc", true), 1, 0, HorizontalAlignment.Center);
+            AddCell(grid, Mk.Stack(4, Header("Arc", true), Mk.Pill("Best value", ArcBadgeTone.Accent)), 1, 0, HorizontalAlignment.Center);
             AddCell(grid, Header("Spreadsheets", false), 2, 0, HorizontalAlignment.Center);
             AddCell(grid, Header("Legacy CRM", false), 3, 0, HorizontalAlignment.Center);
 
@@ -119,8 +124,10 @@ public sealed class ComparisonTablePage : ArcItemPage
                 }
             }
 
-            matrixHost.Content = grid;
+            return grid;
         }
+
+        void Rebuild() => matrixHost.Content = BuildMatrix(onlyDifferences);
 
         var toggle = new ArcSwitch { Label = "Only differences", Checked = false };
         toggle.CheckedChanged += (_, _) =>
@@ -131,7 +138,7 @@ public sealed class ComparisonTablePage : ArcItemPage
 
         Rebuild();
 
-        var head = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        var head = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto") };
         head.Children.Add(Mk.Stack(4,
             Mk.Heading("Why teams switch", 420),
             Mk.Caption("Sample comparison. Alternatives are illustrative.")));
@@ -140,13 +147,32 @@ public sealed class ComparisonTablePage : ArcItemPage
         Grid.SetColumn(toggleHost, 1);
         head.Children.Add(toggleHost);
 
-        return Mk.Surface(new StackPanel
+        var start = Mk.Btn("Start free", ArcButtonVariant.Primary, ArcButtonSize.Sm);
+        start.VerticalAlignment = VerticalAlignment.Center;
+        start.Margin = new Thickness(12, 0, 0, 0);
+        Grid.SetColumn(start, 2);
+        head.Children.Add(start);
+
+        // The filtered table is otherwise only reachable through the switch, so a static copy keeps it visible.
+        var differencesSpecimen = Mk.Surface(new StackPanel
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 14,
-            Margin = new Thickness(24, 22, 24, 18),
-            Children = { head, matrixHost }
+            Spacing = 12,
+            Children =
+            {
+                Mk.Caption("Only the rows where the options differ"),
+                BuildMatrix(true)
+            }
         });
+
+        return Mk.Stack(16,
+            Mk.Surface(new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 14,
+                Margin = new Thickness(24, 22, 24, 18),
+                Children = { head, matrixHost }
+            }),
+            differencesSpecimen);
     }
 
     private static Control Header(string name, bool accent)

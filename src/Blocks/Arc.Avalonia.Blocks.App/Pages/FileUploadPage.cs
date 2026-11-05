@@ -29,6 +29,11 @@ public sealed class FileUploadPage : ArcItemPage
 {
     public override string ItemSlug => "file-upload";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-dropzone", "variant-progress", "variant-done", "variant-retry"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

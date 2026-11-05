@@ -1,0 +1,52 @@
+{
+  "slug": "support-widget",
+  "nameZh": "支持小组件",
+  "summary": "应用内帮助启动器：展开成文章搜索、文章阅读与团队聊天三视图，关闭后收成右下角圆形按钮。",
+  "purpose": [
+    "当产品想在任意页面挂一个帮助入口时，小组件停靠在右下角，展开后是搜索、热门文章与聊天入口。",
+    "面板内部按视图切换：首页给出搜索与热门文章，选中文章进入阅读视图并带返回，聊天视图里有在线状态与输入框。",
+    "面板背后放一块应用界面占位，说明它是浮在宿主之上、而不是整页跳转；关闭后恢复圆形启动器。"
+  ],
+  "whenToUse": [
+    "SaaS 应用需要一个全局帮助入口、又不想占页面布局时。",
+    "帮助内容包括文章与聊天、需要在一个面板里切换时。",
+    "希望帮助在任意页面可用时。"
+  ],
+  "whenNotToUse": [
+    "需要完整的帮助中心页面与主题分类时，用 help-center。",
+    "只需要一条公告或提示时，用 announcement-bar 或 alert。",
+    "需要完整的工单对话页时，用 support-conversation。"
+  ],
+  "variants": [
+    { "key": "state-panel-open", "label": "面板展开", "note": "面板停在右下角，启动器隐藏" },
+    { "key": "layout-home", "label": "首页视图", "note": "搜索、热门文章与聊天入口" },
+    { "key": "variant-app-shell", "label": "宿主界面", "note": "面板背后的应用占位，说明浮层关系" },
+    { "key": "variant-chat-entry", "label": "聊天入口", "note": "Chat with the team 行与在线状态" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "首页与阅读视图都用搜索框找文章" },
+    { "type": "uses", "target": "input", "note": "聊天视图底部用单行输入框写消息" },
+    { "type": "uses", "target": "button", "note": "启动器、文章行与发送都是按钮" },
+    { "type": "uses", "target": "avatar", "note": "聊天气泡与在线状态用头像表示人" },
+    { "type": "alternative", "target": "help-center", "note": "需要完整的帮助中心页面时，改用 help-center" }
+  ],
+  "contrasts": [
+    {
+      "target": "help-center",
+      "title": "Support widget 与 Help center",
+      "rows": [
+        { "dimension": "形态", "self": "右下角浮层，可收起", "other": "整页内容" },
+        { "dimension": "入口", "self": "任意页面常驻的启动器", "other": "从导航或帮助链接进入" },
+        { "dimension": "内容量", "self": "搜索、几篇热门文章与聊天", "other": "主题分类、长文与目录" },
+        { "dimension": "上下文", "self": "不离开当前任务", "other": "专门的自助浏览场景" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "浮在应用上的帮助面板",
+      "language": "xaml",
+      "code": "<Panel>\n  <!-- 宿主应用界面占位 -->\n  <Border Width=\"360\" Height=\"404\"\n          HorizontalAlignment=\"Right\" VerticalAlignment=\"Bottom\"\n          CornerRadius=\"20\" BoxShadow=\"{DynamicResource ArcShadowFloating}\">\n    <StackPanel Spacing=\"10\">\n      <arc:ArcSearchField Placeholder=\"Search help\" />\n      <TextBlock Text=\"Popular articles\" Classes=\"arc-label\" />\n      <!-- 文章行与 Chat with the team -->\n    </StackPanel>\n  </Border>\n  <arc:ArcButton Width=\"48\" Height=\"48\" CornerRadius=\"24\"\n                 HorizontalAlignment=\"Right\" VerticalAlignment=\"Bottom\" />\n</Panel>"
+    }
+  ]
+}

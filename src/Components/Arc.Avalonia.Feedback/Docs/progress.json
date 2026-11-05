@@ -1,0 +1,83 @@
+{
+  "slug": "progress",
+  "nameZh": "进度条",
+  "summary": "已知比例的横向进度条：标签与百分比并排，完成时数字换成对勾，未知进度时改扫一条不确定带。",
+  "purpose": [
+    "回答「这件事做到哪了」：填充条按 Value 与 Max 的比例伸长，标签在左、百分比在右，一行高度就能放进表单、对话框与卡片。",
+    "ShowValue 打开时右侧显示取整百分比，到 100% 时数字换成对勾；Indeterminate 打开时不再假装比例，改为循环扫过一条带子。",
+    "Tone 只在进度本身代表状态时使用（同步过载、导入失败），普通任务保持默认的强调色，避免把颜色当装饰。"
+  ],
+  "whenToUse": [
+    "上传、导入、同步等总量与已完成量都已知的任务。",
+    "用一行「标签 + 百分比 + 细条」就能表达状态的表单、对话框与设置页。",
+    "完成时需要一眼确认（100% 加对勾）的流程。"
+  ],
+  "whenNotToUse": [
+    "总量未知、只能表示「正在加载」时，优先用 skeleton 保留最终布局；如果必须用进度条，则打开 Indeterminate。",
+    "要展示配额与上限（8.4k / 10k requests）时，改用 usage-meter，它有分段、图例与预警阈值。",
+    "表达多步骤流程的位置（第 2 步，共 4 步）时，改用 stepper。",
+    "关心的是剩余时间而不是完成比例时，改用 countdown。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "6 px 细条（默认），用于表格行与紧凑卡片" },
+    { "key": "size-md", "label": "Medium", "note": "8 px，常规卡片与设置页" },
+    { "key": "size-lg", "label": "Large", "note": "12 px，用于对话框或卡片的主进度" },
+    { "key": "state-determinate", "label": "Determinate", "note": "已知比例，显示百分比" },
+    { "key": "state-indeterminate", "label": "Indeterminate", "note": "比例未知，循环扫过一条带" },
+    { "key": "state-complete", "label": "Complete", "note": "100% 时百分比换成对勾" },
+    { "key": "tone-success", "label": "Success", "note": "任务成功完成" },
+    { "key": "tone-warning", "label": "Warning", "note": "接近上限或需要留意" },
+    { "key": "tone-danger", "label": "Danger", "note": "失败或严重积压" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "skeleton", "note": "加载占位用 skeleton；已知比例才用 progress" },
+    { "type": "alternative", "target": "usage-meter", "note": "配额对上限的展示改用 usage-meter" },
+    { "type": "alternative", "target": "stepper", "note": "多步骤流程的位置改用 stepper" },
+    { "type": "alternative", "target": "countdown", "note": "关心剩余时间而不是完成比例时改用 countdown" }
+  ],
+  "contrasts": [
+    {
+      "target": "skeleton",
+      "title": "Progress 与 Skeleton",
+      "rows": [
+        { "dimension": "回答的问题", "self": "已经完成多少", "other": "内容正在加载，先占住位置" },
+        { "dimension": "是否需要总量", "self": "需要总数，否则只能切到 Indeterminate", "other": "不需要任何数字" },
+        { "dimension": "结束时表现", "self": "到 100% 显示对勾后留在原地", "other": "占位消失，真实内容淡入" }
+      ]
+    },
+    {
+      "target": "usage-meter",
+      "title": "Progress 与 Usage meter",
+      "rows": [
+        { "dimension": "语义", "self": "一次任务的完成比例", "other": "一段时间内配额对固定上限" },
+        { "dimension": "结构", "self": "单条填充", "other": "分段填充、图例与剩余量" },
+        { "dimension": "阈值", "self": "只有整体色调", "other": "WarnAt 触发「Almost full」，超限显示「Over limit」" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcProgress Label=\"Uploading report.pdf\"\n                  Value=\"71\"\n                  Max=\"100\"\n                  ShowValue=\"True\" />\n</Window>"
+    },
+    {
+      "title": "把上传进度写进 Value",
+      "language": "csharp",
+      "code": "var progress = new ArcProgress\n{\n    Label = \"Uploading report.pdf\",\n    Max = 100,\n    ShowValue = true\n};\n\nawait UploadAsync(file, percent => progress.Value = percent);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcProgress",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前完成量，自动夹在 0 与 Max 之间",
+      "Max": "完成值，Value 达到它即视为 100%",
+      "Label": "左侧可见标签，同时作为无障碍名称",
+      "ShowValue": "显示取整百分比；100% 时改为对勾",
+      "Size": "条厚度：Sm 6（默认）/ Md 8 / Lg 12",
+      "Tone": "填充色调：Accent / Success / Warning / Danger",
+      "Indeterminate": "比例未知时循环扫过一条带，忽略 Value"
+    }
+  }
+}

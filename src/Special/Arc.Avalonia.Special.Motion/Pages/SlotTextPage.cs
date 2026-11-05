@@ -13,6 +13,11 @@ public sealed class SlotTextPage : ArcItemPage
 {
     public override string ItemSlug => "slot-text";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "value-currency", "value-percent", "value-word", "size-display", "size-small"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -95,17 +100,39 @@ public sealed class SlotTextPage : ArcItemPage
 
         var stage = SmPage.Stage(SmPage.Center(card), height: 280, background: ArcTokens.SurfaceMuted, padding: 24);
 
+        // The card above rests on the currency value; the row below pins the other value forms and sizes.
+        var variants = DemoUi.Row(
+            Variant("百分比", new ArcSlotText { Value = "+12.4%", FontSize = 40 }),
+            Variant("状态词", new ArcSlotText { Value = "Live now", FontSize = 40 }),
+            Variant("小字号", new ArcSlotText { Value = "1,204", FontSize = 20 }));
+
         return new StackPanel
         {
             Spacing = 12,
             Children =
             {
                 stage,
+                variants,
                 SmPage.Hint(
                     "Every character is a reel: digits count toward the new figure and stop left to right. Try a period change.",
                     monthly,
                     yearly,
                     launch)
+            }
+        };
+    }
+
+    /// <summary>One pinned slot value with its caption, for the value-form and size variants.</summary>
+    private static Control Variant(string caption, ArcSlotText text)
+    {
+        return new StackPanel
+        {
+            Spacing = 4,
+            Margin = new Thickness(0, 0, 24, 0),
+            Children =
+            {
+                text,
+                new TextBlock { Text = caption, Classes = { "arc-caption" } }
             }
         };
     }

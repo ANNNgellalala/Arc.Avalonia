@@ -1,0 +1,80 @@
+{
+  "slug": "bottom-sheet",
+  "nameZh": "底部面板",
+  "summary": "从底部升起的模态面板：在几个 detent 高度之间停靠，头部跟手拖动、越过最高点会回弹，向下拖得足够远就关闭。",
+  "purpose": [
+    "当内容或动作更适合从底部上来时——触屏、窄屏与手机——bottom sheet 在预设高度之间停靠，而不是把整块页面盖满。",
+    "捏住头部拖动时面板一比一跟手，超过最高 detent 按 0.22 的系数回弹；松手落到最近的 detent，拖得足够低或速度足够快就关闭。",
+    "抓取条本身就是按钮：方向键移动一档，Home 与 End 跳到两端，Enter 或 Space 在最低与最高之间切换；遮罩随高度变暗，拖动读起来像一个手势。"
+  ],
+  "whenToUse": [
+    "触屏或窄屏上承载选择、详情或轻量表单。",
+    "需要在两种高度之间切换、并希望用户用拖动控制展开程度时。",
+    "动作需要靠近拇指、位于屏幕下方时。"
+  ],
+  "whenNotToUse": [
+    "桌面宽屏上的确认与决策，改用居中的 dialog。",
+    "需要一直对照背后页面的较长表单，改用 drawer。",
+    "只是一条短提示、不需要遮罩时，改用 popover 或 toast。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "遮罩渐显，面板从底部升起" },
+    { "key": "detent-peek", "label": "Peek", "note": "停在较低的 detent，露出背后的页面" },
+    { "key": "detent-full", "label": "Full", "note": "停在最高的 detent" },
+    { "key": "layout-header", "label": "标题区", "note": "抓取条、标题、描述与关闭按钮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dialog", "note": "桌面上的决策需要居中打断时，改用 dialog" },
+    { "type": "alternative", "target": "drawer", "note": "需要保留页面并承载长表单时，改用侧边的 drawer" },
+    { "type": "complement", "target": "button", "note": "面板底部的动作与关闭按钮都复用 button" }
+  ],
+  "contrasts": [
+    {
+      "target": "dialog",
+      "title": "Bottom sheet 与 Dialog",
+      "rows": [
+        { "dimension": "出现方向", "self": "从底部升起，贴住屏幕下沿", "other": "在面板中央浮出" },
+        { "dimension": "适用设备", "self": "手机、触屏与窄窗口", "other": "桌面与宽屏为主" },
+        { "dimension": "高度控制", "self": "在 detents 之间拖动，可下拖关闭", "other": "固定高度，随内容自适应" },
+        { "dimension": "动作位置", "self": "靠近拇指，常在面板底部", "other": "底栏右对齐的一主一次" }
+      ]
+    },
+    {
+      "target": "drawer",
+      "title": "Bottom sheet 与 Drawer",
+      "rows": [
+        { "dimension": "方向", "self": "从底部升起，占满宽度", "other": "从左右边缘滑入，占满高度" },
+        { "dimension": "手势", "self": "拖动头部在一到两个 detent 之间移动", "other": "固定高度，没有拖拽" },
+        { "dimension": "适用场景", "self": "触屏上的选择与轻量内容", "other": "桌面上的筛选与详情" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一个底部面板",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcBottomSheet Title=\"Lisbon, 3 nights\"\n                          Description=\"Oct 12 to Oct 15\"\n                          IsOpen=\"{Binding IsSheetOpen}\"\n                          InitialDetent=\"0\">\n    <effects:ArcBottomSheet.Detents>\n      <x:Double>0.68</x:Double>\n      <x:Double>0.94</x:Double>\n    </effects:ArcBottomSheet.Detents>\n    <StackPanel Spacing=\"8\">\n      <TextBlock Text=\"Flight TP 1042 · 09:10\" />\n      <TextBlock Text=\"Hotel · Alfama Loft\" />\n    </StackPanel>\n  </effects:ArcBottomSheet>\n</Window>"
+    },
+    {
+      "title": "用代码打开并切到最高一档",
+      "language": "csharp",
+      "code": "var sheet = new ArcBottomSheet\n{\n    Title = \"Lisbon, 3 nights\",\n    Description = \"Oct 12 to Oct 15\",\n    Detents = new[] { 0.68, 0.94 },\n    InitialDetent = 0,\n    Content = new StackPanel { Spacing = 8 }\n};\n\nsheet.IsOpen = true;\nsheet.GoToDetent(1);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcBottomSheet",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "IsOpen": "是否显示；置为 false 时向下收走",
+      "Title": "标题，显示在抓取条下方",
+      "Description": "标题下的一行说明，可为空",
+      "Content": "面板正文，通常是列表或轻量表单",
+      "Detents": "停靠高度，按宿主高度的比例给出，从小到大排列；默认 0.45 与 0.92",
+      "InitialDetent": "打开时停在第几档，默认 0（最低一档）",
+      "CloseLabel": "关闭按钮的可访问名称",
+      "Detent": "当前停靠的档位下标",
+      "OpenChanged": "打开或关闭时触发",
+      "DetentChanged": "停靠档位变化时触发"
+    }
+  }
+}

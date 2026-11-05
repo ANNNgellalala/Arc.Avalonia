@@ -1,0 +1,78 @@
+{
+  "slug": "agent-timeline",
+  "nameZh": "智能体时间轴",
+  "summary": "多智能体运行的时间轴回放：每个智能体一条泳道，思考、工具与等待是不同质感的 span，交接画成折线，头部统计时间、token 与成本。",
+  "purpose": [
+    "把「编排器怎么把活分给子智能体、谁等了谁、时间花在哪」画成一张图：左侧每条泳道写智能体与模型，右侧横向是时间，span 的长度就是耗时。",
+    "三种 span 用不同质感区分：thinking 是半透明色块，tool 是实色块（失败填充危险色并画叉），waiting 是斜线填充的等待段——不用读文字也能看出哪里在空等。",
+    "Retry 的 span 在左端画一个弧形箭头；Handoff 在两条泳道之间画成折线，末端落一个点，表示「这一刻把结论交给谁」。回放时 span 跟着播放头长出来，结束瞬间播放头淡出。",
+    "头部同时给两套读数：回放中显示「已播秒数 / 总时长 · 已用 token · 成本」，结束时换成总结行「5 agents · 14.4s · 1.2x faster than sequential · $0.04 · 14.2k tokens」，并行带来的加速直接用数字说明。"
+  ],
+  "whenToUse": [
+    "运行历史或 trace 查看器需要展示编排器如何把工作拆给子智能体、各段耗时多久。",
+    "要在演示或 changelog 里回放一轮真实运行，并给出时间、token 与成本数字。",
+    "多智能体运行需要边跑边看，事件从后端持续流入时。"
+  ],
+  "whenNotToUse": [
+    "只关心「现在在跑吗、在做什么」时，改用 agent-status，一行就够。",
+    "要核对单次调用的完整入参与输出时，改用 tool-call。",
+    "要解释智能体循环这一概念而不是某次真实运行时，改用 agent-loop 图解。"
+  ],
+  "variants": [
+    { "key": "state-finished", "label": "Finished", "note": "回放结束：播放头淡出，头部换成总结与加速比" },
+    { "key": "variant-agent-lanes", "label": "Agent lanes", "note": "每条泳道写智能体名与模型，首条用强调色" },
+    { "key": "variant-span-kinds", "label": "Span kinds", "note": "thinking 半透明、tool 实色、waiting 斜线" },
+    { "key": "variant-failed-span", "label": "Failed span", "note": "失败的工具段填充危险色并画叉" },
+    { "key": "variant-retry-span", "label": "Retry span", "note": "左端带弧形箭头，表示重跑" },
+    { "key": "variant-handoffs", "label": "Handoffs", "note": "跨泳道的折线加落点，标出交接时刻" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "agent-status", "note": "只看当前状态时改用 agent status，它是整轮运行的一行摘要" },
+    { "type": "complement", "target": "tool-call", "note": "时间轴给出全局与并发，工具调用行给出每次调用的参数与结果" },
+    { "type": "complement", "target": "agent-loop", "note": "agent loop 解释概念，时间轴回放同一循环在真实运行里的样子" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-status",
+      "title": "Agent timeline 与 Agent status",
+      "rows": [
+        { "dimension": "粒度", "self": "沿时间轴展开编排器、子智能体与交接", "other": "整轮运行压成一行，展开才看最近五步" },
+        { "dimension": "常驻位置", "self": "运行详情页或可滚动的侧栏", "other": "页头、标题栏或 composer 上方常驻" },
+        { "dimension": "交互", "self": "播放头回放，头部统计时间、token 与成本", "other": "点击展开，内联批准、暂停与停止" }
+      ]
+    },
+    {
+      "target": "tool-call",
+      "title": "Agent timeline 与 Tool call",
+      "rows": [
+        { "dimension": "组织方式", "self": "按时间的泳道图，调用是其中一段 span", "other": "按调用顺序的清单，可逐行展开" },
+        { "dimension": "并发呈现", "self": "并发、等待与交接直接画在时间轴上", "other": "只能从行尾耗时看出重叠" },
+        { "dimension": "适合问题", "self": "这轮流怎么跑、谁等了谁、慢在哪", "other": "这次调用传了什么、返回了什么" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：五条泳道与交接",
+      "language": "xaml",
+      "code": "<arc:ArcAgentTimeline xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                    Title=\"Incident investigation\"\n                    Duration=\"14.4\"\n                    Agents=\"{Binding Agents}\"\n                    Spans=\"{Binding Spans}\"\n                    Handoffs=\"{Binding Handoffs}\" />"
+    },
+    {
+      "title": "失败、重试与交接的 span",
+      "language": "csharp",
+      "code": "var timeline = new ArcAgentTimeline\n{\n    Title = \"Incident investigation\",\n    Duration = 14.4,\n    Agents = new List<ArcTimelineAgent>\n    {\n        new() { Id = \"lead\", Name = \"Orchestrator\", Model = \"Claude Opus 5.5\", PricePerMillion = 8 },\n        new() { Id = \"sql\", Name = \"Analyst\", Model = \"Claude Haiku 5.5\", PricePerMillion = 0.2 }\n    },\n    Spans = new List<ArcTimelineSpan>\n    {\n        new() { Id = \"s1\", AgentId = \"lead\", Kind = \"thinking\", Start = 0, End = 1.4, Label = \"Planned the investigation\", Tokens = 1200 },\n        new() { Id = \"s2\", AgentId = \"lead\", Kind = \"waiting\", Start = 1.4, End = 5.8, Label = \"Waiting on the researcher\" },\n        new() { Id = \"s8\", AgentId = \"sql\", Kind = \"tool\", Tool = \"PostgreSQL\", Start = 9.5, End = 10.3, Label = \"Joined sessions on the raw table\", Tokens = 800, Failed = true },\n        new() { Id = \"s9\", AgentId = \"sql\", Kind = \"tool\", Tool = \"PostgreSQL\", Start = 10.5, End = 12.4, Label = \"Re-ran with a narrower window\", Tokens = 1900, Retry = true }\n    },\n    Handoffs = new List<ArcTimelineHandoff>\n    {\n        new() { From = \"lead\", To = \"sql\", At = 6.6, Label = \"Error rates per hour\" },\n        new() { From = \"sql\", To = \"lead\", At = 12.5, Label = \"Rate doubled at 14:00\" }\n    }\n};\n\n// 回放：播放头从 0 走到 Duration，span 跟着长出来\ntimeline.IsPlaying = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcAgentTimeline",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "时间轴标题，例如 Incident investigation",
+      "Agents": "泳道对应的智能体，元素是 ArcTimelineAgent（名称、模型、每百万 token 价格）",
+      "Spans": "时间段，元素是 ArcTimelineSpan（Kind、Tool、Start、End、Tokens、Failed、Retry）",
+      "Handoffs": "交接，元素是 ArcTimelineHandoff（From、To、At、Label），画成跨泳道折线",
+      "Duration": "整轮运行的总时长（秒），也是横轴范围",
+      "IsPlaying": "是否正在回放；播到结尾会自回 false 并切到总结读数"
+    }
+  }
+}

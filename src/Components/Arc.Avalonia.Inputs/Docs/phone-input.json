@@ -1,0 +1,79 @@
+{
+  "slug": "phone-input",
+  "nameZh": "电话号码输入",
+  "summary": "带国家选择的电话输入：国家按钮点开后长出可搜索列表，号码按该国分组边输边格式化，读回 E.164。",
+  "purpose": [
+    "把国际电话号码收成一个可直接存储的 E.164 字符串（如 +14155550132），同时让用户看到按国家习惯分组的可读号码。",
+    "国家按钮里内建 14 个国家的区号、trunk 前缀、分组规则与位数范围；列表可在顶部搜索，PreferredCountries 会把常用国家固定到「Suggested」分组。",
+    "校验在失焦后进行：位数不足或超出该国范围时，错误文案指出所需位数；位数正确时右侧显示对勾。粘贴带 + 的国际号码会自动切换到对应国家。"
+  ],
+  "whenToUse": [
+    "注册、结账、双因素认证等需要国际电话号码的表单。",
+    "需要把号码以 E.164 交给后端、又希望用户输入时看到本地分组格式的场景。",
+    "需要按国家限定位数范围并给出明确错误文案时。"
+  ],
+  "whenNotToUse": [
+    "只是普通联系方式文本（分机、备注）改用 input。",
+    "只需要固定单一国家、且不显示国家选择器时，用 input 配合掩码校验更轻。",
+    "需要从长列表里选择国家并回填时，如果国家是独立字段，用 select 或 combobox 更符合语义。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "Empty", "note": "未输入，占位与帮助文案" },
+    { "key": "state-filling", "label": "Filling", "note": "输入中，按国家分组格式化、尚未校验" },
+    { "key": "state-valid", "label": "Valid", "note": "位数正确，右侧显示对勾" },
+    { "key": "state-invalid", "label": "Invalid", "note": "位数不足，错误文案替换帮助文案" },
+    { "key": "variant-country-picker", "label": "Country picker", "note": "国家列表展开，含 Suggested 分组" },
+    { "key": "variant-preferred", "label": "Preferred countries", "note": "PreferredCountries 固定常用国家" },
+    { "key": "state-disabled", "label": "Disabled", "note": "只读，国家按钮不可点" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "普通文本联系方式改用 input" },
+    { "type": "complement", "target": "select", "note": "国家作为独立字段时可用 select 承担" },
+    { "type": "uses", "target": "button", "note": "国家选择按钮复用 button" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Phone input 与 Input",
+      "rows": [
+        { "dimension": "输入内容", "self": "国家区号 + 按国分组的号码", "other": "任意单行文本" },
+        { "dimension": "格式化", "self": "边输边按国家分组规则排版", "other": "原样保存用户输入" },
+        { "dimension": "校验与值", "self": "失焦后按位数校验，值为 E.164", "other": "校验与值处理完全交给调用方" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcPhoneInput Label=\"手机号\"\n                     DefaultCountry=\"US\"\n                     Required=\"True\"\n                     Description=\"仅用于订单通知。\"\n                     Value=\"{Binding Phone, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "限定常用国家并读取验证结果",
+      "language": "csharp",
+      "code": "var phone = new ArcPhoneInput\n{\n    Label = \"联系电话\",\n    DefaultCountry = \"GB\",\n    PreferredCountries = new List<string> { \"GB\", \"IE\", \"US\" },\n    Value = \"+447911123456\"\n};\n\nphone.ValueChanged += (_, e) =>\n{\n    Submit.IsEnabled = e.Valid;\n    Hint.Text = e.Formatted;\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcPhoneInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "E.164 号码，如 +14155550132；空字符串表示清空",
+      "Country": "当前选中国家的 ISO 代码，可双向绑定",
+      "DefaultCountry": "初始国家 ISO 代码，默认 US",
+      "Countries": "限制国家列表可选的 ISO 代码集合",
+      "PreferredCountries": "固定在建议分组的 ISO 代码，默认 US/CA/GB",
+      "Label": "可见标签与无障碍名称",
+      "HideLabel": "标签只给读屏，不绘制",
+      "Description": "帮助文案；错误文案出现时被覆盖",
+      "Error": "自定义错误文案，替换内置的位数提示",
+      "Validate": "失焦后是否按国家位数校验，默认 true",
+      "Required": "为空时是否提示必填",
+      "Formatted": "只读，按国家分组规则显示的号码",
+      "IsValid": "只读，位数是否符合当前国家范围",
+      "ValueChanged": "每次编辑触发，参数含 Value、Country、Formatted、Valid",
+      "CountryChanged": "国家变化（含粘贴国际号码自动识别）时触发",
+      "OpenCountryPicker": "展开国家列表，用于页面代码展示打开态"
+    }
+  }
+}

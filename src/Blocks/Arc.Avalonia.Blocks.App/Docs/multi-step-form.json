@@ -1,0 +1,54 @@
+{
+  "slug": "multi-step-form",
+  "nameZh": "多步表单",
+  "summary": "三步向导：一次渲染一组字段，顶部是进度头与步骤，底部是 Back / Continue，最后落到成功态；字段值存在步骤之外，返回时不会丢。",
+  "purpose": [
+    "当注册或入职信息需要分几次问、又不想做多个页面时用它：每一步只放一组字段，顶部告诉你走到哪一步，底部只有 Back 与 Continue。",
+    "字段值放在步骤内容之外，因此 Back 回去修改不会丢数据，这既是参考实现的做法，也是移植版刻意保留的约束。",
+    "右侧有一块「Why three steps」说明，解释拆分的理由；最后一步完成后内容换成成功态，而不是跳到另一个页面。"
+  ],
+  "whenToUse": [
+    "入职、开户或项目创建需要拆成几步短表单时。",
+    "向导需要 Back / Continue、进度显示与最终成功态时。",
+    "希望每一步只呈现一组字段、降低单屏压力时。"
+  ],
+  "whenNotToUse": [
+    "只需要一个独立的进度指示器时用 stepper。",
+    "任务是清单式的勾选、没有表单字段时用 onboarding-checklist。",
+    "字段很少、一屏就能放下时用普通表单加一个提交按钮。"
+  ],
+  "variants": [
+    { "key": "state-step-one", "label": "Step one", "note": "第一步：工作区名称、团队规模与邀请邮箱" },
+    { "key": "variant-stepper", "label": "Stepper", "note": "顶部三步进度头与当前步骤" },
+    { "key": "variant-footer-actions", "label": "Footer actions", "note": "底部的 Back 与 Continue" },
+    { "key": "variant-aside", "label": "Aside", "note": "右侧「Why three steps」说明" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "姓名、团队名称与邀请邮箱输入" },
+    { "type": "uses", "target": "checkbox", "note": "产品更新订阅复选框" },
+    { "type": "uses", "target": "select", "note": "团队规模与套餐选择" },
+    { "type": "uses", "target": "stepper", "note": "顶部三步进度头由 ArcStepper 表达" },
+    { "type": "uses", "target": "badge", "note": "步骤状态与提示用徽标标出" },
+    { "type": "uses", "target": "button", "note": "Continue、Back 与完成后的下一步" },
+    { "type": "alternative", "target": "signup-form", "note": "分步向导与单页注册表单是两种取舍" }
+  ],
+  "contrasts": [
+    {
+      "target": "signup-form",
+      "title": "Multi-step form 与 Signup form",
+      "rows": [
+        { "dimension": "字段组织", "self": "一次只显示一组，分三步", "other": "所有字段在一张卡里" },
+        { "dimension": "导航", "self": "Back / Continue 与顶部步骤", "other": "单一提交按钮" },
+        { "dimension": "返回", "self": "Back 保留已填值", "other": "没有步骤，所有字段常驻" },
+        { "dimension": "适用", "self": "字段多、需要引导的入职或开户", "other": "字段较少的自助注册" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "步骤、进度与页脚",
+      "language": "csharp",
+      "code": "var current = Steps[step];\n\nheaderHost.Content = new ArcStepper\n{\n    Current = done ? Steps.Length : step,\n    Steps = Steps.Select(item => new ArcStep { Label = item.Label }).ToList()\n};\n\nbodyHost.Content = new StackPanel\n{\n    Spacing = 12,\n    Children =\n    {\n        new TextBlock { Text = current.Title, Classes = { \"arc-heading\" } },\n        current.Body\n    }\n};\n\nfooterHost.Content = AppKit.Row(8,\n    AppKit.Btn(\"Back\", ArcButtonVariant.Secondary, ArcButtonSize.Md, Previous),\n    AppKit.Btn(done ? \"Finish\" : \"Continue\", ArcButtonVariant.Primary, ArcButtonSize.Md, Next));\n\nreturn AppKit.Screen(new Border { Padding = new Thickness(24), Child = stage }, 560);"
+    }
+  ]
+}

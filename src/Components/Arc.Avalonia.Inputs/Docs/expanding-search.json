@@ -1,0 +1,85 @@
+{
+  "slug": "expanding-search",
+  "nameZh": "展开式搜索",
+  "summary": "平时是一枚图标按钮，点击后在宽度弹簧上长成搜索框，并在下方浮出最近项或匹配结果，Escape 折回图标。",
+  "purpose": [
+    "为头部空间紧张的页面提供搜索：折叠态只占一个图标按钮的位置，展开后字段在宽度弹簧上长到 ExpandedWidth，不改变工具栏里其它控件的排布基线。",
+    "结果面板跟着字段宽度走：空查询时列出 Suggestions 作为「最近使用」，输入后按标题、Meta 与 Keywords 做本地过滤，键盘上下移动高亮、Enter 选中、Escape 折回并清空。",
+    "它自带结果行与空结果提示，调用方只需要提供条目集合；相比 search-field，省掉了自己渲染下拉列表的接线工作，但代价是必须接受内置的行样式。"
+  ],
+  "whenToUse": [
+    "页头或工具栏只放得下一枚图标、但点击后需要完整搜索体验的地方。",
+    "搜索对象是固定的本地条目集合，可以用 ArcExpandingSearchItem 描述标题、分组与关键词。",
+    "希望搜索框与结果面板一起出现、一起消失，而不是两个独立层叠层。"
+  ],
+  "whenNotToUse": [
+    "搜索框应当常驻可见时改用 search-field，避免用户多点一次。",
+    "结果需要自定义行模板（头像、状态徽章、操作按钮）时，用 search-field 自己渲染列表更自由。",
+    "需要从长列表里选值并回填到字段时改用 combobox，展开式搜索是过滤视图而不是选值控件。"
+  ],
+  "variants": [
+    { "key": "state-collapsed", "label": "Collapsed", "note": "只显示一枚搜索图标按钮" },
+    { "key": "state-expanded", "label": "Expanded", "note": "展开为空字段，聚焦等待输入" },
+    { "key": "state-suggestions", "label": "Suggestions", "note": "展开且空查询，列出最近项" },
+    { "key": "variant-anchor-start", "label": "Anchor start", "note": "图标在左，字段向右长" },
+    { "key": "variant-anchor-end", "label": "Anchor end", "note": "图标在右，字段向左长" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可展开，降低不透明度" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "search-field", "note": "搜索框应常驻可见时改用 search field" },
+    { "type": "complement", "target": "button", "note": "折叠态与工具栏里的图标按钮共享同一行高度" },
+    { "type": "alternative", "target": "combobox", "note": "需要选值回填时改用 combobox" }
+  ],
+  "contrasts": [
+    {
+      "target": "search-field",
+      "title": "Expanding search 与 Search field",
+      "rows": [
+        { "dimension": "常驻占位", "self": "折叠为一枚图标，展开时才占字段宽度", "other": "始终是完整字段，宽度固定" },
+        { "dimension": "结果展示", "self": "内置结果面板，含最近项与无结果提示", "other": "不展示结果，由调用方渲染" },
+        { "dimension": "键盘路径", "self": "Enter/Space 展开，方向键移动，Escape 折回", "other": "直接输入，Escape 清空查询" }
+      ]
+    },
+    {
+      "target": "combobox",
+      "title": "Expanding search 与 Combobox",
+      "rows": [
+        { "dimension": "目标", "self": "过滤当前视图，不产生选中值", "other": "选中一项并回填到字段" },
+        { "dimension": "结果行", "self": "标题 + Meta + 分组，固定样式", "other": "选项行，可带禁用态与清除按钮" },
+        { "dimension": "数据来源", "self": "ArcExpandingSearchItem 集合", "other": "ArcComboboxOption 集合" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcExpandingSearch Label=\"搜索项目与文档\"\n                          Placeholder=\"输入关键词\"\n                          ExpandedWidth=\"400\"\n                          Anchor=\"End\"\n                          Items=\"{Binding SearchItems}\"\n                          Suggestions=\"{Binding RecentItems}\"\n                          Selected=\"OnSearchSelected\" />\n</Window>"
+    },
+    {
+      "title": "页面代码展开并读取选中项",
+      "language": "csharp",
+      "code": "var search = new ArcExpandingSearch\n{\n    Label = \"搜索项目与文档\",\n    Anchor = ArcExpandingSearchAnchor.Start,\n    Items = new List<ArcExpandingSearchItem>\n    {\n        new(\"p1\", \"Arc website\", \"Projects\", \"Updated today\", new[] { \"marketing\" }),\n        new(\"d1\", \"Motion tokens\", \"Docs\", \"Spring, duration\", new[] { \"spring\" })\n    }\n};\n\nsearch.Selected += (_, e) => Open(e.Item.Id);\nsearch.Expand();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcExpandingSearch",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "按钮、字段与结果面板的无障碍名称，如「搜索项目与文档」",
+      "Items": "全部可搜索条目；输入后按标题、Meta 与 Keywords 本地过滤",
+      "Suggestions": "空查询时展示的最近项",
+      "SuggestionsLabel": "空查询时结果面板的分组标题，默认 Recent",
+      "Placeholder": "空查询时的占位文案，默认回退到 Label",
+      "ExpandedWidth": "展开后的目标宽度，默认 360；不会超过容器宽度",
+      "MaxResults": "结果面板最多显示的条数，默认 6",
+      "Anchor": "图标贴边方向 Start/End，决定字段向哪侧长",
+      "EmptyHint": "无匹配结果时显示的第二行提示",
+      "IsExpanded": "展开状态，可由页面代码写入；展开会聚焦字段",
+      "Selected": "选中结果时触发，随后字段自动折回图标",
+      "ExpandedChanged": "展开或折回时触发",
+      "Expand": "展开并聚焦字段",
+      "Collapse": "折回图标并清空查询"
+    }
+  }
+}

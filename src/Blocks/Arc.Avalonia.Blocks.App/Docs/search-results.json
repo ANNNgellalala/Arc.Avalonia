@@ -1,0 +1,53 @@
+{
+  "slug": "search-results",
+  "nameZh": "搜索结果页",
+  "summary": "搜索结果页：带查询栏的工作区搜索，facets 计数跟随查询、筛选 chip、文档 / 人员 / 文件混合结果并高亮匹配，还有键盘光标与预览面板。",
+  "purpose": [
+    "当搜索需要返回多种类型的结果、并让人先读再打开时用它：左侧筛选与 facets，中间结果列表，右侧预览面板。",
+    "查询栏支持 / 聚焦、方向键移动光标、Enter 在预览里打开结果；类型、团队与排序都用分段或选项切换，结果里的匹配词高亮显示。",
+    "所有匹配、排序与 facets 计数都在客户端对少量样本数据完成，没有延迟模拟；预览面板内联显示，窄屏才改为底部抽屉。"
+  ],
+  "whenToUse": [
+    "一次搜索会返回文档、人员、文件等多种结果时。",
+    "用户需要按类型或团队收窄结果、并在打开前预览匹配内容时。",
+    "需要键盘光标与匹配高亮的搜索界面时。"
+  ],
+  "whenNotToUse": [
+    "只需要从任意页面快速跳转时用 command-palette。",
+    "结果是可比较的二维记录时用 data-grid 或 sortable-data-table。",
+    "只是列表上方的筛选区时用 filter-toolbar，不需要整页搜索结构。"
+  ],
+  "variants": [
+    { "key": "state-highlight", "label": "Highlight", "note": "第一条结果被键盘光标选中" },
+    { "key": "variant-query-bar", "label": "Query bar", "note": "顶部查询输入与结果计数" },
+    { "key": "variant-facets", "label": "Facets", "note": "左侧类型与团队 facet，计数跟随查询" },
+    { "key": "variant-filter-chips", "label": "Filter chips", "note": "已生效筛选条件以 chip 展示" },
+    { "key": "variant-preview-pane", "label": "Preview pane", "note": "右侧预览面板显示选中结果的详情" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "顶部查询栏负责输入与聚焦" },
+    { "type": "uses", "target": "segmented-control", "note": "类型、团队与排序用分段控件切换" },
+    { "type": "uses", "target": "badge", "note": "结果类型与计数用徽标标出" },
+    { "type": "uses", "target": "button", "note": "结果行、chip 与预览里的动作都是按钮" },
+    { "type": "alternative", "target": "filter-toolbar", "note": "整页搜索结果与列表上方筛选栏的取舍" }
+  ],
+  "contrasts": [
+    {
+      "target": "filter-toolbar",
+      "title": "Search results 与 Filter toolbar",
+      "rows": [
+        { "dimension": "范围", "self": "整页搜索：查询、facets、结果与预览", "other": "一条工具栏，通常放在表格或列表上方" },
+        { "dimension": "结果", "self": "混合类型的结果与匹配高亮", "other": "不展示结果，只负责缩小数据集" },
+        { "dimension": "布局", "self": "三栏或两栏结构", "other": "单行，放不下时换行" },
+        { "dimension": "适用", "self": "工作区级搜索", "other": "已有列表的筛选与排序" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三栏搜索结果",
+      "language": "csharp",
+      "code": "var page = new Grid { ColumnDefinitions = new ColumnDefinitions(\"220,*,360\") };\n\npage.Children.Add(AppKit.Place(new StackPanel\n{\n    Spacing = 12,\n    Children = { AppKit.Caption(\"Filters\"), facetHost, chipHost }\n}, 0));\n\npage.Children.Add(AppKit.Place(new StackPanel\n{\n    Spacing = 10,\n    Children = { AppKit.Search(\"Search the Northwind workspace\", ApplyQuery), listHost }\n}, 1));\n\npage.Children.Add(AppKit.Place(AppKit.Card(previewHost, 14, 18), 2));\n\nreturn AppKit.Screen(page, 544);"
+    }
+  ]
+}

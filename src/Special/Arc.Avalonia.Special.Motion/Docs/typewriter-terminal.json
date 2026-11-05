@@ -1,0 +1,70 @@
+{
+  "slug": "typewriter-terminal",
+  "nameZh": "打字机终端",
+  "summary": "一个会自己敲命令的终端窗口：按种子化的人类节奏逐字打出命令、逐行流出输出与进度，底部还有播放、重播与可拖动的进度条。",
+  "purpose": [
+    "当落地页首屏、安装区或文档快速开始需要演示一段 CLI 会话时，用 typewriter terminal：命令逐字打出，输出行升起淡入，进度条先快后慢地填完。",
+    "节奏是种子化的：每条命令前有一小段「思考」，单词内部成串、空格处停顿、大写字母处稍微多等一点；同一段脚本在每次重播里都完全一致。",
+    "输出行分几种形态：成功行带勾、任务行带勾与耗时、进度条带百分比、普通行按 shell 语法着色（命令、参数、路径各一色）；底部进度条可以拖动，空格播放或暂停、R 重播。"
+  ],
+  "whenToUse": [
+    "开发者工具的落地页首屏或安装区，需要演示命令的输出。",
+    "文档快速开始，先让人看到每条命令会打印什么。",
+    "更新日志或发布帖里演示一条新命令。"
+  ],
+  "whenNotToUse": [
+    "用户需要不等待就能阅读与复制的命令，用 code-block。",
+    "真实的、持续变化的过程输出，用 realtime-stream。",
+    "展示文件在版本之间的差异，用代码 diff。"
+  ],
+  "variants": [
+    { "key": "state-finished", "label": "Finished", "note": "降级动效下的完整会话：两条命令与全部输出一次呈现" },
+    { "key": "variant-titlebar", "label": "Title bar", "note": "窗口标题栏：三个圆点、zsh 名称与复制按钮" },
+    { "key": "variant-command", "label": "Command", "note": "带提示符与语法着色的命令行，光标在打字时跟随" },
+    { "key": "variant-success", "label": "Success", "note": "成功输出行：成功色文字前置勾号" },
+    { "key": "variant-progress", "label": "Progress", "note": "进度输出行：强调色进度条与百分比读数" },
+    { "key": "variant-scrubber", "label": "Scrubber", "note": "底部播放 / 重播按钮、时间轴与总时长读数" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "code-block", "note": "需要可复制、静态的命令时用代码块" },
+    { "type": "alternative", "target": "realtime-stream", "note": "真实持续输出用实时流" },
+    { "type": "complement", "target": "morph-loader", "note": "等待输出时可用 morph loader 承担加载指示" }
+  ],
+  "contrasts": [
+    {
+      "target": "code-block",
+      "title": "Typewriter terminal 与 Code block",
+      "rows": [
+        { "dimension": "内容", "self": "会自己播放的模拟会话", "other": "可复制、可静态阅读的代码" },
+        { "dimension": "节奏", "self": "逐字打出、逐行流出，有耗时", "other": "一次性呈现" },
+        { "dimension": "用途", "self": "演示命令的效果与输出", "other": "让人带走并运行这段代码" }
+      ]
+    },
+    {
+      "target": "realtime-stream",
+      "title": "Typewriter terminal 与 Realtime stream",
+      "rows": [
+        { "dimension": "数据来源", "self": "种子化脚本，完全可重放", "other": "持续到达的真实数据" },
+        { "dimension": "交互", "self": "播放、暂停、重播、拖动进度", "other": "持续滚动，通常只暂停视图" },
+        { "dimension": "场景", "self": "落地页与文档演示", "other": "监控与实时日志" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcTypewriterTerminal xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                          HorizontalAlignment=\"Stretch\" />"
+    },
+    {
+      "title": "代码构建",
+      "language": "csharp",
+      "code": "var terminal = new ArcTypewriterTerminal();\nAutomationProperties.SetName(terminal, \"Install session\");\n// 空格播放或暂停，R 重播，方向键在命令之间跳转，Home / End 到两端。"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcTypewriterTerminal",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {}
+  }
+}

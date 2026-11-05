@@ -1,0 +1,78 @@
+{
+  "slug": "metric-card",
+  "nameZh": "指标卡",
+  "summary": "单个关键数字加语境：标签、数值、变化徽标与一行上下文，可选一条迷你趋势图。",
+  "purpose": [
+    "把「一个数字 + 它在往哪走」放在一张卡片里：Label 说明是什么，Value 是主数字，Suffix 补单位，Context 交代对比基准。",
+    "Change 与 Trend 一起决定变化徽标的方向：Up 用成功色、Down 用危险色、Flat 保持中性；方向同时写在文字里，不只靠颜色。",
+    "Sparkline 是一个内容插槽，可以放进任意轻量图形（例如一排小柱），在数字旁给出一条趋势形状；不提供图表能力时留空也成立。"
+  ],
+  "whenToUse": [
+    "仪表盘顶部的关键指标（收入、留存、在线人数）。",
+    "需要同时给出「当前值」与「相对上一周期变化」的卡片。",
+    "同一行并排展示 2–4 个指标，需要统一排版时。"
+  ],
+  "whenNotToUse": [
+    "要展示完整的趋势与多序列对比时，改用 line-chart 等图表组件。",
+    "内容是配额对上限、需要分段与剩余量时，改用 usage-meter。",
+    "只是普通内容容器、没有数字时，改用 card。"
+  ],
+  "variants": [
+    { "key": "trend-up", "label": "Up", "note": "上升徽标，成功色" },
+    { "key": "trend-down", "label": "Down", "note": "下降徽标，危险色" },
+    { "key": "trend-flat", "label": "Flat", "note": "持平徽标，中性色" },
+    { "key": "variant-sparkline", "label": "Sparkline", "note": "数字旁的一条迷你趋势" }
+  ],
+  "relations": [
+    { "type": "extends", "target": "card", "note": "指标卡继承卡片的表面、边框与内边距" },
+    { "type": "complement", "target": "usage-meter", "note": "关键指标与配额用量常并排" },
+    { "type": "alternative", "target": "empty-state", "note": "指标没有数据时的空位改用 empty-state" }
+  ],
+  "contrasts": [
+    {
+      "target": "card",
+      "title": "Metric card 与 Card",
+      "rows": [
+        { "dimension": "用途", "self": "一个数字与它的变化", "other": "任意内容容器" },
+        { "dimension": "属性", "self": "Value、Change、Trend、Sparkline 固定排版", "other": "只有 Interactive、Muted 与 Content" },
+        { "dimension": "选择依据", "self": "需要强调数值与方向时", "other": "只是分组内容时" }
+      ]
+    },
+    {
+      "target": "usage-meter",
+      "title": "Metric card 与 Usage meter",
+      "rows": [
+        { "dimension": "需要的基准", "self": "与上一周期比较", "other": "与固定上限比较" },
+        { "dimension": "呈现", "self": "大数字加变化徽标", "other": "分段条加图例与阈值" },
+        { "dimension": "回答的问题", "self": "现在是多少、在涨还是跌", "other": "还剩多少可用" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "上升指标带迷你趋势",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcMetricCard Label=\"Uptime\"\n                    Value=\"99.9\"\n                    Suffix=\"%\"\n                    Context=\"Last 30 days\"\n                    Change=\"+0.2%\"\n                    Trend=\"Up\" />\n</Window>"
+    },
+    {
+      "title": "下降指标并自定义小数",
+      "language": "csharp",
+      "code": "var revenue = new ArcMetricCard\n{\n    Label = \"Monthly revenue\",\n    Value = 48250,\n    Context = \"vs last month\",\n    Change = \"-3.1%\",\n    Trend = ArcMetricTrend.Down\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcMetricCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "指标的说明文字，例如 Monthly revenue",
+      "Value": "主数字，按当前区域格式排版",
+      "Suffix": "数字后的单位，例如 % 或 ms",
+      "Context": "对比基准的一行说明，例如 vs last month",
+      "Change": "变化文案，例如 +0.2%；与 Trend 一起决定徽标方向",
+      "Trend": "变化方向：Up / Down / Flat，默认 Flat",
+      "Sparkline": "可选趋势图形插槽，放在数字旁",
+      "Interactive": "继承自 ArcCard，可点击时打开手型与悬停边框",
+      "Muted": "继承自 ArcCard，用静默表面表示次级分组"
+    }
+  }
+}

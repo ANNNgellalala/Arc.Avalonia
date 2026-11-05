@@ -1,0 +1,78 @@
+{
+  "slug": "streamgraph",
+  "nameZh": "流图",
+  "summary": "堆叠的流层图：多个类别沿一条柔和的基线叠放，既能读总量走势，也能看各类别在总盘子里的此消彼长。",
+  "purpose": [
+    "当你要同时回答两个问题——总量怎么变、构成怎么变——时，流图比多条折线更紧凑：各层厚度代表各自的值，整体轮廓代表合计。",
+    "基线会随数据柔和起伏（wiggle），让每一层在纵向上的位置都尽量稳定，读者在时间轴上追踪某一层时不容易跟丢。",
+    "悬停某一层会压暗其余层，并读取出该层在最近时间点的值；图例可以按层名定位，和颜色一一对应。",
+    "各层按 Series 的顺序自下而上堆叠，顺序本身表达优先级，建议把最关心的类别放在靠上或靠下的稳定位置。"
+  ],
+  "whenToUse": [
+    "要展示多个类别合起来随时间变化的总量，同时保留各自的贡献。",
+    "类别在 3 到 6 个之间、且总量远超任何单层时。",
+    "想用一张紧凑的图代替「一条总量线 + 若干条分项线」时。",
+    "读者关心的是构成的变化趋势，而不是某层在某一刻的精确数值时。"
+  ],
+  "whenNotToUse": [
+    "只需要看总量趋势时改用 line-chart，流图的层会稀释重点。",
+    "各类别量级相近、又需要精确读取单个值时改用 bar-chart。",
+    "需要比较两个时点的构成或排名变化时改用 slope-chart。",
+    "类别没有「合计」含义、只是不同维度的分布时改用 ridgeline。"
+  ],
+  "variants": [
+    { "key": "variant-four-layers", "label": "四层流图", "note": "四个类别堆叠，图例按层名列在顶部" },
+    { "key": "variant-two-layers", "label": "两层流图", "note": "只保留两层时，单层厚度读起来更直接" },
+    { "key": "state-no-legend", "label": "无图例", "note": "ShowLegend=false，只留流层与时间标签" },
+    { "key": "state-empty", "label": "空数据", "note": "Series 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "只看总量或单条趋势时，line chart 更直接" },
+    { "type": "alternative", "target": "bar-chart", "note": "离散类别、需要精确比较单值时用 bar chart" },
+    { "type": "alternative", "target": "ridgeline", "note": "类别是分布而不是合成分量时用 ridgeline" },
+    { "type": "complement", "target": "activity-heatmap", "note": "热力图看单日密度，流图看周级构成，两者常成对出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Streamgraph 与 Line chart",
+      "rows": [
+        { "dimension": "总量", "self": "层叠轮廓就是合计，一眼可见", "other": "合计需要另加一条线或心算" },
+        { "dimension": "单值读取", "self": "层厚表示值，精确读数靠悬停", "other": "纵轴直接对应数值，更易精读" },
+        { "dimension": "类别数量", "self": "适合 3 到 6 个类别", "other": "两三条线最舒服，再多会缠绕" },
+        { "dimension": "适用问题", "self": "构成和总量一起怎么变", "other": "各序列各自的趋势" }
+      ]
+    },
+    {
+      "target": "bar-chart",
+      "title": "Streamgraph 与 Bar chart",
+      "rows": [
+        { "dimension": "时间维度", "self": "连续时间轴，层随时间流动", "other": "离散类别，每个类别一根柱" },
+        { "dimension": "合计", "self": "堆叠轮廓本身就是总量", "other": "需要堆叠柱才看得到合计" },
+        { "dimension": "精确比较", "self": "层与层之间靠厚度估计", "other": "柱高直接对应数值，便于比较" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "工单主题构成",
+      "language": "csharp",
+      "code": "var chart = new ArcStreamgraph\n{\n    Labels = new[] { \"W1\", \"W2\", \"W3\", \"W4\", \"W5\", \"W6\" },\n    Series = new[]\n    {\n        new ChartSeries(\"Bugs\", new double[] { 22, 30, 26, 38, 34, 48 }),\n        new ChartSeries(\"Billing\", new double[] { 14, 18, 24, 20, 28, 26 }),\n        new ChartSeries(\"Onboarding\", new double[] { 10, 14, 12, 18, 22, 20 })\n    },\n    ValueSuffix = \" tickets\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcStreamgraph x:Name=\"Tickets\"\n                         Height=\"240\"\n                         ShowLegend=\"True\"\n                         ValueSuffix=\" tickets\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcStreamgraph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Series": "自下而上堆叠的层；每层的 Name 用于图例与悬停提示",
+      "Labels": "时间轴标签，每个采样点对应一个",
+      "ShowLegend": "在顶部显示层名图例，默认 true",
+      "ValueSuffix": "追加在悬停数值后的单位，例如 \" tickets\""
+    }
+  }
+}

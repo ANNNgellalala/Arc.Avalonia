@@ -21,6 +21,11 @@ public sealed class FeatureBentoPage : ArcItemPage
 {
     public override string ItemSlug => "feature-bento";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-bento", "variant-live-demos"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -84,7 +89,7 @@ public sealed class FeatureBentoPage : ArcItemPage
         Grid.SetColumnSpan(audit, 2);
         grid.Children.Add(audit);
 
-        return Mk.Surface(new Border { Padding = new Thickness(10), Child = grid });
+        return new ArcCard { Padding = new Thickness(10), Content = grid };
     }
 
     private static Control Cell(string title, string caption, string icon, Control demo)

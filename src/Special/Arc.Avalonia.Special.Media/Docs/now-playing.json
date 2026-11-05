@@ -1,0 +1,74 @@
+{
+  "slug": "now-playing",
+  "nameZh": "正在播放",
+  "summary": "从小型播放条长成完整播放器的连续变形：封面、标题、波形擦洗、上一首/播放/下一首与收起按钮共享同一条弹簧。",
+  "purpose": [
+    "媒体在浏览时继续播放的场景需要一条常驻的迷你播放条；当用户愿意停下来看时，同一条表面又应该能展开成完整播放器。Now playing 把两种形态做成一次变形：外壳变大、封面沿同一曲线移动、迷你控件淡出而完整控件淡入。",
+    "完整态把 54 段波形当作擦洗条：已播部分取强调色，时间显示在两端；封面右侧的三条电平条只在播放时起伏。播放由内部时钟驱动，所以没有音频也能演示；真实项目把播放与换曲事件接到媒体元素即可。",
+    "键盘是完整的：Space 播放/暂停，左右各跳 5 秒、PageUp / PageDown 各 30 秒、Home / End 跳到首尾，Up 展开、Escape 收起。封面可以向下拉动超过 70px 来收起，换曲时封面按方向滑入；降级动效时用短淡入与静止的电平条代替。"
+  ],
+  "whenToUse": [
+    "音乐、播客或音频课程在用户浏览其他内容时继续播放。",
+    "希望在同一个控件里同时提供迷你条与完整播放器，而不是两个独立组件时。",
+    "需要波形式擦洗条、而不仅是普通滑杆的媒体界面。"
+  ],
+  "whenNotToUse": [
+    "只需要一条简单的进度滑杆时，改用 slider，不必承担整块播放器。",
+    "一次性出现的浮层、并不是常驻播放器时，改用 bottom-sheet 或 dialog。",
+    "录音与发送语音消息的场景，改用 voice-recorder。"
+  ],
+  "variants": [
+    { "key": "state-expanded", "label": "Expanded", "note": "完整播放器：大封面、标题、波形、上一首/播放/下一首与收起" },
+    { "key": "variant-waveform", "label": "Waveform", "note": "54 段波形擦洗条，已播部分取强调色" },
+    { "key": "variant-progress", "label": "Progress", "note": "两端显示已播与总时长，例如 1:05 / 3:32" },
+    { "key": "variant-controls", "label": "Controls", "note": "播放/暂停、跳曲与右下角的收起按钮" },
+    { "key": "variant-artwork", "label": "Artwork", "note": "程序化生成的封面，换曲时按方向滑入" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "slider", "note": "只需要一条进度滑杆时用 slider" },
+    { "type": "alternative", "target": "cover-flow", "note": "翻专辑封面用 cover flow，播放器只显示当前曲目" },
+    { "type": "complement", "target": "voice-recorder", "note": "音频产品里播放器与录音入口常同时出现，但职责分开" }
+  ],
+  "contrasts": [
+    {
+      "target": "slider",
+      "title": "Now playing 与 Slider",
+      "rows": [
+        { "dimension": "职责", "self": "一整块播放器：封面、控件、波形与收起", "other": "一个可拖动的值选择器" },
+        { "dimension": "擦洗反馈", "self": "波形按段显示已播范围，两端给出时间", "other": "只用轨道与滑块表示比例" },
+        { "dimension": "键盘", "self": "Space 播放、左右 5 秒、翻页 30 秒、Up/Escape 变形", "other": "方向键按 step 调整数值" }
+      ]
+    },
+    {
+      "target": "cover-flow",
+      "title": "Now playing 与 Cover flow",
+      "rows": [
+        { "dimension": "焦点", "self": "当前正在播放的这一首", "other": "整条可浏览的封面轨道" },
+        { "dimension": "形态变化", "self": "迷你条与完整播放器之间的连续变形", "other": "固定轨道上的纵深移动" },
+        { "dimension": "可操作内容", "self": "播放控制、擦洗与展开/收起", "other": "切换与定位条目的浏览动作" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放一个展开的播放器",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcNowPlaying Width=\"880\" Height=\"450\"\n                        HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘与变形",
+      "language": "csharp",
+      "code": "// Space 播放/暂停，Left/Right 各 5 秒，PageUp/PageDown 各 30 秒，\n// Home/End 跳到首尾，Up 展开、Escape 收起。\n// 播放由内部时钟驱动，可先接事件再替换成真实媒体元素。\nvar player = new ArcNowPlaying\n{\n    Width = 880,\n    Height = 450,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcNowPlaying",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "播放器宽度；展开态外壳宽 340，迷你态宽 420",
+      "Height": "播放器高度，迷你条贴在底部",
+      "IsEnabled": "禁用后不再响应播放与擦洗",
+      "IsVisible": "隐藏后停止内部时钟"
+    }
+  }
+}

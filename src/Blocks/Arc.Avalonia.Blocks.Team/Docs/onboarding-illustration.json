@@ -1,0 +1,66 @@
+{
+  "slug": "onboarding-illustration",
+  "nameZh": "新手引导插画",
+  "summary": "首次运行引导卡片：一张随步骤变形的线条插画、步骤文案与四步指示点，底部用 Back / Next 逐步走完并显示进度。",
+  "purpose": [
+    "第一次打开产品时，用户需要的是两三句话加一张图，而不是一堆设置。新手引导插画把插画、标题、说明与步骤控制收进一张 560px 的卡片里。",
+    "插画由七个共享的线条形状在四步场景之间插值：文件夹、文档堆、三个人、带对勾的徽章；顶部还有 Guided tour 徽章与一条步骤进度。",
+    "底部四个步骤点当前步拉长，Back / Next 在最后一步变成 Get started；左右方向键也能翻页，全部走完后给出“你已准备好”的完成态与重新打开入口。",
+    "减少动态效果时插画直接切换场景、不做变形，信息不丢。"
+  ],
+  "whenToUse": [
+    "文档或工作区产品的首次使用引导卡片。",
+    "需要三到四步、每步配一张简单示意图时。",
+    "希望用户能自己控制节奏、随时后退重看时。"
+  ],
+  "whenNotToUse": [
+    "需要用户持续完成任务的清单用 onboarding-checklist。",
+    "营销页上的大插图场景用专门的插画或 hero 区块。",
+    "引导内容超过五步时，改为独立的分步页面或向导。"
+  ],
+  "variants": [
+    { "key": "variant-step-card", "label": "步骤卡片", "note": "当前步骤的标题、正文与前后按钮" },
+    { "key": "variant-illustration", "label": "线条插画", "note": "当前场景的线条示意图" },
+    { "key": "variant-step-dots", "label": "步骤点", "note": "四个点，当前步拉长为胶囊" },
+    { "key": "state-step-progress", "label": "步骤进度", "note": "Guided tour 徽章与 Step 2 of 4 进度条" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "badge", "note": "卡片顶部用 Guided tour 徽章点明这是引导流程" },
+    { "type": "uses", "target": "progress", "note": "步骤进度条随当前步骤推进" },
+    { "type": "uses", "target": "button", "note": "Back / Next / Get started 与重新打开都使用按钮" },
+    { "type": "alternative", "target": "onboarding-checklist", "note": "需要多任务清单时用 onboarding checklist，本区块更适合一次讲完" }
+  ],
+  "contrasts": [
+    {
+      "target": "onboarding-checklist",
+      "title": "Onboarding illustration 与 Onboarding checklist",
+      "rows": [
+        { "dimension": "形式", "self": "一次性的图文引导卡片", "other": "可反复勾选的任务清单" },
+        { "dimension": "节奏", "self": "用户按步翻页，一次讲一个概念", "other": "按任务逐项完成，允许中断" },
+        { "dimension": "完成态", "self": "“You're set up”并提示可重新打开", "other": "完成百分比与剩余任务" },
+        { "dimension": "视觉", "self": "随步骤变形的线条插画", "other": "以任务与进度为主" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "Onboarding illustration 与 Progress",
+      "rows": [
+        { "dimension": "职责", "self": "插画、文案与步骤控制的完整引导", "other": "只显示一条进度" },
+        { "dimension": "步进方式", "self": "按钮、方向键与步骤点都能切换", "other": "无内置步进" },
+        { "dimension": "内容", "self": "四步文案与对应插画场景", "other": "一个比例值" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "步骤点与前后按钮",
+      "language": "csharp",
+      "code": "var tour = new ArcBadge { Content = \"Guided tour\", Tone = ArcBadgeTone.Accent, Dot = true };\nvar progress = new ArcProgressTrack { Fraction = 0.5, Thickness = 4, Width = 150 };\nvar back = new ArcButton { Content = \"Back\", Variant = ArcButtonVariant.Ghost, Size = ArcButtonSize.Sm };\nvar next = new ArcButton { Content = \"Next\", Variant = ArcButtonVariant.Primary, Size = ArcButtonSize.Sm };"
+    },
+    {
+      "title": "引导卡片的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Border Width=\"560\" Padding=\"22\" CornerRadius=\"22\" Background=\"{DynamicResource ArcSurface}\">\n  <StackPanel Spacing=\"14\">\n    <!-- 顶部：图标 + Welcome to Northwind -->\n    <Border Height=\"196\" CornerRadius=\"18\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n      <!-- 七个线条形状组成的当前场景 -->\n    </Border>\n    <TextBlock Text=\"Step 2 of 4\" Classes=\"arc-caption\" />\n    <arc:ArcBadge Content=\"Guided tour\" Tone=\"Accent\" Dot=\"True\" />\n    <arc:ArcProgressTrack />\n    <TextBlock Text=\"Turn files into shared work\" Classes=\"arc-subtitle\" />\n    <TextBlock Text=\"Group the files that belong together, then give the collection one owner.\" Classes=\"arc-body-sm arc-secondary\" />\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n      <arc:ArcButton Content=\"Back\" Variant=\"Ghost\" Size=\"Sm\" />\n      <arc:ArcButton Content=\"Next\" Variant=\"Primary\" Size=\"Sm\" />\n    </StackPanel>\n  </StackPanel>\n</Border>"
+    }
+  ]
+}

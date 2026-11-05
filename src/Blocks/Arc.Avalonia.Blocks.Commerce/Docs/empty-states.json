@@ -1,0 +1,51 @@
+{
+  "slug": "empty-states",
+  "nameZh": "空状态合集",
+  "summary": "四种空状态合集：没有结果、离线、收件箱清零与页面丢失，共用一套可在场景间插值的插画，并配主次动作。",
+  "purpose": [
+    "当同一产品里要出现多种空状态时，这一合集用同一套插画语言统一它们：六块形状在四个场景之间连续插值，切换时不会跳变。",
+    "每个场景配一句标题、一段说明、一个主按钮与一个次要动作；动作只更新本地状态，用来示意真实结果。",
+    "顶部的分段控件负责切换场景，也让文档预览可以一次看全四种状态。"
+  ],
+  "whenToUse": [
+    "需要在产品里统一多种空状态的插画风格时。",
+    "要参考没有结果、离线、收件箱清零与页面丢失四种文案与动作时。",
+    "想从一个合集里挑一种空状态复用到关键页面时。"
+  ],
+  "whenNotToUse": [
+    "只需要一个简单的图标加一行文字的空白卡片时，用 empty-state 组件。",
+    "内容仍在加载时，用 skeleton，而不是空状态。",
+    "错误与恢复提示需要常驻页面时，用 alert。"
+  ],
+  "variants": [
+    { "key": "variant-no-results", "label": "没有结果", "note": "搜索或筛选无匹配，主按钮建议清除条件" },
+    { "key": "variant-offline", "label": "离线", "note": "断网时说明草稿仍在本地，可重试或离线继续" },
+    { "key": "variant-inbox-zero", "label": "收件箱清零", "note": "全部处理完毕，引导去归档或调整通知" },
+    { "key": "variant-missing-page", "label": "页面丢失", "note": "链接来自旧版本，引导回仪表盘或搜索文档" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "四个场景用分段控件切换" },
+    { "type": "uses", "target": "button", "note": "主动作与次要动作都是按钮或按钮式链接" },
+    { "type": "uses", "target": "empty-state", "note": "插画与文案沿用空状态组件的结构，只是换成可插值的绘制" },
+    { "type": "alternative", "target": "skeleton", "note": "内容仍在加载时用 skeleton，空状态只用于确实没有内容时" }
+  ],
+  "contrasts": [
+    {
+      "target": "skeleton",
+      "title": "Empty states 与 Skeleton",
+      "rows": [
+        { "dimension": "对应状态", "self": "确实没有内容（结果为空、离线、页面丢失）", "other": "内容正在加载、马上就有" },
+        { "dimension": "画面", "self": "插画、标题、说明与主次动作", "other": "与最终布局同形的灰块占位" },
+        { "dimension": "动作", "self": "清除条件、重试、返回等可点的下一步", "other": "没有动作，只等待" },
+        { "dimension": "时长", "self": "停留到用户改变条件为止", "other": "数据到达后立即替换" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "场景切换与动作",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\" HorizontalAlignment=\"Center\">\n  <arc:ArcSegmentedControl /> <!-- No results / Offline / Inbox zero / Missing page -->\n  <blocks:ArcEmptyScene HeightHint=\"176\" Scene=\"0\" />\n  <TextBlock Text=\"No results\" Classes=\"arc-subtitle\" />\n  <TextBlock Text=\"Nothing matches those filters.\" Classes=\"arc-body-sm arc-secondary\" />\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"8\" HorizontalAlignment=\"Center\">\n    <arc:ArcButton Content=\"Clear filters\" Variant=\"Primary\" />\n    <arc:ArcButton Content=\"Save this search\" Variant=\"Ghost\" />\n  </StackPanel>\n</StackPanel>"
+    }
+  ]
+}

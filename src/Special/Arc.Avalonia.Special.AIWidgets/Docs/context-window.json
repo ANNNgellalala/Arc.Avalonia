@@ -1,0 +1,73 @@
+{
+  "slug": "context-window",
+  "nameZh": "上下文窗口",
+  "summary": "把模型上下文画成 200 格方块：系统提示、工具、文件、摘要与对话各占一色，虚线标出压缩阈值，超出后自动把最早的对话折成摘要。",
+  "purpose": [
+    "回答「这一轮到底装了什么、还剩多少」：窗口被切成 20×10 共 200 格，每格代表窗口的 1/200，系统提示、工具定义、附件、摘要与对话按固定顺序填进去，浅色空位就是剩余空间。",
+    "为回复预留的格子永远不被占满：Reserve 会画成描边格留在末尾，虚线规则标出 Threshold（默认 80%）——一旦填充越过虚线，下一次发送或附件就会触发压缩，把最早的约 60% 对话折成一条摘要，摘要大约只占被折 token 的 6%。",
+    "头部是可切换的模型菜单与读数「已用 of 窗口 · 百分比」：换模型会把整个网格按新窗口重算，因此 200k 与 1M 的窗口在同样的对话下看起来完全不同。",
+    "右侧图例是这张图的解释器：每一行给出类别、token 与占比，指针掠过某一行时对应格子亮起、其余安静，下方说明这一格装着什么；这三件事让颜色不是唯一的信息来源。"
+  ],
+  "whenToUse": [
+    "开发者或重度用户需要看清模型的上下文被什么占满、什么时候会触发压缩。",
+    "长会话的 agent 或编码工具会自动压缩，需要让这个过程可解释、可预期。",
+    "文档或帮助页需要说明上下文窗口、压缩与预留回复空间时。"
+  ],
+  "whenNotToUse": [
+    "只想表达一个配额百分比或剩余额度时，改用 usage-meter，它更紧凑也更贴近账单语义。",
+    "要看 prompt 缓存命中省下多少 token 与费用时，改用 prompt-cache 图解。",
+    "只想知道整轮智能体运行到哪一步时，改用 agent-status。"
+  ],
+  "variants": [
+    { "key": "state-comfortable", "label": "Comfortable", "note": "约一半占用：空位充足，未到虚线" },
+    { "key": "state-near-limit", "label": "Near the threshold", "note": "占用越过压缩虚线，再发一轮就会压缩" },
+    { "key": "state-compacted", "label": "Compacted", "note": "压缩后：摘要变大、对话变短、占用回落" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "usage-meter", "note": "只表达配额与百分比时改用 usage meter" },
+    { "type": "complement", "target": "prompt-cache", "note": "prompt 缓存省下的 token 正是这张图里可以腾出的空间" },
+    { "type": "complement", "target": "agent-status", "note": "长跑智能体在页头报告状态，上下文窗口解释它消耗窗口的过程" }
+  ],
+  "contrasts": [
+    {
+      "target": "usage-meter",
+      "title": "Context window 与 Usage meter",
+      "rows": [
+        { "dimension": "表示对象", "self": "一次模型调用的上下文构成", "other": "一个计费周期内的配额用量" },
+        { "dimension": "信息粒度", "self": "五类内容各占多少格，可逐格解释", "other": "一根进度条加剩余量" },
+        { "dimension": "动作", "self": "发消息、加附件、立即压缩、切换模型", "other": "通常只读，最多链接到账单页" }
+      ]
+    },
+    {
+      "target": "prompt-cache",
+      "title": "Context window 与 Prompt cache",
+      "rows": [
+        { "dimension": "关注点", "self": "窗口被谁占满、还差多少会压缩", "other": "哪些前缀命中缓存、省了多少费用" },
+        { "dimension": "数据来源", "self": "当前这次调用的内容清单", "other": "多次调用之间的缓存命中统计" },
+        { "dimension": "使用时机", "self": "调试会话与解释压缩行为", "other": "优化成本与响应延迟" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：切换模型与压缩",
+      "language": "xaml",
+      "code": "<arc:ArcContextWindow xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                   ModelId=\"opus\"\n                   Threshold=\"0.8\"\n                   Models=\"{Binding Models}\"\n                   Items=\"{Binding Items}\" />"
+    },
+    {
+      "title": "五类内容与预留回复空间",
+      "language": "csharp",
+      "code": "var window = new ArcContextWindow\n{\n    ModelId = \"opus\",\n    Threshold = 0.8,\n    Models = new List<ArcContextModel>\n    {\n        new() { Id = \"opus\", Name = \"Claude Opus 5.5\", Window = 1_000_000, Reserve = 40_000 },\n        new() { Id = \"haiku\", Name = \"Claude Haiku 5.5\", Window = 200_000, Reserve = 16_000 }\n    },\n    Items = new List<ArcContextItem>\n    {\n        new() { Id = \"system\", Category = ArcContextCategory.System, Label = \"System prompt\", Tokens = 15_000 },\n        new() { Id = \"tools\", Category = ArcContextCategory.Tools, Label = \"Tool definitions\", Tokens = 45_000 },\n        new() { Id = \"files\", Category = ArcContextCategory.Files, Label = \"attached files\", Tokens = 60_000 },\n        new() { Id = \"summary\", Category = ArcContextCategory.Summary, Label = \"Summary of 4 earlier turns\", Tokens = 25_000 },\n        new() { Id = \"messages\", Category = ArcContextCategory.Messages, Label = \"Conversation\", Tokens = 375_000 }\n    }\n};\n\n// 面板里的 Send message / Attach file 会往 Messages / Files 追加内容；\n// 占用一旦越过 Threshold，下一次追加就会自动压缩，把早期对话折成 Summary。"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcContextWindow",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "窗口里的内容，元素是 ArcContextItem（Id、Category、Label、Tokens），按类别顺序填充",
+      "Models": "可切换的模型，元素是 ArcContextModel（Id、Name、Window、Reserve）",
+      "ModelId": "当前模型的 Id，切换后整个网格按新窗口重算",
+      "Threshold": "压缩阈值（占窗口的比例），默认 0.8；虚线画在这个位置"
+    }
+  }
+}

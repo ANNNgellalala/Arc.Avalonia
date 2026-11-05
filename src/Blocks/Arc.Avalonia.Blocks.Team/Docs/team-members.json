@@ -1,0 +1,68 @@
+{
+  "slug": "team-members",
+  "nameZh": "团队成员管理",
+  "summary": "工作区成员设置区块：邀请输入、待处理邀请、成员行与席位用量收在同一张卡里，角色可就地修改、移除成员前会保留至少一人。",
+  "purpose": [
+    "成员设置页要同时回答三件事：现在有谁、还有哪些邀请没接受、席位还剩多少。区块把它们按“邀请 → 待处理 → 当前成员”的顺序排开，管理员从上往下处理即可。",
+    "邀请输入支持回车添加、Backspace 删除最后一个 chip；每个待添加的人可以单独指定 Viewer / Editor / Admin，发送后进入待处理列表。",
+    "成员行显示头像、姓名、邮箱与角色下拉，移除按钮带保护：工作区至少要留一个人；席位胶囊随每次变化滚动，超过上限会标红并写清超出几个。",
+    "所有邀请、角色与席位都是内存中的样本数据，不含真实发送；接入时只需替换 Send invites 的回调。"
+  ],
+  "whenToUse": [
+    "SaaS 应用的团队成员或工作区设置页。",
+    "需要一次邀请多人、并给每个人指定角色时。",
+    "有明确席位上限、需要让管理员看到剩余可邀请人数时。"
+  ],
+  "whenNotToUse": [
+    "只是浏览与联系同事时改用 team-directory。",
+    "要定义角色能做什么、查看权限矩阵时改用 roles-permissions。",
+    "需要批量粘贴邮箱列表导入时改用 invite-people。"
+  ],
+  "variants": [
+    { "key": "variant-member-rows", "label": "成员行", "note": "头像、姓名、邮箱、角色下拉与移除按钮" },
+    { "key": "variant-pending-invites", "label": "待处理邀请", "note": "已发送邀请、重发与撤销" },
+    { "key": "variant-invite-composer", "label": "邀请输入", "note": "邮箱输入、角色选择与发送按钮" },
+    { "key": "state-seat-limit", "label": "席位用量", "note": "席位胶囊显示已用数量与上限" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "邀请输入框接收邮箱，回车即加入待发送列表" },
+    { "type": "uses", "target": "select", "note": "每个待处理邀请与成员行都有角色选择" },
+    { "type": "uses", "target": "avatar", "note": "成员与待处理邀请行用头像标识" },
+    { "type": "uses", "target": "button", "note": "发送邀请、重发、撤销与移除都是按钮" },
+    { "type": "uses", "target": "badge", "note": "页头用席位胶囊汇总已用与上限" },
+    { "type": "alternative", "target": "invite-people", "note": "要批量粘贴名单时用 invite people，单行输入用本区块更轻" }
+  ],
+  "contrasts": [
+    {
+      "target": "invite-people",
+      "title": "Team members 与 Invite people",
+      "rows": [
+        { "dimension": "主要任务", "self": "管理已有成员与待处理邀请", "other": "大批量挑选或粘贴名单" },
+        { "dimension": "输入方式", "self": "单行邮箱输入 + 角色选择", "other": "目录建议 + .env 粘贴解析" },
+        { "dimension": "席位反馈", "self": "顶部胶囊显示已用数量", "other": "进度条显示剩余名额与超限警告" },
+        { "dimension": "适合对象", "self": "日常小规模增删", "other": "项目初始化或团队搬迁" }
+      ]
+    },
+    {
+      "target": "select",
+      "title": "Team members 与 Select",
+      "rows": [
+        { "dimension": "职责", "self": "成员与邀请的完整管理闭环", "other": "单个下拉选择器" },
+        { "dimension": "数据", "self": "成员、邀请、角色与席位", "other": "选项列表与当前值" },
+        { "dimension": "保护规则", "self": "至少保留一名成员、超席位提示", "other": "不感知业务规则" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "邀请输入与角色选择",
+      "language": "csharp",
+      "code": "var email = new ArcInput { Placeholder = \"name@company.com\", LeadingIcon = \"mail\", Width = 280 };\nvar role = new ArcSelect\n{\n    Options = new[]\n    {\n        new ArcSelectOption(\"Viewer\", \"Viewer\"),\n        new ArcSelectOption(\"Editor\", \"Editor\"),\n        new ArcSelectOption(\"Admin\", \"Admin\")\n    },\n    Value = \"Viewer\",\n    Size = ArcFieldSize.Sm,\n    Width = 118\n};\n\nvar send = new ArcButton { Content = \"Send invites\", Variant = ArcButtonVariant.Primary, Size = ArcButtonSize.Sm };"
+    },
+    {
+      "title": "成员设置页的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <Grid ColumnDefinitions=\"*,Auto\">\n    <StackPanel Spacing=\"3\">\n      <TextBlock Text=\"Members\" Classes=\"arc-heading\" />\n      <TextBlock Text=\"Northwind Studio · SAML enforced · 4 roles\" Classes=\"arc-caption\" />\n    </StackPanel>\n    <Border Grid.Column=\"1\" CornerRadius=\"999\" Padding=\"12,6\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n      <TextBlock Text=\"7 of 12 seats used\" Classes=\"arc-caption\" />\n    </Border>\n  </Grid>\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n    <arc:ArcInput Placeholder=\"name@company.com\" Width=\"280\" />\n    <arc:ArcSelect Width=\"118\" />\n    <arc:ArcButton Content=\"Send invites\" Variant=\"Primary\" Size=\"Sm\" />\n  </StackPanel>\n</StackPanel>"
+    }
+  ]
+}

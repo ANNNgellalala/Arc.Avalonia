@@ -1,0 +1,74 @@
+{
+  "slug": "tooltip",
+  "nameZh": "提示气泡",
+  "summary": "为不能自解释的控件补一行文字：悬停短暂延迟后出现，键盘聚焦立刻出现，Escape 或失焦隐藏。",
+  "purpose": [
+    "当控件的标签不足以说明它的作用时——图标按钮、缩写、被截断的字段——tooltip 在它旁边补一行短文字。",
+    "出现时机有区分：指针悬停按 Delay（默认 250ms）后出现，键盘聚焦则立刻出现、失焦隐藏，Escape 也能收起。",
+    "Side 决定气泡在触发器的上方还是下方；它永远只是补充，不能作为完成任务的唯一信息来源。"
+  ],
+  "whenToUse": [
+    "图标按钮或工具栏动作需要一句补充说明时。",
+    "字段值被截断、悬停想看到完整内容时。",
+    "说明很短、即使没看到也不影响完成任务时。"
+  ],
+  "whenNotToUse": [
+    "说明里需要按钮或可交互内容时，改用 popover。",
+    "内容重要到必须被读到（校验错误、必填要求）时，改成字段旁始终可见的说明。",
+    "需要展示人物或链接的完整预览时，改用 hover-card。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "气泡贴在触发器旁显示" },
+    { "key": "side-bottom", "label": "下方", "note": "默认方向，触发器下方 8px" },
+    { "key": "side-top", "label": "上方", "note": "空间不足或需要向上时使用" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "popover", "note": "需要可交互内容时，改用点击打开的 popover" },
+    { "type": "alternative", "target": "hover-card", "note": "需要人物或链接的完整预览时，改用 hover-card" },
+    { "type": "complement", "target": "button", "note": "图标按钮是最常见的宿主，按钮的标签说不清时由 tooltip 补一句" }
+  ],
+  "contrasts": [
+    {
+      "target": "popover",
+      "title": "Tooltip 与 Popover",
+      "rows": [
+        { "dimension": "内容", "self": "一行只读文字", "other": "可交互的控件、菜单或表单" },
+        { "dimension": "打开方式", "self": "悬停（有延迟）或键盘聚焦", "other": "点击触发器" },
+        { "dimension": "关闭方式", "self": "移开指针、失焦或 Escape", "other": "点击外部、Escape 或再次点击触发器" },
+        { "dimension": "焦点顺序", "self": "不进入焦点顺序，只是说明", "other": "面板可聚焦，内容依次可到达" }
+      ]
+    },
+    {
+      "target": "hover-card",
+      "title": "Tooltip 与 Hover card",
+      "rows": [
+        { "dimension": "体量", "self": "一行文字，几个词", "other": "头像、姓名、角色、统计与页脚" },
+        { "dimension": "交互", "self": "纯展示，指针可以离开", "other": "指针可以移入卡片，按 Escape 关闭" },
+        { "dimension": "适用对象", "self": "任何控件", "other": "人名、@提及、链接等有实体的目标" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中给图标按钮加提示",
+      "language": "xaml",
+      "code": "<Window xmlns:overlays=\"clr-namespace:Arc.Avalonia.Overlays.Controls;assembly=Arc.Avalonia.Overlays\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia\">\n  <overlays:ArcTooltip Text=\"Copy the install command\" Side=\"Bottom\" Delay=\"250\">\n    <arc:ArcButton Content=\"Copy\" Variant=\"Ghost\" />\n  </overlays:ArcTooltip>\n</Window>"
+    },
+    {
+      "title": "用代码固定展示打开态",
+      "language": "csharp",
+      "code": "var tip = new ArcTooltip\n{\n    Text = \"Saves to Drafts, not to the live page\",\n    Side = ArcTooltipSide.Top,\n    Delay = 0,\n    IsOpen = true,\n    Content = new ArcButton { Content = \"Save draft\", Variant = ArcButtonVariant.Secondary }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Overlays.Controls.ArcTooltip",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "提示文字，保持一行、尽量短",
+      "Side": "气泡方向：Top 或 Bottom，默认 Bottom",
+      "IsOpen": "气泡是否显示；可赋值以便静态展示打开态",
+      "Delay": "悬停后到出现的毫秒数，默认 250；键盘聚焦不受它影响",
+      "Content": "触发器控件，提示挂在它上面"
+    }
+  }
+}

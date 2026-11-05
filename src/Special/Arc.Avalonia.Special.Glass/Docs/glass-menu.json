@@ -1,0 +1,85 @@
+{
+  "slug": "glass-menu",
+  "nameZh": "玻璃菜单",
+  "summary": "贴着触发器展开的玻璃动作菜单：触发器与面板共享一个盒子，展开是一次弹簧变形；高亮药丸在行间滑动，一个子菜单就地滑入，键盘覆盖打开、移动、子菜单、返回、关闭与首字母跳转。",
+  "purpose": [
+    "当动作属于某个对象本身（照片、文件、卡片）而不是整页时，把触发器做成「缩略图加标题」，菜单就从触发器的盒子长出来，动作与对象的关系一眼可见。",
+    "行上可以放图标、快捷键、勾选与危险色；勾选行带 KeepOpen 时选择后面板不关闭，适合连续标记；一个子菜单在最上层就地滑入，返回时整层滑出，不需要第二个面板。",
+    "结构上它只是一个组合控件：触发器与每一行都是 ArcButton，面板与触发器共用玻璃令牌，因此焦点、读屏名称与键盘行为都沿用现有按钮，不另起一套交互。"
+  ],
+  "whenToUse": [
+    "动作属于某个具体对象（照片、文件或卡片），且触发器可以直接复用对象的缩略图与标题时。",
+    "编辑器或查看器的标题菜单：点标题打开这篇内容的动作，菜单贴着标题出现，而不是跳到屏幕另一角。",
+    "动作规模在一到两组、约四到八行，需要快捷键、勾选或一个子菜单就够时。",
+    "希望菜单成为对象表面的一部分、而不是独立浮层时。"
+  ],
+  "whenNotToUse": [
+    "动作与具体对象无关、挂在页面工具栏上时，用 dropdown-menu；给玻璃菜单硬配一个触发器只会多一步。",
+    "动作由右键或长按唤起时，用 context-menu，那里不需要可见触发器与玻璃外壳。",
+    "动作条目很多（十个以上）或需要搜索过滤时，用 command-palette。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "打开态：面板从触发器盒弹簧变形展开，高亮药丸落在第一行" },
+    { "key": "variant-trigger", "label": "Trigger", "note": "触发器：玻璃外壳里的缩略图、标题与展开箭头" },
+    { "key": "variant-groups", "label": "Groups", "note": "分组标题与组间分隔线" },
+    { "key": "variant-submenu", "label": "Submenu", "note": "带子菜单的行：右侧箭头，进入后就地展开一层" },
+    { "key": "variant-checked", "label": "Checked", "note": "勾选行显示 ✓，KeepOpen 时选择后保持展开" },
+    { "key": "variant-danger", "label": "Danger", "note": "删除等危险行使用危险色" },
+    { "key": "variant-shortcut", "label": "Shortcut", "note": "行尾显示 Ctrl D、F2、Del 等快捷键" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "触发器与每一行都是 ArcButton，焦点、点击与禁用行为由它承担" },
+    { "type": "alternative", "target": "dropdown-menu", "note": "动作不属于具体对象时用 dropdown menu，不必加玻璃外壳" },
+    { "type": "alternative", "target": "context-menu", "note": "右键唤起的快捷动作改用 context menu" },
+    { "type": "complement", "target": "glass-card", "note": "玻璃卡片与菜单共用同一层表面，动作紧贴对象出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "dropdown-menu",
+      "title": "Glass menu 与 Dropdown menu",
+      "rows": [
+        { "dimension": "触发器", "self": "触发器是对象本身：缩略图加标题", "other": "触发器是一段文字或图标按钮" },
+        { "dimension": "展开动效", "self": "从触发器矩形一步弹簧变形到面板矩形", "other": "原地淡入并轻微位移" },
+        { "dimension": "视觉表面", "self": "分层半透明玻璃，没有背板模糊", "other": "实心浮层表面加投影" },
+        { "dimension": "适用动作", "self": "某个对象的动作清单", "other": "与对象无关的菜单命令" }
+      ]
+    },
+    {
+      "target": "context-menu",
+      "title": "Glass menu 与 Context menu",
+      "rows": [
+        { "dimension": "唤起方式", "self": "点击可见的玻璃触发器", "other": "右键或长按对象" },
+        { "dimension": "出现位置", "self": "贴着触发器对齐，可选 Start / End", "other": "跟随指针位置" },
+        { "dimension": "动作内容", "self": "对象动作：重命名、移动、收藏、删除", "other": "任意位置的通用命令" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：照片动作菜单",
+      "language": "xaml",
+      "code": "<arc:ArcGlassMenu xmlns:arc=\"using:Arc.Avalonia.Special.Glass.Controls\"\n                  Label=\"Photo actions\"\n                  TriggerLabel=\"Photo actions\"\n                  Align=\"End\"\n                  PanelWidth=\"268\"\n                  IsOpen=\"True\">\n  <arc:ArcGlassMenu.Groups>\n    <arc:ArcGlassMenuGroup Label=\"This photo\">\n      <arc:ArcGlassMenuItem Id=\"duplicate\" Label=\"Duplicate\" Icon=\"copy\" Shortcut=\"Ctrl D\" />\n      <arc:ArcGlassMenuItem Id=\"rename\" Label=\"Rename\" Icon=\"pencil\" Shortcut=\"F2\" />\n      <arc:ArcGlassMenuItem Id=\"favorite\" Label=\"Add to favourites\" Icon=\"star\" Checked=\"True\" KeepOpen=\"True\" />\n      <arc:ArcGlassMenuItem Id=\"delete\" Label=\"Delete\" Icon=\"trash-2\" Danger=\"True\" Shortcut=\"Del\" />\n    </arc:ArcGlassMenuGroup>\n  </arc:ArcGlassMenu.Groups>\n</arc:ArcGlassMenu>"
+    },
+    {
+      "title": "代码构建：子菜单与选择回调",
+      "language": "csharp",
+      "code": "var menu = new ArcGlassMenu\n{\n    Label = \"Photo actions\",\n    TriggerLabel = \"Photo actions\",\n    Trigger = new TextBlock { Text = \"Pool house\" },\n    Groups = new List<ArcGlassMenuGroup>\n    {\n        new()\n        {\n            Label = \"This photo\",\n            Items = new List<ArcGlassMenuItem>\n            {\n                new() { Id = \"duplicate\", Label = \"Duplicate\", Icon = \"copy\", Shortcut = \"Ctrl D\" },\n                new()\n                {\n                    Id = \"move\",\n                    Label = \"Move to\",\n                    Icon = \"folder\",\n                    Items = new List<ArcGlassMenuItem>\n                    {\n                        new() { Id = \"lisbon\", Label = \"Lisbon trip\", Icon = \"folder\" },\n                        new() { Id = \"archive\", Label = \"Archive\", Icon = \"archive\" }\n                    }\n                },\n                new() { Id = \"favorite\", Label = \"Add to favourites\", Icon = \"star\", Checked = true, KeepOpen = true }\n            }\n        }\n    }\n};\n\nmenu.ItemInvoked += (_, item) => Run(item.Id);\nmenu.IsOpen = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcGlassMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Groups": "菜单分组；组标签、组间分隔线与行为都由控件绘制",
+      "Trigger": "触发器内容，例如缩略图加标题；为空时回退到 TriggerLabel",
+      "TriggerLabel": "触发器文字与读屏名称，仅图标触发器时用它命名",
+      "Label": "菜单的无障碍名称，同时作为面板的读屏标签",
+      "Align": "面板相对触发器左对齐（Start）或右对齐（End），默认 Start",
+      "PanelWidth": "面板宽度，默认 272；行高固定 36",
+      "IsOpen": "是否展开；预览里置 true 可直接呈现打开态",
+      "OpenSubmenuRow": "当前展开子菜单的行，位于顶层时为 null",
+      "OpenChanged": "展开或收起时触发，参数为当前 IsOpen",
+      "ItemInvoked": "选中非子菜单行时触发，参数是那一行"
+    }
+  }
+}

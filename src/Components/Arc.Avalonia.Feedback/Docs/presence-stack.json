@@ -1,0 +1,69 @@
+{
+  "slug": "presence-stack",
+  "nameZh": "在场堆叠",
+  "summary": "实时在场的叠放头像：每人带状态点，Fanned 时展开并显示姓名，超出 Max 折叠为 and N others。",
+  "purpose": [
+    "把「现在谁在这里」放进一小块区域：每个成员一个头像加一个状态点，五种状态覆盖可联系、忙碌、离开、输入中与闲置。",
+    "默认是叠放，悬停或 Fanned 为 true 时向右扇形展开，ShowNames 打开时在下方显示当前头像的姓名，让人不用点开就能对上号。",
+    "成员集合变化后调用 Refresh() 重建；Max 之外的人数折叠成一句「and N others」，读屏会念出完整人数与每个人的状态。"
+  ],
+  "whenToUse": [
+    "实时页头、通话名单、共享文档等需要感受「有人在场」的位置。",
+    "要同时表达身份与当前状态（忙碌、离开、输入中）的紧凑区域。",
+    "成员会加入或离开，需要平滑重排而不是整块闪烁的场景。"
+  ],
+  "whenNotToUse": [
+    "只是静态展示一组团队成员、不需要状态时，改用 avatar-group，更简单也更省空间。",
+    "需要逐个操作成员（移除、改成管理员）时，用列表或菜单。",
+    "只有一个人时，直接用 avatar 加状态点。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Sm", "note": "28 px，紧凑页头" },
+    { "key": "size-md", "label": "Md", "note": "36 px，常规在场条" },
+    { "key": "size-lg", "label": "Lg", "note": "44 px，强调型在场区域" },
+    { "key": "variant-rested", "label": "Rested", "note": "默认叠放，紧凑不占宽" },
+    { "key": "variant-fanned", "label": "Fanned", "note": "常驻扇形展开，姓名可见" },
+    { "key": "variant-overflow", "label": "Overflow", "note": "ShowOthers 打开且超出 Max 时的计数" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "avatar-group", "note": "只要静态成员概览时改用 avatar-group" },
+    { "type": "complement", "target": "avatar", "note": "单个在场者用 avatar 加状态点" },
+    { "type": "complement", "target": "badge", "note": "在场人数或角色用 badge 补充" }
+  ],
+  "contrasts": [
+    {
+      "target": "avatar-group",
+      "title": "Presence stack 与 Avatar group",
+      "rows": [
+        { "dimension": "语义", "self": "此刻谁在场、在做什么", "other": "这组人是谁" },
+        { "dimension": "状态", "self": "五种在场状态与输入中提示", "other": "可选在线/离线圆点" },
+        { "dimension": "展开方式", "self": "Fanned 或聚焦时展开并显示姓名", "other": "悬停向右扇形展开" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "实时在场条",
+      "language": "csharp",
+      "code": "var stack = new ArcPresenceStack\n{\n    Label = \"Reviewers here now\",\n    Max = 4,\n    Size = ArcPresenceSize.Md,\n    ShowOthers = true,\n    Members = new List<PresenceMember>\n    {\n        new() { Id = \"maya\", Name = \"Maya Chen\", Status = ArcPresenceStatus.Available },\n        new() { Id = \"leo\", Name = \"Leo Park\", Status = ArcPresenceStatus.Busy },\n        new() { Id = \"jon\", Name = \"Jon Bell\", Status = ArcPresenceStatus.Typing, IsTyping = true },\n        new() { Id = \"sara\", Name = \"Sara Ruiz\", Status = ArcPresenceStatus.Away }\n    }\n};\n\n// 成员变化后重建：stack.Refresh();"
+    },
+    {
+      "title": "在 XAML 中常驻展开",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcPresenceStack Label=\"Design crit attendees\"\n                       Max=\"4\"\n                       Size=\"Lg\"\n                       Fanned=\"True\"\n                       ShowNames=\"True\"\n                       Members=\"{Binding Attendees}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcPresenceStack",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Members": "在场成员集合，元素是 PresenceMember（Id / Name / Image / Status / IsTyping）",
+      "Max": "最多显示几个头像，其余折叠，默认 4",
+      "Size": "尺寸：Sm 28 / Md 36 / Lg 44，默认 Sm",
+      "ShowNames": "展开时在下方显示成员姓名，默认 true",
+      "Label": "在场区域的无障碍名称，默认 People here now",
+      "Fanned": "常驻扇形展开，不需要悬停",
+      "ShowOthers": "超出 Max 时显示 and N others，默认 false"
+    }
+  }
+}

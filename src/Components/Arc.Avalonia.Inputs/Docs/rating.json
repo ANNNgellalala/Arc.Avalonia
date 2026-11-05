@@ -1,0 +1,86 @@
+{
+  "slug": "rating",
+  "nameZh": "评分",
+  "summary": "1–N 星的评分控件：悬停即预览、可选半星、可一键清空，右侧给出数值对应的词（Poor…Excellent）。",
+  "purpose": [
+    "收集一次数值化的主观评价：星级本身是视觉刻度，右侧的词（ValueLabels）把 3 星、4.5 星翻译成「Good」「Excellent」，让人不必心算。",
+    "悬停与键盘都走同一条预览路径：指针移过第几颗星就有几颗亮起，方向键每次加/减一档（整星或半星），数字键 1–9 直接跳到对应星级，Backspace 清空。",
+    "AllowHalf 打开后每颗星可以填一半，适合展示聚合后的平均分；ReadOnly 则把控件变成纯展示（不可聚焦、指针不变手形），用于「平均 4.5 分」这类只读场景。",
+    "它与字段家族共享尺寸口径：Size 有 Sm 28 / Md 36 / Lg 44 三档单元尺寸，可和 input、select 在同一行对齐。"
+  ],
+  "whenToUse": [
+    "用户对一次体验、一次交付或一个条目给出 1–5 星评价。",
+    "需要展示聚合评分（4.5 分）并允许只读呈现。",
+    "希望用键盘快速给分（方向键微调、数字键直达）的场景。"
+  ],
+  "whenNotToUse": [
+    "需要精确数值（预算、数量）而不是主观刻度时，改用 slider；它支持任意量程与刻度。",
+    "选项是有名字的枚举（差/一般/好）而不需要星级视觉时，改用 radio-group。",
+    "只是二选一的好坏判断时，改用 switch 或 segmented-control。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "Empty", "note": "Value 为 0，右侧显示 Not rated" },
+    { "key": "state-set", "label": "Rated", "note": "整星评分，右侧显示对应词" },
+    { "key": "state-half", "label": "Half star", "note": "AllowHalf 打开后每颗星可填一半" },
+    { "key": "variant-readonly", "label": "Read only", "note": "纯展示，不可聚焦、不可点击" },
+    { "key": "variant-value-labels", "label": "Value labels", "note": "用 ValueLabels 自定义每档的词" },
+    { "key": "size-sm", "label": "Small", "note": "28 px 单元" },
+    { "key": "size-md", "label": "Medium", "note": "默认 36 px 单元" },
+    { "key": "size-lg", "label": "Large", "note": "44 px 单元" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "slider", "note": "需要精确数值与刻度时改用 slider" },
+    { "type": "alternative", "target": "radio-group", "note": "有具名选项、不需要星级视觉时改用 radio group" },
+    { "type": "complement", "target": "textarea", "note": "评分之后常跟一段文字反馈，两者一起提交" }
+  ],
+  "contrasts": [
+    {
+      "target": "slider",
+      "title": "Rating 与 Slider",
+      "rows": [
+        { "dimension": "取值", "self": "离散星级（1–5，可半星）", "other": "连续数值，可任意量程" },
+        { "dimension": "语义", "self": "主观评价，带语言化标签", "other": "可量化的参数，带刻度与单位" },
+        { "dimension": "清空", "self": "Backspace 或再点当前星归零", "other": "拖到最小值，没有清空概念" }
+      ]
+    },
+    {
+      "target": "radio-group",
+      "title": "Rating 与 Radio group",
+      "rows": [
+        { "dimension": "视觉", "self": "一排星，悬停即预览", "other": "一列行式单选，带说明" },
+        { "dimension": "选项文案", "self": "每档只给一个短词", "other": "每行可带完整说明" },
+        { "dimension": "典型场景", "self": "体验评分、商品评价", "other": "套餐、区域等互斥选择" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcRating Label=\"整体体验\"\n                 Value=\"{Binding Score, Mode=TwoWay}\"\n                 Description=\"悬停预览，Backspace 清空。\" />\n</Window>"
+    },
+    {
+      "title": "半星、只读与自定义文案",
+      "language": "csharp",
+      "code": "var editable = new ArcRating\n{\n    Label = \"整体体验\",\n    AllowHalf = true,\n    Value = 4.5,\n    ValueLabels = new[] { \"很差\", \"较差\", \"一般\", \"不错\", \"很好\" }\n};\n\nvar average = new ArcRating\n{\n    Label = \"平均评分\",\n    ReadOnly = true,\n    AllowHalf = true,\n    ShowValue = true,\n    Value = 4.5\n};\n\neditable.ValueChanged += (_, _) => Save(editable.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcRating",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "评分上方的可见标签，同时作为无障碍名称",
+      "Description": "标签下方的说明文字",
+      "Value": "当前分值，范围 0–Max；0 表示未评分",
+      "Max": "星的个数，默认 5",
+      "AllowHalf": "允许半星；开启后 Value 以 0.5 为步进",
+      "AllowClear": "允许清空：再点当前分值或按 Backspace 归零，默认 true",
+      "ReadOnly": "只读展示：不可聚焦、不可点击，指针保持箭头",
+      "ShowValue": "是否在右侧显示分值对应的词，默认 true",
+      "ValueLabels": "每档的词，按 1..Max 顺序；Max 为 5 时默认 Poor…Excellent",
+      "EmptyLabel": "未评分时显示的词，默认 Not rated",
+      "Size": "单元尺寸：Sm 28 / Md 36 / Lg 44，默认 Md",
+      "ValueChanged": "用户提交新分值时触发，此时 Value 已对齐到半星或整星"
+    }
+  }
+}

@@ -21,6 +21,11 @@ public sealed class ChoroplethExplorerPage : ArcItemPage
 {
     public override string ItemSlug => "choropleth-explorer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-choropleth", "variant-tile-map", "variant-legend", "variant-ranked-list", "variant-country-switch"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

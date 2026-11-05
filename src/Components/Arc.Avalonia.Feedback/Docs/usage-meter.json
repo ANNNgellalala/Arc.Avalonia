@@ -1,0 +1,78 @@
+{
+  "slug": "usage-meter",
+  "nameZh": "用量计量",
+  "summary": "配额对上限的分段条形图：每段用量一种颜色，右侧给出已用/上限、剩余量与预警徽标。",
+  "purpose": [
+    "把「用了多少、还剩多少、什么时候会满」放在一行里：分段条按各自 Value 与 Limit 的比例着色，图例列出每段名称与数值。",
+    "徽标随占比变化：正常显示「X% used」，达到 WarnAt（默认 90%）显示「Almost full」，超过 Limit 显示「Over limit」，颜色同步变成警告或危险色。",
+    "分段顺序就是展示顺序，最多四段比较易读；FreeLabel 用来标注剩余空间，OverLabel 说明超限。"
+  ],
+  "whenToUse": [
+    "套餐配额、存储空间、席位数量、API 请求数等有固定上限的用量。",
+    "需要把多个来源的占用拼成一条总量条（文件、媒体、备份）。",
+    "接近上限时需要提醒、超限时需要阻断的计费与配额页面。"
+  ],
+  "whenNotToUse": [
+    "没有固定上限、只有完成比例的下载与导入，改用 progress。",
+    "只关心单个关键数字与环比变化时，改用 metric-card。",
+    "需要按时间趋势展示用量时，改用图表组件（例如 line-chart）。"
+  ],
+  "variants": [
+    { "key": "variant-single", "label": "Single segment", "note": "一种用量对上限" },
+    { "key": "variant-multi", "label": "Segments", "note": "多段用量拼成总量条并带图例" },
+    { "key": "state-normal", "label": "Normal", "note": "未到阈值，徽标显示百分比" },
+    { "key": "state-warning", "label": "Almost full", "note": "超过 WarnAt 后徽标变成警告色" },
+    { "key": "state-over", "label": "Over limit", "note": "超过 Limit 后显示 OverLabel 与危险色" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "progress", "note": "只有完成比例、没有配额语义时改用 progress" },
+    { "type": "complement", "target": "metric-card", "note": "配额与关键指标常并排出现" },
+    { "type": "alternative", "target": "skeleton", "note": "用量数据加载中用 skeleton 占位" }
+  ],
+  "contrasts": [
+    {
+      "target": "progress",
+      "title": "Usage meter 与 Progress",
+      "rows": [
+        { "dimension": "语义", "self": "配额对固定上限，可看剩余量", "other": "一次任务的完成比例" },
+        { "dimension": "结构", "self": "分段条、图例、剩余量与徽标", "other": "单条填充加百分比" },
+        { "dimension": "阈值", "self": "WarnAt 与 Limit 两级状态", "other": "只有整体色调可选" }
+      ]
+    },
+    {
+      "target": "metric-card",
+      "title": "Usage meter 与 Metric card",
+      "rows": [
+        { "dimension": "版面角色", "self": "一条用量条与图例", "other": "卡片化的单个数字与变化" },
+        { "dimension": "需要的上限", "self": "必须提供 Limit 才有比例", "other": "不需要上限" },
+        { "dimension": "适合回答", "self": "还剩多少可用", "other": "现在是增长还是下降" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "单段请求配额",
+      "language": "csharp",
+      "code": "var requests = new ArcUsageMeter\n{\n    Label = \"Requests\",\n    Unit = \"requests\",\n    Limit = 10000,\n    Decimals = 1,\n    Segments = new[]\n    {\n        new ArcUsageSegment { Id = \"api\", Label = \"API\", Value = 8400 }\n    }\n};\n\n// 8400 / 10000 显示 84% used；超过 9000 变成 Almost full。"
+    },
+    {
+      "title": "多段存储占用",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcUsageMeter Label=\"Workspace storage\"\n                    Unit=\"GB\"\n                    Limit=\"50\"\n                    Segments=\"{Binding StorageSegments}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcUsageMeter",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "计量对象，例如 Workspace storage，默认 Usage",
+      "Segments": "用量分段集合，元素是 ArcUsageSegment（Id / Label / Value）",
+      "Limit": "固定上限，与分段使用同一单位，默认 100",
+      "Unit": "数字后的单位，例如 GB 或 requests",
+      "Decimals": "数值保留的小数位，默认 1",
+      "FreeLabel": "图例中剩余空间的文案，默认 Free",
+      "OverLabel": "超过上限时徽标显示的文案，默认 Over limit",
+      "WarnAt": "触发 Almost full 的占比阈值，默认 0.9（90%）"
+    }
+  }
+}

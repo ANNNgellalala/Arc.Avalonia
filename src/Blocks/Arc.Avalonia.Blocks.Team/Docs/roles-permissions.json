@@ -1,0 +1,66 @@
+{
+  "slug": "roles-permissions",
+  "nameZh": "角色与权限",
+  "summary": "权限矩阵区块：行是权限、列是角色，单元格可切换、组头可整组授权，Owner 列锁定，未保存的改动会浮出审阅条。",
+  "purpose": [
+    "当“谁能做什么”需要被逐项检查时，矩阵比一列开关更清楚：横轴是角色，纵轴按组排列权限，组与角色的交叉处显示“3/3”这类汇总。",
+    "每个单元格是一个可聚焦的开关，图标在 check 与 minus 之间切换；组头的计数本身也是可点击的批量开关，带 mixed 状态提示。",
+    "Owner 列整体锁定：视觉上降低不透明度并禁用命中，避免管理员误删自己的最高权限。",
+    "矩阵与最近一次保存的快照比较，有差异时底部浮出审阅条，显示“2 unsaved”徽章、Discard 与 Save changes；保存后审阅条消失。"
+  ],
+  "whenToUse": [
+    "工作区设置里让管理员编辑每个角色能做什么时。",
+    "权限较多、需要按组呈现并支持整组授予或撤销时。",
+    "需要“改动 → 审阅 → 保存”这一步来避免误操作时。"
+  ],
+  "whenNotToUse": [
+    "只是给某个成员分配角色时改用 team-members。",
+    "只需要少量开关、没有角色维度时用 switch 或 checkbox 列表。",
+    "要审计历史变更时用 timeline 或日志页。"
+  ],
+  "variants": [
+    { "key": "variant-permissions-matrix", "label": "权限矩阵", "note": "权限组 × Admin / Editor / Viewer 三列" },
+    { "key": "state-locked-owner", "label": "锁定 Owner 列", "note": "Admin 列禁用命中并降低不透明度" },
+    { "key": "state-mixed-group", "label": "组内混合", "note": "组头计数显示 grants/总数，可整组切换" },
+    { "key": "state-unsaved-review", "label": "未保存审阅", "note": "底部审阅条显示 2 unsaved 与保存操作" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Duplicate Viewer、Discard 与 Save changes 使用按钮" },
+    { "type": "uses", "target": "badge", "note": "未保存数量与组状态用徽章表达" },
+    { "type": "uses", "target": "avatar", "note": "页头显示最近一次审阅人的头像" },
+    { "type": "alternative", "target": "team-members", "note": "给具体成员分配角色时用 team members" }
+  ],
+  "contrasts": [
+    {
+      "target": "team-members",
+      "title": "Roles and permissions 与 Team members",
+      "rows": [
+        { "dimension": "操作对象", "self": "角色与权限定义的交叉矩阵", "other": "具体的成员与邀请" },
+        { "dimension": "改动方式", "self": "切换单元格或整组，再统一保存", "other": "逐人选择角色，立即生效" },
+        { "dimension": "保护机制", "self": "Owner 列锁定 + 未保存审阅条", "other": "至少保留一名成员" },
+        { "dimension": "阅读重点", "self": "每个角色能做什么", "other": "现在有哪些人、什么角色" }
+      ]
+    },
+    {
+      "target": "badge",
+      "title": "Roles and permissions 与 Badge",
+      "rows": [
+        { "dimension": "职责", "self": "矩阵、批量切换与审阅保存的组合", "other": "只渲染一个状态标签" },
+        { "dimension": "数据", "self": "角色、权限组与授权关系", "other": "短文本与色调" },
+        { "dimension": "规则", "self": "混合态、锁定列与未保存计数", "other": "不感知业务规则" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "矩阵单元格与审阅条",
+      "language": "csharp",
+      "code": "var granted = new ArcIcon { Icon = \"check\", Size = 13 };\nvar revoked = new ArcIcon { Icon = \"minus\", Size = 13 };\nvar unsaved = new ArcBadge { Content = \"2 unsaved\", Tone = ArcBadgeTone.Warning, Dot = true };\nvar save = new ArcButton { Content = \"Save changes\", Variant = ArcButtonVariant.Primary, Size = ArcButtonSize.Sm };\nvar discard = new ArcButton { Content = \"Discard\", Variant = ArcButtonVariant.Ghost, Size = ArcButtonSize.Sm };"
+    },
+    {
+      "title": "矩阵结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"360,140,140,140\">\n  <TextBlock Text=\"Permission\" Classes=\"arc-caption\" />\n  <TextBlock Grid.Column=\"1\" Text=\"Admin · locked\" Classes=\"arc-caption\" HorizontalAlignment=\"Center\" />\n  <TextBlock Grid.Column=\"2\" Text=\"Editor · 9 members\" Classes=\"arc-caption\" HorizontalAlignment=\"Center\" />\n  <TextBlock Grid.Column=\"3\" Text=\"Viewer · 13 members\" Classes=\"arc-caption\" HorizontalAlignment=\"Center\" />\n  <!-- 每行权限 + 三个可切换单元格；组头带 grants/总数 -->\n</Grid>\n<Border Padding=\"12,8\" CornerRadius=\"14\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n  <TextBlock Text=\"2 unsaved · Review the matrix before applying it\" Classes=\"arc-caption\" />\n</Border>"
+    }
+  ]
+}

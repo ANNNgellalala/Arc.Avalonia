@@ -1,0 +1,64 @@
+{
+  "slug": "funnel-chart",
+  "nameZh": "漏斗图",
+  "summary": "用一条逐级收窄的带子表达有序转化：每个阶段平坦跨越自己的高度，再平滑过渡到下一段，所以落差本身就是形状；左侧是阶段名与数量，右侧是每一级留下的比例。",
+  "purpose": [
+    "当一组步骤有固定顺序、而且每一步只保留上一部分人时用它：结账、注册、试用激活、提交流程都适合。",
+    "第一段是整体，后续每段是它的子集；ShowConversion 会在每个阶段边界的右侧打印相对上一级的留存比例，让你一眼看到最大的流失点。",
+    "悬停或聚焦某一段会把其余阶段变暗，并在提示里读出该段的数量与占比；没有序列概念，也不需要图例。"
+  ],
+  "whenToUse": [
+    "步骤严格有序、每步只保留上一级的一部分时。",
+    "需要指出「哪一步流失最多」，而不是只展示最终转化率时。",
+    "阶段数量在 3 到 6 个、每段一个数量时。"
+  ],
+  "whenNotToUse": [
+    "步骤之间会分流、合流或跳过时用 sankey-flow，漏斗图只表达线性收窄。",
+    "只关心单一完成度（例如任务完成 7 步中的 3 步）时用 progress，不需要画成漏斗。",
+    "要比较多个并列渠道的最终转化、而不是路径形状时用 bar-chart。"
+  ],
+  "variants": [
+    { "key": "variant-checkout", "label": "Checkout", "note": "四段结账漏斗：访问 → 加购 → 结账 → 购买" },
+    { "key": "variant-signup", "label": "Signup", "note": "三段注册漏斗：访问定价 → 试用 → 激活" },
+    { "key": "state-conversion", "label": "Conversion", "note": "ShowConversion=true，右侧标出逐级留存" },
+    { "key": "state-no-conversion", "label": "No conversion", "note": "ShowConversion=false，只留阶段名与数量" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "sankey-flow", "note": "严格线性的转化用漏斗图，有分流合流时用桑基图" },
+    { "type": "alternative", "target": "progress", "note": "只看单一完成度用 progress，多阶段转化用漏斗图" }
+  ],
+  "contrasts": [
+    {
+      "target": "sankey-flow",
+      "title": "Funnel chart 与 Sankey flow",
+      "rows": [
+        { "dimension": "结构", "self": "一列有序阶段，每段是上一段的子集", "other": "多列节点，可以分流与合流" },
+        { "dimension": "编码", "self": "形状收窄表达逐级留存，右侧给出比例", "other": "连线粗细表达流量，路径表达去向" },
+        { "dimension": "交互", "self": "悬停某段看该级数量与占比", "other": "悬停节点追踪整条路径" },
+        { "dimension": "典型数据", "self": "结账、注册、激活等固定步骤", "other": "渠道来源、预算流向、能量分配" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明漏斗",
+      "language": "xaml",
+      "code": "<arc:ArcFunnelChart xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                  ShowConversion=\"True\"\n                  ValueSuffix=\" sessions\"\n                  Height=\"244\" />"
+    },
+    {
+      "title": "按顺序提供阶段",
+      "language": "csharp",
+      "code": "var funnel = new ArcFunnelChart\n{\n    Stages = new[]\n    {\n        new ArcFunnelStage(\"Visited store\", 100000),\n        new ArcFunnelStage(\"Added to cart\", 16420),\n        new ArcFunnelStage(\"Started checkout\", 9840),\n        new ArcFunnelStage(\"Purchased\", 3590)\n    },\n    ShowConversion = true,\n    ValueSuffix = \" sessions\"\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcFunnelChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Stages": "有序阶段；第一段是整体，后续每段都应是它的子集",
+      "ShowConversion": "在阶段边界打印相对上一级的留存比例，默认 true",
+      "ValueSuffix": "数值后的单位，例如 \" sessions\"",
+      "ValueFormat": "自定义阶段数量与提示的格式"
+    }
+  }
+}

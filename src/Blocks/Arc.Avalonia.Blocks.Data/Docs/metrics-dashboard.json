@@ -1,0 +1,59 @@
+{
+  "slug": "metrics-dashboard",
+  "nameZh": "指标仪表盘",
+  "summary": "产品分析的主看板：四个 KPI 标签、一张可对比上一期的折线图，以及所选时间范围内的热门页面与来源列表。",
+  "purpose": [
+    "当产品团队需要一个每天都会打开的总览页时，用 metrics dashboard：顶部四个 KPI 标签（访问、注册、收入、流失）随时可切换，下方一张大图只画当前指标。",
+    "Comparison 开关把上一周期叠在图上，用虚线区分；时间范围（7 / 30 / 90 天）同时驱动图表与右侧的 Top pages、Sources 列表，所有读数随窗口变化。",
+    "右侧来源用分段条表达占比，列表里的占比条与徽章说明变化方向；导出只会报告一条本地状态，不会真的下载文件。"
+  ],
+  "whenToUse": [
+    "产品分析的总览页：一屏内看四个核心指标并切换细节。",
+    "需要把当前周期与上一周期直接对比的看板。",
+    "需要同屏给出热门页面与来源构成的仪表盘。"
+  ],
+  "whenNotToUse": [
+    "需要逐项拆解收入构成与时间窗口时，用 revenue-explorer。",
+    "KPI 卡片本身要展开成详情时，用 kpi-drilldown。",
+    "只需要一个数字与趋势时，用 metric-card 或 sparkline。"
+  ],
+  "variants": [
+    { "key": "layout-dashboard", "label": "整体布局", "note": "KPI 标签、主图、Top pages 与 Sources 一页并置" },
+    { "key": "variant-kpi-tabs", "label": "KPI tabs", "note": "四个 KPI 标签，当前 Visitors 带强调下划线" },
+    { "key": "variant-compare", "label": "Compare", "note": "主图叠加上一周期的虚线序列" },
+    { "key": "variant-split-bar", "label": "Sources", "note": "来源占比用分段条表达" },
+    { "key": "variant-top-lists", "label": "Top lists", "note": "Top pages 与 Sources 两列排名列表" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "主图是带本期与上期两条序列的折线图" },
+    { "type": "uses", "target": "split-bar", "note": "来源构成用分段条 ArcSplitBar 表达占比" },
+    { "type": "uses", "target": "segmented-control", "note": "时间范围与图表控制用分段控件切换" },
+    { "type": "uses", "target": "switch", "note": "「对比上一期」是一个开关，直接驱动图表叠加虚线" },
+    { "type": "uses", "target": "progress", "note": "列表中的占比条用进度条绘制" },
+    { "type": "uses", "target": "button", "note": "Export 与图例上的操作都是按钮" },
+    { "type": "alternative", "target": "metric-explorer", "note": "需要把 KPI 卡本身打开成详情时，改用 metric-explorer" }
+  ],
+  "contrasts": [
+    {
+      "target": "metric-explorer",
+      "title": "Metrics dashboard 与 Metric explorer",
+      "rows": [
+        { "dimension": "关注点", "self": "四个指标的总览与同屏排名列表", "other": "四张 KPI 卡打开成同一张可拖拽图表" },
+        { "dimension": "图表数量", "self": "一张主图加两条迷你列表", "other": "一张主图，KPI 卡只是入口" },
+        { "dimension": "典型场景", "self": "每天打开的产品总览", "other": "探索某个指标随时间的变化" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <!-- KPI 标签，当前项带强调下划线 -->\n  <arc:ArcSegmentedControl SelectedValue=\"visitors\" />\n  <arc:ArcLineChart Height=\"240\" /> <!-- 本期实线 + 上期虚线 -->\n  <charts:ArcSplitBar Height=\"18\" /> <!-- 来源占比 -->\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：范围与对比",
+      "language": "csharp",
+      "code": "var range = 30;\nvar compare = true;\n\nvar chart = new ArcLineChart\n{\n    Series = BuildSeries(metric, range, compare), // 第二条是上一周期\n    Labels = BuildLabels(range),\n    Height = 240\n};"
+    }
+  ]
+}

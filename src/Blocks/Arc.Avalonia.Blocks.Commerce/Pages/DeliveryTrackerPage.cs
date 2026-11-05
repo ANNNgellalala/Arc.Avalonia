@@ -21,6 +21,11 @@ public sealed class DeliveryTrackerPage : ArcItemPage
 {
     public override string ItemSlug => "delivery-tracker";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-tracker", "variant-stepper", "variant-arrival", "variant-updates", "variant-order-summary"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

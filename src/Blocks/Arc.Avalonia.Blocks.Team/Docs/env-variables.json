@@ -1,0 +1,72 @@
+{
+  "slug": "env-variables",
+  "nameZh": "环境变量",
+  "summary": "按环境管理配置的区块：变量按环境取不同值、敏感项只写不可读、支持搜索与 .env 粘贴导入，并在有未部署改动时给出 Redeploy 横幅。",
+  "purpose": [
+    "同一个变量在 Development、Preview、Production 往往取不同的值。环境变量区块用环境切换统一控制当前展示的值，并为每个变量保留三套作用域。",
+    "敏感值（数据库连接、支付密钥）只写不可读：行里直接显示“Sensitive value · write-only”，没有眼睛按钮；普通值默认掩码，点眼睛临时显示并带复制。",
+    "顶部搜索只匹配变量名、不匹配值；粘贴 .env 会报告有效、无效与重复条数。变量行右侧的三个环境 pill 可以单独开关作用域。",
+    "任何变化都会增加未部署计数，顶部出现 Redeploy 横幅；Redeploy 只清空计数并确认“约一分钟后生效”，不假装真的部署。"
+  ],
+  "whenToUse": [
+    "开发者设置页需要按环境维护配置项与密钥时。",
+    "需要区分可读值与只写敏感值时。",
+    "需要用 .env 文件一次性导入配置时。"
+  ],
+  "whenNotToUse": [
+    "管理调用 API 的密钥与最后使用时间时改用 api-keys。",
+    "只需要一组不区分环境的普通设置时用普通表单即可。",
+    "管理 webhook 端点的签名密钥时改用 webhooks。"
+  ],
+  "variants": [
+    { "key": "variant-variable-rows", "label": "变量行", "note": "名称、敏感徽章、值、作用域与环境开关" },
+    { "key": "state-masked-value", "label": "掩码值", "note": "普通值默认显示 12 位掩码与眼睛按钮" },
+    { "key": "state-sensitive-writeonly", "label": "只写敏感值", "note": "敏感行显示 Sensitive value · write-only，无眼睛按钮" },
+    { "key": "state-redeploy-banner", "label": "未部署横幅", "note": "3 changes not deployed in Production 与 Redeploy" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "copy-button", "note": "普通变量值可一键复制" },
+    { "type": "uses", "target": "input", "note": "新增变量的键名与值输入" },
+    { "type": "uses", "target": "textarea", "note": "粘贴 .env 文件时使用多行输入" },
+    { "type": "uses", "target": "search-field", "note": "顶部按变量名过滤列表" },
+    { "type": "uses", "target": "select", "note": "对比视图里选择左右环境" },
+    { "type": "uses", "target": "checkbox", "note": "新增变量时可勾选“敏感，只写”" },
+    { "type": "uses", "target": "segmented-control", "note": "环境切换与 Variables / Compare 视图切换" },
+    { "type": "uses", "target": "badge", "note": "敏感标记与环境对比状态用徽章" },
+    { "type": "uses", "target": "button", "note": "Redeploy、显示/隐藏、编辑与增删都是按钮" },
+    { "type": "alternative", "target": "api-keys", "note": "管理调用凭证时用 api keys" }
+  ],
+  "contrasts": [
+    {
+      "target": "api-keys",
+      "title": "Env variables 与 API keys",
+      "rows": [
+        { "dimension": "管理对象", "self": "按环境生效的配置与连接串", "other": "调用 API 的凭证" },
+        { "dimension": "读取策略", "self": "普通值可显示，敏感值只写不可读", "other": "创建时一次性展示，之后可再次显示" },
+        { "dimension": "环境维度", "self": "每个变量三套作用域，可环境对比", "other": "每把 key 属于一个环境" },
+        { "dimension": "导入", "self": "支持 .env 粘贴与去重报告", "other": "逐个创建" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Env variables 与 Segmented control",
+      "rows": [
+        { "dimension": "职责", "self": "变量列表、环境、导入与部署提示的组合", "other": "只在一组选项间切换" },
+        { "dimension": "数据", "self": "变量、三套环境值、作用域与未部署计数", "other": "当前选中值" },
+        { "dimension": "安全语义", "self": "掩码、只写与复制都有明确规则", "other": "不感知敏感数据" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "环境切换与敏感行",
+      "language": "csharp",
+      "code": "var environment = new ArcSegmentedControl\n{\n    Label = \"Environment\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"Development\", \"Development\"),\n        new ArcSegmentOption(\"Preview\", \"Preview\"),\n        new ArcSegmentOption(\"Production\", \"Production\")\n    },\n    Value = \"Production\"\n};\nvar search = new ArcSearchField { Placeholder = \"Search keys\", Width = 220 };\nvar sensitive = new ArcBadge { Content = \"Sensitive\", Tone = ArcBadgeTone.Warning };\nvar copy = new ArcCopyButton { Value = value, Label = \"Copy\", IconOnly = true };"
+    },
+    {
+      "title": "变量行的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Border Padding=\"12,5\" CornerRadius=\"14\" BorderThickness=\"1\" BorderBrush=\"{DynamicResource ArcBorder}\">\n  <Grid ColumnDefinitions=\"*,184,36\">\n    <StackPanel Spacing=\"4\">\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n        <TextBlock Text=\"DATABASE_URL\" Classes=\"arc-label\" />\n        <arc:ArcBadge Content=\"Sensitive\" Tone=\"Warning\" />\n      </StackPanel>\n      <TextBlock Text=\"Sensitive value · write-only\" Classes=\"arc-mono\" />\n    </StackPanel>\n    <StackPanel Grid.Column=\"1\" Orientation=\"Horizontal\" Spacing=\"4\">\n      <!-- Dev / Prev / Prod 三个作用域 pill -->\n    </StackPanel>\n    <arc:ArcButton Grid.Column=\"2\" Content=\"Edit\" Variant=\"Ghost\" Size=\"Sm\" />\n  </Grid>\n</Border>"
+    }
+  ]
+}

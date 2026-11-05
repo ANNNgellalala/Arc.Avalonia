@@ -21,6 +21,14 @@ public sealed class AiSidePanelPage : ArcItemPage
 {
     public override string ItemSlug => "ai-side-panel";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-page",
+        "variant-change-card",
+        "variant-context-chips",
+        "variant-composer"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -129,7 +137,7 @@ public sealed class AiSidePanelPage : ArcItemPage
                         changeCard.IsVisible = false;
                         status.Text = "Change discarded. The page is unchanged.";
                     }),
-                    K.Caption("1 block")))
+                    K.Pill("1 block", ArcBadgeTone.Neutral)))
         };
 
         var composer = new ArcInput { Placeholder = "Ask about this page", Height = 42 };

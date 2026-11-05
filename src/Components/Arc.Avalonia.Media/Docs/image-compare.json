@@ -1,0 +1,85 @@
+{
+  "slug": "image-compare",
+  "nameZh": "图片对比",
+  "summary": "在两张图上拖动分隔线做前后对比：支持水平与垂直方向、固定或受控的初始位置，以及可隐藏的 Before / After 角标。",
+  "purpose": [
+    "修图、设计改版、滤镜效果这类“到底改了什么”的问题，单看两张图很难回答。图片对比把两张图叠在同一块画框里，中间一条可拖动的分隔线，读者移动它就能看见差异。",
+    "Orientation 决定分隔方向：水平分割左右、垂直分割上下；Position 是受控位置（0 到 100），DefaultPosition 是非受控的初始位置，两种方式都可用。",
+    "BeforeLabel 与 AfterLabel 在两侧显示角标，ShowLabels=false 时隐藏；AspectRatio 控制画框高宽比，FrameRadius 负责圆角，让它在卡片里也不突兀。",
+    "指针拖动、双击与键盘方向键都能移动分隔线（方向键 1%、Shift 10%、Home/End 到两端），焦点状态有可见的描边；读不到图片路径时会绘制静态占位网格，不依赖网络。"
+  ],
+  "whenToUse": [
+    "展示两张图的差异，例如修图前后、设计改版前后、不同滤镜效果。",
+    "想让读者自己拖动分隔线、按兴趣检查任一侧时。",
+    "需要水平或垂直两种对比方向时。",
+    "两张图尺寸相同、内容对齐，适合叠放比较时。"
+  ],
+  "whenNotToUse": [
+    "要并排浏览多张图、不做逐像素对比时改用 carousel。",
+    "同一张图需要区域放大或标注时，用图像查看器更合适。",
+    "要比较两段视频或动图时改用 media-player 并排播放。",
+    "只需要展示单张图片时用普通 Image，不必引入分隔线。"
+  ],
+  "variants": [
+    { "key": "variant-horizontal", "label": "水平对比", "note": "左右分割，Position=35，两侧带角标" },
+    { "key": "variant-vertical", "label": "垂直对比", "note": "上下分割，DefaultPosition=62" },
+    { "key": "state-left-edge", "label": "最左", "note": "Position=0，只露出 Before 一侧" },
+    { "key": "state-right-edge", "label": "最右", "note": "Position=100，只露出 After 一侧" },
+    { "key": "state-no-labels", "label": "无角标", "note": "ShowLabels=false，只留分隔线" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "carousel", "note": "浏览多张图而不是对比两张时用 carousel" },
+    { "type": "complement", "target": "avatar-upload", "note": "头像裁剪前后需要展示差异时，可把导出图放进 image compare" }
+  ],
+  "contrasts": [
+    {
+      "target": "carousel",
+      "title": "Image compare 与 Carousel",
+      "rows": [
+        { "dimension": "图片数量", "self": "恰好两张，叠放对比", "other": "一组幻灯片，逐张浏览" },
+        { "dimension": "阅读方式", "self": "拖动分隔线检查同一位置的差异", "other": "横向滑动切换不同图片" },
+        { "dimension": "适用问题", "self": "改了什么", "other": "还有哪些" }
+      ]
+    },
+    {
+      "target": "avatar-upload",
+      "title": "Image compare 与 Avatar upload",
+      "rows": [
+        { "dimension": "目标", "self": "展示两张图的差异", "other": "产出一张裁剪好的头像" },
+        { "dimension": "输入", "self": "两张已对齐的图片", "other": "一张待裁剪的图片" },
+        { "dimension": "产物", "self": "可拖动查看对比的画框", "other": "上传完成的正方形图片" },
+        { "dimension": "交互", "self": "拖动分隔线、方向键微调", "other": "拖动裁剪框、滚轮缩放、确认上传" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "修图前后对比",
+      "language": "csharp",
+      "code": "var compare = new ArcImageCompare\n{\n    BeforeSource = \"/photos/portrait-original.jpg\",\n    AfterSource = \"/photos/portrait-retouched.jpg\",\n    Position = 35,\n    BeforeLabel = \"Original\",\n    AfterLabel = \"Retouched\",\n    AspectRatio = 1.5,\n    Label = \"Portrait edit\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcImageCompare x:Name=\"Compare\"\n                         Width=\"400\"\n                         AspectRatio=\"1.5\"\n                         DefaultPosition=\"50\"\n                         BeforeLabel=\"Before\"\n                         AfterLabel=\"After\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcImageCompare",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "BeforeSource": "原图路径或 avares URI；读不到时绘制占位网格",
+      "AfterSource": "结果图路径或 avares URI",
+      "Position": "受控的分隔线位置（0 到 100）；为 null 时由控件自己管理",
+      "DefaultPosition": "非受控时的初始位置，默认 50",
+      "Orientation": "水平分割左右或垂直分割上下",
+      "BeforeLabel": "左侧或上侧的角标，默认 Before",
+      "AfterLabel": "右侧或下侧的角标，默认 After",
+      "ShowLabels": "是否显示两侧角标，默认 true",
+      "Label": "分隔线的无障碍名称，默认 Before and after",
+      "AspectRatio": "画框的宽高比，默认 1.5",
+      "Value": "当前分隔线位置（只读）",
+      "PositionChanged": "分隔线停在新位置后触发，参数是百分比"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "slug": "dock",
+  "nameZh": "浮动画布工具坞",
+  "summary": "浮在画布上的工具坞：标签在按钮之间滑行、强调色块弹到当前工具，成组工具从坞身上长出托盘，整块表面只有一圈发丝线。",
+  "purpose": [
+    "当画布、白板或编辑器里的工具需要一直可见、随手切换时，用 dock：一排等宽的圆角槽位，每个槽位是一个常驻工具，当前工具的强调底色会弹簧滑过去。",
+    "成组工具（例如形状的矩形与椭圆）在槽位右下角带一个 chevron，点开时从坞身上长出一块同材质的托盘，成员行错峰进入；托盘展开时标签贴在坞上方。",
+    "工具可以用 Alt 加方向键重排；标签在指针移入后短暂延迟才跟手，避免横扫时标签乱飞。整体只有一块浮起表面，不会在画布上切出多条横线。"
+  ],
+  "whenToUse": [
+    "画布、白板或编辑器里需要一组常驻、互斥的工具。",
+    "工具可以分组、组内还有变体（矩形 / 椭圆）时。",
+    "允许用户按自己的习惯重排工具顺序时。"
+  ],
+  "whenNotToUse": [
+    "只有两到四个行内选项，用 segmented-control 更轻。",
+    "一次性动作、不保持选中态，用 action-button。",
+    "切换应用分区而不是工具，用 liquid-tab-bar。"
+  ],
+  "variants": [
+    { "key": "state-selected", "label": "Selected", "note": "当前工具 Shapes 带强调底色与更粗的图标描边" },
+    { "key": "state-tray-open", "label": "Tray open", "note": "成组工具长出托盘，成员行与快捷键一并可见" },
+    { "key": "state-member", "label": "Member", "note": "托盘内当前变体 Ellipse 行带浅色底" },
+    { "key": "variant-badge", "label": "Badge", "note": "Comment 工具右上角的未读计数 3" },
+    { "key": "variant-label", "label": "Label", "note": "坞上方的浮动标签，显示「Shapes: Ellipse」与快捷键 O" },
+    { "key": "variant-chevron", "label": "Chevron", "note": "成组工具槽位右下角的展开箭头" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "floating-button-group", "note": "独立软按钮的浮动工具栏用 floating button group" },
+    { "type": "alternative", "target": "button-group", "note": "同一个对象上的少量分段行动用 button group" },
+    { "type": "complement", "target": "dot-grid", "note": "dock 常浮在点阵画布之上，两者共同构成编辑器场景" }
+  ],
+  "contrasts": [
+    {
+      "target": "floating-button-group",
+      "title": "Dock 与 Floating button group",
+      "rows": [
+        { "dimension": "选中态", "self": "工具是互斥选择，当前工具有强调底色", "other": "行动是一次性的，没有选中态" },
+        { "dimension": "分组", "self": "成组工具长出一块托盘展示变体", "other": "用分隔线把行动分簇，没有托盘" },
+        { "dimension": "标签", "self": "坞上方一块浮动标签带快捷键", "other": "每个按钮自己的 tooltip" }
+      ]
+    },
+    {
+      "target": "button-group",
+      "title": "Dock 与 Button group",
+      "rows": [
+        { "dimension": "语义", "self": "常驻工具的模式选择", "other": "作用于同一对象的行动" },
+        { "dimension": "形态", "self": "悬浮的圆角槽位与托盘", "other": "贴在同一表面的分段按钮" },
+        { "dimension": "键盘", "self": "左右移动、上下开合托盘、Alt 重排", "other": "方向键在分段之间漫游" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcDock xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n            HorizontalAlignment=\"Center\"\n            VerticalAlignment=\"Bottom\" />"
+    },
+    {
+      "title": "代码构建：贴在画布底部",
+      "language": "csharp",
+      "code": "var dock = new ArcDock\n{\n    HorizontalAlignment = HorizontalAlignment.Center,\n    VerticalAlignment = VerticalAlignment.Bottom,\n    Margin = new Thickness(0, 0, 0, 24)\n};\ncanvas.Children.Add(dock);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcDock",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {}
+  }
+}

@@ -23,6 +23,14 @@ public sealed class AgentTasksPage : ArcItemPage
 {
     public override string ItemSlug => "agent-tasks";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-composer",
+        "variant-filters",
+        "variant-task-list",
+        "variant-review"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

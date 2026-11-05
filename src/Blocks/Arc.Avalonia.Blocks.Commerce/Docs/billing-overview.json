@@ -1,0 +1,54 @@
+{
+  "slug": "billing-overview",
+  "nameZh": "账单总览",
+  "summary": "SaaS 账单设置页：当前计划卡、用量进度、支付方式就地编辑、发票列表与账单联系人。",
+  "purpose": [
+    "当团队管理员要在一处管理订阅时，账单总览把当前计划、用量、支付方式、发票与账单联系人排成一个设置面。",
+    "计划卡显示当前档位、席位与下次开票金额，Change plan 让卡片原地长成选择器并给出按天折算的预览；支付方式可以就地变成换卡表单。",
+    "用量进度条对照计划额度，发票列表列出最近三张并给未付发票一个 Pay now 入口，右侧固定账单联系人与公司税号。"
+  ],
+  "whenToUse": [
+    "SaaS 产品的账单设置页，需要计划、用量、支付方式与发票同屏时。",
+    "需要让管理员自助改计划、换卡与下载发票时。",
+    "用固定席位收费、没有复杂用量的订阅制产品。"
+  ],
+  "whenNotToUse": [
+    "按用量计费、需要预算与花费提醒时，用 usage-billing。",
+    "面向访客比较计划价格时，用 usage-pricing 或 plan-comparison。",
+    "只需要一张发票的编辑与合计时，用 invoice-studio。"
+  ],
+  "variants": [
+    { "key": "layout-settings", "label": "设置布局", "note": "左侧计划、用量与发票，右侧支付方式与联系人" },
+    { "key": "variant-plan-card", "label": "计划卡", "note": "当前档位、按席价格与下次开票金额" },
+    { "key": "variant-usage-meters", "label": "用量进度", "note": "席位、API 请求与存储对照额度" },
+    { "key": "variant-payment-method", "label": "支付方式", "note": "Visa 尾号摘要与 Update card 链接" },
+    { "key": "variant-invoices", "label": "发票列表", "note": "最近三张，含未付发票的 Pay now" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "改计划、保存卡片与下载发票都是按钮" },
+    { "type": "uses", "target": "segmented-control", "note": "计划选择器里用分段控件切换月付与年付" },
+    { "type": "uses", "target": "progress", "note": "席位、API 请求与存储用量用进度条对照额度" },
+    { "type": "uses", "target": "input", "note": "换卡表单项用文本输入填写卡号、有效期与 CVC" },
+    { "type": "uses", "target": "badge", "note": "当前计划、默认卡与计费周期用徽章标出" },
+    { "type": "alternative", "target": "usage-billing", "note": "按用量计费、需要预算与花费提醒时，改用 usage-billing" }
+  ],
+  "contrasts": [
+    {
+      "target": "usage-billing",
+      "title": "Billing overview 与 Usage billing",
+      "rows": [
+        { "dimension": "计费模型", "self": "固定席位月费", "other": "按用量与限额计费" },
+        { "dimension": "重点视图", "self": "计划、付款方式与发票", "other": "每日支出、投影与预算" },
+        { "dimension": "主要动作", "self": "改计划、换卡、支付未付发票", "other": "加提醒、升级额度、看用量" },
+        { "dimension": "适用", "self": "普通 SaaS 订阅", "other": "基础设施与 API 类产品" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "计划卡、用量与发票的账单页骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,20,330\">\n  <StackPanel Spacing=\"8\">\n    <arc:ArcCard Padding=\"16\"> <!-- 当前计划卡 --> </arc:ArcCard>\n    <arc:ArcCard Padding=\"16\">\n      <StackPanel Spacing=\"8\">\n        <TextBlock Text=\"Usage this period\" Classes=\"arc-label\" />\n        <arc:ArcProgress Value=\"12\" Maximum=\"20\" />\n        <arc:ArcProgress Value=\"6.4\" Maximum=\"10\" />\n      </StackPanel>\n    </arc:ArcCard>\n    <arc:ArcCard Padding=\"16\"> <!-- 最近三张发票 --> </arc:ArcCard>\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"8\">\n    <arc:ArcCard Padding=\"16\"> <!-- 支付方式 --> </arc:ArcCard>\n    <arc:ArcCard Padding=\"16\"> <!-- 账单联系人 --> </arc:ArcCard>\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

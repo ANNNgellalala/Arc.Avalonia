@@ -1,0 +1,58 @@
+{
+  "slug": "ai-answer",
+  "nameZh": "AI 答案",
+  "summary": "把一次问答排成文章：问题在上、可折叠的推理与来源卡在过渡带、答案正文带引用圆点，下面接反馈、版本、模型与耗时，再下面是相关问题与追问输入。",
+  "purpose": [
+    "它按「一篇答案」而不是「一段聊天」来组织：顶部是线程头（Passkey rollout、Today · 1 question、New thread 与分享），然后才是问题本身，正文有标题层级、段落与编号清单。",
+    "答案前面有两块过渡内容：一枚 Thought for 9s 的推理折叠按钮（正文展开后是判断过程），以及 3 sources read 的来源卡——引用圆点 [1] [2] 点击会点亮对应段落与来源卡。",
+    "答案后面的元信息都在一行里：复制、重新生成、好评差评、1 of 3 版本切换、模型标记、1,240 tokens 与 18.4s；这让「这条答案值不值得信」有据可查。",
+    "收尾是相关问题与追问输入：三枚 chip 把话题延伸到相邻问题，输入框让用户在同一线程里继续问，本页的回答是模拟的。"
+  ],
+  "whenToUse": [
+    "需要一条长而完整的答案（含要点、清单与引用），而不是连续聊天的场景。",
+    "答案要能核对：来源卡、引用圆点与推理过程都要留在同一页。",
+    "需要把答案当成可分享的产物（版本、复制、反馈与相关问题）时。"
+  ],
+  "whenNotToUse": [
+    "需要多路检索、过程与来源栏都要展开时，用 research-run，它更重。",
+    "用户会连续多轮追问、需要历史与消息操作时，用 ai-chat。",
+    "只需要一个简短结论或建议、没有引用时，用普通卡片加文本即可，不必套上答案排版。"
+  ],
+  "variants": [
+    { "key": "variant-question", "label": "Question", "note": "线程头与问题标题，含 New thread 与分享" },
+    { "key": "variant-answer", "label": "Answer", "note": "答案正文：段落、编号清单与引用圆点" },
+    { "key": "variant-sources", "label": "Sources", "note": "来源卡与 3 sources read 计数" },
+    { "key": "variant-actions", "label": "Actions", "note": "反馈、版本、模型标记、token 与耗时" },
+    { "key": "variant-related", "label": "Related", "note": "相关问题 chip 与追问输入框" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "复制、重试、好评差评、版本切换、New thread 与发送都是 ArcButton" },
+    { "type": "uses", "target": "input", "note": "底部追问使用 ArcInput" },
+    { "type": "uses", "target": "badge", "note": "线程头的 Simulated 徽标说明答案是模拟的" },
+    { "type": "alternative", "target": "research-run", "note": "需要展示检索过程与来源阅读进度时改用 research run" }
+  ],
+  "contrasts": [
+    {
+      "target": "research-run",
+      "title": "AI answer 与 Research run",
+      "rows": [
+        { "dimension": "过程可见性", "self": "只给答案与来源，过程收起", "other": "子查询、检查站点数与阅读进度都摆出来" },
+        { "dimension": "来源栏", "self": "答案上方一排来源卡", "other": "独立右栏，逐条展示阅读百分比" },
+        { "dimension": "耗时与规模", "self": "适合几秒内的一条长答案", "other": "适合十几秒、十几条来源的调研" },
+        { "dimension": "收尾", "self": "重试生成单条答案", "other": "Rerun 重跑整轮研究" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "答案页：问题、来源、正文与元信息",
+      "language": "csharp",
+      "code": "var content = K.Stack(6,\n    K.Row(6, K.Text(\"Passkey rollout\", \"arc-label\"), K.Caption(\"Today · 1 question\"),\n        K.Pill(\"Simulated\", ArcBadgeTone.Neutral)),\n    K.Divider(2),\n    K.Text(\"How do we roll out passkeys without locking anyone out?\", \"arc-heading\", 700),\n    K.Row(10, reasoningButton, K.Caption(\"3 sources read\")),\n    reasoningBody,\n    sources,\n    K.Divider(2),\n    K.Paragraph(\"Roll passkeys out in stages, and keep one password fallback until recovery is proven. [1]\",\n        Select, \"arc-body-sm\", 700),\n    K.Markdown(\"1. Enable passkeys for staff accounts only\\n2. Watch recovery attempts for two weeks\", null, 700),\n    actions,\n    K.Caption(\"Related questions\"),\n    related,\n    composerRow,\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 820 }, new Thickness(22, 12, 22, 12));"
+    },
+    {
+      "title": "答案底部的一行元信息",
+      "language": "csharp",
+      "code": "var actions = K.Row(6,\n    K.IconBtn(\"copy\", \"Copy answer\"),\n    K.IconBtn(\"refresh-cw\", \"Regenerate\"),\n    K.IconBtn(\"thumbs-up\", \"Helpful\"),\n    K.IconBtn(\"thumbs-down\", \"Not helpful\"),\n    K.Dot(ArcTokens.BorderStrong, 3),\n    K.Caption(\"1 of 3\"),\n    K.IconBtn(\"chevron-left\", \"Previous version\", size: 12),\n    K.IconBtn(\"chevron-right\", \"Next version\", size: 12),\n    K.Dot(ArcTokens.BorderStrong, 3),\n    K.Mark(\"anthropic\", 15),\n    K.Caption(\"1,240 tokens\"),\n    K.Caption(\"18.4s\"));"
+    }
+  ]
+}

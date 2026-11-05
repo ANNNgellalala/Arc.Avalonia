@@ -1,0 +1,78 @@
+{
+  "slug": "control-center",
+  "nameZh": "控制中心",
+  "summary": "快捷设置托盘：若干开关与音量、字号这类橡皮筋刻度排成网格，点开一个 tile 会在同一面板内长成详情——专注模式选择、时长表盘、可联系的人与通知频道。",
+  "purpose": [
+    "当工作区需要一个「快速设置」面板时用它：几个开关加两三条音量、字号之类的刻度，不必跳到设置页。",
+    "tile 展开成详情是同一块固定面板内的淡入与缩放：专注 tile 打开后出现模式列表、时长表盘与可以联系你的人；通知 tile 打开后出现频道开关。",
+    "刻度从抓住的位置一比一跟手，越过两端时有阻尼；表盘旋钮按弹簧吸附到整值，Home/End 跳到极限，方向键一次一步或五分钟。"
+  ],
+  "whenToUse": [
+    "Web 工作区的快捷设置面板，需要少量开关与刻度时。",
+    "专注会话控制：时长表盘，加上会议期间仍可联系你的人。",
+    "需要 tile 展开为详情的紧凑面板，而不是打开独立设置页时。"
+  ],
+  "whenNotToUse": [
+    "只要一两个开关时用 switch 直接放在页面上，不必引入整个托盘。",
+    "设置项很多、需要分组与搜索时用 settings-page 这类完整页面。",
+    "需要浮在其他内容之上、且内容自由时用 popover 或 drawer。"
+  ],
+  "variants": [
+    { "key": "state-tray", "label": "Tray", "note": "快捷设置网格：开关、音量与字号刻度" },
+    { "key": "state-detail", "label": "Detail", "note": "专注 tile 展开成详情面板" },
+    { "key": "variant-meter", "label": "Meters", "note": "Volume 与 Text size 两条橡皮筋刻度" },
+    { "key": "variant-dial", "label": "Dial", "note": "专注时长的圆形表盘，可拖拽并吸附" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "popover", "note": "轻量浮层用 popover，快捷设置面板用控制中心" },
+    { "type": "alternative", "target": "drawer", "note": "侧边抽屉适合长表单，控制中心适合少量开关与刻度" },
+    { "type": "complement", "target": "switch", "note": "单个设置项可以用 switch 表达，控制中心把多个开关聚合在一处" }
+  ],
+  "contrasts": [
+    {
+      "target": "popover",
+      "title": "Control center 与 Popover",
+      "rows": [
+        { "dimension": "内容", "self": "固定的开关、刻度与 tile 详情", "other": "任意内容，由调用方决定" },
+        { "dimension": "结构", "self": "网格 + 展成详情的 tile", "other": "单个自由内容的浮层" },
+        { "dimension": "交互", "self": "刻度拖拽、表盘吸附、tile 展开", "other": "通常点击外部关闭" },
+        { "dimension": "适用", "self": "快捷设置与专注控制", "other": "轻量菜单、说明与临时操作" }
+      ]
+    },
+    {
+      "target": "drawer",
+      "title": "Control center 与 Drawer",
+      "rows": [
+        { "dimension": "位置", "self": "托盘浮在内容上，不贴边", "other": "从侧边滑出的整高抽屉" },
+        { "dimension": "内容量", "self": "少量开关与刻度", "other": "可以承载长表单与多层内容" },
+        { "dimension": "关闭", "self": "Escape 关闭详情或面板", "other": "通常有明确的关闭按钮与遮罩" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明控制中心",
+      "language": "xaml",
+      "code": "<gl:ArcControlCenter xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                       Label=\"Quick settings\"\n                       DefaultVolume=\"60\"\n                       DefaultTextSize=\"100\" />"
+    },
+    {
+      "title": "专注模式、频道与打开详情",
+      "language": "csharp",
+      "code": "var center = new ArcControlCenter\n{\n    Label = \"Quick settings\",\n    DefaultVolume = 62,\n    DefaultTextSize = 105,\n    FocusModes = new List<ArcFocusMode>\n    {\n        new() { Id = \"deep\", Label = \"Deep work\", Icon = \"briefcase\", Description = \"Silences everything but mentions\", DefaultMinutes = 50 },\n        new() { Id = \"rest\", Label = \"Rest\", Icon = \"moon\", Description = \"Silences all alerts\", DefaultMinutes = 30 }\n    },\n    Channels = new List<ArcChannelOption>\n    {\n        new() { Id = \"mentions\", Label = \"Mentions\", Description = \"Direct mentions and replies\", DefaultOn = true },\n        new() { Id = \"deploys\", Label = \"Deploys\", Description = \"Production releases only\" }\n    },\n    People = new List<string> { \"Ana Ruiz\", \"Sam Lee\", \"Noah Park\" }\n};\n\n// 以程序方式打开某个 tile 的详情（预览用它展示展开态）\ncenter.Open(\"focus\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcControlCenter",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "FocusModes": "专注模式；每项包含 Id、Label、Icon、Description 与 DefaultMinutes",
+      "Channels": "通知频道；每项包含 Id、Label、Description 与 DefaultOn",
+      "People": "专注期间仍可联系你的人名",
+      "DefaultVolume": "音量刻度的初始值，默认 60",
+      "DefaultTextSize": "字号刻度的初始百分比，默认 100",
+      "Label": "面板的无障碍名称，默认 Quick settings",
+      "Open": "打开指定 tile 的详情，例如 Open(\"focus\")",
+      "StateChanged": "任何开关或刻度变化后触发"
+    }
+  }
+}

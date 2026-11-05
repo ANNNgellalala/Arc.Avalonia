@@ -42,6 +42,11 @@ public sealed class TestimonialStagePage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-portrait", "variant-quote-panel", "variant-people-tabs"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Testimonials or editorial stories where the person's portrait matters.",

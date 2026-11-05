@@ -6,7 +6,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
@@ -16,78 +15,105 @@ using Arc.Avalonia.Theme;
 namespace Arc.Avalonia.Gallery;
 
 /// <summary>
-/// The gallery shell. Navigation mirrors uiarc.dev's documentation sidebar: Components are grouped into the
-/// site's categories, followed by Blocks and Special components, with a tier filter and search. Clicking an
-/// item opens its item page (or the shared demo page, scrolled to that component's section).
+/// The documentation shell: a persistent three-column layout (navigation, document body, outline). Navigating
+/// swaps the body only, so a built document keeps its visual parent and can be shown again without rebuilding.
+/// The sidebar materialises one category's rows on first expand; selection moves between existing rows instead
+/// of rebuilding the tree.
 /// </summary>
 public sealed class GalleryWindow : Window
 {
+    private const int CacheLimit = 16;
+
     private readonly IReadOnlyList<ArcPage> _pages = ArcPageRegistry.Discover();
+    private readonly Dictionary<string, ArcItemPage> _itemPages = new(StringComparer.Ordinal);
+    private readonly List<ArcPage> _guides = new();
+    private readonly Dictionary<string, ArcCatalogItem> _items = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _itemOrder = new(StringComparer.Ordinal);
 
-    // Raw page content, keyed by page title: reused for section lookups (FindHeading) and to avoid rebuilding.
-    private readonly Dictionary<string, Control> _builtContent = new(StringComparer.Ordinal);
-
-    // The control tree actually shown in the content host (header + content for grouped pages, the page
-    // itself for item pages). A page view belongs to exactly one ScrollViewer for its whole lifetime, so a
-    // cached page can be shown again without ever being reparented into a second container.
-    private readonly Dictionary<string, Control> _builtViews = new(StringComparer.Ordinal);
-
-    private readonly Dictionary<string, Control> _sectionIndex = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ArcPage> _sectionPage = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _expanded = new(StringComparer.Ordinal);
-    private readonly List<(ArcCatalogGroup Group, string Section)> _catalogGroups = new();
-
-    // Live sidebar state. Selecting an item updates two existing buttons instead of rebuilding the whole
-    // sidebar (the rebuild used to cost 270-570 ms and 28-108 MB per click). A category materialises its item
-    // rows once on first expand and afterwards only flips IsVisible.
-    private readonly Dictionary<string, StackPanel> _groupContainers = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Control> _viewCache = new(StringComparer.Ordinal);
+    private readonly List<string> _cacheOrder = new();
+    private readonly Dictionary<string, ArcButton> _navButtons = new(StringComparer.Ordinal);
     private readonly Dictionary<string, StackPanel> _groupItems = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ArcButton> _itemButtons = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, bool> _expandedGroups = new(StringComparer.Ordinal);
 
+    private Grid? _rootGrid;
     private Border? _sidebarHost;
     private ScrollViewer? _contentScroller;
-    private StackPanel? _sidebarStack;
-    private ArcPage? _currentPage;
-    private ArcCatalogItem? _selected;
-    private ArcButton? _selectedItemButton;
-    private string _tierFilter = "all";
-    private string _search = string.Empty;
+    private Border? _contentHost;
+    private Border? _tocHost;
+    private ScrollViewer? _tocScroller;
+    private StackPanel? _tocStack;
+    private StackPanel? _navHost;
+    private TextBox? _searchBox;
 
-    public GalleryWindow()
+    private ArcButton? _selectedNav;
+    private IReadOnlyList<DocSection> _sections = Array.Empty<DocSection>();
+    private readonly Dictionary<string, ArcButton> _tocButtons = new(StringComparer.Ordinal);
+    private string _activeTocKey = string.Empty;
+
+    private string _search = string.Empty;
+    private string _tierFilter = "all";
+    private string? _currentSlug;
+    private ArcPage? _currentPage;
+
+    public GalleryWindow(string? initialSlug = null)
     {
-        Title = "Arc for Avalonia";
-        Width = 1440;
-        Height = 900;
-        MinWidth = 1024;
-        MinHeight = 640;
+        Title = "Arc for Avalonia · 中文文档";
+        Width = 1460;
+        Height = 940;
+        MinWidth = 1120;
+        MinHeight = 700;
         Background = DemoUi.Brush(ArcTokens.Background);
 
-        foreach (var section in ArcCatalog.Sections)
+        foreach (var item in ArcCatalog.AllItems)
         {
-            foreach (var group in section.Groups)
+            _items[item.Slug] = item;
+            _itemOrder[item.Slug] = _itemOrder.Count;
+        }
+
+        foreach (var page in _pages)
+        {
+            if (page is ArcItemPage itemPage)
             {
-                _catalogGroups.Add((group, section.Name));
+                _itemPages.TryAdd(itemPage.ItemSlug, itemPage);
+            }
+            else
+            {
+                _guides.Add(page);
             }
         }
 
         BuildShell();
+        DocNavigation.Navigate = ShowSlug;
+        DocNavigation.OpenStatus = ShowStatusPage;
+
+        if (!string.IsNullOrWhiteSpace(initialSlug) && _items.ContainsKey(initialSlug))
+        {
+            ShowSlug(initialSlug);
+        }
+        else
+        {
+            ShowHome();
+        }
     }
 
-    /// <summary>
-    /// Builds the window once: the sidebar and the content host live for the lifetime of the window.
-    /// Navigating only swaps the sidebar items and the content view, so a cached page is never re-parented
-    /// into a freshly created shell (which is what threw "already has a visual parent").
-    /// </summary>
+    public string? CurrentSlug => _currentSlug;
+
+    public int DocumentCount => ArcDocStore.Count;
+
+    public IReadOnlyList<ArcItemPage> ItemPages =>
+        _itemPages.Values.OrderBy(page => _itemOrder.TryGetValue(page.ItemSlug, out var order) ? order : int.MaxValue).ToList();
+
     private void BuildShell()
     {
-        var root = new Grid { ColumnDefinitions = new ColumnDefinitions("300,*") };
+        var root = new Grid { ColumnDefinitions = new ColumnDefinitions("286,*,224") };
+        _rootGrid = root;
 
         _sidebarHost = new Border
         {
             Background = DemoUi.Brush(ArcTokens.Surface),
             BorderBrush = DemoUi.Brush(ArcTokens.Border),
-            BorderThickness = new Thickness(0, 0, 1, 0),
-            Child = BuildSidebar()
+            BorderThickness = new Thickness(0, 0, 1, 0)
         };
         root.Children.Add(_sidebarHost);
 
@@ -96,39 +122,52 @@ public sealed class GalleryWindow : Window
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
-        var contentHost = new Border { Padding = new Thickness(56, 44, 56, 40), Child = _contentScroller };
-        Grid.SetColumn(contentHost, 1);
-        root.Children.Add(contentHost);
+        _contentScroller.ScrollChanged += (_, _) => UpdateActiveSection();
+        _contentHost = new Border
+        {
+            Padding = new Thickness(56, 44, 56, 56),
+            Child = _contentScroller
+        };
+        Grid.SetColumn(_contentHost, 1);
+        root.Children.Add(_contentHost);
+
+        _tocScroller = new ScrollViewer
+        {
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Padding = new Thickness(4, 44, 20, 24)
+        };
+        _tocStack = new StackPanel { Spacing = 1 };
+        _tocScroller.Content = _tocStack;
+        _tocHost = new Border
+        {
+            BorderBrush = DemoUi.Brush(ArcTokens.Border),
+            BorderThickness = new Thickness(1, 0, 0, 0),
+            Child = _tocScroller
+        };
+        Grid.SetColumn(_tocHost, 2);
+        root.Children.Add(_tocHost);
 
         Content = root;
-
-        ShowPage(DefaultPage());
+        RebuildSidebar();
     }
 
-    private ArcPage? DefaultPage() =>
-        _pages.Where(page => page is not ArcItemPage && page.Order == 0)
-            .OrderBy(page => page.Order)
-            .FirstOrDefault();
+    // ---------------------------------------------------------------- sidebar
 
-    /// <summary>Rebuilds the sidebar in place, for example after a navigation selection or a theme swap.</summary>
-    private void RebuildSidebar()
+    public void RebuildSidebar()
     {
-        if (_sidebarHost is not null)
+        if (_sidebarHost is null)
         {
-            _sidebarHost.Child = BuildSidebar();
+            return;
         }
-    }
 
-    private Control BuildSidebar()
-    {
         var stack = new StackPanel { Spacing = 2 };
-        _sidebarStack = stack;
 
         var brand = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
         brand.Children.Add(new Border
         {
-            Width = 28,
-            Height = 28,
+            Width = 30,
+            Height = 30,
             CornerRadius = new CornerRadius(10),
             Background = DemoUi.Brush(ArcTokens.Accent),
             Child = new TextBlock
@@ -142,42 +181,67 @@ public sealed class GalleryWindow : Window
             }
         });
         var brandText = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
-        brandText.Children.Add(new TextBlock { Text = "Arc", FontSize = 15, FontWeight = FontWeight.Medium });
-        brandText.Children.Add(new TextBlock { Text = "for Avalonia", Classes = { "arc-caption" } });
+        brandText.Children.Add(new TextBlock { Text = "Arc for Avalonia", FontSize = 14, FontWeight = FontWeight.Medium });
+        brandText.Children.Add(new TextBlock { Text = "组件文档", Classes = { "arc-caption" } });
         brand.Children.Add(brandText);
         stack.Children.Add(new Border { Child = brand, Margin = new Thickness(8, 0, 0, 14) });
 
         var filters = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, Margin = new Thickness(8, 0, 0, 10) };
-        filters.Children.Add(TierButton("All", "all"));
-        filters.Children.Add(TierButton("Free", "free"));
+        filters.Children.Add(TierButton("全部", "all"));
+        filters.Children.Add(TierButton("免费", "free"));
         filters.Children.Add(TierButton("Pro", "pro"));
         stack.Children.Add(filters);
 
-        var search = new TextBox
+        _searchBox = new TextBox
         {
             Text = _search,
-            Watermark = "Search 294 items",
+            PlaceholderText = "搜索组件、中文名或文档内容",
             Margin = new Thickness(8, 0, 8, 12),
-            MinHeight = 34,
+            MinHeight = 36,
             FontSize = 13,
             CornerRadius = new CornerRadius(12),
             Padding = new Thickness(12, 0, 12, 0)
         };
-        search.TextChanged += (_, _) =>
+        _searchBox.TextChanged += (_, _) =>
         {
-            _search = search.Text ?? string.Empty;
+            _search = _searchBox.Text ?? string.Empty;
             RefreshNavigation();
         };
-        stack.Children.Add(search);
+        stack.Children.Add(_searchBox);
 
-        RefreshNavigation();
-        return new ScrollViewer
+        _navHost = new StackPanel { Spacing = 1 };
+        stack.Children.Add(_navHost);
+
+        stack.Children.Add(SectionHeading("外观"));
+        var themeRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Margin = new Thickness(10, 0, 0, 6) };
+        themeRow.Children.Add(ThemeButton("浅色", ArcColorScheme.Light));
+        themeRow.Children.Add(ThemeButton("深色", ArcColorScheme.Dark));
+        stack.Children.Add(themeRow);
+
+        var accents = new WrapPanel { Margin = new Thickness(10, 6, 0, 4) };
+        foreach (var accent in Enum.GetValues<ArcAccent>())
+        {
+            accents.Children.Add(AccentChip(accent));
+        }
+
+        stack.Children.Add(accents);
+        stack.Children.Add(new TextBlock
+        {
+            Text = "294 个条目 · 中文文档 · Avalonia 12 / net10.0",
+            Classes = { "arc-caption" },
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(10, 18, 10, 8)
+        });
+
+        _sidebarHost.Child = new ScrollViewer
         {
             Content = stack,
             Padding = new Thickness(12, 22, 12, 16),
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
+
+        RefreshNavigation();
     }
 
     private Control TierButton(string label, string tier)
@@ -209,156 +273,129 @@ public sealed class GalleryWindow : Window
 
     private void RefreshNavigation()
     {
-        if (_sidebarStack is null)
+        if (_navHost is null)
         {
             return;
         }
 
-        // The children below are recreated from scratch, so the incremental state must not point at the old
-        // buttons any more.
-        _groupContainers.Clear();
+        _navButtons.Clear();
         _groupItems.Clear();
-        _itemButtons.Clear();
-        _selectedItemButton = null;
-
-        while (_sidebarStack.Children.Count > 3)
-        {
-            _sidebarStack.Children.RemoveAt(_sidebarStack.Children.Count - 1);
-        }
+        _selectedNav = null;
+        _navHost.Children.Clear();
 
         var query = _search.Trim();
-        var matches = string.IsNullOrEmpty(query)
-            ? null
-            : ArcCatalog.AllItems
-                .Where(item => item.Title.Contains(query, StringComparison.OrdinalIgnoreCase)
-                               || item.Slug.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .Where(PassesTier)
-                .ToList();
-
-        if (matches is not null)
+        if (query.Length > 0)
         {
-            _sidebarStack.Children.Add(Caption($"Results ({matches.Count})"));
-            foreach (var item in matches.Take(80))
+            var hits = DocSearch.Query(query, _tierFilter);
+            _navHost.Children.Add(Caption($"搜索结果 · {hits.Count}"));
+            if (hits.Count == 0)
             {
-                _sidebarStack.Children.Add(ItemButton(item));
-            }
-
-            if (matches.Count > 80)
-            {
-                _sidebarStack.Children.Add(new TextBlock
+                _navHost.Children.Add(new TextBlock
                 {
-                    Text = $"and {matches.Count - 80} more; keep typing",
+                    Text = "没有匹配的条目。试试组件名或中文名，例如 Button、按钮、选择器。",
                     Classes = { "arc-caption" },
-                    Margin = new Thickness(12, 6, 0, 0)
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(10, 4, 10, 0)
                 });
-            }
-        }
-        else
-        {
-            _sidebarStack.Children.Add(Caption("Overview"));
-            foreach (var page in OverviewPages())
-            {
-                _sidebarStack.Children.Add(PageButton(page));
+                return;
             }
 
-            foreach (var section in ArcCatalog.Sections)
+            foreach (var hit in hits.Take(60))
             {
-                _sidebarStack.Children.Add(SectionHeading(section.Name));
-                foreach (var group in section.Groups)
-                {
-                    _sidebarStack.Children.Add(CategoryRow(section.Name, group));
-                }
+                _navHost.Children.Add(ItemButton(hit.Item, hit.Snippet));
             }
 
-            _sidebarStack.Children.Add(SectionHeading("Demo pages"));
-            foreach (var page in DemoPages())
+            if (hits.Count > 60)
             {
-                _sidebarStack.Children.Add(PageButton(page));
+                _navHost.Children.Add(Caption($"还有 {hits.Count - 60} 条，继续输入以缩小范围"));
             }
+
+            HighlightSelection();
+            return;
         }
 
-        _sidebarStack.Children.Add(SectionHeading("Appearance"));
-        var themeRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Margin = new Thickness(10, 0, 0, 6) };
-        themeRow.Children.Add(ThemeButton("Light", ArcColorScheme.Light));
-        themeRow.Children.Add(ThemeButton("Dark", ArcColorScheme.Dark));
-        _sidebarStack.Children.Add(themeRow);
+        _navHost.Children.Add(NavButton("首页", () => ShowHome(), null, null));
 
-        var accents = new WrapPanel { Margin = new Thickness(10, 6, 0, 4) };
-        foreach (var accent in Enum.GetValues<ArcAccent>())
+        var guideTitles = new HashSet<string>(StringComparer.Ordinal)
         {
-            accents.Children.Add(AccentChip(accent));
-        }
-
-        _sidebarStack.Children.Add(accents);
-        _sidebarStack.Children.Add(new TextBlock
-        {
-            Text = "Recreated from uiarc.dev. Avalonia 12, net10.0.",
-            Classes = { "arc-caption" },
-            TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(10, 18, 10, 8)
-        });
-    }
-
-    private bool PassesTier(ArcCatalogItem item) => _tierFilter switch
-    {
-        "free" => !item.IsPro,
-        "pro" => item.IsPro,
-        _ => true
-    };
-
-    private IEnumerable<ArcPage> OverviewPages() =>
-        _pages.Where(page => page is not ArcItemPage && (page.Group == "Overview" || page.Order == 0))
-            .OrderBy(page => page.Order);
-
-    private IEnumerable<ArcPage> DemoPages() =>
-        _pages.Where(page => page is not ArcItemPage && page.Group != "Overview" && page.Order != 0)
-            .OrderBy(page => page.Order);
-
-    private static TextBlock Caption(string text) => new()
-    {
-        Text = text,
-        Classes = { "arc-caption" },
-        Margin = new Thickness(10, 12, 0, 4)
-    };
-
-    private static TextBlock SectionHeading(string text) => new()
-    {
-        Text = text,
-        FontSize = 12,
-        FontWeight = FontWeight.Medium,
-        Foreground = DemoUi.Brush(ArcTokens.TextSecondary),
-        Margin = new Thickness(10, 18, 0, 6)
-    };
-
-    private Control PageButton(ArcPage page)
-    {
-        var button = new ArcButton
-        {
-            Content = page.Title,
-            Variant = ArcButtonVariant.Ghost,
-            Size = ArcButtonSize.Sm,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            HorizontalContentAlignment = HorizontalAlignment.Left,
-            Padding = new Thickness(10, 0),
-            MinHeight = 30,
-            FontSize = 13
+            "Foundations", "Tokens", "Icons", "Motion", "Kit proof", "Virtualized list"
         };
-        button.Click += (_, _) => ShowPage(page);
-        return button;
-    }
+        var guides = _guides
+            .Where(page => page is not Pages.HomePage and not Pages.DocStatusPage)
+            .OrderBy(page => page.Order)
+            .ToList();
 
-    private Control CategoryRow(string section, ArcCatalogGroup group)
-    {
-        var key = section + "/" + group.Name;
-        var expanded = _expanded.Contains(key) || (_selected is not null && group.Items.Contains(_selected));
-        if (expanded)
+        var realGuides = guides.Where(page => guideTitles.Contains(page.Title)).ToList();
+        if (realGuides.Count > 0)
         {
-            _expanded.Add(key);
+            _navHost.Children.Add(SectionHeading("指南"));
+            foreach (var page in realGuides)
+            {
+                _navHost.Children.Add(NavButton(page.Title, () => ShowPage(page), null, page.Title));
+            }
         }
 
-        var headerContent = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        foreach (var section in OrderedSections())
+        {
+            _navHost.Children.Add(SectionHeading(section.Name));
+            foreach (var group in section.Groups)
+            {
+                _navHost.Children.Add(CategoryRow(section.Name, group));
+            }
+        }
+
+        var legacy = guides.Where(page => !guideTitles.Contains(page.Title)).ToList();
+        if (legacy.Count > 0)
+        {
+            _navHost.Children.Add(SectionHeading("场景示例"));
+            foreach (var page in legacy)
+            {
+                _navHost.Children.Add(NavButton(page.Title, () => ShowPage(page), null, page.Title));
+            }
+        }
+
+        _navHost.Children.Add(SectionHeading("文档状态"));
+        var status = _guides.FirstOrDefault(page => page is Pages.DocStatusPage);
+        if (status is not null)
+        {
+            _navHost.Children.Add(NavButton("覆盖率 / 质量审计", () => ShowPage(status), null, status.Title));
+        }
+
+        HighlightSelection();
+    }
+
+    private static IEnumerable<ArcCatalogSection> OrderedSections()
+    {
+        var sections = ArcCatalog.Sections;
+        foreach (var name in new[] { "Components", "Special components", "Blocks" })
+        {
+            var section = sections.FirstOrDefault(candidate => candidate.Name == name);
+            if (section is not null)
+            {
+                yield return section;
+            }
+        }
+
+        foreach (var section in sections.Where(section =>
+                     section.Name is not ("Components" or "Special components" or "Blocks")))
+        {
+            yield return section;
+        }
+    }
+
+    private Control CategoryRow(string sectionName, ArcCatalogGroup group)
+    {
+        var key = sectionName + "/" + group.Name;
+        var expanded = _expandedGroups.TryGetValue(key, out var state) && state;
+
+        var headerContent = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Width = 240 };
         headerContent.Children.Add(new TextBlock { Text = group.Name, FontSize = 13 });
-        var count = CountingLabel(group.Items.Count);
+        var count = new TextBlock
+        {
+            Text = group.Items.Count(item => DocSearch.PassesTier(item, _tierFilter)).ToString(),
+            Classes = { "arc-caption" },
+            VerticalAlignment = VerticalAlignment.Center
+        };
         Grid.SetColumn(count, 1);
         headerContent.Children.Add(count);
 
@@ -370,163 +407,122 @@ public sealed class GalleryWindow : Window
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Padding = new Thickness(10, 0),
-            MinHeight = 32
+            MinHeight = 32,
+            FontWeight = expanded ? FontWeight.Medium : FontWeight.Normal
         };
 
         var stack = new StackPanel { Spacing = 0 };
         stack.Children.Add(header);
-        _groupContainers[key] = stack;
 
+        var itemsHost = new StackPanel { Spacing = 0, IsVisible = expanded };
         if (expanded)
         {
-            EnsureGroupItems(key, group);
+            MaterializeGroup(key, group, itemsHost);
         }
 
+        stack.Children.Add(itemsHost);
         header.Click += (_, _) =>
         {
-            if (_expanded.Remove(key))
+            var open = !(_expandedGroups.TryGetValue(key, out var current) && current);
+            _expandedGroups[key] = open;
+            header.FontWeight = open ? FontWeight.Medium : FontWeight.Normal;
+            if (open && itemsHost.Children.Count == 0)
             {
-                if (_groupItems.TryGetValue(key, out var host))
-                {
-                    host.IsVisible = false;
-                }
-
-                return;
+                MaterializeGroup(key, group, itemsHost);
             }
 
-            _expanded.Add(key);
-            EnsureGroupItems(key, group);
+            itemsHost.IsVisible = open;
         };
 
         return stack;
     }
 
-    /// <summary>
-    /// Materialises one category's item rows on first expand. Later expands only flip IsVisible, so opening a
-    /// category is one insertion rather than a full sidebar rebuild.
-    /// </summary>
-    private StackPanel EnsureGroupItems(string key, ArcCatalogGroup group)
+    private void MaterializeGroup(string key, ArcCatalogGroup group, StackPanel host)
     {
-        if (_groupItems.TryGetValue(key, out var host))
-        {
-            host.IsVisible = true;
-            return host;
-        }
-
-        host = new StackPanel { Spacing = 0 };
-        foreach (var item in group.Items.Where(PassesTier))
-        {
-            host.Children.Add(ItemButton(item));
-        }
-
-        _groupItems[key] = host;
-        if (_groupContainers.TryGetValue(key, out var container))
-        {
-            container.Children.Add(host);
-        }
-
-        return host;
-    }
-
-    private static Control CountingLabel(int count) => new TextBlock
-    {
-        Text = count.ToString(),
-        Classes = { "arc-caption" },
-        VerticalAlignment = VerticalAlignment.Center
-    };
-
-    private Control ItemButton(ArcCatalogItem item)
-    {
-        var selected = _selected?.Slug == item.Slug;
-        var button = new ArcButton
-        {
-            Content = item.Title + (item.IsPro ? "  ·  Pro" : string.Empty),
-            Variant = ArcButtonVariant.Ghost,
-            Size = ArcButtonSize.Sm,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            HorizontalContentAlignment = HorizontalAlignment.Left,
-            Padding = new Thickness(22, 0, 8, 0),
-            MinHeight = 28,
-            FontSize = 12.5,
-            FontWeight = selected ? FontWeight.Medium : FontWeight.Normal
-        };
-        _itemButtons[item.Slug] = button;
-
-        if (selected)
-        {
-            _selectedItemButton = button;
-            button.Background = DemoUi.Brush(ArcTokens.AccentSubtle);
-            button.Foreground = DemoUi.Brush(ArcTokens.AccentStrong);
-        }
-
-        button.Click += (_, _) =>
-        {
-            _selected = item;
-            ExpandGroupsFor(item);
-            SelectItemButton(button);
-            ShowItem(item);
-            Dispatcher.UIThread.Post(() =>
-            {
-                try
-                {
-                    button.BringIntoView();
-                }
-                catch
-                {
-                    // Scrolling is best effort.
-                }
-            }, DispatcherPriority.Loaded);
-        };
-        return button;
-    }
-
-    /// <summary>
-    /// Ensures the category that owns the item is expanded, materialising only that category's rows. A no-op
-    /// when the rows already exist. In search results mode the category containers do not exist yet, so this
-    /// only records the expansion for the next full refresh.
-    /// </summary>
-    private void ExpandGroupsFor(ArcCatalogItem item)
-    {
-        foreach (var (group, section) in _catalogGroups)
-        {
-            if (!group.Items.Contains(item))
-            {
-                continue;
-            }
-
-            var key = section + "/" + group.Name;
-            _expanded.Add(key);
-            if (_groupContainers.ContainsKey(key))
-            {
-                EnsureGroupItems(key, group);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Moves the selection highlight between two existing item buttons (measured at 0.7 ms and a few bytes,
-    /// versus 270-570 ms for rebuilding the sidebar). The brushes are snapshots, so a theme or accent swap
-    /// still goes through RebuildAll and re-applies the highlight.
-    /// </summary>
-    private void SelectItemButton(ArcButton button)
-    {
-        if (ReferenceEquals(_selectedItemButton, button))
+        if (_groupItems.ContainsKey(key))
         {
             return;
         }
 
-        if (_selectedItemButton is { } previous)
+        _groupItems[key] = host;
+        foreach (var item in group.Items.Where(item => DocSearch.PassesTier(item, _tierFilter)))
         {
-            previous.ClearValue(TemplatedControl.BackgroundProperty);
-            previous.ClearValue(TemplatedControl.ForegroundProperty);
-            previous.FontWeight = FontWeight.Normal;
+            host.Children.Add(ItemButton(item, null));
+        }
+    }
+
+    private Control ItemButton(ArcCatalogItem item, string? snippet)
+    {
+        var row = new StackPanel { Spacing = 0 };
+        row.Children.Add(new TextBlock
+        {
+            Text = item.Title + (item.IsPro ? "  ·  Pro" : string.Empty),
+            FontSize = 12.5,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        });
+        if (!string.IsNullOrWhiteSpace(snippet))
+        {
+            row.Children.Add(new TextBlock
+            {
+                Text = snippet,
+                Classes = { "arc-caption" },
+                TextWrapping = TextWrapping.Wrap,
+                MaxLines = 2
+            });
         }
 
-        _selectedItemButton = button;
-        button.Background = DemoUi.Brush(ArcTokens.AccentSubtle);
-        button.Foreground = DemoUi.Brush(ArcTokens.AccentStrong);
-        button.FontWeight = FontWeight.Medium;
+        var button = new ArcButton
+        {
+            Content = row,
+            Variant = ArcButtonVariant.Ghost,
+            Size = ArcButtonSize.Sm,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            Padding = new Thickness(22, 3, 8, 3),
+            MinHeight = 30
+        };
+        _navButtons[item.Slug] = button;
+        button.Click += (_, _) => ShowSlug(item.Slug);
+        return button;
     }
+
+    private Control NavButton(string label, Action action, string? slug, string? pageTitle)
+    {
+        var button = new ArcButton
+        {
+            Content = label,
+            Variant = ArcButtonVariant.Ghost,
+            Size = ArcButtonSize.Sm,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            Padding = new Thickness(10, 0),
+            MinHeight = 32,
+            FontSize = 13
+        };
+        button.Click += (_, _) => action();
+        if (slug is not null)
+        {
+            _navButtons[slug] = button;
+        }
+
+        return button;
+    }
+
+    private static TextBlock Caption(string text) => new()
+    {
+        Text = text,
+        Classes = { "arc-caption" },
+        Margin = new Thickness(10, 10, 0, 2)
+    };
+
+    private static TextBlock SectionHeading(string text) => new()
+    {
+        Text = text,
+        FontSize = 12,
+        FontWeight = FontWeight.Medium,
+        Foreground = DemoUi.Brush(ArcTokens.TextSecondary),
+        Margin = new Thickness(10, 18, 0, 6)
+    };
 
     private Control ThemeButton(string label, ArcColorScheme scheme)
     {
@@ -585,85 +581,206 @@ public sealed class GalleryWindow : Window
         return outer;
     }
 
-    /// <summary>
-    /// Refreshes everything whose brushes are resolved once (rather than through DynamicResource): the
-    /// window background, the sidebar and every cached page. The shell itself is not recreated.
-    /// </summary>
-    private void RebuildAll()
+    // ---------------------------------------------------------------- navigation
+
+    public void ShowSlug(string slug)
     {
-        Background = DemoUi.Brush(ArcTokens.Background);
-        InvalidateBuiltContent();
-        RebuildSidebar();
-        ShowPage(_currentPage ?? DefaultPage());
+        if (!_items.TryGetValue(slug, out var item))
+        {
+            return;
+        }
+
+        if (_itemPages.TryGetValue(slug, out var page))
+        {
+            ShowDoc(page);
+            return;
+        }
+
+        ShowMissing(item);
     }
 
-    private void InvalidateBuiltContent()
+    public void ShowPage(ArcPage page)
     {
-        _builtContent.Clear();
-        _builtViews.Clear();
-        _sectionIndex.Clear();
-        _sectionPage.Clear();
-    }
-
-    private void ShowPage(ArcPage? page)
-    {
-        if (_contentScroller is null || page is null)
+        if (_contentScroller is null)
         {
             return;
         }
 
         _currentPage = page;
-        var view = GetPageView(page);
+        _currentSlug = null;
+        var view = GetPlainPageView(page);
         _contentScroller.Content = view;
         _contentScroller.Offset = default;
+        ShowToc(Array.Empty<DocSection>());
+        HighlightSelection();
     }
 
-    /// <summary>
-    /// Returns the control shown for a page, building it once. The view is cached, so switching back to a
-    /// page moves the same control back into the one scrolling host instead of adding already-parented
-    /// children to a new panel.
-    /// </summary>
-    private Control GetPageView(ArcPage page)
+    public void ShowHome()
     {
-        if (_builtViews.TryGetValue(page.Title, out var cached))
+        var home = _guides.FirstOrDefault(page => page is Pages.HomePage)
+                   ?? _guides.OrderBy(page => page.Order).FirstOrDefault();
+        if (home is not null)
         {
-            return cached;
+            ShowPage(home);
+        }
+    }
+
+    public void Search(string text)
+    {
+        _search = text;
+        if (_searchBox is not null)
+        {
+            _searchBox.Text = text;
         }
 
-        var content = GetPageContent(page);
-        Control view;
-        if (page is ArcItemPage)
+        RefreshNavigation();
+    }
+
+    public void RebuildAll()
+    {
+        Background = DemoUi.Brush(ArcTokens.Background);
+        _viewCache.Clear();
+        _cacheOrder.Clear();
+        RebuildSidebar();
+        if (!string.IsNullOrWhiteSpace(_currentSlug))
         {
-            // Item pages render their own documentation header.
-            view = content;
+            ShowSlug(_currentSlug!);
+        }
+        else if (_currentPage is not null)
+        {
+            ShowPage(_currentPage);
         }
         else
         {
-            var header = new StackPanel { Spacing = 10, Margin = new Thickness(0, 0, 0, 32) };
-            header.Children.Add(new TextBlock { Text = page.Title, Classes = { "arc-title-sm" } });
-            if (!string.IsNullOrWhiteSpace(page.Description))
-            {
-                header.Children.Add(new TextBlock
-                {
-                    Text = page.Description,
-                    Classes = { "arc-body", "arc-secondary" },
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    MaxWidth = 760
-                });
-            }
-
-            view = new StackPanel { Children = { header, content } };
+            ShowHome();
         }
-
-        _builtViews[page.Title] = view;
-        return view;
     }
 
-    private Control GetPageContent(ArcPage page)
+    private void ShowDoc(ArcItemPage page)
     {
-        if (_builtContent.TryGetValue(page.Title, out var cached))
+        if (_contentScroller is null)
         {
+            return;
+        }
+
+        var slug = page.ItemSlug;
+        _currentSlug = slug;
+        _currentPage = page;
+
+        var view = GetDocView(page);
+        _contentScroller.Content = view;
+        _contentScroller.Offset = default;
+        ShowToc(GetSections(page));
+        HighlightSelection();
+        Dispatcher.UIThread.Post(() =>
+        {
+            try
+            {
+                _navButtons.TryGetValue(slug, out var button);
+                button?.BringIntoView();
+            }
+            catch
+            {
+                // Scrolling the sidebar is best effort.
+            }
+        }, DispatcherPriority.Loaded);
+    }
+
+    private void ShowMissing(ArcCatalogItem item)
+    {
+        if (_contentScroller is null)
+        {
+            return;
+        }
+
+        _currentSlug = item.Slug;
+        _currentPage = null;
+
+        var panel = new StackPanel { Spacing = 14, MaxWidth = 720, HorizontalAlignment = HorizontalAlignment.Left };
+        panel.Children.Add(new TextBlock { Text = item.Title, Classes = { "arc-title-sm" } });
+        panel.Children.Add(new TextBlock { Text = item.Description, Classes = { "arc-body", "arc-secondary" }, TextWrapping = TextWrapping.Wrap });
+        panel.Children.Add(new Border
+        {
+            Padding = new Thickness(18),
+            CornerRadius = new CornerRadius(18),
+            Background = DemoUi.Brush(ArcTokens.WarningSubtle),
+            BorderThickness = new Thickness(1),
+            BorderBrush = DemoUi.Brush(ArcTokens.Warning),
+            Child = new TextBlock
+            {
+                Text = "这个条目的中文文档与条目页尚未编写（M2/M3 阶段补齐）。审计会把它列为缺失。",
+                Classes = { "arc-body-sm" },
+                Foreground = DemoUi.Brush(ArcTokens.Warning),
+                TextWrapping = TextWrapping.Wrap
+            }
+        });
+        var statusButton = new ArcButton
+        {
+            Content = "查看文档覆盖率",
+            Variant = ArcButtonVariant.Secondary,
+            Size = ArcButtonSize.Sm,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        statusButton.Click += (_, _) => ShowStatusPage();
+        panel.Children.Add(statusButton);
+
+        _contentScroller.Content = panel;
+        _contentScroller.Offset = default;
+        ShowToc(Array.Empty<DocSection>());
+        HighlightSelection();
+    }
+
+    private void ShowStatusPage()
+    {
+        var status = _guides.FirstOrDefault(page => page.Title == "文档状态");
+        if (status is not null)
+        {
+            ShowPage(status);
+        }
+    }
+
+    private IReadOnlyList<DocSection> GetSections(ArcItemPage page)
+    {
+        if (page.Doc is null)
+        {
+            return Array.Empty<DocSection>();
+        }
+
+        return _sectionsCache.TryGetValue(page.ItemSlug, out var sections)
+            ? sections
+            : Array.Empty<DocSection>();
+    }
+
+    private readonly Dictionary<string, IReadOnlyList<DocSection>> _sectionsCache = new(StringComparer.Ordinal);
+
+    private Control GetDocView(ArcItemPage page)
+    {
+        var key = page.ItemSlug;
+        if (_viewCache.TryGetValue(key, out var cached))
+        {
+            Touch(key);
+            return cached;
+        }
+
+        var demo = new ArcDemoContext(ArcThemeManager.Scheme, ArcThemeManager.Accent);
+        var built = DocLayout.Build(page, demo, ShowSlug);
+        _sectionsCache[key] = built.Sections;
+
+        var stack = new StackPanel { Spacing = 0 };
+        stack.Children.Add(built.Root);
+        stack.Children.Add(BuildFooter(page));
+        _viewCache[key] = stack;
+        Touch(key);
+        Evict();
+        return stack;
+    }
+
+    private Control GetPlainPageView(ArcPage page)
+    {
+        var key = "page:" + page.Title;
+        if (_viewCache.TryGetValue(key, out var cached))
+        {
+            Touch(key);
             return cached;
         }
 
@@ -676,163 +793,247 @@ public sealed class GalleryWindow : Window
         {
             content = new TextBlock
             {
-                Text = $"Page failed to build: {exception.Message}",
+                Text = "页面构建失败：" + exception.Message,
                 Classes = { "arc-body-sm" },
                 Foreground = DemoUi.Brush(ArcTokens.Danger),
                 TextWrapping = TextWrapping.Wrap
             };
         }
 
-        _builtContent[page.Title] = content;
-        return content;
+        var stack = new StackPanel { Spacing = 0 };
+        if (page is Pages.HomePage or Pages.DocStatusPage)
+        {
+            stack.Children.Add(content);
+            _viewCache[key] = stack;
+            Touch(key);
+            Evict();
+            return stack;
+        }
+
+        var header = new StackPanel { Spacing = 8, Margin = new Thickness(0, 0, 0, 28) };
+        header.Children.Add(new TextBlock { Text = page.Title, Classes = { "arc-title-sm" } });
+        if (!string.IsNullOrWhiteSpace(page.Description))
+        {
+            header.Children.Add(new TextBlock
+            {
+                Text = page.Description,
+                Classes = { "arc-body", "arc-secondary" },
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 820
+            });
+        }
+
+        stack.Children.Add(header);
+        stack.Children.Add(content);
+        _viewCache[key] = stack;
+        Touch(key);
+        Evict();
+        return stack;
     }
 
-    private void ShowItem(ArcCatalogItem item)
+    private Control BuildFooter(ArcItemPage page)
     {
-        var itemPage = _pages.OfType<ArcItemPage>()
-            .FirstOrDefault(page => string.Equals(page.ItemSlug, item.Slug, StringComparison.Ordinal));
-        if (itemPage is not null)
+        var index = _itemOrder.TryGetValue(page.ItemSlug, out var order) ? order : -1;
+        var footer = new Grid
         {
-            ShowPage(itemPage);
-            return;
-        }
-
-        // Shared demo pages: the item has no section of its own, so open the page that demonstrates it.
-        foreach (var pageTitle in ArcCatalogAliases.PageTitles(item.Slug))
-        {
-            var aliasPage = _pages.FirstOrDefault(page => string.Equals(page.Title, pageTitle, StringComparison.Ordinal));
-            if (aliasPage is not null)
-            {
-                ShowPage(aliasPage);
-                return;
-            }
-        }
-
-        var (page, section) = FindComponentSection(item);
-        if (page is not null)
-        {
-            ShowPage(page);
-            if (section is not null)
-            {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    try
-                    {
-                        section.BringIntoView();
-                    }
-                    catch
-                    {
-                        // Scrolling is best effort.
-                    }
-                }, DispatcherPriority.Loaded);
-            }
-
-            return;
-        }
-
-        ShowPage(new CatalogEntryPage(item));
-    }
-
-    private (ArcPage? Page, Control? Section) FindComponentSection(ArcCatalogItem item)
-    {
-        if (_sectionIndex.TryGetValue(item.Slug, out var cached))
-        {
-            return (_sectionPage[item.Slug], cached);
-        }
-
-        var target = Normalize(item.Title);
-        foreach (var page in _pages.Where(page => page is not ArcItemPage))
-        {
-            if (!_builtContent.TryGetValue(page.Title, out var content))
-            {
-                try
-                {
-                    content = page.Build(new ArcDemoContext(ArcThemeManager.Scheme, ArcThemeManager.Accent));
-                }
-                catch
-                {
-                    continue;
-                }
-
-                _builtContent[page.Title] = content;
-            }
-
-            var heading = FindHeading(content, target);
-            if (heading is not null)
-            {
-                _sectionIndex[item.Slug] = heading;
-                _sectionPage[item.Slug] = page;
-                return (page, heading);
-            }
-        }
-
-        return (null, null);
-    }
-
-    private static Control? FindHeading(ILogical root, string normalized)
-    {
-        if (root is TextBlock text && text.Classes.Contains("arc-heading")
-            && Normalize(text.Text ?? string.Empty) == normalized)
-        {
-            return text;
-        }
-
-        foreach (var child in root.LogicalChildren)
-        {
-            var found = FindHeading(child, normalized);
-            if (found is not null)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
-    private static string Normalize(string value)
-    {
-        var buffer = new System.Text.StringBuilder(value.Length);
-        foreach (var character in value)
-        {
-            if (char.IsLetterOrDigit(character))
-            {
-                buffer.Append(char.ToLowerInvariant(character));
-            }
-        }
-
-        return buffer.ToString();
-    }
-
-    /// <summary>Shown for a catalog item that has no dedicated page or matching section yet.</summary>
-    private sealed class CatalogEntryPage : ArcItemPage
-    {
-        private readonly ArcCatalogItem _item;
-
-        public CatalogEntryPage(ArcCatalogItem item) => _item = item;
-
-        public override string ItemSlug => _item.Slug;
-
-        public override bool DemoOnCanvas => false;
-
-        protected override Control BuildDemo(ArcDemoContext context) => new ArcCard
-        {
-            Padding = new Thickness(28),
-            Content = new StackPanel
-            {
-                Spacing = 8,
-                Children =
-                {
-                    new TextBlock { Text = "Demo not merged yet", Classes = { "arc-label" } },
-                    new TextBlock
-                    {
-                        Text = "This catalog entry is listed for parity with uiarc.dev. Its interactive demo is not part of the current gallery build.",
-                        Classes = { "arc-body-sm", "arc-secondary" },
-                        TextWrapping = TextWrapping.Wrap,
-                        MaxWidth = 640
-                    }
-                }
-            }
+            ColumnDefinitions = new ColumnDefinitions("*,*"),
+            Margin = new Thickness(0, 60, 0, 0)
         };
+
+        if (index > 0)
+        {
+            var previous = ArcCatalog.AllItems[index - 1];
+            var button = FooterButton("上一个", previous.Title, () => ShowSlug(previous.Slug));
+            button.HorizontalAlignment = HorizontalAlignment.Left;
+            footer.Children.Add(button);
+        }
+
+        if (index >= 0 && index < ArcCatalog.AllItems.Count - 1)
+        {
+            var next = ArcCatalog.AllItems[index + 1];
+            var button = FooterButton("下一个", next.Title, () => ShowSlug(next.Slug));
+            button.HorizontalAlignment = HorizontalAlignment.Right;
+            Grid.SetColumn(button, 1);
+            footer.Children.Add(button);
+        }
+
+        return footer;
+    }
+
+    private static Control FooterButton(string direction, string title, Action action)
+    {
+        var content = new StackPanel { Spacing = 2 };
+        content.Children.Add(new TextBlock { Text = direction, Classes = { "arc-caption" } });
+        content.Children.Add(new TextBlock { Text = title, Classes = { "arc-body-sm", "arc-medium" } });
+        var button = new ArcButton
+        {
+            Content = content,
+            Variant = ArcButtonVariant.Secondary,
+            Size = ArcButtonSize.Sm,
+            Padding = new Thickness(16, 10)
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private void Touch(string key)
+    {
+        _cacheOrder.Remove(key);
+        _cacheOrder.Add(key);
+    }
+
+    private void Evict()
+    {
+        while (_cacheOrder.Count > CacheLimit)
+        {
+            var oldest = _cacheOrder[0];
+            _cacheOrder.RemoveAt(0);
+            _viewCache.Remove(oldest);
+            _sectionsCache.Remove(oldest);
+        }
+    }
+
+    // ---------------------------------------------------------------- outline
+
+    private void ShowToc(IReadOnlyList<DocSection> sections)
+    {
+        _sections = sections;
+        _tocButtons.Clear();
+        _activeTocKey = string.Empty;
+        if (_tocStack is not null)
+        {
+            _tocStack.Children.Clear();
+            if (sections.Count > 0)
+            {
+                _tocStack.Children.Add(new TextBlock
+                {
+                    Text = "本页目录",
+                    Classes = { "arc-caption", "arc-medium" },
+                    Margin = new Thickness(12, 0, 0, 8)
+                });
+
+                foreach (var section in sections)
+                {
+                    var target = section;
+                    var button = new ArcButton
+                    {
+                        Content = target.Title,
+                        Variant = ArcButtonVariant.Ghost,
+                        Size = ArcButtonSize.Sm,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Left,
+                        Padding = new Thickness(12, 0),
+                        MinHeight = 30,
+                        FontSize = 12.5
+                    };
+                    button.Click += (_, _) =>
+                    {
+                        try
+                        {
+                            target.Anchor.BringIntoView();
+                            _activeTocKey = target.Key;
+                            UpdateTocHighlight();
+                        }
+                        catch
+                        {
+                            // Best effort scrolling.
+                        }
+                    };
+                    _tocButtons[target.Key] = button;
+                    _tocStack.Children.Add(button);
+                }
+            }
+        }
+
+        if (_tocHost is not null)
+        {
+            _tocHost.IsVisible = sections.Count > 0;
+        }
+
+        if (_rootGrid is not null)
+        {
+            _rootGrid.ColumnDefinitions[2].Width = sections.Count > 0 ? new GridLength(224) : new GridLength(0);
+        }
+    }
+
+    private void UpdateActiveSection()
+    {
+        if (_sections.Count == 0 || _contentScroller is null)
+        {
+            return;
+        }
+
+        var active = _sections[0].Key;
+        foreach (var section in _sections)
+        {
+            var point = section.Anchor.TranslatePoint(new Point(0, 0), _contentScroller);
+            if (point is not null && point.Value.Y <= 150)
+            {
+                active = section.Key;
+            }
+        }
+
+        if (active == _activeTocKey)
+        {
+            return;
+        }
+
+        _activeTocKey = active;
+        UpdateTocHighlight();
+    }
+
+    private void UpdateTocHighlight()
+    {
+        foreach (var (key, button) in _tocButtons)
+        {
+            if (key == _activeTocKey)
+            {
+                button.Background = DemoUi.Brush(ArcTokens.AccentSubtle);
+                button.Foreground = DemoUi.Brush(ArcTokens.AccentStrong);
+                button.FontWeight = FontWeight.Medium;
+            }
+            else
+            {
+                button.ClearValue(TemplatedControl.BackgroundProperty);
+                button.ClearValue(TemplatedControl.ForegroundProperty);
+                button.FontWeight = FontWeight.Normal;
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- selection
+
+    private void HighlightSelection()
+    {
+        var slug = _currentSlug;
+        if (slug is null)
+        {
+            if (_selectedNav is not null)
+            {
+                _selectedNav.ClearValue(TemplatedControl.BackgroundProperty);
+                _selectedNav.ClearValue(TemplatedControl.ForegroundProperty);
+                _selectedNav.FontWeight = FontWeight.Normal;
+                _selectedNav = null;
+            }
+
+            return;
+        }
+
+        if (!_navButtons.TryGetValue(slug, out var button) || ReferenceEquals(button, _selectedNav))
+        {
+            return;
+        }
+
+        if (_selectedNav is not null)
+        {
+            _selectedNav.ClearValue(TemplatedControl.BackgroundProperty);
+            _selectedNav.ClearValue(TemplatedControl.ForegroundProperty);
+            _selectedNav.FontWeight = FontWeight.Normal;
+        }
+
+        _selectedNav = button;
+        button.Background = DemoUi.Brush(ArcTokens.AccentSubtle);
+        button.Foreground = DemoUi.Brush(ArcTokens.AccentStrong);
+        button.FontWeight = FontWeight.Medium;
     }
 }
-

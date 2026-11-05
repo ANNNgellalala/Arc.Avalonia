@@ -11,6 +11,12 @@ public sealed class MultiRegionFailoverPage : ArcItemPage
 {
     public override string ItemSlug => "multi-region-failover";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-steady",
+        "variant-balancer", "variant-platforms", "variant-policy", "variant-stats", "variant-stage-pills"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A reliability or infrastructure page that shows why two regions keep a service up.",
@@ -41,9 +47,15 @@ public sealed class MultiRegionFailoverPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcMultiRegionFailover
+    // The figure is drawn for a 1068 px gallery column; the docs preview is 860 px wide, so scale it to fit
+    // rather than clipping the right edge of the regional platforms.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 410,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcMultiRegionFailover
+        {
+            Width = 960,
+            Height = 410,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

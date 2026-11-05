@@ -42,6 +42,11 @@ public sealed class OnboardingIllustrationPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-step-card", "variant-illustration", "variant-step-dots", "state-step-progress"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A short first-run dialog in a document or workspace product.",
@@ -92,6 +97,10 @@ public sealed class OnboardingIllustrationPage : ArcItemPage
         };
         var body = TeamKit.Body(Steps[step].Body, 440);
         var stepLabel = TeamKit.Caption($"Step {step + 1} of {Steps.Count}");
+        var tourPill = TeamKit.Pill("Guided tour", ArcBadgeTone.Accent, dot: true);
+        var progress = TeamKit.Meter(0, 4);
+        progress.Width = 150;
+        progress.HorizontalAlignment = HorizontalAlignment.Left;
         var dots = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
         var actionsHost = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         var status = TeamKit.Caption("Use the dots or the arrow keys to look through the tour.");
@@ -166,6 +175,7 @@ public sealed class OnboardingIllustrationPage : ArcItemPage
             title.Text = Steps[step].Title;
             body.Text = Steps[step].Body;
             stepLabel.Text = $"Step {step + 1} of {Steps.Count}";
+            progress.Fraction = (step + 1) / (double)Steps.Count;
             RenderDots();
             RenderActions();
         }
@@ -174,6 +184,7 @@ public sealed class OnboardingIllustrationPage : ArcItemPage
         {
             RenderDots();
             stepLabel.Text = "Setup complete";
+            progress.Fraction = 1;
             title.Text = "You're set up";
             body.Text = "Your first folder is ready. Import files any time, or invite the rest of the team from settings.";
             status.Text = "The tour is complete. Reopen it any time from Help.";
@@ -225,6 +236,7 @@ public sealed class OnboardingIllustrationPage : ArcItemPage
 
         var copy = new StackPanel { Spacing = 6 };
         copy.Children.Add(stepLabel);
+        copy.Children.Add(TeamKit.Row(10, tourPill, progress));
         copy.Children.Add(title);
         copy.Children.Add(body);
 

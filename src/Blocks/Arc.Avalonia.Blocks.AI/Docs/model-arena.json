@@ -1,0 +1,58 @@
+{
+  "slug": "model-arena",
+  "nameZh": "模型竞技场",
+  "summary": "盲测对比：一个提示词、两栏匿名回答、一次投票，投完才揭晓哪个模型写了哪一栏；顶部有盲测开关与排行榜入口。",
+  "purpose": [
+    "它用来回答「哪个模型更好」而不是「选哪个模型」：同一道题同时给两栏答案，标注为 Model A 与 Model B，评价时看不到模型名，避免品牌偏见。",
+    "两栏回答各自带耗时与成本等旁证（示例数据），投票后头部换成真实模型名并把这一票记进状态行，底部再给一枚 Next round 继续下一题。",
+    "盲测是可关掉的：顶部开关保持盲态，关掉后可以直接看到模型名，用于复核或演示；右侧 Leaderboard chip 是排行榜入口，本页只做占位。",
+    "题目输入区在顶部：一个输入框加 Run，下面三枚示例 chip 可以一键换题；本页的两栏答案与投票结果都是模拟数据，不会调用任何模型。"
+  ],
+  "whenToUse": [
+    "做模型对比、A/B 试玩或内部评测演示，希望答案被盲评。",
+    "同一提示词的两份回答需要并排阅读与逐项比较时。",
+    "需要一个轻量的投票入口来收集偏好时。"
+  ],
+  "whenNotToUse": [
+    "要为会话挑一个模型、看参数与价格时，用 model-picker。",
+    "要在评测集上跑分数、看分类与回归时，用 eval-suite，那里有 rubric 与历史。",
+    "只需要展示一条答案时，用 ai-answer。"
+  ],
+  "variants": [
+    { "key": "variant-prompt", "label": "Prompt", "note": "题目输入框、Run 与三枚示例 chip" },
+    { "key": "variant-answers", "label": "Answers", "note": "Model A / Model B 两栏匿名回答与旁证" },
+    { "key": "variant-blind-switch", "label": "Blind switch", "note": "顶部盲测开关与 Leaderboard 入口" },
+    { "key": "variant-vote", "label": "Vote", "note": "Vote 行：选 A / 选 B / 平局，投票后揭晓" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Run、投票、Next round 与 Leaderboard 都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "Simulated 徽标说明两栏答案由页面生成" },
+    { "type": "uses", "target": "switch", "note": "盲测开关控制是否隐藏模型名" },
+    { "type": "uses", "target": "input", "note": "题目由 ArcInput 收集" },
+    { "type": "alternative", "target": "model-picker", "note": "要为会话选择模型时改用 model picker" }
+  ],
+  "contrasts": [
+    {
+      "target": "model-picker",
+      "title": "Model arena 与 Model picker",
+      "rows": [
+        { "dimension": "目的", "self": "对同一题的两个回答做盲投", "other": "为接下来的会话挑一个模型" },
+        { "dimension": "信息", "self": "两段答案、耗时与成本", "other": "上下文、输出上限、价格与 effort" },
+        { "dimension": "交互", "self": "投票后才揭示两个模型是谁", "other": "选完即更新 pill 与复核行" },
+        { "dimension": "常驻位置", "self": "评测页或演示页的主体", "other": "设置页或 composer 的工具行" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "盲测页骨架",
+      "language": "csharp",
+      "code": "var header = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,Auto\") };\nheader.Children.Add(K.Row(8,\n    K.Text(\"Blind comparison\", \"arc-label\"),\n    K.Caption(\"1 prompt · 2 answers · 1 vote\"),\n    K.Pill(\"Simulated\", ArcBadgeTone.Neutral)));\nvar right = K.Row(10, blindSwitch, K.Chip(\"Leaderboard\", icon: \"trophy\"));\nGrid.SetColumn(right, 1);\nheader.Children.Add(right);\n\nvar runRow = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,Auto\") };\nrunRow.Children.Add(prompt);\nGrid.SetColumn(run, 1);\nrunRow.Children.Add(run);\n\nreturn K.Surface(K.Stack(10,\n    header,\n    K.Divider(),\n    runRow,\n    samples,     // 三枚示例题目 chip\n    paneGrid,    // Model A / Model B 两栏\n    K.Row(6, K.Caption(\"Vote\"), voteRow),\n    result,      // 投票后揭晓，初始隐藏\n    status));"
+    },
+    {
+      "title": "投票后揭晓模型名",
+      "language": "csharp",
+      "code": "void Vote(int winner)\n{\n    voted = true;\n    headerA.Text = \"Claude Opus 5.5\";\n    headerB.Text = \"GPT-6.1 Sol\";\n    resultText.Text = winner == 0 ? \"You picked Model A · Claude Opus 5.5\"\n        : winner == 1 ? \"You picked Model B · GPT-6.1 Sol\"\n        : \"You called it a tie\";\n    result.IsVisible = true;\n    status.Text = \"Vote recorded. The two model names are revealed.\";\n}"
+    }
+  ]
+}

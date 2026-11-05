@@ -1,0 +1,71 @@
+{
+  "slug": "liquid-tab-bar",
+  "nameZh": "液签栏",
+  "summary": "少数几个同级分区之间的导航：选中态是一枚会在标签间滑动、变宽的镜片，穿过它的图标与文字被反相重绘，标签随镜片到达才展开。",
+  "purpose": [
+    "当应用有四个左右的一级分区、每个分区都有自己的图标与角标时，用 liquid tab bar：选中不是给标签换底色，而是一枚镜片滑过去，标签在镜片到达时展开。",
+    "镜片在滑动中同时改变宽度，形变与位移合为一次弹簧，既不拉伸也不挤压；未选中标签只留图标，角标始终留在原位。",
+    "它自带一块内容预览卡来示意当前分区；实际接入时把内容换成你的页面即可，镜片与标签的动效不变。"
+  ],
+  "whenToUse": [
+    "四个左右的一级分区，每个分区都有图标，需要一眼可辨。",
+    "移动式布局的顶部或底部栏，希望选中感更有物理感时。",
+    "标签上需要角标计数（例如未读 2）时。"
+  ],
+  "whenNotToUse": [
+    "页内的纯文字面板切换，用 tabs。",
+    "紧凑的过滤或视图切换，用 segmented-control。",
+    "带展开面板的站点导航，用 morph-nav。"
+  ],
+  "variants": [
+    { "key": "state-selected", "label": "Selected", "note": "当前分区 Radio：镜片强调色、图标反相、标签展开" },
+    { "key": "state-unselected", "label": "Unselected", "note": "其余分区只留图标，保持次要文字色" },
+    { "key": "variant-badge", "label": "Badge", "note": "Radio 上的角标 2，选中时反相显示" },
+    { "key": "variant-lens", "label": "Lens", "note": "会滑动并变宽的强调色镜片，穿过处图标加粗" },
+    { "key": "variant-content", "label": "Content", "note": "镜片上方的分区内容卡，标题跟随当前分区" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tabs", "note": "页内文本面板切换用普通 Tabs" },
+    { "type": "alternative", "target": "segmented-control", "note": "紧凑的过滤或视图切换用分段控件" },
+    { "type": "complement", "target": "badge", "note": "未读或新内容计数用 Badge 的语义，角标始终跟随标签" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Liquid tab bar 与 Tabs",
+      "rows": [
+        { "dimension": "形态", "self": "图标加镜片的胶囊栏，可放底部", "other": "文字触发条加下划或胶囊，通常置于内容顶部" },
+        { "dimension": "动效", "self": "镜片滑动并变宽，标签随到达展开", "other": "选中指示静止切换或轻微淡入" },
+        { "dimension": "适用场景", "self": "应用级分区导航", "other": "页内同层内容面板" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Liquid tab bar 与 Segmented control",
+      "rows": [
+        { "dimension": "选项", "self": "四个左右带图标的分区", "other": "两到四个紧凑的文字分段" },
+        { "dimension": "选中表现", "self": "镜片滑过并反相重绘穿过内容", "other": "分段填充强调色" },
+        { "dimension": "位置", "self": "页面或窗口级别的导航栏", "other": "表单或列表内的局部切换" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcLiquidTabBar xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                    SelectedIndex=\"1\"\n                    VerticalAlignment=\"Bottom\" />"
+    },
+    {
+      "title": "代码切换分区",
+      "language": "csharp",
+      "code": "var bar = new ArcLiquidTabBar { SelectedIndex = 1 };\n\n// 点击或方向键都会更新选中项；也可以由代码驱动。\nbar.SelectedIndex = 2;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcLiquidTabBar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "SelectedIndex": "当前分区索引；设置后镜片会滑动过去"
+    }
+  }
+}

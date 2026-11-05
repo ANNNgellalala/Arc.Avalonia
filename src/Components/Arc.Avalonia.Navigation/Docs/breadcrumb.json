@@ -1,0 +1,61 @@
+{
+  "slug": "breadcrumb",
+  "nameZh": "面包屑",
+  "summary": "显示页面在层级里位置的路径：中间各级可以点回上级，最后一级是当前页，永远不是链接。",
+  "purpose": [
+    "当页面处在多级层级里（工作区 / 设置 / 账单 / 发票）时，breadcrumb 把这条路径列出来，让你知道自己在哪里、可以退到哪一层。",
+    "中间各级是可聚焦的按钮，最后一级渲染成高对比的标签而不是链接；层级分隔符只是装饰，读屏会把它跳过。",
+    "它通常和页面标题同排出现在页头，与负责平级视图切换的 tabs 分工明确：一个回答“我在哪”，一个回答“看哪一部分”。"
+  ],
+  "whenToUse": [
+    "页面处于三级以上的层级结构、需要随时回到上级时。",
+    "用户从搜索结果、外部链接直接落到深层页面，需要一条回退路径时。",
+    "同一个页头既有层级位置、又有平级视图切换时，由 breadcrumb 表达层级。"
+  ],
+  "whenNotToUse": [
+    "页面之间是平级切换而不是层级关系时，改用 tabs。",
+    "全站导航需要一次展示多个分区与目的地时，改用 mega-menu-morph。",
+    "只是想翻动长列表的页码时，改用 pagination。"
+  ],
+  "variants": [
+    { "key": "variant-basic", "label": "基础路径", "note": "四级路径，末级为当前页" },
+    { "key": "variant-long", "label": "长路径", "note": "层级多时在容器宽度内自动换行" },
+    { "key": "state-current", "label": "当前页", "note": "末级标签不是链接，读屏念作当前页" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "tabs", "note": "breadcrumb 表达层级位置，tabs 负责同一层内的平级视图切换" },
+    { "type": "complement", "target": "mega-menu-morph", "note": "mega menu 提供全站入口，breadcrumb 说明你此刻在站点里的位置" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Breadcrumb 与 Tabs",
+      "rows": [
+        { "dimension": "回答的问题", "self": "我在层级里的哪一层", "other": "我要看同一对象的哪一组视图" },
+        { "dimension": "结构", "self": "一条从根到当前的路径", "other": "一排平级标签" },
+        { "dimension": "方向", "self": "只向上回退，终点是当前页", "other": "横向切换，可以来回" },
+        { "dimension": "当前项", "self": "最后一级是当前页，不可点击", "other": "当前标签用滑动的胶囊标出" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一条路径",
+      "language": "xaml",
+      "code": "<Window xmlns:nav=\"clr-namespace:Arc.Avalonia.Navigation.Controls;assembly=Arc.Avalonia.Navigation\">\n  <nav:ArcBreadcrumb Label=\"位置\" Items=\"{Binding Trail}\" />\n</Window>"
+    },
+    {
+      "title": "用代码为中间层级挂上跳转",
+      "language": "csharp",
+      "code": "var breadcrumb = new ArcBreadcrumb\n{\n    Label = \"Breadcrumb\",\n    Items = new[]\n    {\n        new ArcBreadcrumbItem(\"Workspace\", () => Navigate(\"/workspace\")),\n        new ArcBreadcrumbItem(\"Settings\", () => Navigate(\"/settings\")),\n        new ArcBreadcrumbItem(\"Billing\", () => Navigate(\"/settings/billing\")),\n        new ArcBreadcrumbItem(\"Invoices\")\n    }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Navigation.Controls.ArcBreadcrumb",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "层级列表：Label 是显示文字，可选 Action 让该级可点；最后一项自动成为当前页",
+      "Label": "导航区域的可访问名称，默认 Breadcrumb"
+    }
+  }
+}

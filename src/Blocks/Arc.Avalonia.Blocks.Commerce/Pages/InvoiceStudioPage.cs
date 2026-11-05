@@ -24,6 +24,11 @@ public sealed class InvoiceStudioPage : ArcItemPage
 {
     public override string ItemSlug => "invoice-studio";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-editor", "variant-client-details", "variant-line-items", "variant-totals", "state-save-idle"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

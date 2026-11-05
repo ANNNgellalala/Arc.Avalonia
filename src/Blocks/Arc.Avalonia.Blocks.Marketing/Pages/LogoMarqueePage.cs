@@ -20,6 +20,11 @@ public sealed class LogoMarqueePage : ArcItemPage
 {
     public override string ItemSlug => "logo-marquee";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-row", "variant-pause-control"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -112,7 +117,7 @@ public sealed class LogoMarqueePage : ArcItemPage
 
         var footer = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto,Auto") };
         footer.Children.Add(Mk.Caption("Sample customer marks"));
-        var middle = Mk.Caption("4,000 teams · 38 countries");
+        var middle = Mk.Pill("4,000 teams · 38 countries", ArcBadgeTone.Neutral);
         Grid.SetColumn(middle, 2);
         middle.VerticalAlignment = VerticalAlignment.Center;
         middle.Margin = new Thickness(0, 0, 12, 0);
@@ -135,14 +140,14 @@ public sealed class LogoMarqueePage : ArcItemPage
         Grid.SetColumn(stateRow, 1);
         head.Children.Add(stateRow);
 
-        return Mk.Surface(new Border
+        return new ArcCard
         {
             Padding = new Thickness(26, 22, 26, 20),
-            Child = Mk.Stack(14,
+            Content = Mk.Stack(14,
                 head,
                 band,
                 footer)
-        });
+        };
     }
 
     private static Control Mark(string name, string icon)

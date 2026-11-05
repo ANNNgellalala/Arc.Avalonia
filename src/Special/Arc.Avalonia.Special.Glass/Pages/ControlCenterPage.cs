@@ -14,6 +14,11 @@ public sealed class ControlCenterPage : ArcItemPage
 {
     public override string ItemSlug => "control-center";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-tray", "state-detail", "variant-meter", "variant-dial"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

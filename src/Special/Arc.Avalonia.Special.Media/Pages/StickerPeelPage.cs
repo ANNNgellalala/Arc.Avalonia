@@ -12,6 +12,11 @@ public sealed class StickerPeelPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-peeling", "variant-stuck", "variant-shapes", "variant-surface"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A personal or team page where people arrange badges, achievements or brand stickers.",

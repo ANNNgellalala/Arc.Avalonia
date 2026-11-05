@@ -13,6 +13,11 @@ public sealed class HoloCardPage : ArcItemPage
 {
     public override string ItemSlug => "holo-card";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-front", "state-flipped", "variant-back-note"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -60,6 +65,7 @@ public sealed class HoloCardPage : ArcItemPage
             MemberSince = "Member since 2024",
             Number = "2481 0917",
             IsFlipped = true,
+            BackNote = "Valid through 2029. Present at the door.",
             MaxTilt = 14,
             Intensity = 0.9
         };

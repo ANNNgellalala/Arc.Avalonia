@@ -1,0 +1,57 @@
+{
+  "slug": "research-run",
+  "nameZh": "深度研究运行",
+  "summary": "计划式的深度研究答案：折叠行里列出三条子查询与各自的站点数，答案正文用引用圆点串起证据，右侧来源栏按阅读进度排开，引用点击会同时点亮句子与来源卡。",
+  "purpose": [
+    "它把「深度研究」的过程摊开：标题下一行是 Researched for 7s · 12 sources，紧跟一枚可折叠的步骤按钮，展开后是三条子查询（benchmarks、measurement、definitions）与各自检查过的站点数。",
+    "答案是文章式的：正文段落里嵌着 [1] [2] 这样的引用圆点，点击或回车会同时点亮所在句子与右侧对应的来源卡；段落之间可以夹无序列表，把三类口径一次讲清。",
+    "右侧来源栏不是装饰：每个来源给出编号、标题、域名与阅读进度（Read 或百分比），底部是 12 read 的计数与 Add sources 入口，让人知道「答案是从哪些页读出来的」。",
+    "收尾动作在正文下方：Rerun 重跑、Copy answer 复制、286 words 的字数，再接一排追问建议与一个追问输入框——研究完成之后仍然可以继续问这一题。"
+  ],
+  "whenToUse": [
+    "问题需要多路检索再综合（对比、调研、竞品分析），用户想看到检索过哪些方向。",
+    "答案必须可核对：每个结论旁边要有能点开的来源。",
+    "一次研究耗时十几秒、来源十几条，需要把过程与结果放在同一屏的场景。"
+  ],
+  "whenNotToUse": [
+    "一次单步问答即可、不需要检索过程时，用 ai-answer，它更轻。",
+    "只需要展示一组结构化检索结果、不需要成文答案时，用 search-results 或 knowledge-base。",
+    "需要把多次工具调用逐条审计、看入参与返回时，用 tool-call。"
+  ],
+  "variants": [
+    { "key": "variant-plan-steps", "label": "Plan steps", "note": "三条子查询与各自检查的站点数，可折叠" },
+    { "key": "variant-answer", "label": "Answer", "note": "带引用圆点的答案段落与无序列表" },
+    { "key": "variant-source-rail", "label": "Source rail", "note": "右栏来源卡：编号、域名与阅读进度" },
+    { "key": "variant-actions", "label": "Actions", "note": "Rerun / Copy answer / 字数与追问" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Rerun、Copy answer、Add sources 与步骤折叠都是 ArcButton" },
+    { "type": "uses", "target": "input", "note": "追问与检索使用 ArcInput" },
+    { "type": "uses", "target": "badge", "note": "标题旁的 Simulated 徽标说明结果是模拟的" },
+    { "type": "alternative", "target": "ai-answer", "note": "单步问答、不需要检索过程时改用 ai answer" }
+  ],
+  "contrasts": [
+    {
+      "target": "ai-answer",
+      "title": "Research run 与 AI answer",
+      "rows": [
+        { "dimension": "过程可见性", "self": "子查询、检查站点数与阅读进度都摆出来", "other": "只给答案与来源，过程收起" },
+        { "dimension": "来源栏", "self": "独立右栏，逐条展示阅读百分比", "other": "答案上方一排来源卡" },
+        { "dimension": "耗时与规模", "self": "适合十几秒、十几条来源的调研", "other": "适合几秒内的一条长答案" },
+        { "dimension": "收尾", "self": "Rerun 重跑整轮研究", "other": "重试生成单条答案" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "研究页：步骤、答案与来源两栏",
+      "language": "csharp",
+      "code": "var stepsBody = new StackPanel { Spacing = 5 };\nforeach (var (query, count) in new[]\n         {\n             (\"support ticket deflection benchmarks 2026\", \"6 sites\"),\n             (\"AI resolution rate measurement\", \"4 sites\"),\n             (\"deflection vs containment definitions\", \"2 sites\")\n         })\n{\n    stepsBody.Children.Add(K.Row(7,\n        new ArcIcon { Icon = \"check\", Size = 12, Foreground = K.Brush(ArcTokens.Success) },\n        K.Text(query, \"arc-caption\"),\n        K.Caption(count)));\n}\n\nvar left = K.Stack(11,\n    K.Stack(3,\n        K.Row(8, K.Text(\"How do support teams measure ticket deflection?\", \"arc-heading\", 620),\n            K.Pill(\"Simulated\", ArcBadgeTone.Neutral)),\n        K.Caption(\"Deep research · 7s · 12 sources\")),\n    stepsToggle,\n    stepsBody,\n    K.Divider(),\n    answerParagraphs,\n    K.Row(6, rerun, copy, K.Caption(\"286 words\")),\n    followUps,\n    composer);\n\nvar rail = K.Stack(7, railHeader, sourceRows, addSources);\nvar columns = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,16,280\") };\ncolumns.Children.Add(left);\nGrid.SetColumn(rail, 2);\ncolumns.Children.Add(rail);\nreturn K.Surface(columns, new Thickness(20, 16, 20, 16));"
+    },
+    {
+      "title": "引用同时点亮句子与来源卡",
+      "language": "csharp",
+      "code": "void Select(int number)\n{\n    ClearHighlights();\n    // 段落底色随引用号变化，右栏对应的来源卡同时加描边\n    Sentences[number].Background = K.Tint(ArcTokens.Accent, 0.08);\n    SourceCards[number].BorderBrush = K.Tint(ArcTokens.Accent, 0.4);\n}\n\n// K.Paragraph 把 [1] [2] 渲染为可聚焦的引用圆点\nvar sentence = K.Paragraph(\n    \"Across the three benchmarks we read, AI-only deflection lands between 22 and 41 percent. [2]\",\n    Select, \"arc-body-sm\", 640);"
+    }
+  ]
+}

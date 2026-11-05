@@ -1,0 +1,65 @@
+{
+  "slug": "week-calendar",
+  "nameZh": "周历",
+  "summary": "一周日程区块：七天 × 小时的网格、全天事件行与可切换的周视图，选中事件后在底部显示详情，空白周显示空态。",
+  "purpose": [
+    "周历要同时表达“这周有什么”和“具体几点”。区块用左侧小时刻度、七列日期与全天行组成网格，事件按开始时间与跨度落在格子上，颜色区分工作与个人日历。",
+    "事件可点击选中，底部详情条显示标题、时间、地点与打开事件的按钮；选中状态是可见的描边，不依赖悬停。",
+    "周切换与 Today 操作放在页头，上一周 / 下一周按钮改变日期范围；离开有事件的这一周后，网格保留但显示空态提示，导航行为诚实。",
+    "窄容器下可切换到议程视图，用列表代替网格；本预览展示周视图与议程入口。"
+  ],
+  "whenToUse": [
+    "团队或个人日程页面，需要按周查看时间块与全天事件时。",
+    "需要区分多个日历（工作/个人）并用颜色编码时。",
+    "需要在周视图与议程列表之间切换时。"
+  ],
+  "whenNotToUse": [
+    "只选一个日期时改用 calendar 或 date-picker。",
+    "要收集多人共同空闲时间时改用 availability-picker。",
+    "需要按月总览时改用 month 视图的日历区块。"
+  ],
+  "variants": [
+    { "key": "variant-week-grid", "label": "周网格", "note": "七天 × 八个小时刻度，事件按时间落入格子" },
+    { "key": "variant-all-day-row", "label": "全天行", "note": "Design offsite 与 Support rota handover 两个全天事件" },
+    { "key": "variant-event-detail", "label": "事件详情", "note": "选中事件的时间、地点与打开按钮" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "周视图与议程视图用分段控件切换" },
+    { "type": "uses", "target": "button", "note": "上一周、下一周、Today 与打开事件都是按钮" },
+    { "type": "uses", "target": "badge", "note": "全天事件与日历归属用徽章式标签标识" },
+    { "type": "alternative", "target": "availability-picker", "note": "要为一次会议找共同空档时用 availability picker" }
+  ],
+  "contrasts": [
+    {
+      "target": "availability-picker",
+      "title": "Week calendar 与 Availability picker",
+      "rows": [
+        { "dimension": "任务", "self": "查看并管理这一周的已有事件", "other": "为一次会议挑选共同空闲时间" },
+        { "dimension": "视图", "self": "七天 × 小时网格 + 全天行", "other": "日期条 + 时段列表 + 摘要" },
+        { "dimension": "操作结果", "self": "选中并打开事件、切换周", "other": "确认一个时间并发出邀请" },
+        { "dimension": "数据重点", "self": "事件与占用时间", "other": "参会人空闲人数" }
+      ]
+    },
+    {
+      "target": "button",
+      "title": "Week calendar 与 Button",
+      "rows": [
+        { "dimension": "职责", "self": "日程网格、选中与周导航的组合", "other": "只渲染一个可点击按钮" },
+        { "dimension": "数据", "self": "日期、小时、事件与覆盖跨度", "other": "标签与点击回调" },
+        { "dimension": "键盘路径", "self": "方向键在日期之间移动、Escape 清除选择", "other": "Tab 聚焦、Enter 激活" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "周导航与视图切换",
+      "language": "csharp",
+      "code": "var view = new ArcSegmentedControl\n{\n    Label = \"View\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"week\", \"Week\"),\n        new ArcSegmentOption(\"agenda\", \"Agenda\")\n    },\n    Value = \"week\"\n};\nvar today = new ArcButton { Content = \"Today\", Variant = ArcButtonVariant.Secondary, Size = ArcButtonSize.Sm };"
+    },
+    {
+      "title": "周网格的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"50,*,*,*,*,*,*,*\">\n  <!-- 第一行：Mon–Sun 与日期 -->\n  <!-- 第二行：全天事件条 -->\n  <!-- 之后每行一个小时刻度，事件按开始时间与跨度占格 -->\n</Grid>\n<Border Padding=\"10\" CornerRadius=\"14\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n  <TextBlock Text=\"Design review · Tue 10:00 – 12:00 · Room 4 · Maya\" Classes=\"arc-caption\" />\n</Border>"
+    }
+  ]
+}

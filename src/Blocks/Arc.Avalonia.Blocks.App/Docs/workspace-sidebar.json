@@ -1,0 +1,54 @@
+{
+  "slug": "workspace-sidebar",
+  "nameZh": "工作区侧栏",
+  "summary": "工作区侧栏：多工作区产品的侧边栏，含工作区切换器、实时搜索、可用键盘重排的收藏、内联项目创建，以及折成 64px 图标栏的能力。",
+  "purpose": [
+    "当产品有多个工作区、侧栏需要快速切换时用它：顶部的切换器列出工作区与套餐，搜索框实时过滤收藏与项目。",
+    "收藏可以键盘重排，项目可以内联创建；侧栏可折成 64px 图标栏，右侧内容区用统计与任务列表展示当前项目。",
+    "它把「切换」「查找」「组织」三件事放在同一列：工作区切换在顶部，搜索在其下，收藏与项目分组在下，底部是账户与展开按钮。"
+  ],
+  "whenToUse": [
+    "多工作区应用的主导航，需要在工作区之间快速切换时。",
+    "侧栏需要实时搜索、可重排收藏与内联创建项目时。",
+    "希望侧栏能折成图标栏、把宽度让给内容时。"
+  ],
+  "whenNotToUse": [
+    "区块需要承担整个应用外壳（面包屑与内容）时用 sidebar-rail。",
+    "文档树的导航用 docs-sidebar。",
+    "只有单一工作区、项目不多时，用 sidebar-rail 或更简单的导航即可。"
+  ],
+  "variants": [
+    { "key": "variant-workspace-header", "label": "Workspace header", "note": "顶部工作区切换器（收起态）与套餐说明" },
+    { "key": "variant-search", "label": "Search", "note": "过滤收藏与项目的搜索框" },
+    { "key": "variant-favorites", "label": "Favorites", "note": "收藏分组与可重排的行" },
+    { "key": "variant-project-list", "label": "Projects", "note": "项目分组与内联创建入口" },
+    { "key": "variant-content-pane", "label": "Content", "note": "右侧的统计与任务列表" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "侧栏顶部的实时搜索" },
+    { "type": "uses", "target": "input", "note": "内联创建项目时的名称输入" },
+    { "type": "uses", "target": "avatar", "note": "任务行与账户区的头像" },
+    { "type": "uses", "target": "badge", "note": "任务状态与计数用徽标标出" },
+    { "type": "uses", "target": "button", "note": "工作区行、项目行、创建与折叠都是按钮" },
+    { "type": "alternative", "target": "sidebar-rail", "note": "多工作区侧栏与整个应用外壳侧栏是两种职责划分" }
+  ],
+  "contrasts": [
+    {
+      "target": "sidebar-rail",
+      "title": "Workspace sidebar 与 Sidebar rail",
+      "rows": [
+        { "dimension": "首位", "self": "工作区切换器与套餐信息", "other": "产品路由与分组导航" },
+        { "dimension": "组织方式", "self": "收藏与项目可重排、可内联创建", "other": "固定路由分组，可就地展开" },
+        { "dimension": "内容区", "self": "当前项目的统计与任务列表", "other": "顶栏面包屑、指标与活动流" },
+        { "dimension": "适用", "self": "多工作区产品的主导航", "other": "产品应用的整体外壳" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "工作区侧栏结构",
+      "language": "csharp",
+      "code": "var sidebar = new Border\n{\n    Width = 272,\n    Padding = new Thickness(10),\n    Child = new StackPanel\n    {\n        Spacing = 2,\n        Children =\n        {\n            AppKit.Pressable(WorkspaceHeader(current), () => switcherOpen = !switcherOpen),\n            AppKit.Search(\"Search\", text => { query = text; Build(); }, 216, query, \"[\"),\n            SectionLabel(\"Favorites\", favorites.Count),\n            favorites.Select(item => NavRow(item)).ToStack(),\n            SectionLabel(\"Projects\", projects.Count),\n            projects.Select(item => NavRow(item)).ToStack(),\n            AppKit.RailIcon(\"panel-left\", \"Collapse the sidebar\", () => collapsed = true)\n        }\n    }\n};\n\nvar shell = new Grid { ColumnDefinitions = new ColumnDefinitions(\"272,*\") };\nshell.Children.Add(sidebar);\nshell.Children.Add(AppKit.Place(contentHost, 1));\nreturn AppKit.Screen(shell, 580);"
+    }
+  ]
+}

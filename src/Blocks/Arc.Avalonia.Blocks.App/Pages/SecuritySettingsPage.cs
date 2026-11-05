@@ -23,6 +23,11 @@ public sealed class SecuritySettingsPage : ArcItemPage
 {
     public override string ItemSlug => "security-settings";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-two-factor-on", "variant-two-factor-rail", "variant-password-strength", "variant-active-sessions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

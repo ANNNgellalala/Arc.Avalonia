@@ -1,0 +1,85 @@
+{
+  "slug": "morph-select",
+  "nameZh": "形变选择器",
+  "summary": "触发区自己长成列表的选择器：没有独立浮层，高亮块滑到当前项，可分组、可带副文本，也可在展开时换成搜索框。",
+  "purpose": [
+    "把「紧凑属性选择器」做成一个会变形的表面：关闭时是 44 px 高的触发器，展开时同一块表面长到 44 + 列表高度，因此不会出现遮住内容或跑到窗口外的独立浮层。",
+    "Items 里可以混排 ArcMorphSelectGroup 与 ArcMorphSelectOption：分组负责标题，选项可以再带一行 meta（例如 UTC+1），列表用一条滑动的高亮块标记当前项。",
+    "不开搜索也有 type-ahead：展开后直接敲字母会跳到第一个匹配项；把 Searchable 打开则用搜索框替换值文本，把过滤和选择放在同一个表面里。",
+    "它只负责「选一个值」并回写 Value；展开与收起通过 IsOpen 暴露出来，ValueChanged 给出新值及其完整选项。"
+  ],
+  "whenToUse": [
+    "设置面板里的单一属性（时区、负责人、区域），宽度只有 200 px 左右。",
+    "选项需要分组标题或副文本（Europe / Americas，UTC+1、UTC−5）才能分辨时。",
+    "希望列表在页面内展开，避免浮层被滚动容器或窗口边缘裁掉。"
+  ],
+  "whenNotToUse": [
+    "候选很长、用户会连续搜索时改用 combobox，它的菜单可以跟随滚动容器定位。",
+    "只是 2–4 个常驻可见的分支时改用 segmented-control，少一次展开。",
+    "需要把触发器与列表分开放置（例如固定在页脚上方的选择面板）时改用 select。"
+  ],
+  "variants": [
+    { "key": "variant-closed", "label": "Closed", "note": "44 px 触发器显示当前值与 chevron" },
+    { "key": "variant-placeholder", "label": "Placeholder", "note": "未选择时回退到占位文案" },
+    { "key": "variant-open", "label": "Open", "note": "表面长成列表，高亮块停在当前项" },
+    { "key": "variant-grouped", "label": "Grouped", "note": "列表按组标题分段" },
+    { "key": "variant-searchable", "label": "Searchable", "note": "展开时用搜索框替换值文本" }
+  ],
+  "relations": [
+    { "type": "extends", "target": "select", "note": "在 select 之上把触发区原地长成列表，省掉独立浮层" },
+    { "type": "alternative", "target": "combobox", "note": "需要连续输入过滤时改用 combobox" },
+    { "type": "complement", "target": "input", "note": "属性面板里形变选择器负责枚举值，input 负责自由文本" }
+  ],
+  "contrasts": [
+    {
+      "target": "select",
+      "title": "Morph select 与 Select",
+      "rows": [
+        { "dimension": "展开形态", "self": "同一块表面原地长成列表", "other": "在触发器下方弹出独立浮层" },
+        { "dimension": "分组与副文本", "self": "支持组标题与每项的 meta 副文本", "other": "只有单行选项，禁用项置灰" },
+        { "dimension": "触发器宽度", "self": "固定紧凑，展开宽度由 PanelWidth 决定", "other": "浮层宽度跟随触发器" }
+      ]
+    },
+    {
+      "target": "combobox",
+      "title": "Morph select 与 Combobox",
+      "rows": [
+        { "dimension": "过滤方式", "self": "可选搜索框，默认首字母 type-ahead", "other": "始终可键入，按关键词过滤" },
+        { "dimension": "列表承载", "self": "展开在控件内部，受可用宽度限制", "other": "弹出层，可超出字段宽度" },
+        { "dimension": "适用列表", "self": "一屏内的分组短列表", "other": "几十到几百条的长列表" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcMorphSelect Label=\"时区\"\n                      Width=\"200\"\n                      PanelWidth=\"272\"\n                      Items=\"{Binding Zones}\"\n                      Value=\"{Binding Zone, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "分组、副文本与搜索",
+      "language": "csharp",
+      "code": "var zone = new ArcMorphSelect\n{\n    Label = \"时区\",\n    Width = 200,\n    Searchable = true,\n    SearchPlaceholder = \"搜索城市\",\n    Items = new List<ArcMorphSelectItem>\n    {\n        new ArcMorphSelectGroup(\n            \"Europe\",\n            new ArcMorphSelectOption(\"europe/london\", \"London\", \"UTC+0\"),\n            new ArcMorphSelectOption(\"europe/zurich\", \"Zurich\", \"UTC+1\")),\n        new ArcMorphSelectGroup(\n            \"Americas\",\n            new ArcMorphSelectOption(\"america/new_york\", \"New York\", \"UTC−5\"))\n    }\n};\n\nzone.ValueChanged += (_, e) => Save(e.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcMorphSelect",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "选项或分组，按显示顺序排列；元素是 ArcMorphSelectOption 或 ArcMorphSelectGroup",
+      "Value": "当前选中项的 Value，未选择时为 null",
+      "Label": "触发器上方的可见标签",
+      "HideLabel": "隐藏可见标签，只保留无障碍名称",
+      "Placeholder": "未选择时显示的占位文案，默认 Select",
+      "Searchable": "展开时用搜索框替换值文本",
+      "SearchPlaceholder": "搜索框的占位文案",
+      "PanelWidth": "展开后表面的宽度，不会窄于触发器，默认 272",
+      "MaxListHeight": "列表最大高度，超出后内部滚动，默认 296",
+      "Align": "展开表面的对齐方式：Start 靠左生长 / End 靠右生长",
+      "IsOpen": "展开状态；由控件自身维护，也暴露给页面代码",
+      "SelectedOption": "只读，当前选中的完整选项",
+      "ValueChanged": "选中后触发，事件参数带 Value 与完整选项",
+      "OpenChanged": "表面展开或收起时触发"
+    }
+  }
+}

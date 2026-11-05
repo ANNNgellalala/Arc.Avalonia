@@ -1,0 +1,85 @@
+{
+  "slug": "combobox",
+  "nameZh": "组合框",
+  "summary": "可以在字段里直接打字的单选字段：输入即过滤列表，焦点始终留在输入框里，选中后回填标签。",
+  "purpose": [
+    "把「从长列表里挑一个值」和「输入过滤」合并到同一个字段里：你不必先展开菜单再找，直接键入关键词，列表就按 Label、Value 与 Keywords 在本地收窄。",
+    "焦点在整个过程中不离开触发区的输入框，所以 ArrowDown / ArrowUp 移动、Enter 选中、Escape 收起这些键盘操作在打字期间一直可用。",
+    "触发区沿用字段外壳：Label、Description、Error 与三档尺寸和 input 完全一致，把它和普通输入框并排放在表单里不需要重新对齐。",
+    "未选择时显示 Placeholder；已选择时输入框里是标签而不是原始值，获得焦点会整段选中，于是「再打一个字」自然变成一次新查询。"
+  ],
+  "whenToUse": [
+    "候选值几十到几百条，用户知道名字、缩写或别名（时区、国家、项目、负责人）。",
+    "需要边输入边过滤，且不希望焦点在菜单和字段之间来回跳。",
+    "字段宽度有限，当前值必须一直可见，同时又要能一键清除重选。"
+  ],
+  "whenNotToUse": [
+    "选项固定且短到一屏就能读完时，改用 select：少一次打字，菜单直接展开。",
+    "一次要提交多个值时，改用 multi-select，它会用标签把已选值留在触发器里。",
+    "选项只是 2–4 个应当常驻可见的分支时，改用 segmented-control，不必先展开面板。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑表单与工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型单一字段" },
+    { "key": "state-empty", "label": "Empty", "note": "未选择时显示 placeholder" },
+    { "key": "state-selected", "label": "Selected", "note": "已选值以标签回填，右侧出现清除按钮" },
+    { "key": "state-error", "label": "Error", "note": "危险色边框与错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可展开，也不接受键入" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "select", "note": "选项固定且一屏可读完时改用 select" },
+    { "type": "alternative", "target": "multi-select", "note": "一次要选多个值改用 multi select" },
+    { "type": "alternative", "target": "morph-select", "note": "希望触发区原地长成列表时改用 morph select" },
+    { "type": "complement", "target": "input", "note": "组合框与普通输入框共用字段外壳，常在同一张表单里并排出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "select",
+      "title": "Combobox 与 Select",
+      "rows": [
+        { "dimension": "过滤方式", "self": "直接在字段里键入，列表按 Label / Value / Keywords 过滤", "other": "展开后逐项移动，不能打字过滤" },
+        { "dimension": "适用列表", "self": "长列表，用户知道关键词或别名", "other": "固定、短，一屏内可读完" },
+        { "dimension": "清除当前值", "self": "有清除按钮，可丢弃当前选择", "other": "只能重新选一项，没有独立清除按钮" }
+      ]
+    },
+    {
+      "target": "multi-select",
+      "title": "Combobox 与 Multi-select",
+      "rows": [
+        { "dimension": "选择数量", "self": "一次一个值", "other": "一次多个值" },
+        { "dimension": "触发器呈现", "self": "输入框里显示已选标签，可继续键入新查询", "other": "多枚标签常驻，超出折叠为 +N" },
+        { "dimension": "Value 类型", "self": "string", "other": "字符串集合" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcCombobox Label=\"时区\"\n                   Placeholder=\"搜索或选择…\"\n                   Options=\"{Binding TimeZones}\"\n                   Value=\"{Binding TimeZone, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "别名关键词与空结果提示",
+      "language": "csharp",
+      "code": "var combo = new ArcCombobox\n{\n    Label = \"时区\",\n    EmptyMessage = \"没有匹配的时区\",\n    Options = new[]\n    {\n        new ArcComboboxOption(\"utc\", \"UTC\"),\n        new ArcComboboxOption(\"cet\", \"Central European\", keywords: new[] { \"zurich\", \"berlin\" }),\n        new ArcComboboxOption(\"pst\", \"Pacific\", keywords: new[] { \"san francisco\" })\n    }\n};\n\ncombo.ValueChanged += (_, _) => Save(combo.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcCombobox",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "候选项集合，元素是 ArcComboboxOption（Value / Label / Disabled / Keywords）",
+      "Value": "当前选中项的 Value，未选择时为空字符串",
+      "Placeholder": "未选择且未输入时显示的占位文案，默认 Search or select…",
+      "EmptyMessage": "过滤结果为空时菜单里的提示，默认 No matches found",
+      "IsOpen": "菜单是否展开；键入、方向键与指针都会写回它",
+      "Label": "可见标签，同时作为内部输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时触发器边框取危险色",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm 36 / Md 44 / Lg 50，默认 Md",
+      "ValueChanged": "选定或清除后触发，此时 Value 与 IsOpen 都已更新"
+    }
+  }
+}

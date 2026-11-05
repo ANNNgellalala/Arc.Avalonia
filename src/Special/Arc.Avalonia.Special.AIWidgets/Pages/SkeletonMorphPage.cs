@@ -18,6 +18,12 @@ public sealed class SkeletonMorphPage : ArcItemPage
 {
     public override string ItemSlug => "skeleton-morph";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-loading", "state-loaded",
+        "variant-circle", "variant-multi-line", "variant-content-row"
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var loadingCard = BuildCard("Mina Okafor", "Design engineer · Arc", loading: true, out var loadingRegion);

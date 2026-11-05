@@ -1,0 +1,54 @@
+{
+  "slug": "checkout-live",
+  "nameZh": "实时结算",
+  "summary": "订阅结算：计划、席位、周期、附加项与优惠码一变，右侧摘要与税费就重算；支付成功后原地换成收据。",
+  "purpose": [
+    "当用户从免费版升级到付费团队计划时，实时结算把可配置项放在左侧、订单摘要放在右侧，任何改动都立刻反映到金额。",
+    "摘要按行列出计划与席位、加购项、优惠码、国家决定的税费，合计与支付按钮上的金额保持同步。",
+    "支付成功后摘要整体换成收据：计划、计费周期、已付金额与发票入口，另有一个重置回结算的入口。"
+  ],
+  "whenToUse": [
+    "升级到按席位计费的团队计划、需要选周期与附加项时。",
+    "金额随配置实时变化的订阅结算。",
+    "需要展示税费随国家变化时。"
+  ],
+  "whenNotToUse": [
+    "单件商品、不需要配置的支付时，用 checkout-summary。",
+    "只需要比较计划、不进入支付时，用 usage-pricing 或 plan-comparison。",
+    "需要查看历史发票时，用 billing-overview。"
+  ],
+  "variants": [
+    { "key": "layout-checkout", "label": "结算布局", "note": "左侧表单与右侧订单摘要" },
+    { "key": "variant-plan-seats", "label": "计划与席位", "note": "Team 计划选择与席位数量输入" },
+    { "key": "variant-addons", "label": "附加项", "note": "Priority support 已选、Audit log 未选的复选" },
+    { "key": "variant-coupon", "label": "优惠码", "note": "LAUNCH20 的输入与 Apply" },
+    { "key": "variant-tax", "label": "税费", "note": "Billing country 选择与摘要里的 Tax 行" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "checkbox", "note": "附加项用复选打开 Priority support 与 Audit log" },
+    { "type": "uses", "target": "select", "note": "账单国家用下拉选择，税费随国家变化" },
+    { "type": "uses", "target": "input", "note": "席位、优惠码与卡片字段都是文本输入" },
+    { "type": "uses", "target": "segmented-control", "note": "月付与年付用分段控件切换" },
+    { "type": "uses", "target": "button", "note": "支付、使用优惠码与返回结算都是按钮" },
+    { "type": "alternative", "target": "checkout-summary", "note": "单件商品、不涉及订阅配置时，改用 checkout-summary" }
+  ],
+  "contrasts": [
+    {
+      "target": "checkout-summary",
+      "title": "Checkout live 与 Checkout summary",
+      "rows": [
+        { "dimension": "配置项", "self": "计划、席位、周期、附加项、国家", "other": "只有促销码" },
+        { "dimension": "金额变化", "self": "每次改动都实时重算", "other": "只在应用促销码时变化" },
+        { "dimension": "支付后", "self": "摘要换成收据与发票入口", "other": "按钮变成 Paid" },
+        { "dimension": "适用场景", "self": "免费转付费的升级", "other": "单品购买" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "左表单右摘要的订阅结算",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,24,360\">\n  <StackPanel Spacing=\"14\">\n    <TextBlock Text=\"Upgrade to Team\" Classes=\"arc-subtitle\" />\n    <!-- Plan / Seats / Billing period / Add-ons / Coupon / Country / Card -->\n    <arc:ArcCheckbox Content=\"Priority support\" IsChecked=\"True\" />\n    <arc:ArcSelect />\n    <arc:ArcInput Placeholder=\"Coupon code\" />\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"8\">\n    <TextBlock Text=\"Order summary\" Classes=\"arc-label\" />\n    <!-- Plan / Billing / Support / Audit log / Coupon / Tax / Total -->\n    <arc:ArcButton Content=\"Pay\" Variant=\"Primary\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

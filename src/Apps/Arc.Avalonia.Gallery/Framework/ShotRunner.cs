@@ -20,7 +20,7 @@ namespace Arc.Avalonia.Gallery;
 /// </summary>
 public static class ShotRunner
 {
-    private const int MaxHeight = 1400;
+    private const int DefaultMaxHeight = 5200;
 
     public static async Task RunAsync(string[] args)
     {
@@ -33,12 +33,14 @@ public static class ShotRunner
         var accentArg = GetArg(args, "--accent");
         var accent = accentArg is not null && Enum.TryParse<ArcAccent>(accentArg, true, out var parsedAccent) ? parsedAccent : ArcAccent.Neutral;
         var width = int.TryParse(GetArg(args, "--width"), out var parsedWidth) ? parsedWidth : 1180;
+        var maxHeight = int.TryParse(GetArg(args, "--max-height"), out var parsedMaxHeight) ? parsedMaxHeight : DefaultMaxHeight;
+        var offset = int.TryParse(GetArg(args, "--offset"), out var parsedOffset) ? Math.Max(0, parsedOffset) : 0;
 
         Directory.CreateDirectory(output);
 
         if (args.Contains("--shell"))
         {
-            await RenderShellAsync(app, output, width);
+            await RenderShellAsync(app, output, width, filter);
             return;
         }
 
@@ -63,13 +65,14 @@ public static class ShotRunner
             Padding = new Thickness(56, 48, 56, 40)
         };
 
+        var clip = new Border { Width = width, ClipToBounds = true, Child = host };
         var window = new Window
         {
             Width = width,
             Height = 900,
             Position = new PixelPoint(-6000, -6000),
             ShowInTaskbar = false,
-            Content = host
+            Content = clip
         };
         window.Show();
         await Task.Delay(300);
@@ -87,7 +90,7 @@ public static class ShotRunner
             {
                 try
                 {
-                    await RenderPageAsync(host, window, page, theme, themeDirectory, width);
+                    await RenderPageAsync(clip, host, window, page, theme, themeDirectory, width, maxHeight, offset);
                     Console.WriteLine($"SHOT {theme.ToString().ToLowerInvariant()}/{page.Slug}.png");
                 }
                 catch (Exception exception)
@@ -98,49 +101,66 @@ public static class ShotRunner
         }
     }
 
-    private static async Task RenderPageAsync(Border host, Window window, ArcPage page, ArcColorScheme theme, string directory, int width)
+    private static async Task RenderPageAsync(Border clip, Border host, Window window, ArcPage page, ArcColorScheme theme, string directory, int width, int maxHeight, int offset)
     {
         host.Child = BuildPage(page, theme);
+        host.RenderTransform = null;
+        host.Margin = offset > 0 ? new Thickness(0, -offset, 0, 0) : default;
+        clip.Background = ArcResources.Brush(ArcTokens.Background);
+        clip.Height = double.NaN;
+        window.Height = 900;
 
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
         await Task.Delay(60);
 
-        host.Measure(new Size(width, double.PositiveInfinity));
-        var naturalHeight = Math.Max(240, host.DesiredSize.Height);
-        var height = (int)Math.Ceiling(Math.Min(naturalHeight, MaxHeight));
+        // The live window is clamped to the work area, so measure the page content itself with unbounded
+        // height. The content stays attached, which keeps application styles resolved while measuring.
+        var padding = host.Padding;
+        var naturalHeight = 240.0;
+        if (host.Child is Control pageContent)
+        {
+            pageContent.InvalidateMeasure();
+            pageContent.Measure(new Size(Math.Max(1, width - padding.Left - padding.Right), double.PositiveInfinity));
+            naturalHeight = Math.Max(240, pageContent.DesiredSize.Height + padding.Top + padding.Bottom);
+        }
+        var visibleHeight = Math.Max(240, naturalHeight - offset);
+        var height = (int)Math.Ceiling(Math.Min(visibleHeight, Math.Min(maxHeight, 1400)));
         window.Height = height;
+        clip.Height = height;
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
         await Task.Delay(120);
 
-        var pixelWidth = Math.Max(1, (int)Math.Round(host.Bounds.Width));
-        var pixelHeight = Math.Max(1, (int)Math.Round(host.Bounds.Height));
-        if (naturalHeight > pixelHeight + 4)
+        var pixelWidth = Math.Max(1, (int)Math.Round(clip.Bounds.Width));
+        var pixelHeight = Math.Max(1, (int)Math.Round(clip.Bounds.Height));
+        if (visibleHeight > pixelHeight + 4)
         {
-            Console.WriteLine($"SHOT WARNING {page.Slug}: page is {naturalHeight:0}px tall and was clipped to {pixelHeight}px; split it into two pages");
+            Console.WriteLine($"SHOT WARNING {page.Slug}: offset {offset}, page is {naturalHeight:0}px tall and this slice ends at {offset + pixelHeight}px (use --offset to see the rest)");
         }
 
         using var bitmap = new RenderTargetBitmap(new PixelSize(pixelWidth, pixelHeight), new Vector(96, 96));
-        bitmap.Render(host);
-        bitmap.Save(Path.Combine(directory, $"{page.Order:000}-{page.Slug}.png"));
+        bitmap.Render(clip);
+        var suffix = offset > 0 ? $"-o{offset}" : string.Empty;
+        bitmap.Save(Path.Combine(directory, $"{page.Order:000}-{page.Slug}{suffix}.png"));
     }
 
     private static Control BuildPage(ArcPage page, ArcColorScheme theme)
     {
+        var context = new ArcDemoContext(theme, ArcThemeManager.Accent);
+        if (page is ArcItemPage itemPage)
+        {
+            // Item pages render the Chinese documentation layout, including the completeness preview.
+            var built = DocLayout.Build(itemPage, context, _ => { });
+            return new StackPanel { Children = { built.Root } };
+        }
+
         Control content;
         try
         {
-            content = page.Build(new ArcDemoContext(theme, ArcThemeManager.Accent));
+            content = page.Build(context);
         }
         catch (Exception exception)
         {
             content = new TextBlock { Text = $"Page failed to build: {exception.Message}" };
-        }
-
-        // Catalog item pages render their own documentation header (title, tier, docs link, description);
-        // only the older grouped pages need the gallery header above them.
-        if (page is ArcItemPage)
-        {
-            return content;
         }
 
         var header = new StackPanel { Spacing = 10, Margin = new Thickness(0, 0, 0, 36) };
@@ -160,13 +180,13 @@ public static class ShotRunner
         return new StackPanel { Children = { header, content } };
     }
 
-    private static async Task RenderShellAsync(Application app, string directory, int width)
+    private static async Task RenderShellAsync(Application app, string directory, int width, string? slug)
     {
         foreach (var theme in new[] { ArcColorScheme.Light, ArcColorScheme.Dark })
         {
             ArcThemeManager.Apply(app, theme, ArcAccent.Neutral);
             await Task.Delay(60);
-            var window = new GalleryWindow { Width = width, Height = 900 };
+            var window = new GalleryWindow(slug) { Width = width, Height = 900 };
             window.Show();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             await Task.Delay(400);

@@ -1,0 +1,76 @@
+{
+  "slug": "swipe-actions",
+  "nameZh": "滑动操作",
+  "summary": "把行操作藏在左右边缘下：横向拖动带阻尼地露出按钮，松手按阈值停靠或回位，一次大滑直接执行最外侧动作。",
+  "purpose": [
+    "列表行（邮件、通知、任务）的快捷操作不必一直占着表面。拖动整行时，左右两侧的按钮从行底下露出来；越界后按 0.24 的阻尼跟随，让手势读起来是弹性而不是失控。",
+    "两侧可以挂不同的 ArcSwipeAction 列表，每个动作带标签、图标与 Tone（Neutral / Accent / Danger）。FullSwipe 为 true 时，拖过阈值再松手会直接执行这一侧最外侧的动作。",
+    "手势不是唯一入口：聚焦行之后按 Left / Right 会露出同一组动作，Tab 走进按钮，Escape 把行收起。动作按钮的按钮类型、数量与颜色在触摸和键盘两条路径上完全一致。"
+  ],
+  "whenToUse": [
+    "触屏或触控板优先的列表（邮件、通知、审批）需要每行一两个快速动作。",
+    "希望在保持行高不变的前提下，让归档、删除这类高频动作随时可达。",
+    "桌面端也需要一条右键菜单之外的、键盘可触达的快捷路径。"
+  ],
+  "whenNotToUse": [
+    "动作需要文字说明或存在多个分支时，改用 dropdown-menu 或 context-menu，滑出的按钮放不下解释。",
+    "行本身要响应点击（打开详情）时不要包滑动层，按压会被用来起拖。",
+    "需要拖拽调整顺序或搬运内容时，用专门的拖拽排序组件，方向与语义都不同。"
+  ],
+  "variants": [
+    { "key": "state-closed", "label": "Closed", "note": "行回到原位，两侧按钮完全藏起" },
+    { "key": "state-leading-open", "label": "Leading open", "note": "右滑露出左侧动作（例如标记未读）" },
+    { "key": "state-trailing-open", "label": "Trailing open", "note": "左滑露出右侧动作（归档、删除）" },
+    { "key": "variant-two-actions", "label": "Two actions", "note": "同一侧并排两个动作，各占 84px" },
+    { "key": "variant-danger-action", "label": "Danger action", "note": "删除动作使用危险色填充" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "context-menu", "note": "桌面端同一组行操作更多用右键菜单承载" },
+    { "type": "alternative", "target": "card-stack", "note": "整张卡片左右滑动做决策时用 card stack，按行开合动作时用 swipe actions" },
+    { "type": "complement", "target": "toast", "note": "执行归档或删除后，用带撤销的 toast 把结果与后悔入口一起给出" }
+  ],
+  "contrasts": [
+    {
+      "target": "context-menu",
+      "title": "Swipe actions 与 Context menu",
+      "rows": [
+        { "dimension": "入口", "self": "横向拖动或聚焦后按方向键", "other": "右键、长按或 Shift+F10" },
+        { "dimension": "动作数量", "self": "每侧一到两个，受行宽限制", "other": "可以放五到七个，还能分组" },
+        { "dimension": "动作可见性", "self": "滑出时才看到图标与短标签", "other": "文字标签、快捷键与勾选态都能展开" }
+      ]
+    },
+    {
+      "target": "card-stack",
+      "title": "Swipe actions 与 Card stack",
+      "rows": [
+        { "dimension": "操作对象", "self": "列表中的一行，行本身留在列表里", "other": "整张卡片，决策后从牌堆移除" },
+        { "dimension": "滑动结果", "self": "露出按钮，再由用户点选或大滑执行", "other": "滑过阈值即完成决策，并播报结果" },
+        { "dimension": "回退方式", "self": "松手未过阈值就回位", "other": "用撤销把卡片放回牌堆" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "两侧各挂一组动作",
+      "language": "csharp",
+      "code": "var row = new ArcSwipeActions\n{\n    Label = \"Design review\",\n    Content = BuildMailRow(\"Maya Chen\", \"Design review\", \"9:41\"),\n    Leading = new List<ArcSwipeAction>\n    {\n        new(\"Unread\", \"mail\", ArcSwipeActionTone.Accent) { KeepRow = true }\n    },\n    Trailing = new List<ArcSwipeAction>\n    {\n        new(\"Archive\", \"archive\"),\n        new(\"Delete\", \"trash-2\", ArcSwipeActionTone.Danger)\n    }\n};\n\nrow.ActionInvoked += (_, action) => status.Text = $\"{action.Label} chosen.\";"
+    },
+    {
+      "title": "在 XAML 中声明元素",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcSwipeActions Label=\"Invoice 2041\">\n    <media:ArcSwipeActions.Trailing>\n      <media:ArcSwipeAction Label=\"Archive\" Icon=\"archive\" />\n      <media:ArcSwipeAction Label=\"Delete\" Icon=\"trash-2\" Tone=\"Danger\" />\n    </media:ArcSwipeActions.Trailing>\n  </media:ArcSwipeActions>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcSwipeActions",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Leading": "左侧动作列表，右滑露出；首个动作在满滑时执行",
+      "Trailing": "右侧动作列表，左滑露出；最后一个动作在满滑时执行",
+      "Label": "行的无障碍名称，例如邮件主题",
+      "FullSwipe": "是否允许大滑直接执行最外侧动作，默认 true",
+      "IsOpen": "只读，任一侧是否正在露出",
+      "ActionInvoked": "动作被点选或由满滑执行时触发，携带 ArcSwipeAction"
+    }
+  }
+}

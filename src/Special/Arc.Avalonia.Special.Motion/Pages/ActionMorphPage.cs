@@ -14,6 +14,11 @@ public sealed class ActionMorphPage : ArcItemPage
 {
     public override string ItemSlug => "action-morph";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-button", "state-menu", "state-composer", "variant-corner-start"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -86,18 +91,41 @@ public sealed class ActionMorphPage : ArcItemPage
         var success = SmPage.Toggle("Confirm", morph.ShowSuccess);
         var reset = SmPage.Toggle("Reset", () => morph.Face = ArcActionMorphFace.Button);
 
+        // The interactive stage above rests on the menu face; the row below pins the other faces statically.
+        var faces = new WrapPanel { Orientation = Orientation.Horizontal };
+        faces.Children.Add(FaceStage(120, 110, new ArcActionMorph { Face = ArcActionMorphFace.Button }));
+        faces.Children.Add(FaceStage(300, 220, new ArcActionMorph { Face = ArcActionMorphFace.Menu, CornerStart = true }));
+        faces.Children.Add(FaceStage(380, 290, new ArcActionMorph { Face = ArcActionMorphFace.Composer }));
+
         return new StackPanel
         {
             Spacing = 12,
             Children =
             {
                 stage,
+                faces,
                 SmPage.Hint(
                     "Pick a quick action, type, and add it without leaving the page. Try the button, or T and N for a composer.",
                     composer,
                     success,
                     reset)
             }
+        };
+    }
+
+    private static Control FaceStage(double width, double height, ArcActionMorph morph)
+    {
+        morph.HorizontalAlignment = HorizontalAlignment.Right;
+        morph.VerticalAlignment = VerticalAlignment.Bottom;
+
+        return new Border
+        {
+            Width = width,
+            Height = height,
+            Margin = new Thickness(0, 0, 12, 12),
+            Background = DemoUi.Brush(ArcTokens.SurfaceMuted),
+            CornerRadius = new CornerRadius(20),
+            Child = morph
         };
     }
 

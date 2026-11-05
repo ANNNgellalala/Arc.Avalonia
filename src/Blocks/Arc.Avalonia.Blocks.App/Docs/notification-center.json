@@ -1,0 +1,51 @@
+{
+  "slug": "notification-center",
+  "nameZh": "通知中心",
+  "summary": "通知中心：带未读徽标的铃铛触发器，打开页内面板列出更新；All / Unread 两个视图、可展开的行、逐行已读与移除，以及批量动作。",
+  "purpose": [
+    "当应用需要一个「最近的更新」入口时用它：铃铛显示未读数，打开后在页头旁浮出一块面板，而不是弹窗。",
+    "面板顶部是 All / Unread 分段视图与未读数，行可以就地展开看正文，也可以逐行标记已读或移除；批量动作处理全部通知。",
+    "面板被放在块内的页头上渲染，因此截图里可见；移植版不挂真实弹窗层，面板位置与遮罩由这个区块自己承担。"
+  ],
+  "whenToUse": [
+    "应用页头需要一个带未读徽标的通知铃铛时。",
+    "通知可以逐行阅读、展开、标记已读与批量清除时。",
+    "需要 All 与 Unread 两个筛选视图时。"
+  ],
+  "whenNotToUse": [
+    "消息会在几秒后自己消失时用 toast，而不是常驻面板。",
+    "需要一个完整的邮件分诊页时用 inbox-triage。",
+    "只是展示一条静态更新时用 announcement-bar，不必引入面板。"
+  ],
+  "variants": [
+    { "key": "state-panel-open", "label": "Panel open", "note": "面板打开，触发器处于打开态" },
+    { "key": "variant-unread-badge", "label": "Unread badge", "note": "铃铛上的未读计数徽标" },
+    { "key": "variant-expanded-row", "label": "Expanded row", "note": "某条通知就地展开显示正文" },
+    { "key": "variant-view-switcher", "label": "View switcher", "note": "All / Unread 分段切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "All 与 Unread 视图用分段控件切换" },
+    { "type": "uses", "target": "avatar", "note": "通知行显示触发人的头像" },
+    { "type": "uses", "target": "button", "note": "铃铛触发器、逐行动作与批量操作都是按钮" },
+    { "type": "alternative", "target": "toast", "note": "常驻的通知中心与即时的轻提示承担不同职责" }
+  ],
+  "contrasts": [
+    {
+      "target": "toast",
+      "title": "Notification center 与 Toast",
+      "rows": [
+        { "dimension": "生命周期", "self": "常驻，直到用户已读或清除", "other": "几秒后自动消失" },
+        { "dimension": "入口", "self": "页头的铃铛与未读徽标", "other": "事件发生时就地弹出" },
+        { "dimension": "批量操作", "self": "全部已读、批量移除与筛选", "other": "通常只有单条动作" },
+        { "dimension": "适用", "self": "近期更新的收件匣", "other": "操作成功的即时反馈" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "铃铛、分段视图与面板",
+      "language": "csharp",
+      "code": "var trigger = AppKit.Pressable(new Border\n{\n    CornerRadius = new CornerRadius(9999),\n    Padding = new Thickness(8),\n    Child = new StackPanel\n    {\n        Orientation = Orientation.Horizontal,\n        Spacing = 4,\n        Children =\n        {\n            new ArcIcon { Icon = \"bell\", Size = 16 },\n            AppKit.Pill(Unread().ToString(), ArcBadgeTone.Accent)\n        }\n    }\n}, () => open = !open);\n\nvar panel = new StackPanel\n{\n    Spacing = 8,\n    Children =\n    {\n        AppKit.Segmented(new[] { (\"all\", \"All\"), (\"unread\", \"Unread\") }, view, SwitchView, 168),\n        AppKit.Caption($\"{Unread()} unread of {updates.Count}\"),\n        rows\n    }\n};\n\nlayer.Children.Add(AppKit.Floating(panel, 10, 16, 340));\nreturn AppKit.Screen(layer, 556);"
+    }
+  ]
+}

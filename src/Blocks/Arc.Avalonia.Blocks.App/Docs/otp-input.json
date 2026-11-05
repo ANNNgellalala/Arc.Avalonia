@@ -1,0 +1,50 @@
+{
+  "slug": "otp-input",
+  "nameZh": "验证码输入",
+  "summary": "验证码输入：六位数字槽、粘贴填充、方向键移动，以及内联的错误与成功反馈；验证码在本机校验，不发送任何消息。",
+  "purpose": [
+    "当用户需要输入邮件或短信验证码时用它：六个独立数字槽，填入自动前进，退格自动回退，粘贴整段验证码会铺满所有槽。",
+    "卡片上写明发送到了哪个邮箱、验证码多久过期，并给出重发与「Use a different email」出口；错误与成功都以行内反馈呈现，不用弹窗。",
+    "右侧用一块说明解释验证码规则（一次性、六位数字、示例码），让演示者清楚两种路径：输对进入成功，输错看到错误。"
+  ],
+  "whenToUse": [
+    "邮件或短信验证码的输入场景。",
+    "两步验证的验证码步骤。",
+    "需要粘贴整段验证码、并清楚展示错误与成功反馈时。"
+  ],
+  "whenNotToUse": [
+    "用户从记忆里输入的密码用 password-field。",
+    "普通文本输入用 input，验证码槽不适合承载其他内容。",
+    "需要一次性生成备份码列表时用 security-settings 的备份码区块。"
+  ],
+  "variants": [
+    { "key": "state-filled", "label": "Filled", "note": "六个槽已填入示例验证码" },
+    { "key": "variant-six-slots", "label": "Six slots", "note": "独立的数字槽与当前焦点环" },
+    { "key": "variant-verify-action", "label": "Verify", "note": "Verify code 主按钮与重发倒计时" },
+    { "key": "variant-guidance", "label": "Guidance", "note": "右侧的验证码规则说明卡片" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Verify code、Resend code 与文字链接" },
+    { "type": "uses", "target": "input", "note": "验证码在语义上是一个数字输入，移植版用自绘槽位承载" },
+    { "type": "uses", "target": "card", "note": "验证卡与右侧说明都放在卡片表面内" },
+    { "type": "alternative", "target": "password-field", "note": "一次性验证码与长期密码是两类凭证，输入体验不同" }
+  ],
+  "contrasts": [
+    {
+      "target": "password-field",
+      "title": "OTP input 与 Password field",
+      "rows": [
+        { "dimension": "凭证", "self": "一次性验证码，几分钟过期", "other": "用户长期记住的密码" },
+        { "dimension": "输入", "self": "六位数字槽、自动前进、粘贴铺满", "other": "单个遮罩输入框，可显示或隐藏" },
+        { "dimension": "辅助", "self": "重发、有效期与不同邮箱出口", "other": "可见性切换与忘记密码出口" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "验证码卡片",
+      "language": "csharp",
+      "code": "var field = new OtpField(6, slotSize: 46, gap: 8, label: \"Verification code\")\n{\n    Value = DemoCode\n};\n\nfield.Completed += (_, value) => Verify(value);\n\nvar card = AppKit.Card(new StackPanel\n{\n    Spacing = 14,\n    Children =\n    {\n        AppKit.Row(9, AppKit.Disc(\"shield-check\", 34, 16, true),\n            new TextBlock { Text = \"Verify your email\", Classes = { \"arc-body\", \"arc-medium\" } }),\n        AppKit.Caption(\"We sent a code to maya@northwind.co\"),\n        AppKit.Field(\"Verification code\", field),\n        feedback,\n        AppKit.Btn(\"Verify code\", ArcButtonVariant.Primary, ArcButtonSize.Md, Verify, height: 42, stretch: true),\n        AppKit.Link(\"Use a different email\", () => { }, icon: \"arrow-left\")\n    }\n}, 18, 18);\n\nreturn AppKit.Screen(new Border { Padding = new Thickness(24), Child = card }, 400);"
+    }
+  ]
+}

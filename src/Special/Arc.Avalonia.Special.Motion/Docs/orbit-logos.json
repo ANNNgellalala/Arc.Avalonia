@@ -1,0 +1,69 @@
+{
+  "slug": "orbit-logos",
+  "nameZh": "轨道 Logo 墙",
+  "summary": "集成生态的轨道展示：品牌标记沿内外两圈缓慢环绕产品标记，选中一个就在右侧展开详情卡，分类胶囊会把匹配的标记转向你、其余变暗。",
+  "purpose": [
+    "当营销站的集成区或设置里的集成页需要让「产品与谁相连」一眼可见时，用 orbit logos：产品标记居中，样本品牌标记分布在内外两圈轨道上，慢慢转动。",
+    "分类胶囊（All / Payments / Dev / Comms / Data / Design）会筛选轨道：匹配的标记保持原样并向内侧转动，其余淡到很低的透明度；选中一个标记会画出强调色虚线并打开详情卡。",
+    "详情卡里有名称、分类、说明、连接状态、Connect 与 Docs，以及上一项/下一项；已连接状态同时用文字与勾号表达，不只靠颜色。指针进入轨道或卡片打开时，转动会停下来。"
+  ],
+  "whenToUse": [
+    "营销首页的集成 / 生态展示区。",
+    "设置里的集成浏览页，需要逐个看说明并连接。",
+    "发布页展示产品能与哪些工具对接时。"
+  ],
+  "whenNotToUse": [
+    "一长排客户 logo 的静态展示，用 logo-marquee。",
+    "集成目录超过二十个、需要搜索与表格时，用 integrations 区块或数据表。"
+  ],
+  "variants": [
+    { "key": "state-selected", "label": "Selected", "note": "Stripe 被选中：强调色圆形、放大并画出虚线连接" },
+    { "key": "state-connected", "label": "Connected", "note": "详情卡里的 Connected 状态：成功色药丸加勾号" },
+    { "key": "variant-chips", "label": "Chips", "note": "分类胶囊，当前分类 All 取强调色" },
+    { "key": "variant-rings", "label": "Rings", "note": "内外两圈轨道与环绕的样本品牌标记" },
+    { "key": "variant-card", "label": "Card", "note": "右侧详情卡：名称、分类、说明与连接状态" },
+    { "key": "variant-nav", "label": "Nav", "note": "详情卡底部的 Connect、Docs 与上一项/下一项" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "logo-marquee", "note": "静态客户 logo 展示用走马灯" },
+    { "type": "alternative", "target": "integrations", "note": "规模更大、需要检索的集成目录用 integrations 区块" },
+    { "type": "complement", "target": "link-unfurl", "note": "连接后的服务信息可用链接预览补充说明" }
+  ],
+  "contrasts": [
+    {
+      "target": "logo-marquee",
+      "title": "Orbit logos 与 Logo marquee",
+      "rows": [
+        { "dimension": "可交互性", "self": "标记可选中、可筛选、可连接", "other": "纯展示，没有交互" },
+        { "dimension": "布局", "self": "内外两圈轨道围绕中心标记", "other": "单行横向滚动" },
+        { "dimension": "信息量", "self": "每个标记背后有说明卡与连接状态", "other": "只有品牌标记本身" }
+      ]
+    },
+    {
+      "target": "integrations",
+      "title": "Orbit logos 与 Integrations",
+      "rows": [
+        { "dimension": "规模", "self": "约十二个样本标记，适合首屏", "other": "面向较大目录，可搜索与分页" },
+        { "dimension": "浏览方式", "self": "沿轨道环绕，逐个查看", "other": "网格或列表快速扫描" },
+        { "dimension": "定位", "self": "营销氛围与探索", "other": "设置页里的管理任务" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcOrbitLogos xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                   HorizontalAlignment=\"Center\"\n                   VerticalAlignment=\"Center\" />"
+    },
+    {
+      "title": "代码构建",
+      "language": "csharp",
+      "code": "var orbit = new ArcOrbitLogos\n{\n    HorizontalAlignment = HorizontalAlignment.Stretch,\n    VerticalAlignment = VerticalAlignment.Stretch\n};\nAutomationProperties.SetName(orbit, \"Integrations\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcOrbitLogos",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {}
+  }
+}

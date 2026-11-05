@@ -1,0 +1,73 @@
+{
+  "slug": "lightbox-gallery",
+  "nameZh": "灯箱画廊",
+  "summary": "瀑布流照片墙：不同宽高比的照片按列错落排布，点开一张就从它所在的格子里飞进可缩放、可下滑关闭的查看器。",
+  "purpose": [
+    "为「先浏览、再放大」的照片集合设计：收起态是多列瀑布流，竖图与横图各自保持比例，列高自动取最短的一列继续排。整块表面只有一次焦点停靠，方向键在格子间移动，Enter 或 Space 打开当前照片。",
+    "查看器从被点的那一格飞出来，飞行中圆角与尺寸一起过渡；进入后可以左右换照片、加减号缩放、数字 0 复位，或者向下拖过阈值、按 Escape 关闭。关闭时照片飞回当前照片所在的格子，而不是最初点击的位置。",
+    "照片由代码绘制且比例来自固定表，所以任何主题与尺寸下的静帧都确定；真实项目只需替换数据源，瀑布流、飞行与手势模型不需要改。"
+  ],
+  "whenToUse": [
+    "旅行、作品集、房源等需要浏览并放大查看细节的照片集合。",
+    "同一组里有竖图与横图、希望各自保持比例而不是被裁成方块时。",
+    "照片数量在十几张左右、用一屏瀑布流加一个查看器就能覆盖的场景。"
+  ],
+  "whenNotToUse": [
+    "需要等宽方块、可切换列数的相册时，改用 photo-grid。",
+    "只有六到十二张、希望一次专注一张并可以拖动甩动时，改用 cover-flow。",
+    "只是内容里的一张图、不需要浏览集合时，用普通图片控件加 dialog 即可。"
+  ],
+  "variants": [
+    { "key": "state-grid", "label": "Grid", "note": "收起态：多列瀑布流，照片带发丝边框" },
+    { "key": "variant-masonry", "label": "Masonry", "note": "每张照片进入当前最短的一列，列高保持接近" },
+    { "key": "variant-portrait", "label": "Portrait", "note": "竖幅照片（比例 0.68–0.82）保持纵向比例" },
+    { "key": "variant-landscape", "label": "Landscape", "note": "横幅照片（比例 1.24–1.46）保持横向比例" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "photo-grid", "note": "需要等宽方格与列数缩放时用 photo grid" },
+    { "type": "alternative", "target": "cover-flow", "note": "一次专注一张、可拖动甩动时用 cover flow" },
+    { "type": "complement", "target": "carousel", "note": "详情页里用轮播展示精选照片，用灯箱承接完整集合" }
+  ],
+  "contrasts": [
+    {
+      "target": "photo-grid",
+      "title": "Lightbox gallery 与 Photo grid",
+      "rows": [
+        { "dimension": "排版", "self": "瀑布流，照片各自保持宽高比", "other": "等宽方块网格，可切换 6 / 4 / 3 列" },
+        { "dimension": "主要交互", "self": "点开后飞入查看器，左右翻页与缩放", "other": "箭头移动焦点、加号减号改变列数、F 收藏" },
+        { "dimension": "适合的照片", "self": "竖横混排、比例差异大的集合", "other": "比例接近、需要快速扫描的相册" }
+      ]
+    },
+    {
+      "target": "cover-flow",
+      "title": "Lightbox gallery 与 Cover flow",
+      "rows": [
+        { "dimension": "浏览方式", "self": "全部照片同时可见，挑一张放大", "other": "一次只把一张推到前景，其余退到两侧" },
+        { "dimension": "空间感", "self": "平面瀑布流", "other": "带透视、阴影与倒影的深度轨道" },
+        { "dimension": "适用数量", "self": "十几张到几十张", "other": "六到十二张精选" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一面照片墙",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcLightboxGallery Width=\"980\" Height=\"438\"\n                             HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "查看器里的键盘操作",
+      "language": "csharp",
+      "code": "// 收起态：方向键在格子间移动，Enter / Space 打开当前照片。\n// 查看器内：Left / Right 换照片，+ / - 缩放，0 复位，Escape 关闭。\n// 向下拖动超过阈值也会关闭，照片飞回当前照片所在的格子。\nvar gallery = new ArcLightboxGallery\n{\n    Width = 980,\n    Height = 438,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcLightboxGallery",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "瀑布流宽度；列数按宽度自动计算（每列约 150px）",
+      "Height": "可见区域高度，超出部分不滚动，只做居中对齐",
+      "IsEnabled": "禁用后不再打开查看器",
+      "IsVisible": "隐藏后同时停止查看器动画"
+    }
+  }
+}

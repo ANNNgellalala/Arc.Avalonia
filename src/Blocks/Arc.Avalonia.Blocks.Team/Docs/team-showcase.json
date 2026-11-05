@@ -1,0 +1,68 @@
+{
+  "slug": "team-showcase",
+  "nameZh": "团队展示",
+  "summary": "对外展示团队区块：画廊或聚光两种布局介绍同一个团队，人物卡片可在原地展开详情并复制邮箱。",
+  "purpose": [
+    "About 页面与招聘页需要把“人”放在最前面。团队展示把同一组人物数据组织成两种阅读方式：画廊四列快速扫过，聚光布局聚焦一个人，两者共用同一份资料。",
+    "画像使用品牌渐变与首字母占位，尺寸按真实摄影预留；选中人物时下方详情条原地换成该人的职责、所在地与加入年份。",
+    "布局切换放在页头右侧的分段控件里，并保留一个“We're hiring”的次要入口；区块本身不承担导航，只负责介绍。",
+    "预览同时给出画廊与聚光两种布局，方便比较信息密度与阅读节奏。"
+  ],
+  "whenToUse": [
+    "对外 About 或公司介绍页面，需要以人物肖像介绍团队时。",
+    "招聘页需要展示团队成员并引导到职位时。",
+    "同一组人物需要画格兰与聚光两种阅读密度时。"
+  ],
+  "whenNotToUse": [
+    "内部检索与联系方式管理改用 team-directory。",
+    "客户评价与证言改用 testimonial-stage。",
+    "只需要一行头像组、不需要个人详情时用 avatar-group。"
+  ],
+  "variants": [
+    { "key": "variant-gallery", "label": "画廊布局", "note": "四列人物卡，首张为选中态" },
+    { "key": "variant-spotlight", "label": "聚光布局", "note": "单人大图 + 右侧资料，作为静态样本展示" },
+    { "key": "variant-detail-strip", "label": "详情条", "note": "选中人物的职责、所在地与复制邮箱" },
+    { "key": "state-selected-card", "label": "选中态", "note": "被选中的卡片带强调底色与描边" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "页头用分段控件切换 Gallery 与 Spotlight 布局" },
+    { "type": "uses", "target": "avatar", "note": "详情条用头像与在线状态标识当前人物" },
+    { "type": "uses", "target": "button", "note": "We're hiring 与 Open profile 等行动入口用按钮" },
+    { "type": "uses", "target": "badge", "note": "招聘入口与布局切换的辅助信息用徽章点缀" },
+    { "type": "uses", "target": "copy-button", "note": "详情条里一键复制成员邮箱" },
+    { "type": "alternative", "target": "team-directory", "note": "内部可搜索目录用 team directory，别人看的是检索而不是形象" }
+  ],
+  "contrasts": [
+    {
+      "target": "team-directory",
+      "title": "Team showcase 与 Team directory",
+      "rows": [
+        { "dimension": "面向对象", "self": "外部访客、候选人", "other": "内部同事" },
+        { "dimension": "组织方式", "self": "画廊或聚光的人物卡片", "other": "可搜索、可筛选的人员列表" },
+        { "dimension": "信息重点", "self": "形象、职责与团队气质", "other": "联系方式、在线状态与团队归属" },
+        { "dimension": "行动", "self": "了解团队、查看职位", "other": "复制邮箱、发起联系" }
+      ]
+    },
+    {
+      "target": "avatar",
+      "title": "Team showcase 与 Avatar",
+      "rows": [
+        { "dimension": "职责", "self": "完整的人物展示与详情切换", "other": "只渲染一个人的头像" },
+        { "dimension": "数据", "self": "整组人物、布局与选中态", "other": "单个姓名、尺寸与状态" },
+        { "dimension": "交互", "self": "选择人物、切换布局、复制邮箱", "other": "无自带交互" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "两种布局共用同一份人物数据",
+      "language": "csharp",
+      "code": "var layout = new ArcSegmentedControl\n{\n    Label = \"Layout\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"gallery\", \"Gallery\"),\n        new ArcSegmentOption(\"spotlight\", \"Spotlight\")\n    },\n    Value = \"gallery\"\n};\n\nvar selected = new ArcAvatar { DisplayName = \"Maya Chen\", Size = ArcAvatarSize.Md, Status = ArcAvatarStatus.Online };\nvar copy = new ArcCopyButton { Value = \"maya.chen@northwind.co\", Label = \"Copy email\" };"
+    },
+    {
+      "title": "聚光布局的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"332,*\">\n  <!-- 左侧：预留 332x236 的肖像位，真实部署换成摄影 -->\n  <Border Width=\"332\" Height=\"236\" CornerRadius=\"20\" Background=\"{DynamicResource ArcGradientSoft}\" />\n  <StackPanel Grid.Column=\"1\" Margin=\"22,6,0,0\" Spacing=\"12\">\n    <TextBlock Text=\"Jonas Weber\" Classes=\"arc-subtitle\" />\n    <TextBlock Text=\"Staff engineer\" Classes=\"arc-label\" />\n    <TextBlock Text=\"Sync engine, offline drafts and performance budgets.\" Classes=\"arc-body-sm arc-secondary\" />\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n      <arc:ArcButton Content=\"Copy email\" Variant=\"Secondary\" Size=\"Sm\" />\n      <arc:ArcButton Content=\"Open profile\" Variant=\"Ghost\" Size=\"Sm\" />\n    </StackPanel>\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

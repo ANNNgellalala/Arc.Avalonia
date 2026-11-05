@@ -1,0 +1,81 @@
+{
+  "slug": "hold-to-confirm",
+  "nameZh": "长按确认",
+  "summary": "把不可逆操作改成按住才生效的按钮：填充跟手覆盖表面，提前松手回弹并提示「继续按住」，完成后标签、图标与色调一起切到已确认。",
+  "purpose": [
+    "用于删除项目、撤销共享、清空数据这类不能只靠一次点击的破坏性动作。按住期间一条填充从左到右吃掉按钮表面，让「正在生效」本身可见；松开得比阈值早就回弹，什么都没发生。",
+    "阈值由 Duration 控制（默认 1200ms）。键盘的 Space 与 Enter 同样要按住，指针滑出 24px、按 Escape 或焦点离开都会取消，所以手势不是唯一路径，误触也不会直接生效。",
+    "已确认态由 IsConfirmed 驱动：为 null 时按钮自己管，也可以置 true/false 交给父级控制，例如撤销之后复位。整个确认过程在按钮内部完成，不弹对话框、不打断当前页面。"
+  ],
+  "whenToUse": [
+    "删除项目、撤销共享、清空收件箱等后果已经显示在屏幕上、只差最后一道确认的破坏性动作。",
+    "希望触发过程本身就是进度提示，而不是再开一个对话框打断流程。",
+    "键盘用户也需要同一条路径：Space 或 Enter 按住同样会走完填充并确认。"
+  ],
+  "whenNotToUse": [
+    "还需要用户阅读一段后果说明、并在「取消 / 确认」之间做选择时，改用 dialog。",
+    "需要按钮自己承担 pending → success → retry 的完整异步状态机时，改用 action-button。",
+    "只是强调一次普通提交、不需要防误触时直接用 button；长按会把每一次正常操作都拖慢。"
+  ],
+  "variants": [
+    { "key": "variant-danger", "label": "Danger", "note": "默认色调，用于不可逆的删除动作" },
+    { "key": "variant-neutral", "label": "Neutral", "note": "非破坏性动作，例如发布或退出" },
+    { "key": "variant-icon", "label": "Custom icon", "note": "长按前后共用同一个前置图标" },
+    { "key": "state-confirmed", "label": "Confirmed", "note": "填充收回，表面切成功色，图标变 check" },
+    { "key": "state-disabled", "label": "Disabled", "note": "半透明、无法按住，标签仍可读" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "confirm-morph", "note": "希望在按钮内同时拿到确认、结果与撤销时用 confirm morph" },
+    { "type": "alternative", "target": "dialog", "note": "需要解释后果并给出取消/确认两个动作时改用 dialog" },
+    { "type": "alternative", "target": "action-button", "note": "需要内置异步状态机时改用 action button" },
+    { "type": "complement", "target": "button", "note": "与普通按钮并排时共用同一行高、圆角与内边距，视觉上属于同一组" }
+  ],
+  "contrasts": [
+    {
+      "target": "confirm-morph",
+      "title": "Hold to confirm 与 Confirm morph",
+      "rows": [
+        { "dimension": "触发方式", "self": "按住到阈值才生效，单击永远不会确认", "other": "单击先展开问题，再点一次确认" },
+        { "dimension": "结果与撤销", "self": "只报告已确认，撤销由调用方另做", "other": "结果态内置 Undo，可在原地撤回" },
+        { "dimension": "适用风险", "self": "删除、清空等需要防误触的高风险动作", "other": "中等风险、需要给用户一次后悔机会的动作" }
+      ]
+    },
+    {
+      "target": "dialog",
+      "title": "Hold to confirm 与 Dialog",
+      "rows": [
+        { "dimension": "打断程度", "self": "留在原位，不遮挡页面其余内容", "other": "压暗背景并抢走焦点，必须先把眼前的问题处理完" },
+        { "dimension": "可承载的说明", "self": "只有按钮标签与确认文案", "other": "标题、描述、正文三段，可以解释清楚后果" },
+        { "dimension": "动作数量", "self": "一个动作，取消就是松手", "other": "通常一主一次两个动作，也可以更多" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一个删除确认",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcHoldToConfirm Label=\"Hold to delete project\"\n                          ConfirmedLabel=\"Project deleted\"\n                          Icon=\"trash-2\"\n                          Tone=\"Danger\"\n                          Duration=\"1200\"\n                          Confirmed=\"OnProjectDeleted\" />\n</Window>"
+    },
+    {
+      "title": "撤销之后复位",
+      "language": "csharp",
+      "code": "var button = new ArcHoldToConfirm\n{\n    Label = \"Hold to delete project\",\n    ConfirmedLabel = \"Project deleted\",\n    Icon = \"trash-2\",\n    Tone = ArcHoldToConfirmTone.Danger\n};\n\nbutton.Confirmed += (_, _) => ShowUndoToast();\n\n// 撤销时把视觉状态交回父级驱动，避免按钮一直停在已确认。\nbutton.IsConfirmed = false;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcHoldToConfirm",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "按住的指令与动作，例如 \"Hold to delete project\"",
+      "ConfirmedLabel": "按住完成之后显示的标签",
+      "Duration": "按住时长，单位毫秒，默认 1200",
+      "Icon": "前置 Lucide 图标名；完成时临时替换为 check",
+      "Tone": "色调：Danger 用于不可逆动作，Neutral 用于发布、退出等",
+      "IsConfirmed": "已确认态；null 表示由按钮自管，true/false 由父级控制",
+      "Done": "只读，当前是否读作已确认（IsConfirmed ?? 内部状态）",
+      "HoldStarted": "按住开始（指针或键盘）时触发",
+      "HoldEnded": "按住结束时触发，无论完成还是提前松开",
+      "Confirmed": "按住达到阈值、确认完成时触发一次"
+    }
+  }
+}

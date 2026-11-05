@@ -1,0 +1,69 @@
+{
+  "slug": "invite-people",
+  "nameZh": "邀请成员",
+  "summary": "批量邀请区块：从目录挑人、粘贴一份杂乱的名单，或直接输入邮箱，给出角色并实时看到席位余量，再一次性发送。",
+  "purpose": [
+    "项目初始化时往往要一次加进十几个人。邀请区块把三种入口放在一起：目录建议（带加号）、粘贴 .env 风格的名单、以及直接键入邮箱；三种来源都进入同一个 chip 字段，再统一发送。",
+    "席位计量是这块的重点：顶部进度条随时间显示已用与上限，文案会写清“还剩 1 个席位”或“超出 2 个”，不依赖颜色单独传达。",
+    "粘贴解析会报告有效、无效与重复条数；重复或无效条目不会污染已选列表，状态行给出可读的原因。",
+    "已选人员以 chip 呈现，每个 chip 带角色下拉与移除按钮，发送后转入右侧待处理列表。"
+  ],
+  "whenToUse": [
+    "项目初始化、团队搬迁、课程开课等需要一次邀请多人时。",
+    "邀请来源混杂：既有目录联系人，也有一份粘贴的邮箱名单时。",
+    "有席位上限、需要在发送前看到影响时。"
+  ],
+  "whenNotToUse": [
+    "日常单个邀请与角色调整改用 team-members。",
+    "只需要一个普通 chip 输入框、没有席位与邀请语义时改用 chip-group。",
+    "要展示角色权限关系时改用 roles-permissions。"
+  ],
+  "variants": [
+    { "key": "variant-chip-field", "label": "已选 chips", "note": "已选人员 chip、角色选择与移除" },
+    { "key": "variant-directory-suggestions", "label": "目录建议", "note": "三位同事的建议行与加号按钮" },
+    { "key": "variant-dotenv-import", "label": "粘贴导入", "note": "多行名单输入、导入按钮与解析提示" },
+    { "key": "state-seat-meter", "label": "席位计量", "note": "进度条、已用/上限与剩余名额文案" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "单行输入框支持键入姓名或邮箱，回车加入" },
+    { "type": "uses", "target": "textarea", "note": "粘贴整份名单时使用多行输入框" },
+    { "type": "uses", "target": "select", "note": "每个已选人员的角色用下拉选择" },
+    { "type": "uses", "target": "avatar", "note": "目录建议与已选 chip 用头像标识人员" },
+    { "type": "uses", "target": "progress", "note": "席位进度条直观显示已用名额占比" },
+    { "type": "uses", "target": "badge", "note": "待处理邀请行用角色徽章展示" },
+    { "type": "alternative", "target": "team-members", "note": "只做日常单个邀请时用 team members 更直接" }
+  ],
+  "contrasts": [
+    {
+      "target": "team-members",
+      "title": "Invite people 与 Team members",
+      "rows": [
+        { "dimension": "批量能力", "self": "目录挑选、粘贴导入、手工键入三路并行", "other": "单行输入，逐个添加" },
+        { "dimension": "席位反馈", "self": "进度条与剩余名额文案", "other": "顶部胶囊显示已用数量" },
+        { "dimension": "解析报告", "self": "报告有效、无效与重复条数", "other": "仅逐条提示错误" },
+        { "dimension": "适合阶段", "self": "项目初始化、团队搬迁", "other": "日常成员维护" }
+      ]
+    },
+    {
+      "target": "textarea",
+      "title": "Invite people 与 Textarea",
+      "rows": [
+        { "dimension": "职责", "self": "解析名单、去重、给角色并计入席位", "other": "只提供多行文本输入" },
+        { "dimension": "输出", "self": "结构化的人员与角色列表", "other": "原始字符串" },
+        { "dimension": "校验", "self": "邮箱格式、重复与席位上限", "other": "无业务校验" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三种入口的组成",
+      "language": "csharp",
+      "code": "var field = new ArcInput { Placeholder = \"Type a name or email, then press Enter\", LeadingIcon = \"mail\" };\nvar paste = new ArcTextarea\n{\n    Placeholder = \"Paste a list of people\",\n    Height = 94,\n    Value = \"maya.chen@northwind.co\\nnot-an-email\\nalice.moreau@northwind.co\"\n};\nvar seats = new ArcProgressTrack { Fraction = 11d / 12, Thickness = 7, FillBrush = ArcResources.Brush(ArcTokens.Accent) };\nvar role = new ArcSelect { Options = new[] { new ArcSelectOption(\"Viewer\", \"Viewer\") }, Value = \"Viewer\", Width = 110 };"
+    },
+    {
+      "title": "左右两栏的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"640,1,*\">\n  <StackPanel Spacing=\"8\">\n    <TextBlock Text=\"Invite people\" Classes=\"arc-heading\" />\n    <Border Padding=\"8\" CornerRadius=\"16\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n      <!-- 已选 chips：头像 + 邮箱 + ArcSelect + 移除 -->\n    </Border>\n    <TextBlock Text=\"From the directory\" Classes=\"arc-label\" />\n    <!-- 建议行：ArcAvatar + 姓名/邮箱 + 加号按钮 -->\n    <TextBlock Text=\"Paste a list\" Classes=\"arc-label\" />\n    <arc:ArcTextarea Height=\"94\" />\n  </StackPanel>\n  <Border Grid.Column=\"1\" Width=\"1\" Background=\"{DynamicResource ArcBorderSubtle}\" />\n  <StackPanel Grid.Column=\"2\" Spacing=\"14\">\n    <TextBlock Text=\"Seats\" Classes=\"arc-label\" />\n    <arc:ArcProgressTrack />\n    <TextBlock Text=\"11 of 12 seats, 1 left\" Classes=\"arc-caption\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "slug": "stretch-refresh",
+  "nameZh": "拉伸刷新",
+  "summary": "下拉刷新的桌面版：信息流被往下拖时逐行张开，缺口里的线拉到阈值长满、变强调色并写 Release to refresh，松手后跑一轮刷新再落新条目。",
+  "purpose": [
+    "让「下拉刷新」在桌面外壳里也成立：指针在信息流上拖动即触发，上方的行按 i 的次序依次位移（越往下位移越多），于是整叠看起来像被手指拉开的纸，而不是整块平移。",
+    "缺口里的反馈是一条竖线：Pull 越大线越长，达到 Threshold 前是中性色并写 Pull to refresh，越过阈值后线变成强调色、末端圆点填充、文案换成 Release to refresh；松手若未过阈值就以 260 ms 弹性收回。",
+    "松手过阈值后线进入转圈状态（Refreshing），刷新完成时线收回、结果文字 3 new updates 停留片刻，两条新条目插入顶部、副标题改写为 Updated just now——一次刷新里状态、数据与文案同时更新。",
+    "键盘与开关设备走同一条路径：头部右侧有 Refresh 按钮，刷新期间控件把帮助文本改成 Refreshing 供读屏播报，这样不必逼人用指针做手势。"
+  ],
+  "whenToUse": [
+    "时间线、收件箱、活动流这类「新内容从顶部来」的列表。",
+    "支持触摸、鼠标拖动或触控板手势的面板，需要下拉刷新。",
+    "桌面外壳里嵌了移动形态的列表，用户会期待这个手势时。"
+  ],
+  "whenNotToUse": [
+    "内容不会刷新的静态列表，用普通 List 即可。",
+    "要往前翻旧内容时，改用 pagination，下拉手势只负责「取最新」。",
+    "需要自动轮询或推送更新时，用静默更新加 toast，不必要求用户做手势。"
+  ],
+  "variants": [
+    { "key": "state-idle", "label": "Idle", "note": "没有拉动：缺口为零，行不动" },
+    { "key": "state-pulling", "label": "Pulling", "note": "拉动中：行逐行张开，竖线与 Pull to refresh" },
+    { "key": "state-armed", "label": "Armed", "note": "越过阈值：线满、强调色、Release to refresh" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "pagination", "note": "要逐页翻阅旧内容时改用 pagination" },
+    { "type": "complement", "target": "scroll-area", "note": "滚动容器负责滚动，拉伸刷新负责越过顶部的下拉手势" },
+    { "type": "uses", "target": "button", "note": "Refresh 按钮与信息流的刷新动作同源，供键盘与开关设备使用" }
+  ],
+  "contrasts": [
+    {
+      "target": "pagination",
+      "title": "Stretch refresh 与 Pagination",
+      "rows": [
+        { "dimension": "取数方向", "self": "下拉取更新（顶部）", "other": "翻页取更早的内容（尾部）" },
+        { "dimension": "内容变化", "self": "新条目插入顶部，旧的向下推", "other": "整页替换，位置从第一页重新算" },
+        { "dimension": "手势依赖", "self": "以拖动手势为主，配一个 Refresh 按钮", "other": "纯点击或键盘，无手势" }
+      ]
+    },
+    {
+      "target": "scroll-area",
+      "title": "Stretch refresh 与 Scroll area",
+      "rows": [
+        { "dimension": "职责", "self": "把越过顶部的下拉翻译成刷新", "other": "负责内容的滚动与惯性" },
+        { "dimension": "手势", "self": "拖动后回弹，按阈值决定是否触发", "other": "滚动与滚动条，没有阈值动作" },
+        { "dimension": "状态", "self": "idle / pulling / armed / refreshing / 结果", "other": "只有滚动位置" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：停在阈值之上",
+      "language": "xaml",
+      "code": "<arc:ArcStretchRefresh xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                      Title=\"Inbox\"\n                      Subtitle=\"Updated 14 min ago\"\n                      Threshold=\"72\"\n                      Items=\"{Binding FeedItems}\" />"
+    },
+    {
+      "title": "静态帧：把拉动停在阈值之上",
+      "language": "csharp",
+      "code": "var feed = new ArcStretchRefresh\n{\n    Title = \"Inbox\",\n    Subtitle = \"Updated 14 min ago\",\n    Threshold = 72,\n    Items = new List<ArcFeedItem>\n    {\n        new() { Id = \"1\", Icon = \"code\", Title = \"Mina opened a pull request in arc-ui/web\", Meta = \"Review requested · 3 files\", Time = \"09:41\" },\n        new() { Id = \"2\", Icon = \"message-circle\", Title = \"Rowan replied in #design-system\", Meta = \"The radii look right on the nested cards\", Time = \"09:12\" },\n        new() { Id = \"3\", Icon = \"bell\", Title = \"Nightly visual regression finished\", Meta = \"412 of 412 snapshots match\", Time = \"08:30\" }\n    }\n};\n\n// 把画面固定在「已过阈值、还没松手」的一帧：线满、文案显示 Release to refresh\nfeed.HoldPreview(1.15);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcStretchRefresh",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "信息流标题，例如 Inbox",
+      "Subtitle": "标题下方的说明行，刷新完成后会改写为 Updated just now",
+      "Items": "信息流条目，元素是 ArcFeedItem（图标、标题、说明、时间）",
+      "Threshold": "触发刷新所需的拉动距离，默认 72",
+      "HoldPreview": "方法：把拉动固定在某比例（1 表示正好到阈值），供文档与截图取静止帧"
+    }
+  }
+}

@@ -23,6 +23,11 @@ public sealed class ProductListingPage : ArcItemPage
 {
     public override string ItemSlug => "product-listing";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-collection", "variant-filter-rail", "variant-sort-control", "variant-product-grid"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

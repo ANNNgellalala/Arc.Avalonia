@@ -21,6 +21,11 @@ public sealed class LoginCenteredPage : ArcItemPage
 {
     public override string ItemSlug => "login-centered";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-sign-in", "variant-passkey", "variant-ring-backdrop", "state-first-step"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

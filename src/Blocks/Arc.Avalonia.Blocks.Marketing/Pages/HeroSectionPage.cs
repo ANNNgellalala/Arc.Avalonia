@@ -23,6 +23,11 @@ public sealed class HeroSectionPage : ArcItemPage
 {
     public override string ItemSlug => "hero-section";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-dashboard", "variant-workflow", "variant-mesh"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -73,7 +78,15 @@ public sealed class HeroSectionPage : ArcItemPage
 
         Show("screenshot");
 
-        return Mk.Stack(14, switchRow, host);
+        // All three designs are stacked below the interactive specimen, so every declared variant is visible
+        // without touching the segmented control.
+        return Mk.Stack(14,
+            switchRow,
+            host,
+            Mk.Caption("Workflow design: one event routing through the graph"),
+            Workflow(),
+            Mk.Caption("Mesh design: editorial type over the drifting wash"),
+            Editorial());
     }
 
     private static Control DashboardContent()

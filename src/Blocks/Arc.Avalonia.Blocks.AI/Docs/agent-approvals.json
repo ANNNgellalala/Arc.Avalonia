@@ -1,0 +1,57 @@
+{
+  "slug": "agent-approvals",
+  "nameZh": "智能体审批",
+  "summary": "一次只处理一个权限请求：焦点卡给出工具、智能体的理由、可核对的参数与三个决定（拒绝 / 始终允许 / 批准），下方是等待队列、规则入口与已决日志。",
+  "purpose": [
+    "它把审批从聊天流里单独拎出来：同一时间只有一张焦点卡，卡片写清是哪个 agent、要用哪个工具、做什么、为什么，以及三条参数；决定做完，下一张请求自动补位。",
+    "决定只有三档：Deny 记录拒绝，Approve 放行一次，Always allow 则同时生成一条规则——头部 Rules 1 的计数与「规则弹层」的说明都与之对应，避免每次重复问。",
+    "等待队列是次要信息：焦点卡下方每行一枚盾牌、一条标题、agent 与摘要，加一个风险徽标（High / Medium / Low），让人知道还有多少、风险多大。",
+    "底部用 Waiting / Resolved 过滤切换：Waiting 3 显示待处理的请求，Resolved 2 展开已决日志；所有决定都只记录在本页，不会真的调用工具。"
+  ],
+  "whenToUse": [
+    "智能体要执行写数据库、发消息、部署这类有副作用的工具调用，必须由人放行。",
+    "需要逐条给出工具、理由与参数，让审批人不必回看上下文就能决定。",
+    "希望区分「一次性放行」与「始终允许」并累积规则时。"
+  ],
+  "whenNotToUse": [
+    "审批只是编码任务流程中的一步、且要同时看 diff 时，用 agent-run 的批准门。",
+    "需要审计每一次历史工具调用的入参与输出时，用 tool-call。",
+    "只是普通确认（删除一行）时，用 dialog 或 hold-to-confirm，不必引入队列与规则。"
+  ],
+  "variants": [
+    { "key": "variant-focus-card", "label": "Focus card", "note": "当前请求：工具、理由、三条参数与三个决定" },
+    { "key": "variant-queue", "label": "Queue", "note": "等待队列行与 High / Medium / Low 风险徽标" },
+    { "key": "variant-rules", "label": "Rules", "note": "头部 Rules 计数与规则说明" },
+    { "key": "variant-filter", "label": "Filter", "note": "Waiting / Resolved 过滤与已决日志" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Deny、Always allow、Approve、Rules 与队列行动作都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "队列与焦点卡的风险等级用徽标标出，颜色之外还有 High / Medium / Low 字样" },
+    { "type": "uses", "target": "segmented-control", "note": "底部的 Waiting / Resolved 过滤由 ArcSegmentedControl 表达" },
+    { "type": "alternative", "target": "agent-run", "note": "审批与 diff 需要一起看时改用 agent run" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-run",
+      "title": "Agent approvals 与 Agent run",
+      "rows": [
+        { "dimension": "对象", "self": "一条工具调用权限请求", "other": "一个任务的完整运行" },
+        { "dimension": "决定对象", "self": "放行、拒绝或始终允许", "other": "批准或打回这次代码改动" },
+        { "dimension": "证据", "self": "工具、理由与参数", "other": "步骤、文件页签与 diff 行" },
+        { "dimension": "节奏", "self": "一次一张卡，决定后自动补位", "other": "一次运行一个批准门" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "审批页骨架：焦点卡、队列与过滤",
+      "language": "csharp",
+      "code": "var content = K.Stack(9,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(2, K.Text(\"Approvals\", \"arc-heading\"),\n                K.Caption($\"{Queue.Length} waiting · Emma Collins reviewing\")),\n            K.Row(4, rulesButton, K.IconBtn(\"more-horizontal\", \"Approval settings\"))\n        }\n    },\n    K.Divider(2),\n    cardHost,     // 焦点卡：工具、理由、参数与三个决定\n    K.Divider(2),\n    queueHost,    // 其余的等待请求\n    resolvedFilter, // Waiting 3 / Resolved 2\n    resolvedLog,\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 780 }, new Thickness(22, 15, 22, 15));"
+    },
+    {
+      "title": "三个决定：拒绝、始终允许、批准",
+      "language": "csharp",
+      "code": "var approve = Decision(\"Approve\", \"Approved\");\nvar deny = Decision(\"Deny\", \"Denied\");\nvar always = K.Chip(\"Always allow\", icon: \"shield-check\");\nalways.Click += (_, _) =>\n{\n    rules++;\n    resolved.Insert(0, $\"Rule added: {request.Agent} may use {request.Tool}\");\n    Decide(\"Approved·always\", request);\n};\n\n// 风险等级既上色也写字\nvar riskTone = request.Risk == \"High\" ? ArcBadgeTone.Danger\n    : request.Risk == \"Medium\" ? ArcBadgeTone.Warning\n    : ArcBadgeTone.Success;\nvar risk = K.Pill($\"{request.Risk} risk\", riskTone);"
+    }
+  ]
+}

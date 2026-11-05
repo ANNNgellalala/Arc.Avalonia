@@ -1,0 +1,53 @@
+{
+  "slug": "settings-command",
+  "nameZh": "设置命令面板",
+  "summary": "设置命令：单页滚动的工作区设置，左侧固定分区导航，搜索框会长成命令面板，底部始终给出未保存变更条。",
+  "purpose": [
+    "当设置项很多、用户需要「直接跳到某一项」时用它：单页滚动的工作区设置，顶部搜索框一聚焦就长成命令面板。",
+    "面板里按分组列出设置项，↑↓ 移动、Enter 跳到对应行并把该行标记出来，Escape 关闭；左侧分区导航与右侧设置行同步高亮。",
+    "底部一直显示未保存变更条（演示里固定为 3 条），提供 Discard 与 Save；面板是页内浮层，不是独立弹窗。"
+  ],
+  "whenToUse": [
+    "工作区设置有很多分区与选项、需要搜索跳转时。",
+    "管理员需要把用户直接送到某一个具体设置时。",
+    "设置页面需要常驻的未保存变更条与显式保存时。"
+  ],
+  "whenNotToUse": [
+    "字段很少的短表单用 settings-page，不需要命令面板与滚动页。",
+    "应用级任意跳转用 command-palette，它不限于设置。",
+    "需要分步引导的高风险设置用 security-settings。"
+  ],
+  "variants": [
+    { "key": "state-palette-open", "label": "Palette open", "note": "搜索框长成的命令面板覆盖在设置页上" },
+    { "key": "variant-section-nav", "label": "Section nav", "note": "左侧固定的分区导航与计数" },
+    { "key": "variant-settings-page", "label": "Settings page", "note": "右侧滚动的设置行与控件" },
+    { "key": "variant-search-field", "label": "Search field", "note": "顶部搜索框，聚焦即打开面板" },
+    { "key": "variant-unsaved-bar", "label": "Unsaved bar", "note": "底部的未保存变更条与 Discard / Save" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "顶部搜索框触发命令面板" },
+    { "type": "uses", "target": "segmented-control", "note": "设置行里的分段选项" },
+    { "type": "uses", "target": "select", "note": "设置行里的下拉选择" },
+    { "type": "uses", "target": "switch", "note": "设置行里的开关项" },
+    { "type": "uses", "target": "input", "note": "设置行里的文本输入" },
+    { "type": "alternative", "target": "command-palette", "note": "设置内的命令面板与全局命令面板用途不同" }
+  ],
+  "contrasts": [
+    {
+      "target": "command-palette",
+      "title": "Settings command 与 Command palette",
+      "rows": [
+        { "dimension": "范围", "self": "只在工作区设置内搜索与跳转", "other": "应用内页面、创建与动作" },
+        { "dimension": "结果", "self": "设置项，选中后滚动并标出该行", "other": "命令，选中后直接执行或跳页" },
+        { "dimension": "底层", "self": "设置页本身，含分区导航与未保存条", "other": "任何页面上的遮罩浮层" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "设置页与命令面板",
+      "language": "csharp",
+      "code": "var layout = new Grid { ColumnDefinitions = new ColumnDefinitions(\"230,*\") };\nlayout.Children.Add(AppKit.Place(new Border\n{\n    Padding = new Thickness(12),\n    Child = sectionsHost\n}, 0));\n\nlayout.Children.Add(AppKit.Place(new ScrollViewer\n{\n    Content = new StackPanel\n    {\n        Spacing = 12,\n        Children = { AppKit.Search(\"Search settings\", Open, 300, null, \"⌘K\"), listHost }\n    }\n}, 1));\n\nvar overlay = new Panel { Children = { layout, paletteHost, barHost } };\nreturn AppKit.Screen(overlay, 556);"
+    }
+  ]
+}

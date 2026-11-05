@@ -1,0 +1,68 @@
+{
+  "slug": "team-directory",
+  "nameZh": "团队目录",
+  "summary": "可搜索的内部人员目录：左侧是带团队筛选与在线状态的人员列表，右侧是常驻的成员资料面板，选中谁资料就换成谁。",
+  "purpose": [
+    "内部目录要回答的问题通常很具体：这个人在哪个团队、现在在不在线、邮箱是什么。区块把搜索、团队筛选、人员列表与资料面板放在同一张卡里，选中列表行时右侧资料原地更新，不需要跳页。",
+    "列表行由头像、姓名、角色、团队徽章与在线状态组成；在线状态同时出现在列表与资料面板里，避免两处信息打架。",
+    "搜索框按姓名、角色与团队做内存过滤，筛选 chip 带人数；没有匹配时会给出可解释的空态，而不是空白列表。",
+    "资料面板集中放联系信息：大号人物插图、团队、职责、所在地与时区、复制邮箱按钮。它属于内网工具，不承担对外展示。"
+  ],
+  "whenToUse": [
+    "内部目录或人员检索页面，需要按团队筛选并快速复制联系方式时。",
+    "团队页需要常驻资料面板、让选中的人员详情与列表保持在同一屏时。",
+    "组织里有多个团队、人数在几十人规模、需要在线与离线状态时。"
+  ],
+  "whenNotToUse": [
+    "要管理角色、邀请与席位时改用 team-members。",
+    "对外展示团队形象、以人物肖像为主时改用 team-showcase。",
+    "只想展示一段客户引言时改用 testimonial-stage。"
+  ],
+  "variants": [
+    { "key": "variant-search-filters", "label": "搜索与筛选", "note": "搜索框与四个团队 chip，chip 上带人数" },
+    { "key": "variant-people-list", "label": "人员列表", "note": "头像、姓名、角色、团队徽章与在线状态" },
+    { "key": "variant-profile-pane", "label": "资料面板", "note": "选中人员的插图、职责、时区与复制邮箱" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "顶部搜索框负责按姓名、角色与团队过滤人员" },
+    { "type": "uses", "target": "chip-group", "note": "团队筛选用 chip group，每个 chip 带成员人数" },
+    { "type": "uses", "target": "avatar", "note": "每行与资料面板都使用头像，在线状态由头像角标承担" },
+    { "type": "uses", "target": "avatar-group", "note": "页头用头像组展示在线成员，并汇总可用人数" },
+    { "type": "uses", "target": "badge", "note": "团队名与在线状态用徽章表达" },
+    { "type": "uses", "target": "copy-button", "note": "资料面板里一键复制邮箱地址" },
+    { "type": "alternative", "target": "team-members", "note": "需要管理成员与邀请时用 team members，而不是浏览目录" }
+  ],
+  "contrasts": [
+    {
+      "target": "team-members",
+      "title": "Team directory 与 Team members",
+      "rows": [
+        { "dimension": "主要任务", "self": "浏览、搜索与联系同事", "other": "管理成员、角色与待处理邀请" },
+        { "dimension": "左侧内容", "self": "可筛选的人员列表", "other": "邀请输入、待处理邀请与成员行" },
+        { "dimension": "右侧内容", "self": "选中人员的资料面板", "other": "席位用量与发送邀请" },
+        { "dimension": "权限", "self": "全员可读", "other": "通常只有管理员可见" }
+      ]
+    },
+    {
+      "target": "search-field",
+      "title": "Team directory 与 Search field",
+      "rows": [
+        { "dimension": "作用范围", "self": "搜索 + 筛选 + 列表 + 资料完整闭环", "other": "只提供输入与清除" },
+        { "dimension": "结果呈现", "self": "列表、空态与资料面板都由区块负责", "other": "调用方自己渲染结果" },
+        { "dimension": "多人协作", "self": "内置在线状态、团队与人数", "other": "不感知人员模型" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "搜索、筛选与资料联动",
+      "language": "csharp",
+      "code": "var search = new ArcSearchField { Placeholder = \"Search people, roles, teams\", Width = 268 };\nvar teams = new ArcChipGroup\n{\n    Label = \"Team\",\n    Multiple = false,\n    Options = new[]\n    {\n        new ArcChipOption(\"all\", \"All 8\"),\n        new ArcChipOption(\"design\", \"Design 3\"),\n        new ArcChipOption(\"engineering\", \"Engineering 3\")\n    },\n    Value = new[] { \"all\" }\n};\n\nvar avatar = new ArcAvatar { DisplayName = \"Maya Chen\", Size = ArcAvatarSize.Sm, Status = ArcAvatarStatus.Online };\nvar copy = new ArcCopyButton { Value = \"maya.chen@northwind.co\", Label = \"Copy email\", Variant = ArcButtonVariant.Secondary };"
+    },
+    {
+      "title": "目录页的骨架（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"604,1,357\">\n  <StackPanel Spacing=\"10\">\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"10\">\n      <arc:ArcSearchField Placeholder=\"Search people, roles, teams\" Width=\"268\" />\n      <arc:ArcButton Content=\"Invite people\" Variant=\"Secondary\" Size=\"Sm\" />\n    </StackPanel>\n    <arc:ArcChipGroup Label=\"Team\" />\n    <!-- 人员行：头像 + 姓名/角色 + 团队徽章 + 在线状态 -->\n  </StackPanel>\n  <Border Grid.Column=\"1\" Width=\"1\" Background=\"{DynamicResource ArcBorderSubtle}\" />\n  <StackPanel Grid.Column=\"2\" Spacing=\"10\">\n    <!-- 资料面板：肖像、职责、时区、ArcCopyButton -->\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

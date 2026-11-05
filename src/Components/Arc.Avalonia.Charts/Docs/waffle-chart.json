@@ -1,0 +1,78 @@
+{
+  "slug": "waffle-chart",
+  "nameZh": "华夫图",
+  "summary": "十乘十的单位格图：每个格子代表百分之一，各组从底部按列填充，小份额也能数得清。",
+  "purpose": [
+    "把百分比变成可以逐格数的方块：总共一百格，某一组占多少格就该多清楚。对低于 5% 的小份额，华夫图比环形图的扇区更容易被看见。",
+    "格子从底部左侧开始按列向上填充，组的顺序与图例一致；悬停任意格子会同时高亮整组，并在图例里显示它的份额。",
+    "它适合表达「一部分占整体的百分之几」，不提供精确到小数点的读数——需要精读时应该配合图例里的百分比或改用 split-bar。",
+    "Unit 与 ValueFormat 用来把份额写成读者熟悉的单位（TWh、座位数等）。"
+  ],
+  "whenToUse": [
+    "要展示几个组的百分比构成，并且希望读者能一眼数出格数时。",
+    "有小份额需要被看见（例如 4% 的「其他」），环形图会把它压得几乎不可见。",
+    "主题是「一百格里的分布」这类直觉性表达，例如能源结构、预算分配。",
+    "看图的人不需要精确到小数点的份额时。"
+  ],
+  "whenNotToUse": [
+    "需要精确到小数点后一位的占比时改用 split-bar，它的图例直接给出百分比。",
+    "想强调中心合计或单一数字时改用 donut-chart。",
+    "类别带层级、或者类别远多于 6 个时改用 treemap。",
+    "数据是随时间变化的序列时改用 line-chart 或 streamgraph。"
+  ],
+  "variants": [
+    { "key": "variant-mix", "label": "五组构成", "note": "电力结构：风电、水电、燃气、煤电、其他" },
+    { "key": "variant-balanced", "label": "四等分", "note": "四组各占 25%，格子均分" },
+    { "key": "state-no-legend", "label": "无图例", "note": "ShowLegend=false，只留格子与组色" },
+    { "key": "state-empty", "label": "空数据", "note": "Segments 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "donut-chart", "note": "单个整体、想强调中心合计时用 donut chart" },
+    { "type": "alternative", "target": "split-bar", "note": "需要精确百分比读数的 100% 构成用 split bar" },
+    { "type": "alternative", "target": "treemap", "note": "类别带层级或数量更多时用 treemap" },
+    { "type": "complement", "target": "metric-card", "note": "指标卡里的小构成图可以用 waffle 表达「一百格里的几格」" }
+  ],
+  "contrasts": [
+    {
+      "target": "donut-chart",
+      "title": "Waffle chart 与 Donut chart",
+      "rows": [
+        { "dimension": "视觉编码", "self": "一百个单位格，每格 1%", "other": "圆环扇区的角度" },
+        { "dimension": "小份额", "self": "小份额仍占若干格，可见", "other": "低于 3% 的扇区几乎看不见" },
+        { "dimension": "中心位置", "self": "没有中心，合计放图例", "other": "中心可放合计与单位" },
+        { "dimension": "读数精度", "self": "可数格，精度到 1%", "other": "靠角度估计，精度更低" }
+      ]
+    },
+    {
+      "target": "split-bar",
+      "title": "Waffle chart 与 Split bar",
+      "rows": [
+        { "dimension": "形状", "self": "方形格子阵列", "other": "一条水平 100% 构成条" },
+        { "dimension": "精确读数", "self": "读格数与图例百分比", "other": "图例直接给出精确百分比" },
+        { "dimension": "空间", "self": "需要接近正方形的区域", "other": "扁长，适合窄栏与表格行" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "电力结构",
+      "language": "csharp",
+      "code": "var chart = new ArcWaffleChart\n{\n    Segments = new[]\n    {\n        new ChartValue(\"Wind + solar\", 34),\n        new ChartValue(\"Hydro\", 24),\n        new ChartValue(\"Gas\", 18),\n        new ChartValue(\"Coal\", 14),\n        new ChartValue(\"Other\", 10)\n    },\n    Unit = \"TWh\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcWaffleChart x:Name=\"PowerMix\"\n                         Height=\"210\"\n                         ShowLegend=\"True\"\n                         Unit=\"TWh\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcWaffleChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Segments": "各组的值，总和会归一化到一百格",
+      "ShowLegend": "在格子旁显示组名与百分比，默认 true",
+      "Unit": "图例中使用的单位，例如 TWh",
+      "ValueFormat": "自定义图例数值格式"
+    }
+  }
+}

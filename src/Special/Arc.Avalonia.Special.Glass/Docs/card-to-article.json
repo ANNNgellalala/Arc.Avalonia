@@ -1,0 +1,74 @@
+{
+  "slug": "card-to-article",
+  "nameZh": "卡片转文章",
+  "summary": "故事卡片网格：点开一张卡后，卡片本身以一次变形长成完整文章——矩形与圆角弹向阅读面板、主图作为一块整体放大、正文随后升起，顶部阅读进度条记录滚动位置。",
+  "purpose": [
+    "当博客、期刊或更新日志的每个条目都有一张强图片时用它：先以卡片网格浏览，点开后不跳页，卡片原地变成文章。",
+    "变形以卡片在网格中测量到的矩形为起点、文章目标矩形为终点，圆角与尺寸同时弹簧；关闭时反向收回，拖拽主图向下超过阈值也可以收起。",
+    "文章内容是同一份 ArcArticleItem：标签、标题、阅读时长、场景图与正文；打开时焦点进入文章、Esc 关闭并回到原卡片，阅读进度条随滚动填充。"
+  ],
+  "whenToUse": [
+    "博客、期刊与更新日志，每个条目都有强图片时。",
+    "编辑型落地页，希望不离开页面就能试读故事时。",
+    "需要在卡片与长文之间保持空间连续性的阅读流。"
+  ],
+  "whenNotToUse": [
+    "只是普通卡片列表、点开后跳转详情页时用 card，不必做变形。",
+    "文章需要在独立路由中打开、并有评论与目录时，用独立详情页。",
+    "条目没有主图、或正文很短时用 expandable-card，变形会显得过重。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "文章打开：卡片已变形为阅读面板" },
+    { "key": "variant-meta", "label": "Meta", "note": "标签与阅读时长出现在主图下方" },
+    { "key": "variant-progress", "label": "Progress", "note": "顶部阅读进度条随滚动填充" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "card", "note": "普通卡片列表用 card，卡片要变形成文章时用卡片转文章" },
+    { "type": "alternative", "target": "dialog", "note": "用对话框读长文用 dialog，卡片与文章同形时用卡片转文章" },
+    { "type": "complement", "target": "blog-grid", "note": "博客网格常以它作为点开一篇的阅读层" }
+  ],
+  "contrasts": [
+    {
+      "target": "card",
+      "title": "Card to article 与 Card",
+      "rows": [
+        { "dimension": "打开", "self": "卡片原地变形成文章，不离开页面", "other": "通常是静态卡片或跳转链接" },
+        { "dimension": "内容", "self": "主图、标签、阅读时长与正文", "other": "摘要与少量字段" },
+        { "dimension": "返回", "self": "Esc 或下拉收起，焦点回到原卡片", "other": "没有原位返回的概念" },
+        { "dimension": "适用", "self": "编辑型故事与期刊", "other": "通用内容卡片" }
+      ]
+    },
+    {
+      "target": "dialog",
+      "title": "Card to article 与 Dialog",
+      "rows": [
+        { "dimension": "起点", "self": "从被点卡片自己的矩形长出来", "other": "在屏幕中央淡入" },
+        { "dimension": "阅读", "self": "带阅读进度与下拉收起", "other": "以确认或短内容为主" },
+        { "dimension": "焦点", "self": "打开后焦点进入文章，关闭回原卡片", "other": "打开后焦点进入对话框" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明视图",
+      "language": "xaml",
+      "code": "<gl:ArcCardToArticle xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                     Label=\"Journal\"\n                     OpenId=\"glass-house\"\n                     AspectRatio=\"1.777\" />"
+    },
+    {
+      "title": "条目、打开与关闭",
+      "language": "csharp",
+      "code": "var view = new ArcCardToArticle\n{\n    Label = \"Journal\",\n    AspectRatio = 16.0 / 9.0,\n    Items = new List<ArcArticleItem>\n    {\n        new()\n        {\n            Id = \"glass-house\",\n            Tag = \"Case study\",\n            Title = \"A glass house that stays cool in August\",\n            Meta = \"5 min read\",\n            Scene = ArcGlassScene.Villa,\n            Body = \"The brief was simple and a little unreasonable: a house that feels like it is outdoors...\"\n        },\n        new()\n        {\n            Id = \"light\",\n            Tag = \"Journal\",\n            Title = \"The light in October\",\n            Meta = \"3 min read\",\n            Scene = ArcGlassScene.Coast,\n            Body = \"October light arrives sideways...\"\n        }\n    }\n};\n\n// 打开第一篇；置 null 收起\nview.OpenId = \"glass-house\";\nview.OpenChanged += (_, id) => Console.WriteLine(id ?? \"closed\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcCardToArticle",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "故事条目；每项包含 Id、Tag、Title、Meta、Scene 与 Body",
+      "OpenId": "当前打开的文章 Id；null 表示只显示卡片网格",
+      "AspectRatio": "卡片主图的宽高比，默认 16:9",
+      "Label": "网格的无障碍名称，默认 Journal",
+      "OpenChanged": "打开或关闭文章时触发，参数为当前文章的 Id"
+    }
+  }
+}

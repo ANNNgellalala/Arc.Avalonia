@@ -20,6 +20,11 @@ public sealed class SemanticZoomPage : ArcItemPage
 {
     public override string ItemSlug => "semantic-zoom";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-zoom", "variant-tiles", "variant-breadcrumb", "variant-level-panel"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

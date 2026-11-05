@@ -12,6 +12,12 @@ public sealed class ProductGalleryPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-default", "state-magnifier", "variant-thumbnails",
+        "variant-colorways", "variant-size-grid", "variant-add-to-bag"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Product detail pages with several photos per colour and a size picker.",

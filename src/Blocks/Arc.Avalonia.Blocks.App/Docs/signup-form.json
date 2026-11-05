@@ -1,0 +1,51 @@
+{
+  "slug": "signup-form",
+  "nameZh": "注册表单",
+  "summary": "注册表单：账户创建卡片，含单点登录、姓名、邮箱、实时密码强度、产品更新订阅、本地校验与完成面板；不会真的创建账号。",
+  "purpose": [
+    "当用户需要自助创建账号时用它：一张卡片收集姓名、邮箱与密码，密码强度实时反馈，校验失败就在字段旁标出。",
+    "提供方按钮与邮箱表单并列，底部是产品更新订阅与创建按钮；提交时按钮进入 loading，成功后同一张卡换成完成面板。",
+    "右侧一列「What you get」用三块说明解释试用权益；它和左侧表单共同组成注册页，适合在注册页里直接复用。"
+  ],
+  "whenToUse": [
+    "邮箱加密码的自助注册，需要密码强度与订阅选项时。",
+    "注册页需要同时说明试用权益、让用户安心提交时。",
+    "需要在创建成功后展示完成面板而不是跳页时。"
+  ],
+  "whenNotToUse": [
+    "老用户登录用 sign-in 或 login-split。",
+    "无密码或验证码注册用 otp-input。",
+    "字段很多、需要分步引导时用 multi-step-form。"
+  ],
+  "variants": [
+    { "key": "variant-form-fields", "label": "Fields", "note": "姓名、邮箱与密码字段与本地校验" },
+    { "key": "variant-password-strength", "label": "Strength", "note": "随输入变化的密码强度计" },
+    { "key": "variant-opt-in", "label": "Opt-in", "note": "产品更新订阅复选框" },
+    { "key": "variant-aside-benefits", "label": "Benefits", "note": "右侧的试用权益说明卡片" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "姓名与邮箱输入框" },
+    { "type": "uses", "target": "checkbox", "note": "产品更新订阅复选框" },
+    { "type": "uses", "target": "password-strength", "note": "密码字段旁的实时强度计" },
+    { "type": "uses", "target": "button", "note": "提供方、创建账号与完成后的下一页" },
+    { "type": "alternative", "target": "sign-in", "note": "注册与登录共用输入结构，但目标与后续步骤不同" }
+  ],
+  "contrasts": [
+    {
+      "target": "sign-in",
+      "title": "Signup form 与 Sign in",
+      "rows": [
+        { "dimension": "目标", "self": "创建新账号并开始试用", "other": "已有账号的登录与验证" },
+        { "dimension": "字段", "self": "姓名、邮箱、密码强度与订阅选项", "other": "邮箱与验证码，或 passkey" },
+        { "dimension": "完成态", "self": "同卡换成完成面板与下一步", "other": "账号摘要与进入工作区" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "注册卡片与强度计",
+      "language": "csharp",
+      "code": "var strength = new ArcPasswordStrength\n{\n    Value = password,\n    Placeholder = \"At least 8 characters\"\n};\nstrength.ValueChanged += (_, args) =>\n{\n    password = args.Value;\n    passwordError = string.Empty;\n};\n\nvar form = new StackPanel\n{\n    Spacing = 10,\n    Children =\n    {\n        new TextBlock { Text = \"Create your account\", Classes = { \"arc-heading\" } },\n        AppKit.Providers(provider => SignUp(provider)),\n        AppKit.Input(\"Maya Chen\", name, value => name = value),\n        AppKit.Input(\"maya@northwind.co\", email, value => email = value),\n        AppKit.Field(\"Password\", strength, \"Use a phrase you can remember.\"),\n        AppKit.Check(\"Email me product updates\", updates, value => updates = value),\n        AppKit.Btn(\"Create account\", ArcButtonVariant.Primary, ArcButtonSize.Md, Submit, height: 42, stretch: true)\n    }\n};\n\nreturn AppKit.Screen(AppKit.Card(form, 20, 20), 590);"
+    }
+  ]
+}

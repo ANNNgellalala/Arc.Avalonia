@@ -1,0 +1,56 @@
+{
+  "slug": "activity-terrain",
+  "nameZh": "活动地形",
+  "summary": "把一周七天乘二十四小时的活跃度画成等距地形：柱体高低表示数量，可以切换会话 / 注册 / 错误指标，也能压平成热力图。",
+  "purpose": [
+    "当需要在一屏里同时看「星期几」和「几点」的节奏时，用 activity terrain：七列二十四行的柱体在等距投影里长成一块地形，峰值一眼可见。",
+    "指标切换（Sessions / Signups / Errors）会重算整块地形的单位与配色；相机支持平移、缩放与倾角，Enter 可把地形压平成热力图，用来读具体格子。",
+    "Peak hours 与平均值磁贴列出最忙的格子与整周平均；它适合做节奏与峰值分析，不适合精确读数或逐条下钻。"
+  ],
+  "whenToUse": [
+    "分析一周内的活跃度节奏与峰值时段时。",
+    "要同时呈现星期维度与小时维度时。",
+    "需要地形与热力图两种读法之间切换时。"
+  ],
+  "whenNotToUse": [
+    "需要精确读格子数值时，用 activity-heatmap。",
+    "只有一条时间序列时，用 line-chart。",
+    "需要按地区比较时，用 choropleth-explorer。"
+  ],
+  "variants": [
+    { "key": "layout-terrain", "label": "整体布局", "note": "地形、指标切换、峰值磁贴与相机说明并置" },
+    { "key": "variant-terrain", "label": "Terrain", "note": "7×24 的等距柱体网格与投影" },
+    { "key": "variant-metric-switch", "label": "Metric", "note": "Sessions / Signups / Errors 的指标切换" },
+    { "key": "variant-peak-tiles", "label": "Peak hours", "note": "峰值时段与整周平均的磁贴" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "峰值跳转与相机复位用按钮" },
+    { "type": "uses", "target": "segmented-control", "note": "指标切换用分段控件" },
+    { "type": "uses", "target": "switch", "note": "压平成热力图是一个开关" },
+    { "type": "uses", "target": "card", "note": "地形与读数面板由卡片承载" },
+    { "type": "alternative", "target": "activity-heatmap", "note": "需要精确读格子时，改用 activity heatmap" }
+  ],
+  "contrasts": [
+    {
+      "target": "activity-heatmap",
+      "title": "Activity terrain 与 Activity heatmap",
+      "rows": [
+        { "dimension": "呈现", "self": "等距柱体地形，高度编码数量", "other": "平面方格，颜色深浅编码数量" },
+        { "dimension": "读数", "self": "看节奏与峰值，精确值要点选", "other": "逐格读色阶，适合精确比较" },
+        { "dimension": "探索", "self": "可平移、缩放、切换倾角", "other": "固定网格，快速扫视" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <arc:ArcSegmentedControl SelectedValue=\"sessions\" />\n  <charts:ArcTerrainStage Height=\"320\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建",
+      "language": "csharp",
+      "code": "var grid = BuildGrid(rows: 7, cols: 24); // 一周 × 24 小时\nvar stage = new ArcTerrainStage(grid, \"sessions\")\n{\n    Flattened = false // Enter 或开关可压平成热力图\n};"
+    }
+  ]
+}

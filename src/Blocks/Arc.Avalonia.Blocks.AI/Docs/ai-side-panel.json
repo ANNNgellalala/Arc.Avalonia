@@ -1,0 +1,57 @@
+{
+  "slug": "ai-side-panel",
+  "nameZh": "AI 侧边助手",
+  "summary": "停靠在文档旁的助手：它读出选中段落，把建议做成一处的词级 diff，Apply 就地改写页面里的块、Undo 复原，底部保留提问输入。",
+  "purpose": [
+    "它是「边读边改」的形态：左侧是正在阅读的文档（北风定价页的 Intro / Refunds / Plans / Terms），右侧是助手栏，用户不必离开页面去复制粘贴。",
+    "助手先把上下文说清楚：两枚 chip 标出 This page 与 Selection: Refunds，接一句对矛盾点的判断，然后把改动做成一张 change card——标题写清 Change in Refunds，下面是被改句子的词级 diff（删除划掉、新增带下划线），并标出 1 block。",
+    "应用与撤销是一对就地动作：Apply 把页面里那段文字换成新版本、把段落底色染成成功色并浮出 Applied to the page + Undo 的胶囊；Undo 把文字与底色一起还原。",
+    "底部保留一个提问框：可以对这一页继续追问，回复同样是脚本化的；窄容器下这块面板会折成底部 sheet（参考实现的响应式行为，本移植版按整块演示）。"
+  ],
+  "whenToUse": [
+    "编辑器、文档站或表单页需要助手在原地解释并改一段内容，而不是给出整篇重写。",
+    "用户已经选中了要改的段落，希望看到精确的词级改动再决定是否应用。",
+    "需要「应用后可撤销」这一对动作，并且页面本身就在旁边可对照的场景。"
+  ],
+  "whenNotToUse": [
+    "需要完整的对话历史与消息操作时，用 ai-chat。",
+    "只需要一篇文章式的问答答案时，用 ai-answer，不必把页面和面板并排。",
+    "助手要直接改文件并等待批准时，用 agent-run，那里有步骤、diff 与批准门。"
+  ],
+  "variants": [
+    { "key": "variant-page", "label": "Document", "note": "左侧文档：Intro / Refunds / Plans / Terms 四段，可高亮" },
+    { "key": "variant-change-card", "label": "Change card", "note": "词级 diff、Apply / Discard 与 1 block 徽标" },
+    { "key": "variant-context-chips", "label": "Context chips", "note": "This page 与 Selection: Refunds 两枚上下文 chip" },
+    { "key": "variant-composer", "label": "Composer", "note": "底部提问框与发送键" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Apply、Discard、Undo、关闭面板与发送都是 ArcButton" },
+    { "type": "uses", "target": "input", "note": "底部「Ask about this page」是 ArcInput" },
+    { "type": "uses", "target": "badge", "note": "改动卡片上的 1 block 计数用徽标表达影响范围" },
+    { "type": "alternative", "target": "ai-chat", "note": "需要完整会话与消息操作时改用 ai chat" }
+  ],
+  "contrasts": [
+    {
+      "target": "ai-chat",
+      "title": "AI side panel 与 AI chat",
+      "rows": [
+        { "dimension": "布局", "self": "页面与助手并排，文档始终可对照", "other": "会话占满主体，只在底部留输入" },
+        { "dimension": "输出形态", "self": "一处词级 diff，可应用或丢弃", "other": "一段段消息文本与引用" },
+        { "dimension": "上下文", "self": "用 This page / Selection chip 指明读的是哪一段", "other": "上下文是整个线程" },
+        { "dimension": "收尾", "self": "Apply 后出现 Undo，随时撤回", "other": "消息留在历史里，可重试或评分" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面与助手两栏",
+      "language": "csharp",
+      "code": "var page = K.Panel(K.Stack(4,\n    K.Stack(4, K.Caption(\"Intro\"), K.Text(\"Northwind bills monthly in arrears.\", \"arc-body-sm\", 560)),\n    K.Stack(4, K.Caption(\"Refunds\"), refundParagraph),\n    K.Stack(4, K.Caption(\"Plans\"), plans),\n    K.Stack(4, K.Caption(\"Terms\"), K.Text(\"Annual plans renew on the purchase date.\", \"arc-body-sm\", 560))), 16, 18);\n\nvar panel = new Border\n{\n    BorderThickness = new Thickness(1),\n    CornerRadius = new CornerRadius(18),\n    Padding = new Thickness(14, 12, 14, 12),\n    Child = K.Stack(10,\n        K.Row(7, K.Disc(\"sparkles\", 22, true, 12), K.Label(\"Assistant\"), K.Caption(\"Sonnet 5.5\")),\n        K.RowWrap(6, K.Chip(\"This page\", icon: \"check\"), K.Chip(\"Selection: Refunds\", icon: \"quote\")),\n        K.Text(\"The refund window is stricter than the plan terms. I can tighten this paragraph.\", \"arc-body-sm\"),\n        changeCard,\n        undoPill,\n        composer,\n        status)\n};\n\nvar columns = new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,16,360\") };\ncolumns.Children.Add(page);\nGrid.SetColumn(panel, 2);\ncolumns.Children.Add(panel);\nreturn K.Surface(columns, new Thickness(20, 18, 20, 18));"
+    },
+    {
+      "title": "把改动应用回页面并可撤销",
+      "language": "csharp",
+      "code": "const string original = \"Refunds are issued within 30 days of the request, and original shipping is never refunded.\";\nconst string proposed = \"Refunds are issued within 14 days of the request, and original shipping is refunded once.\";\n\nvoid Apply()\n{\n    refundText.Text = proposed;\n    pageTint.Background = K.Tint(ArcTokens.Success, 0.1);\n    undoPill.IsVisible = true;\n    status.Text = \"Applied to the page. Undo is available.\";\n}\n\nvoid Undo()\n{\n    refundText.Text = original;\n    pageTint.Background = Brushes.Transparent;\n    undoPill.IsVisible = false;\n    status.Text = \"Undone. The page is back to the previous version.\";\n}\n\nvar diff = K.WordDiff(\"Refunds within |-30 days|+14 days|; shipping is |-never refunded|+refunded once|.\");"
+    }
+  ]
+}

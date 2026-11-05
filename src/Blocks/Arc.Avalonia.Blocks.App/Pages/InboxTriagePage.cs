@@ -21,6 +21,11 @@ public sealed class InboxTriagePage : ArcItemPage
 {
     public override string ItemSlug => "inbox-triage";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-folder-tabs", "variant-expanded-row", "variant-message-actions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

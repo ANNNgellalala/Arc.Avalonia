@@ -1,0 +1,77 @@
+{
+  "slug": "chip-group",
+  "nameZh": "筛选芯片组",
+  "summary": "摊平在页面上的筛选条件：每个 chip 一个布尔项，选中后变形并显示勾，选项过多折叠为 +N more，已选项始终可见。",
+  "purpose": [
+    "把一组筛选条件从下拉菜单里搬到页面上：每个 ArcChipOption 是一枚 chip，点一下切换选中，多个筛选同时生效时也能一眼看清哪几项在起作用。",
+    "选中会改变 chip 自身形态：内部插入 check 图标、文字换成强调前景、背景换成强调底色；整组用 WrapPanel 排布，窄容器里自动换行。",
+    "MaxVisible 控制常驻数量，超出的收在「+N more」后面，点开变成「Show less」；无论如何折叠，已选中的 chip 始终留在可见区，这是它和普通折叠列表最大的区别。",
+    "整组只有一个 Tab 停靠点，左右或上下方向键在 chip 之间移动焦点，Home / End 跳到首尾，切到哪枚就停在哪枚。"
+  ],
+  "whenToUse": [
+    "结果列表或表格上方的筛选条：状态、标签、类型这类 3–10 个固定筛选项。",
+    "需要让用户随时看见「现在生效的是哪几个筛选」，而不是藏在一个字段里。",
+    "同一页里既有可多选的标签筛选，也有只能单选的状态筛选，需要同一套外观。"
+  ],
+  "whenNotToUse": [
+    "值由用户自由输入而不是来自固定列表时，改用 tag-input。",
+    "筛选条件多到需要按字段分组、逐行填写时，改用多选字段 multi-select。",
+    "只是几个视图之间的切换（Day / Week / Month）时，改用 segmented-control，它有滑动的高亮块。"
+  ],
+  "variants": [
+    { "key": "variant-multi", "label": "Multiple", "note": "多个 chip 同时选中，筛选叠加" },
+    { "key": "variant-single", "label": "Single", "note": "Multiple=false，再点一次可以清空" },
+    { "key": "variant-collapsed", "label": "Collapsed", "note": "超出 MaxVisible 的选项折叠为 +N more" },
+    { "key": "variant-none", "label": "No filter", "note": "没有任何 chip 选中，条件为空" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "multi-select", "note": "多值需要收进一个字段时改用 multi select" },
+    { "type": "alternative", "target": "segmented-control", "note": "2–5 个视图之间的切换改用 segmented control" },
+    { "type": "alternative", "target": "tag-input", "note": "值由用户自由输入时改用 tag input" },
+    { "type": "complement", "target": "data-grid", "note": "筛选芯片通常放在结果表格上方，负责收窄表格里的行" }
+  ],
+  "contrasts": [
+    {
+      "target": "multi-select",
+      "title": "Chip group 与 Multi-select",
+      "rows": [
+        { "dimension": "选项可见性", "self": "所有 chip 常驻在页面上", "other": "选项收在菜单里，触发器只显示已选" },
+        { "dimension": "空间占用", "self": "随选项数量换行，可能占两三行", "other": "恒定一行，选多少都不变高" },
+        { "dimension": "典型场景", "self": "结果列表上方的筛选条", "other": "表单里的多值字段" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Chip group 与 Segmented control",
+      "rows": [
+        { "dimension": "选择数量", "self": "多选或可清空的单选", "other": "严格单选，始终有一个生效" },
+        { "dimension": "高亮呈现", "self": "每个 chip 各自变形并显示勾", "other": "一块共享的高亮 pill 滑动" },
+        { "dimension": "选项数量", "self": "3–10 个，允许折叠", "other": "2–5 个，全部常驻" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcChipGroup Label=\"Topics\"\n                    MaxVisible=\"4\"\n                    Options=\"{Binding Topics}\"\n                    Value=\"{Binding ActiveTopics, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "多选与可清空的单选",
+      "language": "csharp",
+      "code": "var topics = new ArcChipGroup\n{\n    Label = \"Topics\",\n    Multiple = true,\n    MaxVisible = 4,\n    Value = new[] { \"design\", \"motion\" },\n    Options = new[]\n    {\n        new ArcChipOption(\"design\", \"Design\"),\n        new ArcChipOption(\"motion\", \"Motion\"),\n        new ArcChipOption(\"code\", \"Code\"),\n        new ArcChipOption(\"research\", \"Research\"),\n        new ArcChipOption(\"writing\", \"Writing\")\n    }\n};\n\nvar status = new ArcChipGroup\n{\n    Label = \"Status\",\n    Multiple = false,\n    Value = new[] { \"open\" },\n    Options = new[]\n    {\n        new ArcChipOption(\"open\", \"Open\"),\n        new ArcChipOption(\"closed\", \"Closed\"),\n        new ArcChipOption(\"archived\", \"Archived\")\n    }\n};\n\ntopics.ValueChanged += (_, _) => Filter(topics.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcChipGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "chip 集合，元素是 ArcChipOption（Value / Label）",
+      "Value": "当前选中的 Value 集合；Multiple=false 时最多一项，清空后为空集合",
+      "Label": "组的无障碍名称，例如 Topics",
+      "Multiple": "是否允许同时选中多个 chip，默认 true",
+      "MaxVisible": "常驻显示的 chip 数量，超出折叠为 +N more，默认不折叠",
+      "ValueChanged": "任一 chip 切换后触发，此时 Value 已按 Options 顺序重排"
+    }
+  }
+}

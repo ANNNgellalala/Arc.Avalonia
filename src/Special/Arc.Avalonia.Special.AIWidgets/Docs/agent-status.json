@@ -1,0 +1,80 @@
+{
+  "slug": "agent-status",
+  "nameZh": "智能体状态",
+  "summary": "运行中 AI 智能体的紧凑状态胶囊：活环里是智能体标记，旁边是当前活动、计数与已用时间；按下就地展开步骤、进度线与 Pause / Stop / Open run，等待批准时直接给出 Deny / Approve。",
+  "purpose": [
+    "把「它还在跑吗、在做什么、跑了多久」压成一行：你可以把它放在页头、标题栏或输入框上方，需要细节时再展开。",
+    "运行状态同时用词、环与颜色表达：Working 扫环、NeedsInput 在胶囊里变成强调点并带内联批准、Paused 冻结、Done 与 Failed 收口；每个状态都有对应文字，不靠颜色猜。",
+    "展开面板复用同一份 Steps：Done / Active / Waiting / Pending 决定行首图标，进度线按已完成步数计算，计时器只在 Working 时累加，其余状态保持数值。"
+  ],
+  "whenToUse": [
+    "页头、标题栏或 composer 需要让用户一眼看出智能体正在运行、在做什么、已经多久时。",
+    "智能体暂停等待批准，用户需要就地 Approve / Deny、而不必打开完整运行视图时。",
+    "后台运行、只需要偶尔查看的智能体：胶囊保持一行，步骤收在面板里。"
+  ],
+  "whenNotToUse": [
+    "要逐次查看或审批每一次工具调用时，用 tool-call，那里有输入、输出与重试。",
+    "要按时间顺序回放整轮运行、对比每一步耗时时，用 agent-timeline，胶囊只承载当前状态。",
+    "只是普通的后台任务进度时，用 progress 或 usage-meter，不必引入智能体语义。"
+  ],
+  "variants": [
+    { "key": "state-expanded", "label": "Expanded", "note": "展开态：最近五步、进度线、Pause / Stop / Open run" },
+    { "key": "state-working", "label": "Working", "note": "运行中：活环扫动、计时器累加" },
+    { "key": "state-needs-input", "label": "Needs input", "note": "等待批准：胶囊内出现 Deny / Approve" },
+    { "key": "state-paused", "label": "Paused", "note": "已暂停：环冻结，面板按钮变为 Resume" },
+    { "key": "state-done", "label": "Done", "note": "已完成：环收口，徽章与计时显示总耗时" },
+    { "key": "state-failed", "label": "Failed", "note": "失败：危险环与 Retry，可重新回到 Working" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Approve、Deny、Retry、Pause / Resume、Stop 与 Open run 都是 ArcButton" },
+    { "type": "alternative", "target": "agent-timeline", "note": "要完整回放整轮运行时改用 agent timeline" },
+    { "type": "alternative", "target": "tool-call", "note": "要看单次工具调用的输入输出时改用 tool call" },
+    { "type": "complement", "target": "agent-plan", "note": "智能体按计划推进时，胶囊报告当前这一步的状态" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-timeline",
+      "title": "Agent status 与 Agent timeline",
+      "rows": [
+        { "dimension": "粒度", "self": "整轮运行压成一行，展开才看最近五步", "other": "沿时间轴展开编排器、子智能体与交接" },
+        { "dimension": "常驻位置", "self": "页头、标题栏或 composer 上方常驻", "other": "运行详情页或可滚动的侧栏" },
+        { "dimension": "交互", "self": "点击展开，内联批准、暂停与停止", "other": "用播放头回放，头部统计时间、token 与成本" }
+      ]
+    },
+    {
+      "target": "tool-call",
+      "title": "Agent status 与 Tool call",
+      "rows": [
+        { "dimension": "表示对象", "self": "一整轮运行的状态", "other": "一次工具调用" },
+        { "dimension": "内容深度", "self": "活动、计数、计时与步骤摘要", "other": "调用参数与完整输出" },
+        { "dimension": "批准", "self": "在胶囊内对整轮运行批准或拒绝", "other": "对单次调用批准、重试或展开详情" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：运行中的胶囊",
+      "language": "xaml",
+      "code": "<arc:ArcAgentStatus xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                    Status=\"Working\"\n                    AgentName=\"Claude Sonnet 5.5\"\n                    ActivityLabel=\"Running tests\"\n                    ActivityIcon=\"sparkles\"\n                    ActivityCount=\"8 of 12\"\n                    ElapsedSeconds=\"72\"\n                    IsExpanded=\"True\" />"
+    },
+    {
+      "title": "代码构建：步骤与状态切换",
+      "language": "csharp",
+      "code": "var status = new ArcAgentStatus\n{\n    Status = ArcAgentRunStatus.Working,\n    AgentName = \"Claude Sonnet 5.5\",\n    ActivityLabel = \"Running tests\",\n    ActivityCount = \"8 of 12\",\n    ElapsedSeconds = 72,\n    IsExpanded = true,\n    Steps = new List<ArcAgentStep>\n    {\n        new() { Id = \"read\", Label = \"Read 12 files\", State = ArcAgentStepState.Done, DurationSeconds = 1.9 },\n        new() { Id = \"edit\", Label = \"Edited src/billing/invoice.ts\", State = ArcAgentStepState.Done, DurationSeconds = 2.5 },\n        new() { Id = \"tests\", Label = \"Running tests\", State = ArcAgentStepState.Active },\n        new() { Id = \"push\", Label = \"Push the branch\", State = ArcAgentStepState.Pending }\n    }\n};\n\n// 等待用户批准：胶囊内出现 Deny / Approve，批准后回到 Working\nstatus.Status = ArcAgentRunStatus.NeedsInput;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcAgentStatus",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Status": "运行状态：Working / NeedsInput / Paused / Done / Failed / Stopped / Idle，默认 Working",
+      "AgentName": "智能体名称，显示在活动下方的说明行",
+      "ActivityLabel": "当前活动的一句话描述，例如 Running tests",
+      "ActivityIcon": "活动前的 Lucide 图标名，可留空",
+      "ActivityCount": "原地跳动的计数，例如 8 of 12；不改变胶囊宽度",
+      "ElapsedSeconds": "已用秒数；Working 时持续累加，其余状态冻结在切换时的值",
+      "Steps": "全部步骤，含 Pending；面板取最近五步并据此计算进度线",
+      "IsExpanded": "是否展开详情面板；点击胶囊会切换它"
+    }
+  }
+}

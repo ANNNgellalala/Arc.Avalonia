@@ -1,0 +1,51 @@
+{
+  "slug": "login-centered",
+  "nameZh": "居中登录页",
+  "summary": "居中登录页：passkey 优先的登录 / 注册卡片，背后是静态的令牌圆环背景，卡片在 passkey、邮箱与验证码步骤间切换。",
+  "purpose": [
+    "当登录卡需要占据页面中心、并且以 passkey 为主要方式时用它：卡片居中，背景是安静的圆环与光晕，不依赖摄影图。",
+    "第一屏就是 passkey 按钮加邮箱备选；填写邮箱后进入六位验证码步骤，成功后面板换成账号摘要，步骤切换时卡片高度跟随。",
+    "登录与注册共用一张卡：模式切换只改文案与后续步骤，视觉结构保持一致，因此两种入口不会显得像两个产品。"
+  ],
+  "whenToUse": [
+    "整页登录或注册，且 passkey 是推荐方式、邮箱验证码作为兜底时。",
+    "希望用令牌绘制的圆环背景营造安静氛围、而不引入摄影图时。",
+    "登录与注册共用一张卡片、只切换模式与步骤时。"
+  ],
+  "whenNotToUse": [
+    "密码登录加品牌图文布局用 login-split。",
+    "登录卡要嵌在已有页面里、而不是整页居中的场景用 sign-in。",
+    "魔法链接登录用 login-immersive，它的重点在背景与信封状态。"
+  ],
+  "variants": [
+    { "key": "variant-sign-in", "label": "Sign in", "note": "登录模式的卡片文案与入口" },
+    { "key": "variant-passkey", "label": "Passkey", "note": "卡片首要的 Continue with a passkey 按钮" },
+    { "key": "variant-ring-backdrop", "label": "Ring backdrop", "note": "页面背后的令牌圆环与光晕" },
+    { "key": "state-first-step", "label": "First step", "note": "停在第一步：passkey 与邮箱入口" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "邮箱步骤的输入框" },
+    { "type": "uses", "target": "button", "note": "passkey、邮箱验证码与提供方按钮" },
+    { "type": "uses", "target": "avatar", "note": "验证成功后的账号摘要显示头像" },
+    { "type": "alternative", "target": "login-split", "note": "passkey 优先的居中卡片与密码加品牌图的分栏布局" }
+  ],
+  "contrasts": [
+    {
+      "target": "login-split",
+      "title": "Login centered 与 Login split",
+      "rows": [
+        { "dimension": "首屏方式", "self": "passkey 优先，邮箱验证码兜底", "other": "邮箱优先，第二步问密码" },
+        { "dimension": "布局", "self": "单卡居中，背后是令牌圆环", "other": "左表单右品牌图的分栏" },
+        { "dimension": "步骤", "self": "passkey → 邮箱 → 验证码 → 账号摘要", "other": "邮箱 → 密码 → 登录" },
+        { "dimension": "品牌", "self": "背景承担氛围，卡片保持中性", "other": "品牌图与引语直接占一半画面" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "居中卡片与圆环背景",
+      "language": "xaml",
+      "code": "<Panel xmlns=\"https://github.com/avaloniaui\">\n  <Border Background=\"{DynamicResource ArcBackgroundBrush}\" />\n  <Border Width=\"360\"\n          Padding=\"22\"\n          CornerRadius=\"22\"\n          Background=\"{DynamicResource ArcSurfaceBrush}\"\n          HorizontalAlignment=\"Center\"\n          VerticalAlignment=\"Center\">\n    <StackPanel Spacing=\"12\">\n      <TextBlock Text=\"Sign in to Northwind\" Classes=\"arc-subtitle\" />\n      <Button Content=\"Continue with a passkey\" />\n      <TextBox Watermark=\"Work email\" />\n      <Button Content=\"Email me a code\" />\n    </StackPanel>\n  </Border>\n</Panel>"
+    }
+  ]
+}

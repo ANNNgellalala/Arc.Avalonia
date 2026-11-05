@@ -1,0 +1,66 @@
+{
+  "slug": "kanban-board",
+  "nameZh": "泳道看板",
+  "summary": "按流分组的看板：每个 stream 一条泳道，To do / Doing / Done 三列带实时 WIP 上限，Doing 超限时给出文字警告与“Over limit”徽章。",
+  "purpose": [
+    "当团队有两条并行流、又希望限制同时进行的任务数量时，单层看板不够用。泳道看板在纵向按 stream 分组、横向仍是状态列，列头汇总两条泳道的卡片数。",
+    "WIP 上限是本区块的核心规则：Doing 列上限为 2，超过时行内出现警告带，列头出现“Over limit”徽章，文案写清“3 of 2”，不只靠颜色。",
+    "卡片通过左右箭头在状态列之间移动，每张卡带标签、编号与负责人头像；空单元格显示可解释的“Drop a card here”提示。",
+    "Add card 会往 To do 追加草稿卡，并实时重算列计数与警告；所有卡片都是内存中的样本数据。"
+  ],
+  "whenToUse": [
+    "团队有多个并行 stream、需要按流分组查看任务时。",
+    "需要限制同时进行中的任务数量（WIP limit）时。",
+    "卡片数量中等、状态列固定为三档时。"
+  ],
+  "whenNotToUse": [
+    "只有一条流水线、任务较少时改用 project-board。",
+    "需要按日期安排工作时改用 week-calendar。",
+    "只需要一个可拖动排序的列表时改用 reorderable-list。"
+  ],
+  "variants": [
+    { "key": "variant-swimlanes", "label": "泳道分组", "note": "Platform 与 Growth 两条泳道，各自带卡片数" },
+    { "key": "variant-wip-columns", "label": "WIP 列头", "note": "To do / Doing / Done 与“3 of 2 max”计数" },
+    { "key": "state-wip-warning", "label": "超限警告", "note": "Doing 超限时出现警告带与 Over limit 徽章" },
+    { "key": "variant-empty-cell", "label": "空单元格", "note": "空列显示“Drop a card here”占位" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar", "note": "卡片底部用头像标识负责人" },
+    { "type": "uses", "target": "badge", "note": "标签、WIP 上限与超限状态用徽章表达" },
+    { "type": "uses", "target": "button", "note": "Add card 与卡片左右移动按钮都是 ArcButton" },
+    { "type": "alternative", "target": "project-board", "note": "单泳道、无 WIP 上限时用 project board 更轻" }
+  ],
+  "contrasts": [
+    {
+      "target": "project-board",
+      "title": "Kanban board 与 Project board",
+      "rows": [
+        { "dimension": "分组", "self": "按 stream 分泳道，再分三列", "other": "只有四阶段列" },
+        { "dimension": "WIP 限制", "self": "Doing 列有上限并实时警告", "other": "不限制同时进行数量" },
+        { "dimension": "列头信息", "self": "“3 of 2 max”与 Over limit 徽章", "other": "阶段名与卡片数徽章" },
+        { "dimension": "复杂度", "self": "适合两条以上并行流", "other": "适合单一流水线" }
+      ]
+    },
+    {
+      "target": "badge",
+      "title": "Kanban board 与 Badge",
+      "rows": [
+        { "dimension": "职责", "self": "泳道、状态列与 WIP 规则的完整组合", "other": "只渲染一个标签或计数" },
+        { "dimension": "规则", "self": "移动卡片后重新检查 WIP 上限", "other": "不感知业务规则" },
+        { "dimension": "数据", "self": "卡片、阶段、泳道与负责人", "other": "一个短文本与色调" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "泳道、卡片与 WIP 计数",
+      "language": "csharp",
+      "code": "var tag = new ArcBadge { Content = \"Billing\", Tone = ArcBadgeTone.Neutral };\nvar owner = new ArcAvatar { DisplayName = \"Jonas Weber\", Size = ArcAvatarSize.Xs };\nvar move = new ArcButton\n{\n    Content = new ArcIcon { Icon = \"chevron-right\", Size = 15 },\n    Variant = ArcButtonVariant.Ghost,\n    Size = ArcButtonSize.Sm,\n    Compact = true\n};\nvar overLimit = new ArcBadge { Content = \"Over limit\", Tone = ArcBadgeTone.Warning, Dot = true };"
+    },
+    {
+      "title": "泳道看板的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"92,*,*,*\">\n  <!-- 列头：To do / Doing (2 max) / Done，附计数与超限徽章 -->\n  <StackPanel Grid.Row=\"1\" Grid.Column=\"1\">\n    <!-- Platform 泳道的 To do 卡片 -->\n  </StackPanel>\n  <StackPanel Grid.Row=\"1\" Grid.Column=\"2\">\n    <!-- Platform 泳道的 Doing 卡片，超过 2 时出现警告带 -->\n  </StackPanel>\n  <StackPanel Grid.Row=\"2\" Grid.Column=\"1\">\n    <!-- Growth 泳道的 To do 卡片 -->\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

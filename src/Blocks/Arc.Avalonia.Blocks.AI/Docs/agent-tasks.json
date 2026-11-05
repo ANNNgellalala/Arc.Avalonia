@@ -1,0 +1,58 @@
+{
+  "slug": "agent-tasks",
+  "nameZh": "智能体任务",
+  "summary": "后台编码任务队列：输入任务并指定仓库、分支与模型后启动，筛选器按状态切分队列，卡片展示进度、检查与耗时，完成后可就地发起 PR。",
+  "purpose": [
+    "它是「把活交给编码 agent 再做别的事」的入口：顶部输入任务描述，下面是三枚 chip 指定仓库（arc-ui/web）、分支方向（main ← agent/task）与模型（Opus 5.5），按 Start 后队列里多一张运行中的卡。",
+    "队列按状态组织：筛选器把 Running / Ready for review / Merged 分开，每张卡给出标题、分支、进度条、检查数与耗时，运行中的卡可以 Cancel，待审的卡可以 Create pull request。",
+    "状态行始终说明这批任务的总体情况（例如 4 tasks：1 running、1 ready for review、1 merged），避免用户以为卡片的进度是实时推送的。",
+    "所有任务、diff 与检查都是示例数据：启动、取消、发起 PR 只改变页面状态，不会真的碰仓库。"
+  ],
+  "whenToUse": [
+    "把编码、重构、修测试这类后台任务交给 agent，随后回来看结果。",
+    "需要按状态浏览一批任务，并对完成的改动发起 PR 时。",
+    "把「任务描述 + 仓库 / 分支 / 模型」作为一次提交的标准配置时。"
+  ],
+  "whenNotToUse": [
+    "要跟进单个任务的步骤、diff 与批准门时，用 agent-run。",
+    "任务按日程自动运行、无需每次提交时，用 agent-routines。",
+    "只是普通的待办列表、不涉及代码分支时，用项目看板或 onboarding-checklist。"
+  ],
+  "variants": [
+    { "key": "variant-composer", "label": "Composer", "note": "任务描述、仓库 / 分支 / 模型 chip 与 Start" },
+    { "key": "variant-filters", "label": "Filters", "note": "按 Running / Ready for review / Merged 切分队列" },
+    { "key": "variant-task-list", "label": "Task list", "note": "任务卡：分支、进度条、检查与耗时" },
+    { "key": "variant-review", "label": "Review", "note": "待审任务的 Create pull request 与取消" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Start、Cancel、Create pull request、筛选 chip 与刷新都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "任务状态（Running / Ready / Merged）用徽标标出" },
+    { "type": "uses", "target": "progress", "note": "任务卡上的进度条由 ArcProgress 表达" },
+    { "type": "uses", "target": "input", "note": "任务描述由 ArcInput 收集" },
+    { "type": "alternative", "target": "agent-run", "note": "要看单个任务的步骤与批准门时改用 agent run" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-run",
+      "title": "Agent tasks 与 Agent run",
+      "rows": [
+        { "dimension": "粒度", "self": "一批后台任务的队列", "other": "一个任务的完整运行详情" },
+        { "dimension": "内容", "self": "标题、分支、进度、检查与耗时", "other": "步骤、diff、批准门与结果" },
+        { "dimension": "动作", "self": "启动、取消、发起 PR", "other": "批准或打回改动、查看文件" },
+        { "dimension": "使用时机", "self": "派活与回看结果", "other": "审查一次具体改动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "任务队列骨架",
+      "language": "csharp",
+      "code": "var composer = new Border\n{\n    CornerRadius = new CornerRadius(14),\n    Padding = new Thickness(10, 8, 10, 8),\n    Child = K.Stack(6,\n        new Grid { ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"), Children = { prompt, start } },\n        K.RowWrap(6,\n            K.Chip(\"arc-ui/web\", icon: \"folder\"),\n            K.Chip(\"main ← agent/task\", icon: \"arrow-down-up\"),\n            K.Chip(\"Opus 5.5\", icon: \"cpu\")))\n};\n\nreturn K.Surface(new Border\n{\n    Child = K.Stack(9,\n        K.Row(6,\n            K.Stack(2, K.Text(\"Background tasks\", \"arc-heading\"),\n                K.Caption(\"Coding agents work on a branch and come back for review\")),\n            K.Row(4, K.IconBtn(\"refresh-cw\", \"Refresh tasks\"), K.IconBtn(\"settings\", \"Task settings\"))),\n        composer,\n        filters,\n        K.Scroller(list, 318),\n        status),\n    MaxWidth = 880\n}, new Thickness(20, 12, 20, 12));"
+    },
+    {
+      "title": "运行中的卡片与待审动作",
+      "language": "csharp",
+      "code": "var card = K.Panel(K.Stack(7,\n    K.Row(6,\n        K.Text(task.Title, \"arc-label\"),\n        K.Pill(toneFor(task), ArcBadgeTone.Accent)),\n    K.Row(6, K.Mono(task.Branch, 11), K.Caption($\"{task.Checks} checks\")),\n    K.Bar(task.Progress, 100, ArcProgressSize.Sm),          // 进度条\n    K.Row(6,\n        K.Caption(task.Elapsed),\n        task.State == TaskState.Running\n            ? K.Chip(\"Cancel\", icon: \"x\")\n            : K.Chip(\"Create pull request\", icon: \"git-pull-request\"))),\n    14);"
+    }
+  ]
+}

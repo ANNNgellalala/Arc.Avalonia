@@ -17,6 +17,12 @@ public sealed class MorphLoaderPage : ArcItemPage
 {
     public override string ItemSlug => "morph-loader";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-dots", "variant-bars", "variant-ring", "variant-square",
+        "state-loading", "state-success", "state-error"
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var tiles = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };

@@ -1,0 +1,51 @@
+{
+  "slug": "contact-section",
+  "nameZh": "联系我们",
+  "summary": "带校验的联系表单：提交后原地变成确认卡；右侧并排支持渠道与带当地时间的办公室卡片。",
+  "purpose": [
+    "把「怎么联系你们」拆成两条路：左边是姓名、邮箱与留言的表单，右边是可以直接点的支持渠道（聊天、邮箱）与两个办公室的地址和当地时间。",
+    "表单在本地校验：姓名必填、邮箱要像邮箱、留言至少一句；失败时错误文案落在对应字段旁，成功时整个表单原地换成确认卡，不弹 toast、不跳页。",
+    "组成依赖：文本字段用 input，留言用 textarea，发送用 button，复制邮箱用 copy-button；确认卡与表单共用同一块宽度，切换时不跳动。"
+  ],
+  "whenToUse": [
+    "销售或支持页面，表单是页面主行动时。",
+    "希望在表单旁边直接给出真实渠道，而不是藏进页脚时。",
+    "公司有多个办公地点、需要展示当地时间与地址时。"
+  ],
+  "whenNotToUse": [
+    "用户的问题是常见问题、答案固定时，改用 faq-section。",
+    "只需要收集邮箱时，用 newsletter-signup 或 hero-signup，不要摆一整张表单。",
+    "需要用户确认高风险操作时，用 dialog，而不是联系表单。"
+  ],
+  "variants": [
+    { "key": "variant-form", "label": "Form", "note": "默认状态：三个字段加发送按钮" },
+    { "key": "state-confirmation", "label": "Confirmation", "note": "提交成功后表单换成确认卡" },
+    { "key": "variant-support", "label": "Support channels", "note": "聊天与邮箱入口，可一键复制地址" },
+    { "key": "variant-offices", "label": "Office cards", "note": "两座城市的地址与当地时间" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "姓名与邮箱字段用 ArcInput，错误文案落在字段内" },
+    { "type": "uses", "target": "textarea", "note": "留言字段用 textarea，可换行" },
+    { "type": "uses", "target": "button", "note": "发送、再发一条与渠道入口都是 ArcButton" },
+    { "type": "uses", "target": "copy-button", "note": "邮箱旁的复制按钮用 copy button" },
+    { "type": "alternative", "target": "faq-section", "note": "答案固定的问题改用 faq section" }
+  ],
+  "contrasts": [
+    {
+      "target": "faq-section",
+      "title": "Contact section 与 FAQ section",
+      "rows": [
+        { "dimension": "输入", "self": "用户填写表单并等待人工回复", "other": "用户自助筛选并阅读答案" },
+        { "dimension": "右侧内容", "self": "支持渠道与办公室", "other": "搜索框与匹配计数" },
+        { "dimension": "结束状态", "self": "表单变确认卡", "other": "展开某一条答案" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "表单与支持渠道并排",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:i=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <Grid ColumnDefinitions=\"1.1*,0.9*\" Margin=\"26,24,26,24\">\n    <StackPanel Spacing=\"12\">\n      <TextBlock Text=\"Talk to the team\" Classes=\"arc-heading\" />\n      <Grid ColumnDefinitions=\"*,*\">\n        <i:ArcInput Label=\"Name\" Placeholder=\"Maya Chen\" />\n        <i:ArcInput Grid.Column=\"1\" Label=\"Work email\" Placeholder=\"maya@company.com\" />\n      </Grid>\n      <i:ArcTextarea Label=\"Message\" Rows=\"3\" Placeholder=\"What are you trying to solve?\" />\n      <c:ArcButton Content=\"Send message\" HorizontalAlignment=\"Left\" />\n    </StackPanel>\n    <StackPanel Grid.Column=\"1\" Spacing=\"10\">\n      <c:ArcCopyButton Value=\"hello@acme.com\" Label=\"Copy email\" IconOnly=\"True\" />\n    </StackPanel>\n  </Grid>\n</Window>"
+    }
+  ]
+}

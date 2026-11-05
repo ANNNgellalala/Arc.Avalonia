@@ -1,0 +1,66 @@
+{
+  "slug": "link-unfurl",
+  "nameZh": "链接展开卡",
+  "summary": "消息或评论输入框里的链接展开：粘贴链接后先掠过一道加载扫光，然后卡片从链接自己的矩形展开，宽度先长、高度后长，露出站点、标题、摘要与预览图。",
+  "purpose": [
+    "当输入框里粘贴的链接需要在发送前确认指向哪里时用它：聊天、评论、笔记应用的消息输入区。",
+    "展开是同一块矩形上的两段弹簧：先长宽、再长高，正文在标题之后淡入；收起沿同一条路径反向、速度更快。",
+    "每张卡都有可命名的折叠与移除按钮，标题是真实的链接目标；折叠后的卡片离开 Tab 顺序，状态变化通过礼貌的播报行通知读屏。"
+  ],
+  "whenToUse": [
+    "消息或评论输入区，粘贴链接后需要先确认它指向哪里。",
+    "分享面板或笔记应用里，链接预览要在发送前就地展开与收起。",
+    "产品演示需要展示聊天或笔记应用如何处理链接时。"
+  ],
+  "whenNotToUse": [
+    "鼠标悬停即可预览、且不需要输入框时用 hover-card。",
+    "链接已经在消息流里渲染成卡片、不需要折叠交互时，用静态链接卡片或 chat-thread 的附件样式。",
+    "需要抓取真实网页元数据时，本移植用本地解析器模拟，服务端抓取应由宿主完成。"
+  ],
+  "variants": [
+    { "key": "state-expanded", "label": "Expanded", "note": "预览卡展开，显示站点、标题与摘要" },
+    { "key": "variant-two-cards", "label": "Two links", "note": "一个输入框里两张链接卡" },
+    { "key": "variant-samples", "label": "Samples", "note": "ShowSamples 的示例链接条，点一根重新展开" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "hover-card", "note": "悬停预览用 hover card，输入框内粘贴链接用链接展开卡" },
+    { "type": "complement", "target": "chat-thread", "note": "消息流里的链接预览常与聊天记录一起出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "hover-card",
+      "title": "Link unfurl 与 Hover card",
+      "rows": [
+        { "dimension": "触发", "self": "在输入框里粘贴或点击展开", "other": "指针悬停即出现，移开消失" },
+        { "dimension": "流程", "self": "加载扫光 → 宽度 → 高度 → 正文", "other": "直接淡入浮层" },
+        { "dimension": "编辑", "self": "可折叠、可移除，可同时有多张卡", "other": "通常只读，不能就地编辑" },
+        { "dimension": "适用", "self": "消息与评论输入区", "other": "链接、术语或用户名的悬停预览" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明输入框",
+      "language": "xaml",
+      "code": "<gl:ArcLinkUnfurl xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                   Label=\"Message #lisbon-offsite\"\n                   Value=\"Found a place for the offsite, take a look\"\n                   IsExpanded=\"True\"\n                   ShowSamples=\"True\" />"
+    },
+    {
+      "title": "预览数据与展开回调",
+      "language": "csharp",
+      "code": "var unfurl = new ArcLinkUnfurl\n{\n    Label = \"Message #lisbon-offsite\",\n    Value = \"Found a place for the offsite, take a look\",\n    IsExpanded = true,\n    ShowSamples = true,\n    Samples = new List<ArcLinkPreview>\n    {\n        new()\n        {\n            Url = \"https://uiarc.dev/components\",\n            Site = \"uiarc.dev\",\n            Title = \"The Arc component library\",\n            Description = \"Quiet, precise components with motion and glass that respect the reader.\",\n            Scene = ArcGlassScene.Coast\n        }\n    }\n};\n\nunfurl.PreviewChanged += (_, preview) =>\n    Console.WriteLine(preview is null ? \"collapsed\" : preview.Url);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcLinkUnfurl",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "输入框与状态播报的无障碍名称",
+      "Placeholder": "输入框占位文案",
+      "Value": "输入框正文，可以包含一条或多条链接",
+      "Samples": "可展开的链接预览；每项包含 Url、Site、Title、Description 与 Scene",
+      "IsExpanded": "预览卡是否展开，默认 true",
+      "ShowSamples": "显示示例链接条，默认 true",
+      "PreviewChanged": "展开或折叠时触发，参数为当前预览；null 表示折叠"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "slug": "action-swap",
+  "nameZh": "行动轮换",
+  "summary": "同一个按钮在若干稳定状态之间循环：每按一次前进一格，标签、图标与色调一起就地变形，位置与焦点都不动。",
+  "purpose": [
+    "当同一个入口在多个稳定状态之间切换（Follow / Following、Send / Sent、Save draft / Saved）时，用 action swap 而不是换一个按钮：位置不动，用户不会丢失目标。",
+    "每个状态是一个 ArcActionSwapState：Id 是稳定标识，Tone 决定强调色（Accent / Quiet / Success / Neutral / Warning），可选的 PendingLabel 在异步期间替代当前文案。",
+    "每次按压前进一步，走到末尾自动回卷到第一个状态；失败时短暂显示 FailureLabel 再回到原状态。切换时标签与图标的形变是就地完成的，宽度不动。"
+  ],
+  "whenToUse": [
+    "关注 / 已关注、订阅 / 已订阅这类二元或三元状态切换。",
+    "状态切换同时需要改变图标与色调，例如 Add → Added。",
+    "希望每次按压都有明确的即时反馈、而不是先打开菜单。"
+  ],
+  "whenNotToUse": [
+    "状态切换需要打开菜单选择：改用 dropdown-menu 或 segmented-control。",
+    "一次按压执行一个不可逆的异步提交：改用 action-button。",
+    "需要在多个互斥选项中选择一个并始终显示全部选项：改用 radio-group 或 segmented-control。"
+  ],
+  "variants": [
+    { "key": "tone-accent", "label": "Accent", "note": "未完成态，取强调色，例如 Follow" },
+    { "key": "tone-quiet", "label": "Quiet", "note": "已完成态，安静表现，例如 Following" },
+    { "key": "tone-success", "label": "Success", "note": "成功结果，例如 Sent、Saved" },
+    { "key": "tone-neutral", "label": "Neutral", "note": "普通草稿态，例如 Save draft" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可按下，仍保留当前面" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "button", "note": "不会循环标签、只触发一次行动时用 Button" },
+    { "type": "alternative", "target": "action-button", "note": "一次异步提交带 pending / success 时用它" },
+    { "type": "complement", "target": "icon-morph", "note": "状态切换时图标形态可交给 Icon morph" }
+  ],
+  "contrasts": [
+    {
+      "target": "button",
+      "title": "Action swap 与 Button",
+      "rows": [
+        { "dimension": "按压结果", "self": "每次按压在状态之间前进一格", "other": "每次按压触发一次行动" },
+        { "dimension": "文案", "self": "标签、图标、色调一起就地变形", "other": "文案固定，由调用方决定是否修改" },
+        { "dimension": "状态记忆", "self": "按钮自己记住当前状态 Id", "other": "状态由外部变量持有" }
+      ]
+    },
+    {
+      "target": "action-button",
+      "title": "Action swap 与 Action button",
+      "rows": [
+        { "dimension": "状态数量", "self": "两个或更多稳定状态循环", "other": "单一操作的 pending → success 流程" },
+        { "dimension": "结果驻留", "self": "新状态一直保留，直到再次按压", "other": "成功后自动回到 Idle" },
+        { "dimension": "适用场景", "self": "Follow / Following 这类开关型语义", "other": "Publish / Save 这类一次性提交" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "关注按钮的两态",
+      "language": "csharp",
+      "code": "var follow = new ArcActionSwap\n{\n    Value = \"follow\",\n    States = new[]\n    {\n        new ArcActionSwapState { Id = \"follow\", Label = \"Follow\", Icon = \"plus\", Tone = ArcActionSwapTone.Accent },\n        new ArcActionSwapState { Id = \"following\", Label = \"Following\", Icon = \"check\", Tone = ArcActionSwapTone.Quiet }\n    }\n};\nfollow.ValueChanged += (_, state) => Save(state.Id);"
+    },
+    {
+      "title": "带 pending 文案的三态",
+      "language": "csharp",
+      "code": "var invite = new ArcActionSwap\n{\n    States = new[]\n    {\n        new ArcActionSwapState { Id = \"send\", Label = \"Send invite\", Icon = \"send\", Tone = ArcActionSwapTone.Accent },\n        new ArcActionSwapState\n        {\n            Id = \"sent\",\n            Label = \"Sent\",\n            Icon = \"check\",\n            Tone = ArcActionSwapTone.Success,\n            PendingLabel = \"Sending\",\n            HoldFor = 2000\n        }\n    }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcActionSwap",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "States": "按顺序排列的状态集合，按压依次前进并在末尾回卷",
+      "Value": "当前状态 Id；可设置以便静态展示某一态",
+      "FailureLabel": "动作失败时短暂显示的文案，默认 Try again",
+      "ValueChanged": "提交到新状态后触发，参数是新状态"
+    }
+  }
+}

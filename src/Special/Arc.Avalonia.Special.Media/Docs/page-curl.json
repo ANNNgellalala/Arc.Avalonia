@@ -1,0 +1,74 @@
+{
+  "slug": "page-curl",
+  "nameZh": "翻页",
+  "summary": "一本可以用手翻的小杂志：拖住右下角，纸张沿折线掀起、露出纸背与亮折痕，越过中线或甩一下翻到下一跨页。",
+  "purpose": [
+    "把纸感做进界面的一次尝试：一跨两页的册子居中摆好，右下角有一个折角提示可以拖。折线是「被抓住的角」与指针之间的中垂线，因此纸张跟手；过中线或甩一下会翻到下一跨页，并向另一侧回弹。",
+    "封面与封底单独占一页，其余是跨页（Pages 2 and 3 of 8），两侧各有一条上下页按钮，翻到两端时对应按钮禁用。页码读数、跨页标题与正文都由控件绘制，中部还有一条渐隐的书脊；首次进入时会显示「Drag the corner」提示，翻过页后提示消失。",
+    "Avalonia 没有 CSS 3D 变换，所以折页是真正的二维多边形几何：抬起部分在中垂线处裁剪、镜像绘制，并叠一层渐变纸背、亮折痕与纸下阴影。键盘用户用左右键或翻页键翻页，Home / End 跳到封面与封底；降级动效时直接换跨页、不画卷曲。"
+  ],
+  "whenToUse": [
+    "品牌、编辑或营销页面希望把「纸」本身当作叙事的一部分时。",
+    "菜单、作品集、年鉴等只有少量跨页、适合逐页翻阅的内容。",
+    "需要一点仪式感的阅读体验，而不是连续滚动的长页面时。"
+  ],
+  "whenNotToUse": [
+    "长内容需要搜索、选择与复制时，用普通滚动页面或文档查看器。",
+    "内容都是独立卡片、只需幻灯片式切换时，改用 carousel。",
+    "需要在固定盒子里滚动显示超长内容时，改用 scroll-area。"
+  ],
+  "variants": [
+    { "key": "state-spread", "label": "Spread", "note": "跨页：左右两页与书脊一起呈现，读数为 Pages 2 and 3 of 8" },
+    { "key": "variant-dog-ear", "label": "Dog-ear", "note": "右下角的折角，提示这一角可以拖动" },
+    { "key": "variant-page-controls", "label": "Page controls", "note": "左右两条翻页按钮，两端自动禁用" },
+    { "key": "variant-page-count", "label": "Page count", "note": "底部的页码读数，封面与封底显示 Cover / Back cover" },
+    { "key": "variant-spine", "label": "Spine", "note": "跨页中部的书脊渐隐与分割线" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "carousel", "note": "幻灯片式切换用 carousel，翻页的纸感用 page curl" },
+    { "type": "alternative", "target": "scroll-area", "note": "长内容连续滚动用 scroll area，短册子逐页翻阅用 page curl" },
+    { "type": "complement", "target": "progress", "note": "册子较长时可以在旁边补一条阅读进度" }
+  ],
+  "contrasts": [
+    {
+      "target": "carousel",
+      "title": "Page curl 与 Carousel",
+      "rows": [
+        { "dimension": "切换方式", "self": "拖住页角翻转，过中线或甩动才翻页", "other": "点箭头、拖幻灯片或自动播放" },
+        { "dimension": "视觉隐喻", "self": "纸张、折痕、纸背与书脊", "other": "平铺的卡片或幻灯片" },
+        { "dimension": "内容形态", "self": "固定跨页的册子", "other": "任意数量的独立幻灯片" }
+      ]
+    },
+    {
+      "target": "scroll-area",
+      "title": "Page curl 与 Scroll area",
+      "rows": [
+        { "dimension": "阅读模型", "self": "逐跨页翻，一屏两页", "other": "连续滚动，内容可以很长" },
+        { "dimension": "定位", "self": "页码、上一页/下一页与 Home / End", "other": "滚动位置、滚轮与键盘滚动" },
+        { "dimension": "适合内容", "self": "少量编辑型跨页", "other": "长列表、日志或文档" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放一本小册子",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcPageCurl Width=\"900\" Height=\"460\"\n                      HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘与手势",
+      "language": "csharp",
+      "code": "// 拖住右下角（或左下角）翻页；过中线或甩一下会翻到下一跨页。\n// Right / PageDown / Down 下一页，Left / PageUp / Up 上一页，\n// Home / End 跳到封面与封底。\nvar book = new ArcPageCurl\n{\n    Width = 900,\n    Height = 460,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcPageCurl",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "册子宽度；页面高度按宽度与内容自适应",
+      "Height": "册子高度，翻页按钮与页码在书的下方",
+      "IsEnabled": "禁用后不再翻页或拖动",
+      "IsVisible": "隐藏后停止翻页动画"
+    }
+  }
+}

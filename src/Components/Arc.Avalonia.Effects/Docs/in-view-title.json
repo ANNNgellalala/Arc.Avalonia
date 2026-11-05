@@ -1,0 +1,79 @@
+{
+  "slug": "in-view-title",
+  "nameZh": "进入视口标题",
+  "summary": "滚动到视口才出现的区块标题：提供 blur、word、line、tracking、wipe 五种入场样式，减少动效时直接显示。",
+  "purpose": [
+    "长页面里的区块标题如果一开始就全部在场，滚动过程会显得平。进入视口标题等标题真正进入视口时才把它带进来，让每次滚动都有一次轻量的节奏点。",
+    "五种 Variant 覆盖不同的文案气质：Blur 从模糊中清晰，Word 按词收起，Line 按显式行分隔出现，Tracking 让字距从松到紧，Wipe 从左向右擦出。",
+    "Lines 用于 Line 变体指定显式换行，避免按容器宽度硬折行；Once 默认 true，只在第一次进入视口时播放，设成 false 则每次进入都重播。",
+    "Level 决定字号与语义层级；无障碍名称始终是完整句子。减少动效时标题立刻显示，没有遮罩、位移或模糊。"
+  ],
+  "whenToUse": [
+    "长文或落地页里的区块标题，需要在滚动时引入注意时。",
+    "希望同一页里各区块的标题共享一套入场节奏时。",
+    "文案本身较短、适合按行或按词拆分的标题。",
+    "需要在减少动效时完全静默、不出现遮罩与位移时。"
+  ],
+  "whenNotToUse": [
+    "标题在首屏就已可见、不需要滚动触发时改用 text-reveal。",
+    "文案会在状态之间变化、而不是首次出现时改用 text-morph。",
+    "只是加载中的状态行时改用 text-shimmer。",
+    "标题需要参与搜索或作为锚点、不希望延迟可见时，直接用普通标题。"
+  ],
+  "variants": [
+    { "key": "variant-blur", "label": "模糊入场", "note": "从模糊中变清晰，默认样式" },
+    { "key": "variant-word", "label": "按词入场", "note": "每个词依次落下" },
+    { "key": "variant-line", "label": "按行入场", "note": "用 Lines 指定换行，逐行出现" },
+    { "key": "variant-tracking", "label": "字距入场", "note": "字距从松到紧收拢" },
+    { "key": "variant-wipe", "label": "擦出入场", "note": "从左向右揭开" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "text-reveal", "note": "首屏文案的入场用 text reveal" },
+    { "type": "alternative", "target": "text-morph", "note": "文案值变化时用 text morph" },
+    { "type": "complement", "target": "scroll-area", "note": "视口触发依赖滚动容器，两者常在同一页配合" }
+  ],
+  "contrasts": [
+    {
+      "target": "text-reveal",
+      "title": "In-view title 与 Text reveal",
+      "rows": [
+        { "dimension": "触发时机", "self": "进入视口时", "other": "首次绘制或显式 Replay" },
+        { "dimension": "样式数量", "self": "五种：blur / word / line / tracking / wipe", "other": "单一的按词或按字升起" },
+        { "dimension": "视口重复", "self": "Once=false 时每次进入都重播", "other": "只播放一次，除非手动 Replay" },
+        { "dimension": "换行控制", "self": "Lines 可以指定显式行", "other": "用 \\n 手动换行" }
+      ]
+    },
+    {
+      "target": "text-morph",
+      "title": "In-view title 与 Text morph",
+      "rows": [
+        { "dimension": "内容变化", "self": "文案不变，只是从不可见变为可见", "other": "旧文案退出、新文案进入" },
+        { "dimension": "触发原因", "self": "滚动进入视口", "other": "Text 属性变化" },
+        { "dimension": "宽度", "self": "按终态占位，不改变布局", "other": "框架宽度随新文案弹性过渡" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三种样式混排的区块标题",
+      "language": "csharp",
+      "code": "var blur = new ArcInViewTitle\n{\n    Text = \"Everything your team needs\",\n    Variant = ArcInViewVariant.Blur,\n    Level = ArcTextLevel.H3\n};\n\nvar line = new ArcInViewTitle\n{\n    Text = \"Everything your team needs to ship\",\n    Variant = ArcInViewVariant.Line,\n    Lines = new[] { \"Everything your team\", \"needs to ship\" },\n    Level = ArcTextLevel.H3\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcInViewTitle x:Name=\"SectionTitle\"\n                          Text=\"Everything your team needs\"\n                          Variant=\"Blur\"\n                          Level=\"H3\"\n                          Once=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcInViewTitle",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "标题文案；行变体之外按容器宽度自动换行",
+      "Variant": "入场样式：Blur / Word / Line / Tracking / Wipe，默认 Blur",
+      "Level": "类型层级，决定字号与语义标签，默认 H2",
+      "Lines": "Line 变体的显式行列表",
+      "Once": "是否只在第一次进入视口时播放，默认 true"
+    }
+  }
+}

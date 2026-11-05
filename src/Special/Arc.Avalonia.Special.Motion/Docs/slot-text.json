@@ -1,0 +1,75 @@
+{
+  "slug": "slot-text",
+  "nameZh": "转轮数字",
+  "summary": "把数值拆成一个个字符转轮：数码按数字移动的方向滚动、字母在字母表里洗牌，从新值的最左位开始依次落定，不会冲过目标。",
+  "purpose": [
+    "当定价切换、KPI 卡片或发布揭晓需要一个像老虎机一样落定的数值时，用 slot text：每个字符是一条独立的转轮，值变化时从旧字符滚到新字符。",
+    "数码会按数值增减的方向滚动（加就从 0 往上），字母在大小写字母表里洗牌；字符从前到后依次停下，启动快、落地软，从不过冲。",
+    "货币符号与分隔符作为固定前缀保留，只有会变的字符在转；字号 28px 及以上自动切换为展示字体，更小的值则用正文字体。"
+  ],
+  "whenToUse": [
+    "定价周期、KPI 卡片与仪表盘里需要引起注意的数值变化。",
+    "发布、抽奖或揭晓时刻，希望数值落定有一点节奏。",
+    "值很短：数字、价格、百分比或状态词。"
+  ],
+  "whenNotToUse": [
+    "每秒更新多次的实时数值，滚动会变得令人疲惫，用普通文本或 animated-counter。",
+    "句子与段落文字，逐字符转轮会变成噪音。",
+    "需要强调文字本身的形变时，用 text-morph。"
+  ],
+  "variants": [
+    { "key": "value-currency", "label": "Currency", "note": "货币金额 $12,480：固定 $ 前缀，数码按位滚动" },
+    { "key": "value-percent", "label": "Percent", "note": "百分比 +12.4%：符号与数字混排" },
+    { "key": "value-word", "label": "Word", "note": "状态词 Live now：字母在字母表里洗牌" },
+    { "key": "size-display", "label": "Display", "note": "64px 值使用展示字体，适合卡片主数值" },
+    { "key": "size-small", "label": "Small", "note": "小字号回退正文字体，适合行内数值" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "animated-counter", "note": "连续的数字滚动计数用 animated counter" },
+    { "type": "alternative", "target": "text-morph", "note": "文字本身的形变用 text morph" },
+    { "type": "complement", "target": "metric-card", "note": "KPI 卡片里用 slot text 作为主数值" }
+  ],
+  "contrasts": [
+    {
+      "target": "animated-counter",
+      "title": "Slot text 与 Animated counter",
+      "rows": [
+        { "dimension": "动画单位", "self": "逐字符转轮，字符各自落定", "other": "整个数字从旧值补间到新值" },
+        { "dimension": "适用值", "self": "短数值、百分比与状态词", "other": "需要连续读数的较大数字" },
+        { "dimension": "落定", "self": "从左到右依次停住，有先后节奏", "other": "一个数字平滑停住" }
+      ]
+    },
+    {
+      "target": "text-morph",
+      "title": "Slot text 与 Text morph",
+      "rows": [
+        { "dimension": "变形对象", "self": "字符在轮上滚动", "other": "文字字形本身拉伸与替换" },
+        { "dimension": "触发", "self": "值变化时", "other": "样式或内容切换时" },
+        { "dimension": "用途", "self": "仪表盘、定价与揭晓", "other": "标题与强调文字的形变" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcSlotText xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                Value=\"$12,480\"\n                FontSize=\"64\" />"
+    },
+    {
+      "title": "代码切换值",
+      "language": "csharp",
+      "code": "var value = new ArcSlotText\n{\n    Value = \"$12,480\",\n    FontSize = 64,\n    SpinDuration = 900,\n    Stagger = 70,\n    Spins = 1\n};\n\nvalue.Value = \"$143,760\"; // 数码按增值方向滚动"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcSlotText",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "要显示的值；每个字符是一条转轮",
+      "FontSize": "字号，默认 72；28 及以上使用展示字体",
+      "SpinDuration": "第一段转轮滚动的毫秒数，默认 900",
+      "Stagger": "相邻转轮落定的间隔毫秒数，默认 70",
+      "Spins": "落定前额外滚过的整圈数，0 表示直接滚到新字符"
+    }
+  }
+}

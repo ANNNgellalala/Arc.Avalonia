@@ -11,6 +11,12 @@ public sealed class MixtureOfExpertsPage : ArcItemPage
 {
     public override string ItemSlug => "mixture-of-experts";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-merged",
+        "variant-input", "variant-router", "variant-experts", "variant-output", "variant-top-k", "variant-footer"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Explaining why a sparse mixture of experts model is cheap per token.",
@@ -43,9 +49,15 @@ public sealed class MixtureOfExpertsPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcMixtureOfExperts
+    // The figure needs the full 1068 px it was drawn for (merge point and output card sit past 960), so the
+    // docs column scales it down with a Viewbox instead of clipping the output card.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 400,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcMixtureOfExperts
+        {
+            Width = 1068,
+            Height = 400,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

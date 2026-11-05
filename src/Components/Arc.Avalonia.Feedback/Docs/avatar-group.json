@@ -1,0 +1,75 @@
+{
+  "slug": "avatar-group",
+  "nameZh": "头像组",
+  "summary": "一组人的头像叠放：只显示前 Max 个，其余折叠成 +N，尺寸统一，悬停时向右扇形展开。",
+  "purpose": [
+    "用一叠圆形头像表达「都有谁」：最多显示 Max 个，超出部分折叠成 +N 计数，宽度可以提前算出来，不会把一行撑开。",
+    "Size 决定整组直径，重叠量按直径固定比例计算；FanOnHover 为 true 时悬停或聚焦会向右扇形展开，露出每个人再收回去。",
+    "每个成员可以带在线状态点，组本身有一个 Label 作为读屏名称；成员数多于显示数时读屏会听到完整人数。"
+  ],
+  "whenToUse": [
+    "协作面板、评论头、卡片角标等空间有限的位置，用一叠头像表示参与者。",
+    "成员数量在 3–8 人之间、只需要知道「都有谁」而不需要逐个操作时。",
+    "需要在同一定义里混用照片与首字母成员时。"
+  ],
+  "whenNotToUse": [
+    "只有一个人时，直接用 avatar。",
+    "要表达实时在场、谁在输入、谁忙碌时，改用 presence-stack。",
+    "需要完整名单（姓名、角色、操作）时，用普通列表，头像组只负责概览。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Sm", "note": "28 px，紧凑行内" },
+    { "key": "size-md", "label": "Md", "note": "40 px，常规卡片与面板" },
+    { "key": "size-lg", "label": "Lg", "note": "56 px，区块头与空状态" },
+    { "key": "variant-overflow", "label": "Overflow", "note": "成员多于 Max 时折叠为 +N" },
+    { "key": "variant-all", "label": "All shown", "note": "Max 覆盖全部成员，没有 +N" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "avatar", "note": "只显示一个人时用 avatar" },
+    { "type": "alternative", "target": "presence-stack", "note": "实时在场与状态改用 presence-stack" },
+    { "type": "complement", "target": "badge", "note": "成员数或角色用 badge 补在旁边" }
+  ],
+  "contrasts": [
+    {
+      "target": "avatar",
+      "title": "Avatar group 与 Avatar",
+      "rows": [
+        { "dimension": "人数", "self": "一组人，按 Max 折叠", "other": "单独一个人" },
+        { "dimension": "尺寸", "self": "一个 Size 应用到整组", "other": "逐个指定五档尺寸" },
+        { "dimension": "交互", "self": "悬停时可以扇形展开", "other": "没有组级交互" }
+      ]
+    },
+    {
+      "target": "presence-stack",
+      "title": "Avatar group 与 Presence stack",
+      "rows": [
+        { "dimension": "语义", "self": "这些人是谁", "other": "这些人现在在不在、在做什么" },
+        { "dimension": "状态", "self": "可选的状态点", "other": "五种在场状态与输入中提示" },
+        { "dimension": "展开方式", "self": "悬停向右扇形展开", "other": "Fanned 或聚焦时展开并显示姓名" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "声明成员与显示上限",
+      "language": "csharp",
+      "code": "var group = new ArcAvatarGroup\n{\n    Label = \"Editors\",\n    Max = 3,\n    Size = ArcAvatarSize.Md,\n    Members = new[]\n    {\n        new ArcAvatarMember { Name = \"Maya Chen\", Status = ArcAvatarStatus.Online },\n        new ArcAvatarMember { Name = \"Leo Park\" },\n        new ArcAvatarMember { Name = \"Sara Ruiz\" },\n        new ArcAvatarMember { Name = \"Tom Hale\" }\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中绑定成员",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcAvatarGroup Label=\"Team members\"\n                     Max=\"4\"\n                     Size=\"Md\"\n                     Members=\"{Binding TeamMembers}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcAvatarGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Members": "成员集合，元素是 ArcAvatarMember（Name / Src / Status）",
+      "Max": "最多显示几个头像，其余折叠为 +N，默认 4",
+      "Size": "整组尺寸：Xs 24 / Sm 28 / Md 40 / Lg 56 / Xl 88，默认 Xs",
+      "Label": "组的无障碍名称，默认 Team members",
+      "FanOnHover": "悬停或聚焦时向右展开，默认 true"
+    }
+  }
+}

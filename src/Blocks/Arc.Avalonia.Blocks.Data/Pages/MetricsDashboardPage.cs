@@ -25,6 +25,11 @@ public sealed class MetricsDashboardPage : ArcItemPage
 {
     public override string ItemSlug => "metrics-dashboard";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-dashboard", "variant-kpi-tabs", "variant-compare", "variant-split-bar", "variant-top-lists"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

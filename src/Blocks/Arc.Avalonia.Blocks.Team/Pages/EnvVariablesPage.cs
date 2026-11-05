@@ -43,6 +43,11 @@ public sealed class EnvVariablesPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-variable-rows", "state-masked-value", "state-sensitive-writeonly", "state-redeploy-banner"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A settings screen where developers manage configuration and secrets across environments.",

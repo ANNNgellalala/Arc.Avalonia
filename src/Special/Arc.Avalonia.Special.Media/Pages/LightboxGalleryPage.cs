@@ -12,6 +12,11 @@ public sealed class LightboxGalleryPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-grid", "variant-masonry", "variant-portrait", "variant-landscape"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Photo collections people browse and inspect up close, such as trips, portfolios or listings.",

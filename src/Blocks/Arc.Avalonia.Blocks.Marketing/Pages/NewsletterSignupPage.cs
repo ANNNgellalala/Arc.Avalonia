@@ -22,6 +22,11 @@ public sealed class NewsletterSignupPage : ArcItemPage
 {
     public override string ItemSlug => "newsletter-signup";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-form", "variant-archive", "state-confirmed"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -138,7 +143,21 @@ public sealed class NewsletterSignupPage : ArcItemPage
         Grid.SetColumn(stackHost, 1);
         root.Children.Add(stackHost);
 
-        return Mk.Surface(new Border { Padding = new Thickness(26, 26, 26, 24), Child = root });
+        // The subscribed state is otherwise only reachable by submitting, so a static copy keeps it visible.
+        var confirmedSpecimen = Mk.Stack(8,
+            Mk.Caption("After subscribing: the next issue lands on the front of the stack"),
+            Mk.Surface(new StackPanel
+            {
+                Spacing = 8,
+                Children =
+                {
+                    IssueCard("12", "The next issue, written for you", "Arrives Thursday · 6 min", true, "maya@acme.com")
+                }
+            }));
+
+        return Mk.Stack(16,
+            Mk.Surface(new Border { Padding = new Thickness(26, 26, 26, 24), Child = root }),
+            confirmedSpecimen);
     }
 
     private static Control ArchiveLink()

@@ -24,6 +24,11 @@ public sealed class UsageBillingPage : ArcItemPage
 {
     public override string ItemSlug => "usage-billing";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-usage-billing", "variant-spend-chart", "variant-meters", "variant-alerts", "variant-invoices"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

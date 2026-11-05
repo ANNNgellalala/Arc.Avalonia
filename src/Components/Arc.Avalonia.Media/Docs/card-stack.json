@@ -1,0 +1,84 @@
+{
+  "slug": "card-stack",
+  "nameZh": "卡片堆叠",
+  "summary": "一叠可逐张做决定的卡片：向左或向右抛出、按键盘方向键选择、可撤销上一步，并在全部评审完后显示空态。",
+  "purpose": [
+    "当一组候选需要逐张取舍——城市短名单、设计稿评审、待办分诊——卡片堆叠把其他候选压在下面，让读者一次只看一张，决定后自动翻到下一张。",
+    "每张卡片可以整体拖动：越过阈值松开即按方向决定，松手前会显示将落到哪一侧；也可以用底部按钮或键盘 Left / Right 完成同样的决定。",
+    "决定会带着左/右标签与过去式文案（例如 Skip / Shortlist、skipped / shortlisted）通过 CardDismissed 交出，Backspace 或撤销按钮可以还原上一步，全部完成后显示空态与重新开始。",
+    "CardWidth 控制牌堆舞台宽度；卡片内容由 ArcCardStackItem 的标题、描述与自定义内容组成，适合放预览图、属性表或任意控件。"
+  ],
+  "whenToUse": [
+    "需要用户逐张浏览并对每张做二选一决定时。",
+    "候选数量较多、一次展示全部会淹没重点时。",
+    "希望决定可以撤销、并在完成后给出清晰的结束状态时。",
+    "移动端或触控场景里更自然的左右手势决策时。"
+  ],
+  "whenNotToUse": [
+    "只是浏览一组内容、不需要决定时改用 carousel。",
+    "需要同时并排比较多个候选时用网格或列表。",
+    "左右滑动的对象是列表行、动作用于归档或删除时改用 swipe-actions。",
+    "需要一个完整的筛选流程（多条件、重置）时用 filter-toolbar 加 data-grid。"
+  ],
+  "variants": [
+    { "key": "variant-default", "label": "默认牌堆", "note": "四张城市卡片，Skip / Shortlist" },
+    { "key": "variant-compact", "label": "紧凑牌堆", "note": "CardWidth=320，适合窄栏" },
+    { "key": "variant-custom-labels", "label": "自定义文案", "note": "Pass / Save 与 decided / kept 过去式" },
+    { "key": "variant-two-cards", "label": "两张卡", "note": "只评审两个候选时牌堆更轻" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "carousel", "note": "只是浏览、不做取舍时用 carousel" },
+    { "type": "alternative", "target": "swipe-actions", "note": "滑动对象是列表行时用 swipe actions" },
+    { "type": "complement", "target": "empty-state", "note": "全部评审完后用空态承接重新开始" }
+  ],
+  "contrasts": [
+    {
+      "target": "carousel",
+      "title": "Card stack 与 Carousel",
+      "rows": [
+        { "dimension": "互动目的", "self": "逐张做出取舍", "other": "浏览一组内容" },
+        { "dimension": "结果", "self": "决定会把卡片移出牌堆，可撤销", "other": "所有幻灯片始终保留" },
+        { "dimension": "结束状态", "self": "牌堆清空后显示空态与重新开始", "other": "循环浏览，没有结束态" },
+        { "dimension": "导航", "self": "拖动、按钮、方向键", "other": "拖动、方向键、圆点跳转" }
+      ]
+    },
+    {
+      "target": "swipe-actions",
+      "title": "Card stack 与 Swipe actions",
+      "rows": [
+        { "dimension": "操作对象", "self": "整张卡片及其决定", "other": "列表行上的快捷动作" },
+        { "dimension": "动作语义", "self": "二选一，决定后卡片离开", "other": "一行可有多个动作，动作后行仍在" },
+        { "dimension": "信息密度", "self": "一次一张，聚焦单个候选", "other": "一屏多行，适合批量处理" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "城市短名单",
+      "language": "csharp",
+      "code": "var stack = new ArcCardStack\n{\n    Label = \"City shortlist\",\n    LeftLabel = \"Skip\",\n    RightLabel = \"Shortlist\",\n    LeftOutcome = \"skipped\",\n    RightOutcome = \"shortlisted\",\n    CardWidth = 420,\n    Cards = new List<ArcCardStackItem>\n    {\n        new(\"lis\", \"Lisbon\", \"Lisbon\", \"Tiled facades, steep streets, and the light coming off the river.\"),\n        new(\"osl\", \"Oslo\", \"Oslo\", \"Fjord swimming in summer, quiet design in winter.\"),\n        new(\"kyo\", \"Kyoto\", \"Kyoto\", \"Temple gardens and a very particular sense of season.\")\n    }\n};\n\nstack.CardDismissed += (_, args) => Decisions.Add(args.Item.Key, args.Decision);"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcCardStack x:Name=\"Shortlist\"\n                      Width=\"420\"\n                      Label=\"City shortlist\"\n                      LeftLabel=\"Skip\"\n                      RightLabel=\"Shortlist\"\n                      CardWidth=\"420\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcCardStack",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Cards": "按顺序叠放的候选卡片",
+      "Label": "牌堆的无障碍名称，默认 Cards",
+      "LeftLabel": "向左决定按钮的文案，默认 Pass",
+      "RightLabel": "向右决定按钮的文案，默认 Keep",
+      "LeftOutcome": "向左决定的过去式，用于播报，默认 passed",
+      "RightOutcome": "向右决定的过去式，用于播报，默认 kept",
+      "CardWidth": "牌堆舞台宽度（px），默认 420",
+      "Index": "当前顶部卡片下标；全部完成时等于卡片数（只读）",
+      "CardDismissed": "一张卡片离开牌堆时触发，带上卡片与决定",
+      "CardUndone": "撤销上一步决定后触发",
+      "StackReset": "所有卡片恢复后触发"
+    }
+  }
+}

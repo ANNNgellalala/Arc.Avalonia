@@ -1,0 +1,49 @@
+{
+  "slug": "plan-comparison",
+  "nameZh": "套餐对比",
+  "summary": "自家套餐之间的对比：三列表头、可切换的月付年付、可过滤的功能矩阵，被选中的套餐整列高亮。",
+  "purpose": [
+    "把套餐差异放在一张表里：表头是三个套餐与价格，下面是功能矩阵，被选中的套餐有一整块高亮表面，底部状态行用文字重复当前选择。",
+    "月付与年付切换会让价格滚动到新值；「只看差异」开关隐藏各套餐一致的行，让矩阵只留下真正的区别。",
+    "组成依赖：账单周期切换用 segmented-control，套餐选择与行动按钮用 button，只看差异的开关用 switch。"
+  ],
+  "whenToUse": [
+    "同一产品的两三个套餐之间对比，差异项在 8–20 行之间。",
+    "需要同时支持月付与年付、并让价格变化可见时。",
+    "用户需要在表里直接选定一个套餐时。"
+  ],
+  "whenNotToUse": [
+    "需要按席位数估算价格时，改用 pricing-calculator。",
+    "对比的是竞品而不是自家套餐时，用 comparison-table。",
+    "套餐差异很少、一两句话能讲清时，用普通卡片与 cta-section。"
+  ],
+  "variants": [
+    { "key": "variant-prices", "label": "Prices", "note": "三列表头与账单周期价格" },
+    { "key": "variant-matrix", "label": "Feature matrix", "note": "逐项功能行与对勾/短横" },
+    { "key": "variant-plan-highlight", "label": "Selected plan", "note": "被选中的套餐整列高亮，底部状态行写明" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "月付与年付切换用 segmented control" },
+    { "type": "uses", "target": "button", "note": "套餐选择与行动入口都是 ArcButton" },
+    { "type": "uses", "target": "switch", "note": "只看差异的过滤开关用 ArcSwitch" },
+    { "type": "alternative", "target": "pricing-calculator", "note": "需要按席位估算价格时改用 pricing calculator" }
+  ],
+  "contrasts": [
+    {
+      "target": "pricing-calculator",
+      "title": "Plan comparison 与 Pricing calculator",
+      "rows": [
+        { "dimension": "输入", "self": "选择套餐与账单周期", "other": "拖动席位并切换账单周期" },
+        { "dimension": "价格", "self": "静态档位价，切换周期时滚动", "other": "按席位与用量实时计算总价" },
+        { "dimension": "适合决定", "self": "「我该选哪一档」", "other": "「我的团队要花多少钱」" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "表头与周期切换",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"14\" Margin=\"24,22,24,18\">\n    <Grid ColumnDefinitions=\"1.7*,*,*,*\">\n      <TextBlock Text=\"Features\" Classes=\"arc-caption\" />\n      <TextBlock Grid.Column=\"1\" Text=\"Starter\" Classes=\"arc-body-sm arc-medium\" TextAlignment=\"Center\" />\n      <TextBlock Grid.Column=\"2\" Text=\"Team\" Classes=\"arc-body-sm arc-medium\" TextAlignment=\"Center\" />\n      <TextBlock Grid.Column=\"3\" Text=\"Enterprise\" Classes=\"arc-body-sm arc-medium\" TextAlignment=\"Center\" />\n    </Grid>\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n      <c:ArcSegmentedControl Label=\"Billing period\" />\n      <c:ArcSwitch Label=\"Only differences\" />\n    </StackPanel>\n    <TextBlock Text=\"Team selected\" Classes=\"arc-caption\" />\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

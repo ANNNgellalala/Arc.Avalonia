@@ -20,6 +20,11 @@ public sealed class SignInPage : ArcItemPage
 {
     public override string ItemSlug => "sign-in";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-email-step", "variant-providers", "variant-passkey", "variant-compact-card"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

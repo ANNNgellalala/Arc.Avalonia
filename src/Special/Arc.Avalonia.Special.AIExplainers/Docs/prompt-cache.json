@@ -1,0 +1,66 @@
+{
+  "slug": "prompt-cache",
+  "nameZh": "提示缓存插画",
+  "summary": "解释提示缓存的插画：三条请求共享同一段前缀，第一条付出缓存写入成本，后面的请求读回缓存，第三处在变更段处变成部分命中，成本与首 token 时间随之变化。",
+  "purpose": [
+    "把「同一段前缀只算一次」画成可对照的三行：每行是一条请求，右侧标出输入成本、首 token 时间与从缓存读回的 token 量；第三条请求改了 system prompt，命中范围到变更段为止，所以是 Partial hit。",
+    "右侧 Cache 面板给出这条缓存的构成与寿命：TTL 环、Tools / System prompt / Documents / Conversation 四段的 token 量，以及「读 0.1×、写 1.25×」的计价说明；底部汇总 Saved $0.09 与 7.6× faster to first token。",
+    "开启减弱动效时停在第三条请求部分命中的代表帧（相位 0.78）。预览展示这一帧，声明的变体都是帧内同时可见的元素；点击或按 E 可切换「是否修改 system prompt」来观察命中范围变化。"
+  ],
+  "whenToUse": [
+    "AI 产品或 API 文档需要解释上下文缓存为什么能把重复前缀变便宜。",
+    "性能或成本页面需要对照「写入一次、命中多次」的费用与延迟差异。",
+    "需要说明缓存 TTL、前缀命中与部分命中的边界。"
+  ],
+  "whenNotToUse": [
+    "只展示真实用量与配额时，改用 usage-meter。",
+    "需要展示成本随时间变化的趋势时，改用 line-chart。",
+    "需要解释草稿模型校验时，改用 speculative-decoding。"
+  ],
+  "variants": [
+    { "key": "state-partial-hit", "label": "Partial hit", "note": "默认帧：第三条请求在变更段之前命中缓存" },
+    { "key": "variant-requests", "label": "Requests", "note": "三条请求行：消息、输入成本、首 token 时间与缓存读取量" },
+    { "key": "variant-segments", "label": "Segments", "note": "前缀分段条：Tools / System prompt / Documents / Conversation" },
+    { "key": "variant-cache-panel", "label": "Cache panel", "note": "右侧 Cache 面板：TTL 环、分段 token 与 42.4K tokens cached" },
+    { "key": "variant-savings", "label": "Savings", "note": "底部 Saved $0.09 on input 与 7.6× faster to first token" },
+    { "key": "variant-edit-pill", "label": "Edit prompt", "note": "Change the system prompt 按钮，用于制造部分命中" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "usage-meter", "note": "只需要真实用量与配额时改用 usage meter" },
+    { "type": "complement", "target": "line-chart", "note": "用图表补充缓存命中率随时间的变化" },
+    { "type": "complement", "target": "speculative-decoding", "note": "同属推理成本/延迟优化解释，常在同一篇性能文档里出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "usage-meter",
+      "title": "Prompt cache 与 Usage meter",
+      "rows": [
+        { "dimension": "角色", "self": "解释缓存机制的教学插画", "other": "绑定真实用量与配额的计量条" },
+        { "dimension": "数据", "self": "固定的三条请求与示例价格", "other": "真实计数、上限与剩余量" },
+        { "dimension": "阅读重点", "self": "命中范围、费用与首 token 时间", "other": "已用多少、还剩多少" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcPromptCache Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "配合成本讲解暂停",
+      "language": "csharp",
+      "code": "var cache = new ArcPromptCache { Height = 400 };\n\n// 讲到「部分命中」时暂停，讲完再继续。\ncache.SetPaused(true);\n// ...\ncache.SetPaused(false);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcPromptCache",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停后画面停在当前帧",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

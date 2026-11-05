@@ -1,0 +1,75 @@
+{
+  "slug": "black-hole",
+  "nameZh": "黑洞删除",
+  "summary": "把删除做成一次可见的消失：选中的行沿螺旋落进中心黑洞，黑洞先张开再塌缩并放出一圈冲击波，Undo 沿同一条路径把它们转回来。",
+  "purpose": [
+    "删除是批量、偶发且值得被看见的动作：一次清掉几条会话、通知或文件时，比起高度瞬间塌缩，让这些行被「吸走」更能让人确认刚才发生了什么。",
+    "下落不是整块平移：同一行里离洞更近的点先落，于是行被拉成一条手臂、沿对数螺旋向内收；黑洞随吞噬略微变大，最后塌缩并放出一圈描边冲击波。",
+    "每个状态都留了退路：选中行显示强调色复选框，头部按钮变成 Delete 2；删除完成后行消失、状态行变强调色写出「2 conversations deleted · Undo brings them back」，Undo 按钮出现并沿同一条路径反向播回。",
+    "它自己不做确认，也不替你做决定：Delete 只对已选中的行生效，Undo 只保留最近一次删除。高风险或不可逆的操作应当先用 hold-to-confirm 之类的确认，而不是靠这段动效代替。"
+  ],
+  "whenToUse": [
+    "删除或归档少量选中的行、卡片与文件，并紧跟一个 Undo 时。",
+    "清空回收站、清通知、批量忽略这类「消失应当显得干脆」的动作。",
+    "演示或 changelog 里，删除这件事本身值得演一次时。"
+  ],
+  "whenNotToUse": [
+    "高频删除，例如清掉一枚筛选 chip，改用快速高度塌缩即可。",
+    "不可逆且没有 Undo 的操作：动效不能代替确认，先用 hold-to-confirm 或 dialog。",
+    "列表行本身的滑动删除手势更适合用 swipe-actions。"
+  ],
+  "variants": [
+    { "key": "state-idle", "label": "Idle", "note": "没有选中行：Delete 禁用，状态行提示先选行" },
+    { "key": "state-selected", "label": "Selected", "note": "选中两行：强调复选框与描边，按钮变成 Delete 2" },
+    { "key": "state-deleted", "label": "Deleted", "note": "删除完成：行消失、状态行变强调色、出现 Undo" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "hold-to-confirm", "note": "高风险或不可逆的删除应先用长按确认" },
+    { "type": "alternative", "target": "swipe-actions", "note": "列表行的滑动删除改用 swipe actions" },
+    { "type": "complement", "target": "toast", "note": "删除结果与撤销入口也可以放到 toast 上，黑洞负责消失本身" },
+    { "type": "uses", "target": "button", "note": "Delete 与 Undo 都是 ArcButton" }
+  ],
+  "contrasts": [
+    {
+      "target": "hold-to-confirm",
+      "title": "Black hole 与 Hold to confirm",
+      "rows": [
+        { "dimension": "安全感来源", "self": "删除后紧跟 Undo，事后可恢复", "other": "删除前要求长按，事中拦截" },
+        { "dimension": "时机", "self": "动效发生在操作之后", "other": "确认发生在操作之前" },
+        { "dimension": "适用动作", "self": "批量、可撤销的清理", "other": "单个、不可逆的高风险动作" }
+      ]
+    },
+    {
+      "target": "swipe-actions",
+      "title": "Black hole 与 Swipe actions",
+      "rows": [
+        { "dimension": "触发方式", "self": "选中若干行，再按 Delete 或快捷键", "other": "在单行上横向滑动露出动作" },
+        { "dimension": "动画对象", "self": "整批行同时沿螺旋落入黑洞", "other": "被滑走的那一行离开轨道" },
+        { "dimension": "反馈重心", "self": "消失本身值得被看见", "other": "快速露出并执行动作，尽量不打断" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：预选两行",
+      "language": "xaml",
+      "code": "<arc:ArcBlackHole xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                Title=\"Inbox\"\n                Items=\"{Binding Conversations}\" />"
+    },
+    {
+      "title": "选择、删除与撤销",
+      "language": "csharp",
+      "code": "var hole = new ArcBlackHole\n{\n    Title = \"Inbox\",\n    Items = new List<ArcBlackHoleItem>\n    {\n        new() { Id = \"1\", Subject = \"Weekly metrics digest\", From = \"Arc analytics\", Time = \"09:41\" },\n        new() { Id = \"2\", Subject = \"Re: motion review notes\", From = \"Rowan Pike\", Time = \"09:12\" },\n        new() { Id = \"3\", Subject = \"Invoice 2041 is ready\", From = \"Billing\", Time = \"08:50\" },\n        new() { Id = \"4\", Subject = \"Deploy finished on staging\", From = \"Pipeline\", Time = \"08:30\" }\n    }\n};\n\n// 先选中再删除：按钮会显示 Delete 2\nhole.Select(\"2\", \"3\");\nhole.Delete();\n\n// Undo 沿同一条螺旋把最近一次删除的行转回来\nhole.Undo();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcBlackHole",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "可删除的条目，元素是 ArcBlackHoleItem（Id、Subject、From、Time）",
+      "Title": "列表标题，例如 Inbox",
+      "Select": "方法：按 id 选中若干行，文档与演示用它预选两行",
+      "Delete": "方法：让已选中的行沿螺旋落入黑洞；未选中时不做任何事",
+      "Undo": "方法：沿同一条路径把最近一次删除的行转回来"
+    }
+  }
+}

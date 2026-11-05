@@ -1,0 +1,69 @@
+{
+  "slug": "scroll-area",
+  "nameZh": "滚动区域",
+  "summary": "隐藏系统滚动条的自定义滚动容器：细滚动条只在滚动或悬停时淡入，内容溢出的一侧出现渐隐边缘，键盘滚动保持原生。",
+  "purpose": [
+    "当内容比盒子大时，原生 ScrollViewer 的滚轮、触控与键盘行为值得保留，真正需要替换的是可见的滚动条。ArcScrollArea 用 8px 覆盖式滑块代替系统滚动条：Auto 模式下滚动或悬停时淡入，停止后按 HideDelay 延迟淡出。",
+    "Orientation 决定哪些轴可以滚动，进而决定哪一侧的滚动条与渐隐出现；WheelToHorizontal 让竖向滚轮驱动横向条，横向模板条与日志条因此不必依赖触控板横向手势。",
+    "Fade 是边缘渐隐的长度，只在内容真的越过对应边缘时出现——内容刚好装下时整块区域是干净的，没有任何条或渐变，所以固定高度的卡片不会平白多出一条滚动条。"
+  ],
+  "whenToUse": [
+    "弹窗、侧栏、详情面板里的内容可能超出固定高度，但不想让系统滚动条打断表面。",
+    "图库、模板条、日志窗口等需要横向滚动的区域。",
+    "需要「还能往下/往右」的柔和暗示，而不是一条常年可见的粗滚动条。"
+  ],
+  "whenNotToUse": [
+    "内容长度固定、永远不会溢出时不必包滚动区域，直接布局更清楚。",
+    "需要在固定高度里并排两个可调宽度的面板时，改用 resizable-panels。",
+    "数据是成千上万行、需要虚拟化的超长列表时，用虚拟化列表控件，而不是一次性铺开全部内容。"
+  ],
+  "variants": [
+    { "key": "orientation-vertical", "label": "Vertical", "note": "默认方向，只允许纵向滚动" },
+    { "key": "orientation-horizontal", "label": "Horizontal", "note": "横向条带，竖向滚轮会被转成横向滚动" },
+    { "key": "orientation-both", "label": "Both", "note": "两个方向都溢出，两条滚动条同时出现" },
+    { "key": "scrollbars-always", "label": "Always bars", "note": "Scrollbars=Always 让滚动条在溢出时保持可见" },
+    { "key": "state-fitted", "label": "Fitted", "note": "内容刚好装下：没有滚动条，也没有边缘渐隐" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "resizable-panels", "note": "同样在固定盒子里分配空间：靠滚动就够用 scroll area，要拖动分隔条则用 resizable panels" },
+    { "type": "complement", "target": "sortable-data-table", "note": "长表格放进滚动区域，表头之外的部分由它承载滚动" },
+    { "type": "complement", "target": "tree-view", "note": "层级树展开后变长时，用滚动区域托住它" }
+  ],
+  "contrasts": [
+    {
+      "target": "resizable-panels",
+      "title": "Scroll area 与 Resizable panels",
+      "rows": [
+        { "dimension": "空间策略", "self": "盒子尺寸固定，内容超出部分滚动可达", "other": "盒子尺寸由用户拖动分隔条实时改变" },
+        { "dimension": "交互", "self": "滚轮、触控板、方向键与滑块拖动", "other": "拖动分隔条、方向键微调、Enter 折叠窗格" },
+        { "dimension": "适用内容", "self": "同一条内容比盒子长或宽", "other": "两块内容需要同时看见并争用同一段空间" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "固定高度的活动列表",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcScrollArea Width=\"380\"\n                       Height=\"196\"\n                       Fade=\"24\"\n                       Label=\"Recent activity\"\n                       Scrollbars=\"Auto\">\n    <StackPanel Spacing=\"10\" Margin=\"16\">\n      <!-- 比 196px 高的内容 -->\n    </StackPanel>\n  </media:ArcScrollArea>\n</Window>"
+    },
+    {
+      "title": "横向模板条，竖向滚轮转横向",
+      "language": "csharp",
+      "code": "var strip = new ArcScrollArea\n{\n    Label = \"Templates\",\n    Orientation = ArcScrollOrientation.Horizontal,\n    WheelToHorizontal = true,\n    Scrollbars = ArcScrollbarsMode.Always,\n    Fade = 20,\n    Width = 380,\n    Height = 196,\n    Content = BuildTemplateStrip(8)\n};\n\n// 内容越过右边缘时会报告，用来决定是否显示「查看全部」。\nstrip.EdgeChanged += (_, edges) => moreHint.IsVisible = edges.Right;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcScrollArea",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Orientation": "可滚动的轴：Vertical / Horizontal / Both",
+      "Fade": "边缘渐隐的长度（px），0 关闭渐隐",
+      "Scrollbars": "Auto：滚动或悬停时出现；Always：溢出时保持可见",
+      "HideDelay": "滚动停止后滚动条继续停留的毫秒数",
+      "Label": "滚动区域的无障碍名称",
+      "WheelToHorizontal": "把竖向滚轮转成横向滚动，默认 true",
+      "Edges": "只读，四个边缘中哪些还有内容可以进入",
+      "EdgeChanged": "内容开始或停止越过某个边缘时触发，携带四个边缘的布尔值"
+    }
+  }
+}

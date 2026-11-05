@@ -11,6 +11,12 @@ public sealed class OrbitLogosPage : ArcItemPage
 {
     public override string ItemSlug => "orbit-logos";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-selected", "state-connected", "variant-chips",
+        "variant-rings", "variant-card", "variant-nav"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

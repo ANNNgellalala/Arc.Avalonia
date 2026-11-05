@@ -1,0 +1,75 @@
+{
+  "slug": "emoji-picker",
+  "nameZh": "表情选择器",
+  "summary": "完整的 emoji 选择器：即时搜索、分类栏与滚动同步、肤色选择、最近使用与虚拟化网格，选中后保持打开以便连续挑几个。",
+  "purpose": [
+    "当输入框、评论框或文档编辑器需要完整的 emoji 集合时，emoji picker 提供搜索、八个分类与虚拟化网格，键盘也能走完整个网格。",
+    "搜索即时过滤名字与关键词并保留分组；分类栏跟随滚动高亮；显示肤色时，支持肤色的 emoji 会套用当前肤色。",
+    "选中一个 emoji 会触发 Selected 并保持面板打开，方便连续挑几个；Escape 先清空搜索，再关闭并触发 Closed。"
+  ],
+  "whenToUse": [
+    "评论框、消息输入与文档编辑器需要插入 emoji 时。",
+    "需要按名字或关键词快速搜到 emoji 时。",
+    "用户会连续挑几个 emoji、面板应当保持打开时。"
+  ],
+  "whenNotToUse": [
+    "只需要几个常用表情的快捷回应时，改用 reactions。",
+    "表情只是页面上的装饰图标时，用 icon 而不是可交互的选择器。",
+    "只需要展示一个静态表情时，用文本即可。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "搜索框、分类栏与网格一起出现" },
+    { "key": "state-search", "label": "搜索", "note": "输入关键词即时过滤并保留分组" },
+    { "key": "state-recent", "label": "最近使用", "note": "没有搜索时顶部显示最近用过的 emoji" },
+    { "key": "state-skin-tones", "label": "肤色", "note": "ShowSkinTones 打开时显示六个肤色选项" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "reactions", "note": "只需要几个常用表情的快捷回应时，用一排 reactions 更轻" },
+    { "type": "complement", "target": "rich-text-editor", "note": "富文本编辑器与评论框常把 emoji picker 挂在工具栏上" }
+  ],
+  "contrasts": [
+    {
+      "target": "reactions",
+      "title": "Emoji picker 与 Reactions",
+      "rows": [
+        { "dimension": "范围", "self": "完整的 emoji 集合与分类", "other": "一小排预设表情" },
+        { "dimension": "交互", "self": "搜索、滚动分类、肤色与最近使用", "other": "点一下即添加，没有面板" },
+        { "dimension": "结果", "self": "插入一个 glyph 到输入内容里", "other": "给内容加一个回应计数" },
+        { "dimension": "页面占用", "self": "展开时一整块面板", "other": "始终是一行小按钮" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中挂到编辑器的工具栏",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcEmojiPicker Width=\"360\"\n                          IsOpen=\"{Binding IsEmojiOpen}\"\n                          SearchText=\"{Binding EmojiQuery}\"\n                          ShowSkinTones=\"True\"\n                          SkinTone=\"MediumLight\" />\n</Window>"
+    },
+    {
+      "title": "用代码处理选择与最近使用",
+      "language": "csharp",
+      "code": "var picker = new ArcEmojiPicker\n{\n    Width = 380,\n    ShowSkinTones = true,\n    SkinTone = ArcSkinTone.MediumLight,\n    DefaultRecent = new[] { \"😂\", \"❤\", \"🔥\", \"👍\", \"🎉\" },\n    RecentLimit = 12\n};\n\npicker.Selected += (_, selection) => Composer.Insert(selection.Emoji);\npicker.Closed += (_, _) => toolbarButton.Focus();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcEmojiPicker",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "IsOpen": "面板是否显示；由触发按钮切换，Escape 关闭",
+      "SelectedEmoji": "最后选中的 glyph，已套用当前肤色",
+      "SearchText": "搜索词；即时过滤名字与关键词并保留分组",
+      "SkinTone": "当前肤色：Light、MediumLight、Medium、MediumDark、Dark",
+      "ShowSkinTones": "在预览名旁显示六个肤色选项，默认 false",
+      "Categories": "限定显示的分类；null 表示全部八个",
+      "CellSize": "网格单元尺寸（含外边距），默认 36",
+      "Columns": "固定每行几个；0 表示按宽度推导，至少六个",
+      "RecentLimit": "最多保留几个最近使用，默认 18",
+      "DefaultRecent": "最近使用行的初始内容，选中过之后不再使用",
+      "SearchPlaceholder": "搜索框的占位文字",
+      "Label": "选择器组的可访问名称",
+      "Recent": "最近使用的 glyph 列表，最近的在前",
+      "Selected": "点击、Enter、Space 或最近使用项选中时触发",
+      "Closed": "Escape 或宿主关闭面板时触发"
+    }
+  }
+}

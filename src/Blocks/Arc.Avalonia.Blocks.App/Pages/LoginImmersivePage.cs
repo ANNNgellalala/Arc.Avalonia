@@ -21,6 +21,11 @@ public sealed class LoginImmersivePage : ArcItemPage
 {
     public override string ItemSlug => "login-immersive";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-form", "variant-dusk-backdrop", "variant-top-bar"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

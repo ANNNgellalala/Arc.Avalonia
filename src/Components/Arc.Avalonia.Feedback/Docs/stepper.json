@@ -1,0 +1,81 @@
+{
+  "slug": "stepper",
+  "nameZh": "步骤条",
+  "summary": "多步骤流程的位置指示：已完成、当前与出错步骤用标记和文案区分，可横向或纵向排列。",
+  "purpose": [
+    "告诉你「现在在第几步」：已完成步骤的标记变成对勾，当前步骤高亮，未开始步骤保持静默；Current 等于步骤数时显示完成文案。",
+    "横向适合一屏内的表单向导，纵向适合需要逐条说明与错误提示的账户设置；Compact 只留标记，用一行小字给出进度。",
+    "某个步骤带 Error 时，标记变成警告图标并显示错误原文，允许流程停在原地让人修正，而不是等到最后一步才报错。"
+  ],
+  "whenToUse": [
+    "结账、开户、审核等有严格顺序的多步骤流程。",
+    "需要让用户知道还有几步、当前步骤叫什么、哪一步出了问题。",
+    "允许回跳到已完成步骤继续修改的向导。"
+  ],
+  "whenNotToUse": [
+    "在几组平级视图之间来回切换时，改用 tabs，顺序不是重点。",
+    "只关心总体完成比例、不关心步骤名称时，改用 progress。",
+    "步骤之间没有顺序、可以任意跳过的清单，改用 onboarding-checklist。"
+  ],
+  "variants": [
+    { "key": "orientation-horizontal", "label": "Horizontal", "note": "横向一行，适合表单向导" },
+    { "key": "orientation-vertical", "label": "Vertical", "note": "纵向排列，可带说明与错误" },
+    { "key": "details-all", "label": "All details", "note": "所有步骤都显示说明" },
+    { "key": "details-current", "label": "Current only", "note": "只展开当前步骤的说明，错误始终显示" },
+    { "key": "state-error", "label": "Error", "note": "错误步骤的标记与文案变成警告色" },
+    { "key": "state-compact", "label": "Compact", "note": "只留标记，行下方一行进度小字" },
+    { "key": "state-complete", "label": "Complete", "note": "Current 等于步骤数时显示 CompleteLabel" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tabs", "note": "平级视图切换改用 tabs" },
+    { "type": "alternative", "target": "progress", "note": "只需要总完成比例时改用 progress" },
+    { "type": "alternative", "target": "onboarding-checklist", "note": "没有顺序、可任意完成的清单改用 onboarding-checklist" },
+    { "type": "complement", "target": "button", "note": "上一步、下一步按钮通常放在步骤条下方" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Stepper 与 Tabs",
+      "rows": [
+        { "dimension": "顺序", "self": "严格顺序，前进或回退", "other": "平级切换，没有先后" },
+        { "dimension": "完成状态", "self": "区分已完成、当前与未开始", "other": "只有选中与未选中" },
+        { "dimension": "典型场景", "self": "结账、开户、审核向导", "other": "同一对象的多组视图" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "Stepper 与 Progress",
+      "rows": [
+        { "dimension": "表达方式", "self": "具名步骤与位置标记", "other": "一条连续的填充条" },
+        { "dimension": "错误定位", "self": "错误落在具体步骤上", "other": "只能整体变色" },
+        { "dimension": "适合流程", "self": "3–7 步的表单向导", "other": "单任务的上传、同步与导入" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "横向向导",
+      "language": "csharp",
+      "code": "var stepper = new ArcStepper\n{\n    Label = \"Checkout progress\",\n    Current = 1,\n    Steps = new List<ArcStep>\n    {\n        new() { Id = \"cart\", Label = \"Cart\" },\n        new() { Id = \"shipping\", Label = \"Shipping\", Description = \"Address and delivery\" },\n        new() { Id = \"payment\", Label = \"Payment\", Description = \"Card and billing address\" },\n        new() { Id = \"review\", Label = \"Review\" }\n    }\n};\n\nstepper.StepSelected += (_, index) => stepper.Current = index;"
+    },
+    {
+      "title": "纵向、带错误步骤",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcStepper Label=\"Account setup\"\n                 Current=\"2\"\n                 Orientation=\"Vertical\"\n                 Details=\"All\"\n                 Steps=\"{Binding SetupSteps}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcStepper",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Steps": "步骤集合，元素是 ArcStep（Id / Label / Description / Error）",
+      "Current": "当前步骤下标；等于 Steps 数量时视为全部完成",
+      "Orientation": "Horizontal 或 Vertical，默认 Horizontal",
+      "Details": "All 显示全部说明；Current 只显示当前步骤说明，错误始终显示",
+      "Compact": "只显示标记，用一行小字代替标签",
+      "Label": "步骤条的无障碍名称",
+      "CompleteLabel": "全部完成时显示的文案",
+      "StepSelected": "点击已完成步骤时触发，参数是步骤下标"
+    }
+  }
+}

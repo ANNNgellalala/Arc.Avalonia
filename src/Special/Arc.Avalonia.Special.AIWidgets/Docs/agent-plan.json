@@ -1,0 +1,78 @@
+{
+  "slug": "agent-plan",
+  "nameZh": "智能体计划",
+  "summary": "智能体的分步计划卡：草稿态可逐条编辑并批准，运行态把同一份计划变成带进度的清单，失败步骤就地给 Retry / Skip，结束后收成一句话总结。",
+  "purpose": [
+    "让「先看计划、再动手」成为可见的流程：Draft 态下每一步都是一行可上下移动（方向键在握把上）、可改名、可删除的条目，底部是 Add step / Keep planning 与主行动 Approve plan。",
+    "批准后同一张卡变成实时清单：标题右侧是进度条与「2 of 5」，当前步骤带子步骤（读了哪个文件、跑了哪些测试），行尾写 now；状态徽章从 Draft 变成 Running。",
+    "失败不会静默跳过：Failed 步骤用危险色标题、给出错误说明与 Retry / Skip 两个动作；Skipped 步骤标题降为弱化色，运行为止的统计仍把它算进总数。",
+    "结束是第三种形态：Done 态徽章变绿、上方写 all steps finished，底部换成「Done in 12.4s」加 Summary 与 Start over；Paused 则暂停推进并把当前步骤标成 paused，主按钮变成 Resume。"
+  ],
+  "whenToUse": [
+    "智能体在改代码、跑命令或碰生产数据之前，需要先把计划摆出来并取得批准。",
+    "同一个人既要调整计划，又要在批准后盯着同一份计划逐条完成。",
+    "侧边面板里跟踪多步任务，需要当前步骤、失败决策与最终总结三件事同时可见。"
+  ],
+  "whenNotToUse": [
+    "只是普通任务清单、没有审批与自动推进时，改用 onboarding-checklist。",
+    "只需要一个「第几步/共几步」的进度指示、没有计划语义时，改用 stepper。",
+    "要看多个智能体之间如何分派与交接时，改用 agent-timeline。"
+  ],
+  "variants": [
+    { "key": "state-draft", "label": "Draft", "note": "草稿：可拖动/改名的行、Add step / Keep planning / Approve plan" },
+    { "key": "state-running", "label": "Running", "note": "运行：进度条、当前步骤的子步骤与 now 标记" },
+    { "key": "state-paused", "label": "Paused", "note": "暂停：警告色徽章，当前步骤标 paused，按钮变 Resume" },
+    { "key": "state-done", "label": "Done", "note": "完成：all steps finished、总耗时与 Summary、Start over" },
+    { "key": "variant-step-failed", "label": "Failed step", "note": "失败步骤：危险色标题、错误说明与 Retry / Skip" },
+    { "key": "variant-step-skipped", "label": "Skipped step", "note": "跳过步骤：弱化标题与跳过字形" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "agent-status", "note": "计划负责步骤，状态胶囊报告整轮运行当前停在哪一步" },
+    { "type": "alternative", "target": "onboarding-checklist", "note": "没有审批与自动推进的普通清单改用 onboarding checklist" },
+    { "type": "alternative", "target": "stepper", "note": "只表达「第几步」的线性流程改用 stepper" },
+    { "type": "uses", "target": "button", "note": "Approve plan、Pause / Resume、Retry、Skip 与 Start over 都是 ArcButton" }
+  ],
+  "contrasts": [
+    {
+      "target": "onboarding-checklist",
+      "title": "Agent plan 与 Onboarding checklist",
+      "rows": [
+        { "dimension": "推进方式", "self": "由智能体逐条执行，进度条自动前进", "other": "由用户逐条勾选完成" },
+        { "dimension": "前置审批", "self": "草稿态可编辑并 Approve plan 后运行", "other": "没有审批步骤，直接开始" },
+        { "dimension": "失败处理", "self": "失败步骤带错误与 Retry / Skip", "other": "只有完成与未完成两种状态" }
+      ]
+    },
+    {
+      "target": "stepper",
+      "title": "Agent plan 与 Stepper",
+      "rows": [
+        { "dimension": "内容", "self": "每一步有标题、说明、子步骤、耗时与备注", "other": "只有标签与当前第几步" },
+        { "dimension": "交互", "self": "编辑、重排、批准、暂停、重试", "other": "通常只读或前后切换" },
+        { "dimension": "结尾", "self": "结束时给出总耗时与一句话总结", "other": "走到最后一步即结束" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "草稿与运行两种形态",
+      "language": "xaml",
+      "code": "<arc:ArcAgentPlan xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                 Status=\"Draft\"\n                 Goal=\"Add rate limiting to the public API\"\n                 ModelName=\"Claude Opus 5.5\"\n                 Steps=\"{Binding Steps}\" />"
+    },
+    {
+      "title": "带子步骤的运行态与完成态",
+      "language": "csharp",
+      "code": "var running = new ArcAgentPlan\n{\n    Status = ArcAgentPlanStatus.Running,\n    Goal = \"Add rate limiting to the public API\",\n    Steps = new List<ArcAgentPlanStep>\n    {\n        new() { Id = \"a\", Title = \"Add a sliding window limiter to the API middleware\", State = ArcAgentPlanStepState.Done, DurationSeconds = 1.4 },\n        new()\n        {\n            Id = \"c\",\n            Title = \"Return a 429 with a Retry-After header\",\n            State = ArcAgentPlanStepState.Active,\n            SubSteps = new[] { \"Read src/middleware/limits.ts\", \"Ran 6 tests\" }\n        },\n        new() { Id = \"d\", Title = \"Cover the limiter with six request tests\", State = ArcAgentPlanStepState.Pending }\n    }\n};\n\n// 运行结束后：徽章变 Done，底部换成总耗时与 Summary\nrunning.Status = ArcAgentPlanStatus.Done;\nrunning.Summary = \"Rate limiting is live and covered by six tests.\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcAgentPlan",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Steps": "计划步骤，元素是 ArcAgentPlanStep（标题、状态、子步骤、备注、错误、耗时）",
+      "Status": "Draft 可编辑并批准 / Running 自动推进 / Paused 暂停 / Done 收尾",
+      "Goal": "计划要达成的目标，显示在标题下方",
+      "ModelName": "草稿态标题旁注明的模型名",
+      "Summary": "完成后写在底部的总结句"
+    }
+  }
+}

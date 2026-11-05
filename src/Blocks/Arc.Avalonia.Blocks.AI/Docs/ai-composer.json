@@ -1,0 +1,58 @@
+{
+  "slug": "ai-composer",
+  "nameZh": "AI 输入器",
+  "summary": "助手底部的提示输入区：上方是已完成的一轮问答，输入卡片里是附件 chip、多行输入框、Web search 与 Thinking 开关、模型 chip 与发送键，下面还有一行起始建议。",
+  "purpose": [
+    "它是「新会话」这一屏的输入骨架：一个固定高度的线程区放着已经发生的一轮问答，底部一张 composer 卡片承载输入、附件、工具开关、模型选择与发送，让整块界面在空会话时也不显得空。",
+    "发送前的状态是明确的：输入为空时发送键禁用并降到 45% 不透明度，一旦有文字就恢复；Enter 发送、Shift+Enter 换行，下方计数从 0 / 4000 跟着走。",
+    "composer 里的每个 chip 都是可切换的开关：Web search 与 Thinking 用选中态表达「这次带上什么」，模型 chip 点一下换成下一个模型并在状态行说明，附件 chip 可以单独移除。",
+    "起始建议是空会话时的第一个入口：三枚 chip 把提示词直接填进输入框并聚焦，用户改完按 Enter 即可；本页的回复是脚本化的，用于把交互流程演完。"
+  ],
+  "whenToUse": [
+    "助手、编码 agent 或产品内 AI 功能的提示输入框，用户需要附件、工具开关与模型选择。",
+    "新会话页先展示几条起始建议，出现第一轮问答后继续接在下面。",
+    "需要发送键在流式回复期间变成 Stop 的场景（本页展示的是发送前状态）。"
+  ],
+  "whenNotToUse": [
+    "需要带历史、消息操作与评分的完整会话时，用 ai-chat。",
+    "只需要挑一个模型、不涉及输入时，用 model-picker。",
+    "输入只是一行搜索词或命令时，用 search-field 或 command-palette 的输入，不必套上整个 composer。"
+  ],
+  "variants": [
+    { "key": "variant-thread", "label": "Thread", "note": "固定高度的线程区：一条用户消息与一段助手回复" },
+    { "key": "variant-composer", "label": "Composer", "note": "composer 卡片：附件 chip、输入框、工具栏与发送键" },
+    { "key": "variant-toolbar", "label": "Toolbar", "note": "Web search / Thinking 开关与模型 chip" },
+    { "key": "variant-starters", "label": "Starters", "note": "空会话时的三枚起始建议 chip" },
+    { "key": "state-send-disabled", "label": "Send disabled", "note": "输入为空：发送键禁用并降到 45% 不透明度" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "textarea", "note": "composer 的多行输入框是 ArcTextarea：Enter 发送、Shift+Enter 换行、4000 字上限与计数" },
+    { "type": "uses", "target": "button", "note": "发送键、模型 chip、Web search / Thinking 开关与起始建议都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "标题旁的 Simulated 徽标标出示例回复是脚本化的" },
+    { "type": "alternative", "target": "ai-chat", "note": "需要完整会话与消息操作时改用 ai chat" }
+  ],
+  "contrasts": [
+    {
+      "target": "ai-chat",
+      "title": "AI composer 与 AI chat",
+      "rows": [
+        { "dimension": "覆盖范围", "self": "输入器加一段简短的线程预览", "other": "完整的会话卡：长线程、推理与来源" },
+        { "dimension": "常驻位置", "self": "新会话页或已有对话的底部", "other": "聊天页主体，输入只占底部一行" },
+        { "dimension": "附件与工具", "self": "附件 chip 与工具开关就在输入卡片里", "other": "工具与来源附着在单条回复上" },
+        { "dimension": "历史", "self": "只保留当前这一轮", "other": "多轮历史、版本与评分" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "composer 骨架：线程、输入卡片与工具栏",
+      "language": "csharp",
+      "code": "var field = new ArcTextarea\n{\n    Label = \"Message\",\n    Placeholder = \"Ask anything, / for commands, @ to add context\",\n    Rows = 2,\n    MaxLength = 4000,\n    Height = 64,\n    Description = \"Enter sends, Shift Enter adds a line.\"\n};\n\nvar attachRow = K.RowWrap(6, K.Chip(\"trace-0418.json\", icon: \"file\"));\nvar toolbar = K.Row(6,\n    K.IconBtn(\"plus\", \"Add files or a screenshot\"),\n    K.Chip(\"Web search\", icon: \"globe\"),\n    K.Chip(\"Thinking\", icon: \"sparkles\", selected: true),\n    new K.ModelChip(K.Models[0]).Button,\n    K.IconBtn(\"mic\", \"Dictate\"),\n    K.Btn(\"\", ArcButtonVariant.Primary, ArcButtonSize.Sm, icon: \"arrow-up\", enabled: false));\n\nvar composer = new Border\n{\n    BorderThickness = new Thickness(1),\n    CornerRadius = new CornerRadius(18),\n    Padding = new Thickness(12, 9, 9, 8),\n    Child = K.Stack(7, attachRow, field, toolbar)\n};\n\nreturn K.Surface(K.Stack(10,\n    K.Row(8, K.Disc(\"message-circle\", 24, true, 13), K.Label(\"Assistant\"), K.Pill(\"Simulated\")),\n    K.Divider(),\n    K.Scroller(thread, 172),\n    composer));"
+    },
+    {
+      "title": "起始建议把提示词填进输入框",
+      "language": "csharp",
+      "code": "foreach (var (label, prompt, icon) in new[]\n         {\n             (\"Summarise this release\", \"Summarise this release and list the risky changes.\", \"list\"),\n             (\"Draft a migration note\", \"Draft a migration note for the retry window change.\", \"file\"),\n             (\"Find the failing check\", \"Find the failing check in last night's CI run.\", \"search\")\n         })\n{\n    var chip = K.Chip(label, icon: icon);\n    chip.Click += (_, _) =>\n    {\n        field.Value = prompt;\n        field.Focus();\n    };\n    starterRow.Children.Add(chip);\n}"
+    }
+  ]
+}

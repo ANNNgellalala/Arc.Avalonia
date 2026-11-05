@@ -21,6 +21,11 @@ public sealed class FaqSectionPage : ArcItemPage
 {
     public override string ItemSlug => "faq-section";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-topic-filter", "variant-search", "state-empty"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -130,20 +135,34 @@ public sealed class FaqSectionPage : ArcItemPage
         count.VerticalAlignment = VerticalAlignment.Center;
         controls.Children.Add(count);
 
-        return Mk.Surface(new StackPanel
+        // The empty result is only reachable by filtering; a static copy keeps it visible in the preview.
+        var emptySpecimen = new Border
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 18,
-            Margin = new Thickness(24, 22, 24, 20),
-            Children =
+            Background = Mk.Brush(ArcTokens.SurfaceMuted),
+            CornerRadius = new CornerRadius(18),
+            Padding = new Thickness(24),
+            Child = Mk.Stack(4,
+                Mk.Text("No questions match", "arc-body arc-medium"),
+                Mk.Body("Try another topic or a shorter search."))
+        };
+
+        return Mk.Stack(16,
+            Mk.Surface(new StackPanel
             {
-                Mk.Stack(4,
-                    Mk.Heading("Questions, answered", 520),
-                    Mk.Body("Everything teams ask before they move their planning into Arc.")),
-                controls,
-                accordionHost
-            }
-        }, padding: new Thickness(0));
+                Orientation = Orientation.Vertical,
+                Spacing = 18,
+                Margin = new Thickness(24, 22, 24, 20),
+                Children =
+                {
+                    Mk.Stack(4,
+                        Mk.Heading("Questions, answered", 520),
+                        Mk.Body("Everything teams ask before they move their planning into Arc.")),
+                    controls,
+                    accordionHost
+                }
+            }, padding: new Thickness(0)),
+            Mk.Caption("No matches for the current topic or query"),
+            emptySpecimen);
     }
 }
 

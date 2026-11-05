@@ -1,0 +1,77 @@
+{
+  "slug": "sunburst",
+  "nameZh": "旭日图",
+  "summary": "同心环表达的层级占比图：每圈是一层，扇区大小即数值占比；悬停会高亮整条分支路径，点击扇区可以下钻，并用面包屑返回。",
+  "purpose": [
+    "当总量需要按层级拆开时用它：先看一级分类的占比，再逐圈看到子类，比并排多张饼图更省空间，也更容易理解「这一块由什么组成」。",
+    "扇区大小来自数值（父节点的值是其子节点之和），中心读数跟随指针与键盘焦点；悬停会把祖先与后代的整条路径提亮，其余扇区变暗。",
+    "点击扇区进入下一层，顶部出现面包屑与 Back；Depth 控制一次显示几圈，ShowLabels 与 ShowLegend 可以按卡片宽度取舍。"
+  ],
+  "whenToUse": [
+    "云支出、团队预算、分类销售这类「总量 → 分类 → 子类」的数据。",
+    "需要在一个卡片内逐层查看占比，而不是并列多张单层饼图时。",
+    "希望用点击下钻替代多次页面跳转时。"
+  ],
+  "whenNotToUse": [
+    "只有一层分类时用 donut-chart，单圈更直接，中心还能放一个总数。",
+    "更强调面积比较、或需要矩形切分与标签排布时用 treemap。",
+    "数据随时间变化、需要看趋势时用 line-chart，旭日图没有时间轴。"
+  ],
+  "variants": [
+    { "key": "variant-depth-3", "label": "Three rings", "note": "Depth=3，三圈逐层下钻" },
+    { "key": "variant-depth-2", "label": "Two rings", "note": "Depth=2，更浅的分支填满半径" },
+    { "key": "state-no-labels", "label": "No arc labels", "note": "ShowLabels=false，环上标签收起" },
+    { "key": "state-no-legend", "label": "No legend", "note": "ShowLegend=false，右侧图例收起" }
+  ],
+  "relations": [
+    { "type": "extends", "target": "donut-chart", "note": "单层圆环的多层版本：多圈表达层级，并可逐层下钻" },
+    { "type": "alternative", "target": "treemap", "note": "同样表达层级占比，径向环图与矩形嵌套二选一" }
+  ],
+  "contrasts": [
+    {
+      "target": "donut-chart",
+      "title": "Sunburst 与 Donut chart",
+      "rows": [
+        { "dimension": "层级", "self": "多圈嵌套，父节点是子节点之和", "other": "单圈，只表达一层分类" },
+        { "dimension": "中心信息", "self": "中心读数跟随指针与焦点，显示当前分支", "other": "中心通常放总数或标题" },
+        { "dimension": "交互", "self": "点击下钻，面包屑与 Back 返回", "other": "没有下钻，图例用于显隐" },
+        { "dimension": "适用数据", "self": "分类下面还有子分类", "other": "扁平的一层占比" }
+      ]
+    },
+    {
+      "target": "treemap",
+      "title": "Sunburst 与 Treemap",
+      "rows": [
+        { "dimension": "形状", "self": "同心环，角度与半径共同编码层级", "other": "嵌套矩形，面积编码数值" },
+        { "dimension": "面积可读性", "self": "外圈扇区面积不一致，精确比较较难", "other": "矩形面积更易并排比较" },
+        { "dimension": "层级提示", "self": "圈层本身就是层级线索", "other": "靠缩进、边框与颜色区分层级" },
+        { "dimension": "下钻", "self": "点击扇区下钻，路径清晰", "other": "通常放大子树或用面包屑" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明图表外壳",
+      "language": "xaml",
+      "code": "<arc:ArcSunburstChart xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                     CenterLabel=\"Cloud spend\"\n                     Depth=\"3\"\n                     ShowLabels=\"True\"\n                     ShowLegend=\"True\"\n                     Height=\"244\" />"
+    },
+    {
+      "title": "构造层级数据并处理下钻",
+      "language": "csharp",
+      "code": "var root = new ArcSunburstNode(\n    \"All teams\",\n    new ArcSunburstNode(\"Platform\",\n        new ArcSunburstNode(\"Compute\",\n            new ArcSunburstNode(\"api\", 18910),\n            new ArcSunburstNode(\"batch\", 8160)),\n        new ArcSunburstNode(\"Storage\", 8670)),\n    new ArcSunburstNode(\"Data\",\n        new ArcSunburstNode(\"Warehouse\", 31020),\n        new ArcSunburstNode(\"Pipelines\", 9400)));\n\nvar chart = new ArcSunburstChart\n{\n    Root = root,\n    CenterLabel = \"Cloud spend\",\n    Depth = 3,\n    ValueFormat = value => \"$\" + (value / 1000).ToString(\"0.#\") + \"K\"\n};\n\nchart.NodeSelected += (_, selection) =>\n    Console.WriteLine(string.Join(\" / \", selection.Path.Select(node => node.Label)));"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcSunburstChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Root": "层级根节点；分支的值是子节点之和，叶子传数值",
+      "CenterLabel": "中心读数上方的说明，默认 Total",
+      "ShowLabels": "在放得下的扇区中心画节点名，默认 true",
+      "ShowLegend": "在右侧列出中心的直接子节点及占比，默认 true",
+      "Depth": "一次显示几圈，默认 3；更浅的分支会填满半径",
+      "ValueFormat": "格式化数值，用于中心读数、标签与悬停提示",
+      "NodeSelected": "点击扇区或按 Enter 选中节点后触发，带节点与从根到它的路径"
+    }
+  }
+}

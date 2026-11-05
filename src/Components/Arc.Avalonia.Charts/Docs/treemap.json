@@ -1,0 +1,77 @@
+{
+  "slug": "treemap",
+  "nameZh": "矩形树图",
+  "summary": "方形化矩形树图：面积对应大小、色相区分身份，标签只在放得下时出现，悬停某块会压暗其余并读出精确份额。",
+  "purpose": [
+    "当类别数量较多、又都想保留可见面积时，矩形树图比环形图更能容纳小份额：每一块的面积严格按值分配，长宽比尽量接近方形以便比较。",
+    "颜色来自 Arc 系列令牌，身份由色相承担、大小由面积承担，两种编码互不干扰；ShowValues 控制是否在每块中印出格式化的值。",
+    "标签只在块足够大时出现，避免小块的文字溢出；要看精确份额时把指针移上去，悬停块会高亮而其他块变淡。",
+    "它是一层平铺的构成图；如果类别有层级（大区里再分城市），应该改用能下钻的 sunburst。"
+  ],
+  "whenToUse": [
+    "展示 5 到 12 个类别占整体的比例，并希望小份额也占有一块可见面积时。",
+    "类别名称较短、可以在块内显示时。",
+    "要同时表达大小与身份、又不想用图例来回对照时。",
+    "需要一张接近正方形的构成图、且没有层级时。"
+  ],
+  "whenNotToUse": [
+    "类别带层级、需要逐层下钻时改用 sunburst。",
+    "只需要一条线性比例、类别很少时改用 split-bar 或 donut-chart。",
+    "想用逐格数数的方式表达百分比时改用 waffle-chart。",
+    "数据随时间变化时改用 streamgraph。"
+  ],
+  "variants": [
+    { "key": "variant-regions", "label": "地区营收", "note": "六个地区的营收占比，块内显示金额" },
+    { "key": "variant-budget", "label": "预算分配", "note": "五个预算科目的分配，单位换成千美元" },
+    { "key": "state-no-values", "label": "只显示名称", "note": "ShowValues=false，块内只留名称" },
+    { "key": "state-empty", "label": "空数据", "note": "Items 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "donut-chart", "note": "类别不超过六个、想要中心合计时用 donut chart" },
+    { "type": "alternative", "target": "waffle-chart", "note": "需要按格子数百分比时用 waffle chart" },
+    { "type": "alternative", "target": "split-bar", "note": "只要一条线性构成条时用 split bar" },
+    { "type": "alternative", "target": "sunburst", "note": "类别带层级、需要下钻时用 sunburst" }
+  ],
+  "contrasts": [
+    {
+      "target": "donut-chart",
+      "title": "Treemap 与 Donut chart",
+      "rows": [
+        { "dimension": "面积利用", "self": "方形铺满，能容纳更多类别", "other": "圆环外围有空白，类别多了扇区变窄" },
+        { "dimension": "小份额", "self": "小份额仍有一块可点面积", "other": "低于 3% 的扇区几乎不可见" },
+        { "dimension": "标签位置", "self": "名称与值印在块内", "other": "名称与百分比在图例" },
+        { "dimension": "适合问题", "self": "谁占得多、各占多少", "other": "整体构成与合计" }
+      ]
+    },
+    {
+      "target": "sunburst",
+      "title": "Treemap 与 Sunburst",
+      "rows": [
+        { "dimension": "层级", "self": "只有一层平铺", "other": "多层同心圆环，可下钻" },
+        { "dimension": "切分方式", "self": "方形面积切分", "other": "圆环角度切分" },
+        { "dimension": "空间效率", "self": "同面积下能放更多标签", "other": "层级越深外圈越窄" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "地区营收",
+      "language": "csharp",
+      "code": "var treemap = new ArcTreemap\n{\n    Items = new[]\n    {\n        new ChartValue(\"North America\", 18400),\n        new ChartValue(\"Europe\", 12400),\n        new ChartValue(\"Asia Pacific\", 8100),\n        new ChartValue(\"Latin America\", 4200),\n        new ChartValue(\"Middle East\", 2650)\n    },\n    ShowValues = true,\n    ValueFormat = value => \"$\" + (value / 1000).ToString(\"0.#\") + \"k\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcTreemap x:Name=\"Revenue\"\n                     Height=\"220\"\n                     ShowValues=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcTreemap",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "按面积大小铺排的各部分，值越大块越大",
+      "ShowValues": "在每块名称下显示格式化的值，默认 true",
+      "ValueFormat": "自定义块内数值格式"
+    }
+  }
+}

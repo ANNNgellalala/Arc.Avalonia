@@ -1,0 +1,78 @@
+{
+  "slug": "comment-thread",
+  "nameZh": "评论线程",
+  "summary": "围绕一个对象的讨论：支持嵌套回复、表情回应、已编辑与已删除标记，以及整线程解决状态。",
+  "purpose": [
+    "把一份文档、一个设计稿或一条记录的讨论收在一个线程里：标题旁显示评论数量，正文按时间顺序排列，回复用缩进与左侧细线区分层级。",
+    "每条评论可以有表情回应（带人数）、编辑标记与删除占位；MaxDepth 控制回复的最大嵌套深度，超过的回复挂到最深允许的父级。",
+    "Resolved 为 true 时线程收起为一条「已解决」说明，只留标题与数量；未解决时底部有输入框，Ctrl+Enter 或 Cmd+Enter 发送，Enter 换行。"
+  ],
+  "whenToUse": [
+    "评审意见、文档批注等围绕单个对象的讨论。",
+    "需要多层回复、表情回应与「解决/重新打开」流程的协作场景。",
+    "需要保留编辑与删除痕迹，让讨论历史可追溯时。"
+  ],
+  "whenNotToUse": [
+    "需要实时来回聊天、消息按时间流不断追加时，改用 chat-thread。",
+    "只是记录发生了什么、不需要回复时，改用 timeline。",
+    "一次性反馈、不需要线程结构时，用普通表单加评论列表即可。"
+  ],
+  "variants": [
+    { "key": "variant-nested", "label": "Nested replies", "note": "回复缩进并带左侧细线" },
+    { "key": "variant-reactions", "label": "Reactions", "note": "评论下的表情与人数" },
+    { "key": "variant-edited", "label": "Edited", "note": "时间旁标注 edited" },
+    { "key": "variant-deleted", "label": "Deleted", "note": "正文替换为「This comment was deleted.」" },
+    { "key": "state-resolved", "label": "Resolved", "note": "线程收起为已解决说明" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "chat-thread", "note": "实时对话改用 chat-thread" },
+    { "type": "alternative", "target": "timeline", "note": "只记录事件、不需要回复时改用 timeline" },
+    { "type": "complement", "target": "avatar", "note": "作者头像用 avatar 呈现" }
+  ],
+  "contrasts": [
+    {
+      "target": "chat-thread",
+      "title": "Comment thread 与 Chat thread",
+      "rows": [
+        { "dimension": "组织方式", "self": "围绕一个对象的树状讨论", "other": "按时间流动的消息流" },
+        { "dimension": "层级", "self": "回复可嵌套（受 MaxDepth 限制）", "other": "单层消息，连续同作者合并" },
+        { "dimension": "结束状态", "self": "可以标记为已解决", "other": "没有解决语义，只有已读/已送达" }
+      ]
+    },
+    {
+      "target": "timeline",
+      "title": "Comment thread 与 Timeline",
+      "rows": [
+        { "dimension": "参与者", "self": "多人互相回复", "other": "系统或人产生的事件记录" },
+        { "dimension": "结构", "self": "树状回复与表情回应", "other": "按日期分组的单层时间轴" },
+        { "dimension": "结束状态", "self": "解决/重新打开", "other": "没有状态，只追加新事件" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带回复与回应的线程",
+      "language": "csharp",
+      "code": "var maya = new ArcCommentAuthor { Id = \"maya\", Name = \"Maya Chen\" };\nvar leo = new ArcCommentAuthor { Id = \"leo\", Name = \"Leo Park\" };\n\nvar thread = new ArcCommentThread\n{\n    Title = \"Hero headline\",\n    CurrentUser = maya,\n    Placeholder = \"Write a comment\",\n    MaxDepth = 2,\n    Comments = new List<ArcComment>\n    {\n        new()\n        {\n            Id = \"c1\",\n            Author = maya,\n            CreatedAt = \"2h\",\n            Body = \"Could we try a shorter headline on mobile?\",\n            Reactions = new List<ArcCommentReaction>\n            {\n                new() { Emoji = \"👍\", Users = { \"leo\" } }\n            },\n            Replies = new List<ArcComment>\n            {\n                new() { Id = \"c2\", Author = leo, CreatedAt = \"1h\", Body = \"Testing a two-line version now.\" }\n            }\n        }\n    }\n};"
+    },
+    {
+      "title": "已解决的线程",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <fb:ArcCommentThread Title=\"Hero headline\"\n                       Resolved=\"True\"\n                       Comments=\"{Binding ClosedDiscussion}\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcCommentThread",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "线程标题，显示在头部",
+      "CurrentUser": "当前用户，用作输入框旁的头像与作者匹配",
+      "Comments": "顶层评论集合，元素是 ArcComment（Author / Body / CreatedAt / Edited / Deleted / Reactions / Replies）",
+      "Resolved": "true 时收起为已解决说明，默认 false",
+      "Placeholder": "输入框占位文案，默认 Write a comment",
+      "MaxDepth": "回复的最大嵌套深度，默认 2",
+      "CommentsChanged": "发送新评论后触发",
+      "ResolvedChanged": "解决或重新打开时触发"
+    }
+  }
+}

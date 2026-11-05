@@ -1,0 +1,49 @@
+{
+  "slug": "inbox-triage",
+  "nameZh": "收件箱分诊",
+  "summary": "一次一条的分诊队列：Inbox、Snoozed、Archive 三个文件夹、就地展开的消息行、归档 / 稍后 / 恢复动作与对应的字母快捷键，以及一次撤销。",
+  "purpose": [
+    "当目标是把收件箱清空、而不是逐封精读时用它：文件夹以标签行组织，一次只处理一条，做出的移动可以撤销一次。",
+    "消息行就地展开显示正文与动作行；归档、稍后、恢复各有字母快捷键，移动后底部出现撤销，读屏会礼貌播报每次变化。",
+    "它把「队列」和「动作」分开：上方是文件夹标签与未读过滤，中间是卡片式消息，展开的行里才是动作，避免在列表上堆满按钮。"
+  ],
+  "whenToUse": [
+    "消息或请求队列需要归档、稍后、恢复这类明确决策时。",
+    "希望一条一条处理、并把动作收进展开行时。",
+    "需要为高频动作提供字母快捷键和一次撤销时。"
+  ],
+  "whenNotToUse": [
+    "日常阅读邮件、需要在三栏间跳转时用 inbox-sidebar。",
+    "系统通知用 notification-center，不要做队列分诊。",
+    "需要多人协作或分配任务时，用任务队列或看板。"
+  ],
+  "variants": [
+    { "key": "variant-folder-tabs", "label": "Folder tabs", "note": "Inbox / Snoozed / Archive 标签行" },
+    { "key": "variant-expanded-row", "label": "Expanded row", "note": "消息就地展开，显示正文" },
+    { "key": "variant-message-actions", "label": "Actions", "note": "展开行里的归档、稍后、恢复动作" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "文件夹标签、消息行与动作都是按钮" },
+    { "type": "uses", "target": "avatar", "note": "发件人头像出现在消息卡片与展开行" },
+    { "type": "uses", "target": "tabs", "note": "三个文件夹以标签行的形式组织并切换队列" },
+    { "type": "alternative", "target": "notification-center", "note": "消息分诊与系统通知面板职责不同，按对象选择" }
+  ],
+  "contrasts": [
+    {
+      "target": "notification-center",
+      "title": "Inbox triage 与 Notification center",
+      "rows": [
+        { "dimension": "对象", "self": "需要回复或处理的邮件与请求", "other": "系统与应用通知" },
+        { "dimension": "动作", "self": "归档、稍后、恢复与撤销", "other": "标记已读、展开、批量清除" },
+        { "dimension": "呈现", "self": "单列卡片队列，行就地展开", "other": "应用页头旁的浮层面板" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "文件夹标签与可展开消息",
+      "language": "csharp",
+      "code": "var tabs = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };\nforeach (var name in new[] { \"inbox\", \"snoozed\", \"archive\" })\n{\n    tabs.Children.Add(AppKit.Chip(FolderLabel(name), folder == name, () => SwitchFolder(name)));\n}\n\nvar list = new StackPanel { Spacing = 8 };\nforeach (var mail in mails)\n{\n    list.Children.Add(AppKit.Pressable(card: mail, expanded: expanded == mail.Id, open: () => Toggle(mail.Id)));\n}\n\nreturn AppKit.Screen(new StackPanel { Spacing = 10, Children = { tabs, list, undoHost } }, 560);"
+    }
+  ]
+}

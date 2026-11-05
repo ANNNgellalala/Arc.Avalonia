@@ -1,0 +1,67 @@
+{
+  "slug": "project-board",
+  "nameZh": "项目看板",
+  "summary": "四阶段工作流看板：Planned / In progress / Review / Done 四列带计数与卡片，顶部显示冲刺进度，卡片通过显式箭头按钮在阶段间移动。",
+  "purpose": [
+    "小型团队的项目看板不需要拖拽物理。项目看板用四个固定阶段列组织任务卡，每列头部有阶段名与卡片数，卡片底部左右箭头按标签移动到相邻阶段，键盘用户与鼠标用户路径一致。",
+    "顶部一条 Sprint 进度条由 Done 卡片数除以可见卡片数得出，右侧写清“3 of 8 done · 38%”，进度只表达事实、不做动效。",
+    "All work / My work 分段控件过滤视图：切到 My work 后列数与进度都按 Maya 的任务重算，状态行写明当前视图。",
+    "Add task 会把一张草稿卡追加到 Planned，用来演示数据变化；所有任务都是内存中的样本数据。"
+  ],
+  "whenToUse": [
+    "任务数量在十几张以内、阶段固定的紧凑看板时。",
+    "需要通过显式按钮移动任务、保证键盘可达时。",
+    "需要在同一屏看到阶段分布与冲刺完成度时。"
+  ],
+  "whenNotToUse": [
+    "需要按团队分泳道、并有 WIP 上限时改用 kanban-board。",
+    "只在一个列表内排序、没有阶段概念时改用 reorderable-list。",
+    "按日期排布工作与事件时改用 week-calendar。"
+  ],
+  "variants": [
+    { "key": "variant-four-stage-columns", "label": "四阶段列", "note": "Planned / In progress / Review / Done 与计数徽章" },
+    { "key": "variant-task-card", "label": "任务卡", "note": "标签、负责人头像、编号与移动箭头" },
+    { "key": "state-sprint-progress", "label": "冲刺进度", "note": "进度条与 “3 of 8 done · 38%” 文案" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "All work 与 My work 用分段控件切换过滤视图" },
+    { "type": "uses", "target": "progress", "note": "顶部冲刺进度条由完成卡片占比驱动" },
+    { "type": "uses", "target": "avatar", "note": "任务卡右下角用头像标识负责人" },
+    { "type": "uses", "target": "badge", "note": "标签与列头计数用徽章表达" },
+    { "type": "uses", "target": "button", "note": "Add task 与卡片左右移动按钮都是 ArcButton" },
+    { "type": "alternative", "target": "kanban-board", "note": "需要泳道与 WIP 上限时用 kanban board" }
+  ],
+  "contrasts": [
+    {
+      "target": "kanban-board",
+      "title": "Project board 与 Kanban board",
+      "rows": [
+        { "dimension": "分组", "self": "单一四阶段流水线", "other": "按 stream 泳道再乘阶段列" },
+        { "dimension": "WIP 限制", "self": "没有 WIP 上限", "other": "Doing 列有上限并在超限时警告" },
+        { "dimension": "规模", "self": "十几张卡片的紧凑视图", "other": "两到多条泳道的中型看板" },
+        { "dimension": "进度", "self": "顶部一条冲刺进度条", "other": "每列计数与超限徽章" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "Project board 与 Progress",
+      "rows": [
+        { "dimension": "职责", "self": "看板、过滤与卡片移动的完整组合", "other": "只渲染一条进度条" },
+        { "dimension": "数据", "self": "任务、阶段、负责人与计数", "other": "一个 0 到 1 的比例" },
+        { "dimension": "交互", "self": "过滤视图、增加任务、移动卡片", "other": "无内置交互" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "阶段列与进度",
+      "language": "csharp",
+      "code": "var stages = new[] { \"Planned\", \"In progress\", \"Review\", \"Done\" };\nvar filter = new ArcSegmentedControl\n{\n    Label = \"Filter\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"all\", \"All work\"),\n        new ArcSegmentOption(\"mine\", \"My work\")\n    },\n    Value = \"all\"\n};\nvar sprint = new ArcProgressTrack { Fraction = 0.38, Thickness = 7 };\nvar tag = new ArcBadge { Content = \"Design\", Tone = ArcBadgeTone.Accent };\nvar owner = new ArcAvatar { DisplayName = \"Maya Chen\", Size = ArcAvatarSize.Xs };"
+    },
+    {
+      "title": "四列看板的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <Grid ColumnDefinitions=\"*,Auto\">\n    <StackPanel Spacing=\"3\">\n      <TextBlock Text=\"Sprint 24\" Classes=\"arc-heading\" />\n      <TextBlock Text=\"Northwind Studio · Nov 3 – Nov 14\" Classes=\"arc-caption\" />\n    </StackPanel>\n    <StackPanel Grid.Column=\"1\" Orientation=\"Horizontal\" Spacing=\"8\">\n      <arc:ArcSegmentedControl />\n      <arc:ArcButton Content=\"Add task\" Variant=\"Secondary\" Size=\"Sm\" />\n    </StackPanel>\n  </Grid>\n  <Grid ColumnDefinitions=\"Auto,*,Auto\">\n    <TextBlock Text=\"Progress\" Classes=\"arc-caption\" />\n    <arc:ArcProgressTrack Grid.Column=\"1\" Margin=\"12,0\" />\n    <TextBlock Grid.Column=\"2\" Text=\"3 of 8 done · 38%\" Classes=\"arc-caption\" />\n  </Grid>\n  <Grid ColumnDefinitions=\"*,*,*,*\" ColumnSpacing=\"12\">\n    <!-- 每列：阶段名 + ArcBadge 计数 + 任务卡 -->\n  </Grid>\n</StackPanel>"
+    }
+  ]
+}

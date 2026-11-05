@@ -23,6 +23,11 @@ public sealed class CheckoutSummaryPage : ArcItemPage
 {
     public override string ItemSlug => "checkout-summary";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-two-column", "variant-product-card", "variant-price-lines", "variant-promo", "state-pay-idle"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,67 @@
+{
+  "slug": "availability-picker",
+  "nameZh": "空闲时间选择器",
+  "summary": "多人约时间的区块：五天日期条、按时段排列的空闲槽位与出席人状态，右侧给出选中时间的摘要与确认按钮。",
+  "purpose": [
+    "约一个所有人都方便的时间，比单看日历更复杂：要看哪几天、每个时段的空闲人数、以及确认后的时区。空闲时间选择器把日期、槽位、参与人与摘要收进一块。",
+    "日期条每天显示日期与本月，选中的一天高亮；槽位以两列排列，每个时段用圆点与文字标出“4 人全空闲”或“2 of 4 free”，尽量不靠颜色单独表达。",
+    "右侧摘要给出选中的日期、时段、时区与每位参与人的 Free / Busy 状态，确认后按钮变为已发送；会议长度用分段控件切换（30 / 45 / 60 分钟）。",
+    "时间统一标注 Zürich 时区，摘要下方再列三个参会城市时区，避免“几点”没有时区前提。"
+  ],
+  "whenToUse": [
+    "多人会议、面试或客户约谈需要挑一个共同空闲时段时。",
+    "需要展示每位参与人的空闲人数、而不只是显示一个日历格时。",
+    "预约流程需要一个明确的确认步骤时。"
+  ],
+  "whenNotToUse": [
+    "只选一个日期时改用 calendar 或 date-picker。",
+    "只输入一个自由时间时改用 time-picker。",
+    "要展示整周的工作安排与已有事件时改用 week-calendar。"
+  ],
+  "variants": [
+    { "key": "variant-day-strip", "label": "日期条", "note": "五天日期、星期与选中高亮" },
+    { "key": "variant-slot-grid", "label": "空闲槽位", "note": "六个时段两列排列，带空闲人数" },
+    { "key": "variant-booking-summary", "label": "时间摘要", "note": "日期、时段、时区与参与人状态" },
+    { "key": "variant-time-zones", "label": "参会时区", "note": "Zürich / San Francisco / Bengaluru 三地时间" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar", "note": "摘要里的每位参与人用头像与 Free/Busy 状态呈现" },
+    { "type": "uses", "target": "avatar-group", "note": "页头用头像组汇总四位参会人" },
+    { "type": "uses", "target": "segmented-control", "note": "会议长度 30 / 45 / 60 分钟用分段控件切换" },
+    { "type": "uses", "target": "button", "note": "确认时间与步骤按钮使用 ArcButton" },
+    { "type": "alternative", "target": "week-calendar", "note": "要查看整周已有安排与时间块时用 week calendar" }
+  ],
+  "contrasts": [
+    {
+      "target": "week-calendar",
+      "title": "Availability picker 与 Week calendar",
+      "rows": [
+        { "dimension": "任务", "self": "为一次会议挑共同空闲的时间", "other": "查看并管理一周已有事件" },
+        { "dimension": "视图", "self": "日期条 + 槽位列表 + 摘要", "other": "七天 × 小时网格 + 全天行" },
+        { "dimension": "参会人", "self": "以空闲人数与 Free/Busy 呈现", "other": "以事件与占用时间呈现" },
+        { "dimension": "结果", "self": "确认后发出会议邀请", "other": "编辑已有日程" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Availability picker 与 Segmented control",
+      "rows": [
+        { "dimension": "职责", "self": "日期、槽位、参会人与确认的完整预约", "other": "在少数互斥选项间切换" },
+        { "dimension": "数据", "self": "每天的空闲人数与参会人状态", "other": "一组选项与当前值" },
+        { "dimension": "结果", "self": "产出一个可确认的时间", "other": "只更新一个选项值" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "槽位与参会人状态",
+      "language": "csharp",
+      "code": "var day = new ArcBadge { Content = \"Tue 10 Nov\", Tone = ArcBadgeTone.Accent };\nvar attendees = new ArcAvatarGroup\n{\n    Members = new[]\n    {\n        new ArcAvatarMember { Name = \"Maya Chen\" },\n        new ArcAvatarMember { Name = \"Jonas Weber\" },\n        new ArcAvatarMember { Name = \"Priya Raman\" },\n        new ArcAvatarMember { Name = \"Lena Fischer\" }\n    },\n    Max = 4,\n    Size = ArcAvatarSize.Xs,\n    Label = \"Attendees\"\n};\nvar duration = new ArcSegmentedControl\n{\n    Label = \"Meeting length\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"30\", \"30 min\"),\n        new ArcSegmentOption(\"45\", \"45 min\"),\n        new ArcSegmentOption(\"60\", \"60 min\")\n    },\n    Value = \"30\"\n};"
+    },
+    {
+      "title": "预约区块的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,340\">\n  <StackPanel Spacing=\"14\">\n    <TextBlock Text=\"November 2026\" Classes=\"arc-label\" />\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n      <!-- 五个日期卡，选中的一天使用强调色描边 -->\n    </StackPanel>\n    <TextBlock Text=\"Open times\" Classes=\"arc-label\" />\n    <!-- 2 列 × 3 行的时段按钮，附空闲人数 -->\n  </StackPanel>\n  <StackPanel Grid.Column=\"1\" Spacing=\"10\">\n    <Border Padding=\"16\" CornerRadius=\"18\" Background=\"{DynamicResource ArcSurfaceMuted}\">\n      <TextBlock Text=\"Tue 10 Nov · 10:30 – 11:00 · Zürich time\" Classes=\"arc-caption\" />\n    </Border>\n    <arc:ArcButton Content=\"Confirm time\" Variant=\"Primary\" Size=\"Sm\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

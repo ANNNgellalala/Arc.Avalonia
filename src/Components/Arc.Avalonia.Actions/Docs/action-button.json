@@ -1,0 +1,86 @@
+{
+  "slug": "action-button",
+  "nameZh": "异步行动按钮",
+  "summary": "把一次异步操作的全过程收在按钮里的行动入口：按下后原地显示 spinner，成功后变成勾选与过去的时态，再自动回到待命。",
+  "purpose": [
+    "当你有一个会返回结果的异步操作（发布、保存、提交、同步），并且希望进度与结果都出现在触发它的那个按钮上时，用 action button。",
+    "它内置 Idle → Pending → Success 的状态机：Pending 期间按钮不禁用、只是拒绝第二次按压，键盘焦点始终留在按钮上，读屏会读到 busy 状态；成功后按 ResetAfterMs 自动回到 Idle。",
+    "它是行动层里最重的一枚按钮。如果只需要一个 loading 圈、结果由你在别处展示，用更轻的 Button 就够了；如果需要先问一句再执行，用 Confirm morph。"
+  ],
+  "whenToUse": [
+    "异步提交需要就地给出成功反馈，例如发布、保存草稿、发送邀请。",
+    "希望结果留在原按钮上、不用 toast 打断用户时。",
+    "表单提交过程中键盘焦点不能跳走、读屏需要播报 busy 的场景。"
+  ],
+  "whenNotToUse": [
+    "只想要一个 loading 指示、成功与否在页面其他区域说明时，改用 button 的 Loading 面。",
+    "删除等不可逆操作需要先确认时，改用 confirm-morph。",
+    "没有异步过程、只是在几个稳定标签之间切换时，改用 action-swap。"
+  ],
+  "variants": [
+    { "key": "variant-primary", "label": "Primary", "note": "主要提交，一屏一个" },
+    { "key": "variant-secondary", "label": "Secondary", "note": "次要提交" },
+    { "key": "variant-danger", "label": "Danger", "note": "破坏性提交" },
+    { "key": "size-sm", "label": "Small", "note": "紧凑工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "size-lg", "label": "Large", "note": "对话框主行动" },
+    { "key": "state-pending", "label": "Pending", "note": "spinner 占位，保留焦点，拒绝二次按压" },
+    { "key": "state-success", "label": "Success", "note": "勾选加过去时文案，ResetAfterMs 后回 Idle" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可发起，仍保留轮廓" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "button", "note": "只需要 loading、不跟踪成功态时用更轻的 Button" },
+    { "type": "alternative", "target": "confirm-morph", "note": "不可逆操作需要就地二次确认时用它" },
+    { "type": "alternative", "target": "action-swap", "note": "在多个稳定状态间循环、没有异步结果时用它" },
+    { "type": "complement", "target": "toast", "note": "成功结果需要跨页面留存时，用 Toast 补一条可撤销提示" }
+  ],
+  "contrasts": [
+    {
+      "target": "button",
+      "title": "Action button 与 Button",
+      "rows": [
+        { "dimension": "状态机", "self": "内置 Idle → Pending → Success 三态", "other": "只有 Loading 布尔，成功与否由你判断" },
+        { "dimension": "焦点处理", "self": "Pending 时不禁用，只拒绝第二次按压", "other": "Loading 时吞掉点击，同样保留键盘焦点" },
+        { "dimension": "收尾", "self": "成功后按 ResetAfterMs 自动回到 Idle", "other": "由调用方手动把 Loading 复位" }
+      ]
+    },
+    {
+      "target": "confirm-morph",
+      "title": "Action button 与 Confirm morph",
+      "rows": [
+        { "dimension": "确认步骤", "self": "按下即执行，没有额外一问", "other": "先就地提问，确认后才执行" },
+        { "dimension": "失败表现", "self": "回到 Idle 并通过 OnActionError 回调", "other": "Error 面自带 Retry 按钮" },
+        { "dimension": "适用操作", "self": "可逆的提交，如发布、保存", "other": "不可逆的删除、撤销权限" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<arc:ArcActionButton Label=\"Publish\" PendingLabel=\"Publishing\" SuccessLabel=\"Published\"\n                        Variant=\"Primary\" Size=\"Md\" />"
+    },
+    {
+      "title": "C# 里接一次真实提交",
+      "language": "csharp",
+      "code": "var publish = new ArcActionButton\n{\n    Label = \"Publish\",\n    PendingLabel = \"Publishing\",\n    SuccessLabel = \"Published\",\n    ResetAfterMs = 2400,\n    OnAction = () => PublishAsync(),\n    OnActionError = error => ShowError(error)\n};\n\n// Pending 期间按钮不禁用：键盘焦点留在原位，读屏读到 busy。\n// 失败时会自己回到 Idle，OnActionError 负责把错误告知页面。"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcActionButton",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "待命文案，同时是默认可访问名称",
+      "PendingLabel": "异步进行中的文案，默认 Saving",
+      "SuccessLabel": "成功后的文案，默认 Saved",
+      "ResetAfterMs": "成功后回到 Idle 的延迟毫秒数，0 表示停在成功态",
+      "OnAction": "执行的异步操作；返回的 Task 结束前保持 Pending",
+      "OnActionError": "OnAction 抛错后回调；此时按钮已回到 Idle",
+      "Variant": "视觉层级：Primary / Secondary / Ghost / Danger",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "State": "当前状态：Idle / Pending / Success，可设置以便静态展示",
+      "IsEnabled": "禁用后仍保留轮廓，点击不触发 OnAction",
+      "Click": "按下时触发的基类事件；Pending 期间不会触发"
+    }
+  }
+}

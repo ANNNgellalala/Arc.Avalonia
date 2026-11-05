@@ -1,0 +1,53 @@
+{
+  "slug": "checkout-summary",
+  "nameZh": "结算摘要",
+  "summary": "单商品结算的最后一屏：左侧商品卡，右侧小计、立减、促销码、税费与支付按钮，支付在按钮里走 idle → processing → paid。",
+  "purpose": [
+    "当买家只买一件商品、需要一个安静的最终确认屏时，结算摘要把商品、优惠与税费列在一起，底部只保留一个支付动作。",
+    "价格行按顺序展开：小计、限时立减、促销码折扣与结算时计算的税费，合计随折扣实时变化。",
+    "支付按钮承担全部状态：idle 时显示金额，点击后在自己的宽度里显示 processing，成功后原地变成 Paid。"
+  ],
+  "whenToUse": [
+    "单件商品或一次性授权、需要最后确认金额时。",
+    "有促销码或限时立减需要在支付前生效时。",
+    "作为跳转到托管收银台之前的最后一步时。"
+  ],
+  "whenNotToUse": [
+    "购物袋里有多件商品、还要改数量时，用 cart-drawer。",
+    "订阅计划需要选席位、周期与附加项时，用 checkout-live。",
+    "需要完整账单信息与发票历史时，用 billing-overview。"
+  ],
+  "variants": [
+    { "key": "layout-two-column", "label": "两栏布局", "note": "左侧商品说明，右侧订单摘要" },
+    { "key": "variant-product-card", "label": "商品卡", "note": "照片占位、名称与三条权益" },
+    { "key": "variant-price-lines", "label": "价格行", "note": "Subtotal / Launch price / Tax / Total" },
+    { "key": "variant-promo", "label": "促销码", "note": "输入 LAUNCH10 后就地变成折扣行" },
+    { "key": "state-pay-idle", "label": "等待支付", "note": "支付按钮显示金额与锁图标" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "支付按钮与下载、返回入口都复用 button" },
+    { "type": "uses", "target": "input", "note": "促销码用文本输入填写并校验" },
+    { "type": "uses", "target": "badge", "note": "限时立减与保障信息用徽章和标签标出" },
+    { "type": "uses", "target": "card", "note": "商品与摘要各占一张卡片" },
+    { "type": "alternative", "target": "checkout-live", "note": "订阅制、金额随配置变化时，改用 checkout-live" }
+  ],
+  "contrasts": [
+    {
+      "target": "checkout-live",
+      "title": "Checkout summary 与 Checkout live",
+      "rows": [
+        { "dimension": "商品类型", "self": "单件商品或一次性授权", "other": "订阅计划加席位与附加项" },
+        { "dimension": "金额构成", "self": "小计、立减、促销码与税", "other": "席位、周期折扣、附加项、优惠码与税" },
+        { "dimension": "交互量", "self": "只填促销码", "other": "计划、席位、周期、附加项、国家都可改" },
+        { "dimension": "适用场景", "self": "单品购买的最后一步", "other": "免费转付费的升级结算" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "两栏摘要与一个支付动作",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"460,28,*\">\n  <StackPanel Spacing=\"12\">\n    <Border Height=\"220\" CornerRadius=\"20\"> <!-- 商品照片占位 --> </Border>\n    <TextBlock Text=\"Arc Pro\" Classes=\"arc-heading\" />\n    <TextBlock Text=\"Lifetime licence, one payment\" Classes=\"arc-caption\" />\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"10\">\n    <TextBlock Text=\"Order summary\" Classes=\"arc-label\" />\n    <!-- Subtotal / Launch price / Tax / Total -->\n    <arc:ArcInput Placeholder=\"Promo code\" />\n    <arc:ArcButton Content=\"Pay\" Variant=\"Primary\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

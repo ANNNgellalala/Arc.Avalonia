@@ -1,0 +1,146 @@
+{
+  "slug": "dialog",
+  "nameZh": "对话框",
+  "summary": "打断当前流程、要求你做一个决定的模态面板：标题、一行描述、正文与右对齐的底栏动作，Escape 与遮罩点击都能关闭。",
+  "purpose": [
+    "当你必须让用户停下来做一个决定时——删除确认、覆盖已有内容、离开未保存的页面——对话框把背景压暗到 42%，只留下一个问题、一段说明和至多两个动作。",
+    "它的结构固定：标题、描述、正文、底栏。底栏动作复用 button，通常一主一次；危险操作把 Danger 变体放在主行动的位置。",
+    "打开时焦点移进面板并在面板内循环，关闭时还给打开前的控件；按 Escape、点击遮罩或由代码把 IsOpen 置为 false 都会走同一条关闭路径。",
+    "在 Avalonia 里它是页面中的一个控件而不是独立窗口：它铺满最近的面板，并把这个面板背后的内容压暗。把页面放进固定尺寸的容器里，就能在演示或截图里看到完整的打开态。"
+  ],
+  "whenToUse": [
+    "删除、覆盖或离开未保存页面等不可逆操作，需要你先明确确认。",
+    "流程必须立刻得到一个回答、否则无法继续的分支决定。",
+    "内容短到一屏能读完，且只需要一到两个动作。"
+  ],
+  "whenNotToUse": [
+    "内容较长、或者你需要随时对照原页面时，改用 drawer 从侧边滑出。",
+    "在触屏或窄屏上、动作更适合从底部上来时，改用 bottom-sheet。",
+    "只是补充解释、不需要你做决定时，改用 tooltip 或 popover。"
+  ],
+  "variants": [
+    {
+      "key": "state-open",
+      "label": "Open",
+      "note": "遮罩压暗背景，面板上移 8px 并从 96% 缩放弹入"
+    },
+    {
+      "key": "state-destructive",
+      "label": "Destructive",
+      "note": "主行动用 Danger，放在底栏最右"
+    },
+    {
+      "key": "state-confirm",
+      "label": "Confirm",
+      "note": "主行动用 Primary，确认后立刻生效"
+    },
+    {
+      "key": "layout-footer",
+      "label": "Footer actions",
+      "note": "右对齐的一主一次两个按钮"
+    },
+    {
+      "key": "layout-no-footer",
+      "label": "No footer",
+      "note": "纯信息面板，用 Escape 或遮罩收起"
+    }
+  ],
+  "relations": [
+    {
+      "type": "alternative",
+      "target": "drawer",
+      "note": "要保留页面上下文、内容更长时用 drawer 从侧边滑出"
+    },
+    {
+      "type": "alternative",
+      "target": "bottom-sheet",
+      "note": "触屏小屏上同一个决定改用从底部升起的 bottom sheet"
+    },
+    {
+      "type": "complement",
+      "target": "button",
+      "note": "底栏动作区由 button 组成：次要行动用 Secondary，主行动用 Primary 或 Danger"
+    }
+  ],
+  "contrasts": [
+    {
+      "target": "drawer",
+      "title": "Dialog 与 Drawer",
+      "rows": [
+        {
+          "dimension": "出现方向",
+          "self": "在面板中央浮出，四周被遮罩包围",
+          "other": "从左侧或右侧边缘滑出"
+        },
+        {
+          "dimension": "适合内容",
+          "self": "一个决定、一到两个动作",
+          "other": "较长的表单、筛选条件或详情"
+        },
+        {
+          "dimension": "页面上下文",
+          "self": "完全遮住背景，要求先处理眼前的问题",
+          "other": "保留页面大部分可见，可随时对照"
+        },
+        {
+          "dimension": "键盘焦点",
+          "self": "焦点锁在居中的面板里循环",
+          "other": "焦点锁在侧面板里，关闭后回到触发控件"
+        }
+      ]
+    },
+    {
+      "target": "bottom-sheet",
+      "title": "Dialog 与 Bottom sheet",
+      "rows": [
+        {
+          "dimension": "位置",
+          "self": "垂直居中的卡片",
+          "other": "从底部升起的横向面板"
+        },
+        {
+          "dimension": "适用设备",
+          "self": "桌面与宽屏为主",
+          "other": "手机、触屏与窄窗口"
+        },
+        {
+          "dimension": "动作位置",
+          "self": "底栏右对齐的一主一次",
+          "other": "动作靠近拇指，常为整行按钮"
+        },
+        {
+          "dimension": "关闭方式",
+          "self": "Escape、遮罩点击或动作按钮",
+          "other": "下拖手势、遮罩点击或动作按钮"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一个删除确认",
+      "language": "xaml",
+      "code": "<Window xmlns:overlays=\"clr-namespace:Arc.Avalonia.Overlays.Controls;assembly=Arc.Avalonia.Overlays\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia\">\n  <overlays:ArcDialog Title=\"删除工作区\"\n                      Description=\"Acme Studio 里的项目、文件与邀请都会被删除，且无法撤销。\"\n                      IsOpen=\"{Binding IsDeleteOpen}\">\n    <overlays:ArcDialog.Footer>\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n        <arc:ArcButton Content=\"取消\" Variant=\"Secondary\" Click=\"OnCancel\" />\n        <arc:ArcButton Content=\"删除工作区\" Variant=\"Danger\" Click=\"OnDelete\" />\n      </StackPanel>\n    </overlays:ArcDialog.Footer>\n  </overlays:ArcDialog>\n</Window>"
+    },
+    {
+      "title": "用代码打开并处理关闭",
+      "language": "csharp",
+      "code": "var dialog = new ArcDialog\n{\n    Title = \"删除工作区\",\n    Description = \"该操作无法撤销。\",\n    CloseOnBackdropPress = false,\n    Content = new TextBlock { Text = \"将删除 12 个项目、48 个文件与 3 个集成。\" },\n    Footer = new StackPanel\n    {\n        Orientation = Orientation.Horizontal,\n        Spacing = 8,\n        Children =\n        {\n            new ArcButton { Content = \"取消\", Variant = ArcButtonVariant.Secondary },\n            new ArcButton { Content = \"删除工作区\", Variant = ArcButtonVariant.Danger }\n        }\n    }\n};\n\ndialog.Closed += (_, _) => statusText.Text = \"对话框已关闭\";\ndialog.IsOpen = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Overlays.Controls.ArcDialog",
+    "exclude": [
+      "TemplatedParent"
+    ],
+    "descriptions": {
+      "IsOpen": "是否显示；由页面或 ViewModel 赋值，置为 false 即关闭",
+      "Title": "标题，使用 arc-heading 样式；为空时不占位",
+      "Description": "标题下的一行说明，使用次要文字色，可为空",
+      "Content": "正文区，任意控件；高度随内容自适应",
+      "Footer": "底栏动作区，右对齐，通常放两个按钮",
+      "CloseOnBackdropPress": "点击遮罩是否关闭，默认 true；高风险操作可设为 false",
+      "Closed": "关闭后触发，无论关闭来自 Escape、遮罩还是代码"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "slug": "settings-page",
+  "nameZh": "设置页",
+  "summary": "设置页：带滑动分区导航的账户设置，字段一改动保存条就变形出现；值来自样本数据，保存只更新本地状态。",
+  "purpose": [
+    "当账户或工作区偏好需要按分区呈现时用它：左侧导航在分区之间滑动，右侧一次显示一个分区的表单。",
+    "任何字段变化都会让底部保存条从「All changes saved」变形为「N unsaved changes」，并提供 Discard 与 Save；保存只更新本页状态。",
+    "演示停在 Profile 分区：头像、姓名、邮箱、时区与界面密度，密度用分段控件；其他分区（通知、账单等）作为结构示范存在。"
+  ],
+  "whenToUse": [
+    "账户或工作区设置分成几个分区、每个分区是一组短表单时。",
+    "希望只在有改动时出现保存条、而不是常驻保存按钮时。",
+    "偏好设置以文本、下拉、分段与开关为主时。"
+  ],
+  "whenNotToUse": [
+    "安全相关（会话、双因素、密码）用 security-settings。",
+    "设置项很多、需要跨分区搜索跳转时用 settings-command。",
+    "只有一两个字段时，直接用 input 与 button 组合，不必引入整页结构。"
+  ],
+  "variants": [
+    { "key": "state-unsaved", "label": "Unsaved", "note": "有 1 条未保存变更，底部保存条已出现" },
+    { "key": "variant-section-nav", "label": "Section nav", "note": "左侧分区导航，当前分区高亮" },
+    { "key": "variant-profile-form", "label": "Profile form", "note": "头像、姓名、邮箱、时区等字段" },
+    { "key": "variant-density-segmented", "label": "Density", "note": "界面密度用分段控件切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "姓名、邮箱与投递地址输入" },
+    { "type": "uses", "target": "select", "note": "时区下拉选择" },
+    { "type": "uses", "target": "segmented-control", "note": "界面密度切换" },
+    { "type": "uses", "target": "switch", "note": "通知分区的开关项" },
+    { "type": "uses", "target": "avatar", "note": "头像预览与上传" },
+    { "type": "alternative", "target": "settings-command", "note": "短表单的分区设置与带命令面板的大设置页是两种规模" }
+  ],
+  "contrasts": [
+    {
+      "target": "settings-command",
+      "title": "Settings page 与 Settings command",
+      "rows": [
+        { "dimension": "规模", "self": "少量分区、每区几个字段", "other": "大量设置项、单页滚动" },
+        { "dimension": "查找", "self": "靠左侧分区导航浏览", "other": "搜索框长成命令面板直接跳转" },
+        { "dimension": "保存", "self": "改动后出现保存条", "other": "常驻未保存变更条" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "分区导航与保存条",
+      "language": "csharp",
+      "code": "var layout = new Grid { ColumnDefinitions = new ColumnDefinitions(\"188,*\") };\nlayout.Children.Add(AppKit.Place(new Border\n{\n    Padding = new Thickness(12),\n    Child = navHost\n}, 0));\n\nlayout.Children.Add(AppKit.Place(new Grid\n{\n    RowDefinitions = new RowDefinitions(\"*,Auto\"),\n    RowSpacing = 12,\n    Children = { bodyHost, saveHost }\n}, 1));\n\nbodyHost.Content = ProfileForm();\nBuildSaveBar(); // changed == 1：底部显示 1 unsaved change\nreturn AppKit.Screen(layout, 560);"
+    }
+  ]
+}

@@ -33,6 +33,11 @@ public sealed class RolesPermissionsPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-permissions-matrix", "state-locked-owner", "state-mixed-group", "state-unsaved-review"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Workspace settings where admins edit what each role can do.",
@@ -329,7 +334,9 @@ public sealed class RolesPermissionsPage : ArcItemPage
             Children =
             {
                 new TextBlock { Text = "Roles and permissions", Classes = { "arc-heading" } },
-                TeamKit.Caption("Northwind Studio · 24 members · last reviewed by Priya on 2 Nov")
+                TeamKit.Row(6,
+                    TeamKit.Avatar("Priya Raman", ArcAvatarSize.Xs),
+                    TeamKit.Caption("Northwind Studio · 24 members · last reviewed by Priya on 2 Nov"))
             }
         });
         Grid.SetColumn(duplicate, 1);

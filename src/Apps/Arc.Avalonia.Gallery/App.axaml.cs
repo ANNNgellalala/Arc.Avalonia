@@ -91,7 +91,9 @@ public partial class App : Application
                 return;
             }
 
-            desktop.MainWindow = new GalleryWindow();
+            var pageIndex = Array.IndexOf(args, "--page");
+            var initialSlug = pageIndex >= 0 && pageIndex + 1 < args.Length ? args[pageIndex + 1] : null;
+            desktop.MainWindow = new GalleryWindow(initialSlug);
             desktop.MainWindow.Show();
         }
 

@@ -22,6 +22,11 @@ public sealed class ScrollStoryPage : ArcItemPage
 {
     public override string ItemSlug => "scroll-story";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-steps", "variant-preview"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

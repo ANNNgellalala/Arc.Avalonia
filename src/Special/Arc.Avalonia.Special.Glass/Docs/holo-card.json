@@ -1,0 +1,77 @@
+{
+  "slug": "holo-card",
+  "nameZh": "全息卡片",
+  "summary": "带金属箔、闪粉与眩光的会员卡：指针倾斜时箔片滑移、变色，闪粉逆着倾斜漂移；点击或按 Enter 翻到背面，页面只保留当前朝外的一面。",
+  "purpose": [
+    "当会员身份本身值得展示与截图时用它：订阅会员卡、可分享的个人徽章或成就卡。卡片正面放姓名、等级、入会时间与编号，背面放使用说明。",
+    "倾斜与高光都按弹簧跟随指针，箔片的色相随角度移动；翻面是一次带轻微回弹的半圈旋转，在转到一半时交换正反面，所以文字不会镜像。",
+    "静态时它依然是一张可读的卡：正面展示身份信息，背面展示 BackNote 与全息底纹；隐藏的一面不在无障碍树里，读屏只读当前朝外的一面。"
+  ],
+  "whenToUse": [
+    "账户页或欢迎页里的会员、订阅卡片。",
+    "可分享的个人徽章、成就卡或活动通行证。",
+    "需要「正反两面」承载不同信息、并希望有金属质感的卡片时。"
+  ],
+  "whenNotToUse": [
+    "普通的内容卡片用 glass-card，全息箔片会压过内容。",
+    "多张支付卡切换与管理用 wallet-stack，单张全息卡不适合堆叠。",
+    "需要展示大量字段或表单时用 card 或设置页，卡片背面放不下表单。"
+  ],
+  "variants": [
+    { "key": "state-front", "label": "Front", "note": "正面：姓名、等级、入会时间与编号" },
+    { "key": "state-flipped", "label": "Flipped", "note": "背面：BackNote 与全息底纹" },
+    { "key": "variant-back-note", "label": "Back note", "note": "背面底部的一行说明文字" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "glass-card", "note": "普通人物卡用玻璃卡片，需要全息箔片与翻面时用全息卡片" },
+    { "type": "alternative", "target": "wallet-stack", "note": "单张会员卡用全息卡片，多张支付卡用钱包卡片堆" }
+  ],
+  "contrasts": [
+    {
+      "target": "glass-card",
+      "title": "Holo card 与 Glass card",
+      "rows": [
+        { "dimension": "表面", "self": "金属箔 + 闪粉 + 眩光，色相随角度变化", "other": "分层半透明玻璃，跟随指针的高光" },
+        { "dimension": "面数", "self": "正反两面，可翻面切换", "other": "单面，展开详情而非翻面" },
+        { "dimension": "内容", "self": "身份信息为主，背面放使用说明", "other": "照片主导，展开后放正文与行动" },
+        { "dimension": "适用", "self": "会员卡、徽章、通行证", "other": "人物、房源、创作者卡片" }
+      ]
+    },
+    {
+      "target": "wallet-stack",
+      "title": "Holo card 与 Wallet stack",
+      "rows": [
+        { "dimension": "数量", "self": "单张卡片", "other": "多张卡片堆叠并可切换" },
+        { "dimension": "信息", "self": "身份与编号，背后一行说明", "other": "余额与最近交易" },
+        { "dimension": "动作", "self": "翻面", "other": "抬起、切换、查看活动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明全息卡",
+      "language": "xaml",
+      "code": "<gl:ArcHoloCard xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                 MemberName=\"Jasmine Brooks\"\n                 Tier=\"Founding member\"\n                 Number=\"2481 0917\"\n                 IsFlipped=\"False\" />"
+    },
+    {
+      "title": "正反面与翻转回调",
+      "language": "csharp",
+      "code": "var card = new ArcHoloCard\n{\n    MemberName = \"Jasmine Brooks\",\n    Tier = \"Founding member\",\n    MemberSince = \"Member since 2024\",\n    Number = \"2481 0917\",\n    BackNote = \"Valid through 2029. Present at the door.\",\n    MaxTilt = 14,\n    Intensity = 1,\n    IsFlipped = false\n};\n\ncard.FlippedChanged += (_, flipped) => Console.WriteLine(flipped ? \"back\" : \"front\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcHoloCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "MemberName": "持卡人姓名，卡片正面的主标题",
+      "Tier": "会员等级文字，例如 Founding member",
+      "MemberSince": "入会时间说明",
+      "Number": "卡号或会员编号",
+      "BackNote": "背面底部的一行说明，默认带使用提示",
+      "MaxTilt": "指针倾斜的最大角度，默认 14",
+      "Intensity": "箔片与闪粉的强度，0 到 1，默认 1",
+      "IsFlipped": "是否显示背面，点击或 Enter 切换",
+      "FlippedChanged": "翻面完成后触发，参数为是否显示背面"
+    }
+  }
+}

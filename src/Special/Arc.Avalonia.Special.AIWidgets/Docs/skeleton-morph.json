@@ -1,0 +1,75 @@
+{
+  "slug": "skeleton-morph",
+  "nameZh": "骨架形变",
+  "summary": "按真实布局占位的骨架加载：灰块与原内容同框，加载完成后一块块在原地淡出、内容浮现，块间按阅读顺序错开 40 ms。",
+  "purpose": [
+    "加载时用骨架占住真实版面：每个 ArcMorphBlock 保留其内容的盒子，圆形块画圆、多行块按 Lines 画几条线，所以占位不会把布局撑大，内容到位时也不会跳动。",
+    "完成不是一次性硬切：块按阅读顺序逐个解析，默认每块错开 40 ms（Stagger），每块先从骨架淡出、内容带着约 1.5% 的缩放浮现，整个过程原地发生。",
+    "加载中的骨架有一道缓慢的明暗呼吸，提示「还在等」；一旦解析完成就停止。回到 Loading 是立刻的，快速重新加载不会留下半块残留。",
+    "它只负责子树的呈现：Loading 为 true 时把子块当骨架，false 时显示真实内容；子块可以是任意控件（头像圆、标题、段落、徽章与按钮行），因此同一份布局在两种状态下完全对齐。"
+  ],
+  "whenToUse": [
+    "个人资料卡、信息流与列表这类几秒内就会加载完的内容。",
+    "数据未到但布局已知的面板与仪表盘。",
+    "从灰块硬切到内容会显得突兀、希望原地过渡的地方。"
+  ],
+  "whenNotToUse": [
+    "几百行的长列表，逐块错开的开销不划算，改用普通 skeleton 或虚拟化列表。",
+    "加载会持续很久时，改用进度指示器，让人知道还要等多久。",
+    "只是一个按钮内的短等待时，改用 morph-loader。"
+  ],
+  "variants": [
+    { "key": "state-loading", "label": "Loading", "note": "骨架占位：圆形与线条块，带呼吸" },
+    { "key": "state-loaded", "label": "Loaded", "note": "内容已就位，块与加载前同框" },
+    { "key": "variant-circle", "label": "Circle block", "note": "圆形块，用作头像占位" },
+    { "key": "variant-multi-line", "label": "Multi-line block", "note": "按 Lines 画多行线条的段落块" },
+    { "key": "variant-content-row", "label": "Content row", "note": "承载徽章、按钮等非文本内容的块" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "skeleton", "note": "静态骨架、不需要原地解析过渡时改用 skeleton" },
+    { "type": "alternative", "target": "morph-loader", "note": "按钮或行内的小等待改用 morph loader" },
+    { "type": "complement", "target": "card", "note": "骨架常包住整张卡片，卡片负责边界与内边距" }
+  ],
+  "contrasts": [
+    {
+      "target": "skeleton",
+      "title": "Skeleton morph 与 Skeleton",
+      "rows": [
+        { "dimension": "解析方式", "self": "块按阅读顺序错开、原地淡出并浮现内容", "other": "骨架整体消失，内容一次出现" },
+        { "dimension": "布局依据", "self": "骨架块保留真实内容的盒子", "other": "手写形状，容易与内容尺寸不一致" },
+        { "dimension": "适合场景", "self": "卡片、资料页等结构已知的中等区块", "other": "简单列表或占位面积小的位置" }
+      ]
+    },
+    {
+      "target": "morph-loader",
+      "title": "Skeleton morph 与 Morph loader",
+      "rows": [
+        { "dimension": "占位对象", "self": "按真实布局摊开的多个骨架块", "other": "一枚 16–32 px 的标记" },
+        { "dimension": "结束方式", "self": "块逐块替换成内容", "other": "标记折成勾或叉" },
+        { "dimension": "依赖布局", "self": "需要知道内容的结构与行数", "other": "不依赖布局，塞进哪都行" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：加载与完成同一张卡",
+      "language": "xaml",
+      "code": "<arc:ArcSkeletonMorph xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                     Loading=\"True\"\n                     Stagger=\"0.04\"\n                     LoadingLabel=\"Loading profile\">\n  <StackPanel Spacing=\"12\">\n    <arc:ArcMorphBlock Circle=\"True\" Width=\"48\" Height=\"48\" />\n    <arc:ArcMorphBlock Lines=\"1\" LineHeight=\"22\">\n      <TextBlock Text=\"Mina Okafor\" />\n    </arc:ArcMorphBlock>\n    <arc:ArcMorphBlock Lines=\"3\" LineHeight=\"19\">\n      <TextBlock Text=\"Draws the motion language for Arc's surfaces.\" />\n    </arc:ArcMorphBlock>\n  </StackPanel>\n</arc:ArcSkeletonMorph>"
+    },
+    {
+      "title": "代码里切换加载状态",
+      "language": "csharp",
+      "code": "var region = new ArcSkeletonMorph\n{\n    Loading = true,\n    Stagger = 0.04,\n    LoadingLabel = \"Loading profile\",\n    Child = card   // card 内按真实布局摆放 ArcMorphBlock\n};\n\n// 数据到了：块按阅读顺序逐块解析，圆块与文本块都在原框内替换\nregion.Loading = false;\n\n// 重新加载是立刻的，不会留下半块残留\nregion.Loading = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcSkeletonMorph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Loading": "true 时子树呈现为骨架，false 时解析成真实内容，默认 true",
+      "Stagger": "相邻两块解析之间的间隔（秒），默认 0.04",
+      "LoadingLabel": "加载中给读屏的状态文案，默认 Loading",
+      "Child": "被包裹的子树，其中的 ArcMorphBlock 会被收集并按顺序解析"
+    }
+  }
+}

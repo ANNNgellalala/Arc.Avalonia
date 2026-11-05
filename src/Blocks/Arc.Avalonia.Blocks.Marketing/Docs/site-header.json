@@ -1,0 +1,55 @@
+{
+  "slug": "site-header",
+  "nameZh": "站点页头",
+  "summary": "营销站的顶部区块：分区共享同一块浮层面板，滚动越过阈值后从透明变为实心，指示条在触发词下滑动；窄容器下折叠成一张手风琴式 sheet。",
+  "purpose": [
+    "它是营销站、落地页或文档站的最顶一行：品牌、三到六个分区，加上一个明确的注册行动。你可以把它当成整页的导航骨架，而不是单个控件。",
+    "分区共享同一块浮层面板，面板在分区之间做尺寸与位置的变形，指示条在触发词下滑动；这样不会同时打开多个菜单，也不会在页面上留下多块浮层。",
+    "组成依赖清楚：导航与折叠行为由 mega menu morph 提供，右侧行动是可复用的 button，链接行上的 New 之类状态用 badge 标出。"
+  ],
+  "whenToUse": [
+    "营销站、落地页或文档站的顶部导航，需要品牌、三到六个分区和一个注册行动时。",
+    "分区下有多条值得解释的目的地（标题加一句说明），适合用浮层菜单一次呈现时。",
+    "页面顶部需要在滚动后变为实心、在窄容器下折叠成 sheet 的响应式行为时。"
+  ],
+  "whenNotToUse": [
+    "应用内部的侧边导航或工作台顶栏，用 workspace-sidebar 或 sidebar-rail，不要套营销页头。",
+    "只需要页面标题与视图标签时，用 page-header，那里不需要整站分区浮层，也不必放注册行动。",
+    "分区少于三个、导航只有一两个链接时，用 button-group 就够，浮层变形反而显得夸张。"
+  ],
+  "variants": [
+    { "key": "state-transparent", "label": "Transparent", "note": "页顶：bar 无背景与下边框，页面内容从下方透出" },
+    { "key": "state-solid", "label": "Solid", "note": "滚动越过阈值：surface 背景加一条细下边框" },
+    { "key": "state-narrow", "label": "Narrow", "note": "窄容器：分区折进手风琴 sheet，主行动留在 bar 上" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "mega-menu-morph", "note": "导航行、共享浮层、指示条与折叠 sheet 都由 ArcMegaMenu 提供" },
+    { "type": "uses", "target": "button", "note": "Sign in / Start free、触发词与折叠态菜单按钮都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "链接行上的 New 之类状态由 ArcBadge 标出" },
+    { "type": "alternative", "target": "page-header", "note": "内容页的标题区用 page header，营销站顶栏才需要分区浮层" }
+  ],
+  "contrasts": [
+    {
+      "target": "page-header",
+      "title": "Site header 与 Page header",
+      "rows": [
+        { "dimension": "职责", "self": "整站导航与分区的入口", "other": "项目或应用内页面的标题与视图标签" },
+        { "dimension": "浮层", "self": "分区共享一块浮层面板并在其间变形", "other": "没有分区浮层，标签直接切换内容" },
+        { "dimension": "滚动行为", "self": "越过滚动阈值后从透明变实心", "other": "滚动时折叠成紧凑 bar，保留页面上下文" },
+        { "dimension": "顶部内容", "self": "品牌、分区导航与注册行动", "other": "页面标题、标签与页面级行动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架：页头加内容",
+      "language": "xaml",
+      "code": "<Grid xmlns:arc=\"using:Arc.Avalonia.Navigation.Controls\" RowDefinitions=\"Auto,*\">\n  <!-- 分区与行动在后台代码里赋值，见下一个示例 -->\n  <arc:ArcMegaMenu Brand=\"Acme\"\n                   BrandIcon=\"layers\"\n                   Label=\"Main\"\n                   Current=\"product\"\n                   CollapseBelow=\"900\" />\n  <ContentControl Grid.Row=\"1\" Content=\"{Binding PageContent}\" />\n</Grid>"
+    },
+    {
+      "title": "构造分区、行动与折叠态",
+      "language": "csharp",
+      "code": "var header = new ArcMegaMenu\n{\n    Brand = \"Acme\",\n    BrandIcon = \"layers\",\n    Label = \"Main\",\n    Current = \"product\",\n    CollapseBelow = 900, // 窄于 900px 时折成 sheet；演示可用 ForceNarrow 固定折叠态\n    Sections = new List<ArcMegaMenuSection>\n    {\n        new()\n        {\n            Value = \"product\",\n            Label = \"Product\",\n            Groups = new List<ArcMegaMenuGroup>\n            {\n                new()\n                {\n                    Title = \"Platform\",\n                    Links = new List<ArcMegaMenuLink>\n                    {\n                        new() { Label = \"Automations\", Description = \"Run work when events land\", Icon = \"zap\" },\n                        new() { Label = \"Data\", Description = \"One source for every team\", Icon = \"database\" }\n                    }\n                }\n            },\n            Footer = \"Trusted by 4,000 product teams.\"\n        },\n        new() { Value = \"docs\", Label = \"Docs\" },\n        new() { Value = \"pricing\", Label = \"Pricing\" }\n    },\n    Actions = new List<ArcMegaMenuAction>\n    {\n        new() { Label = \"Sign in\", Variant = ArcMegaMenuActionVariant.Quiet },\n        new() { Label = \"Start free\", Variant = ArcMegaMenuActionVariant.Primary }\n    }\n};\n\nheader.ItemInvoked += (_, args) => Navigate(args.Destination);"
+    }
+  ]
+}

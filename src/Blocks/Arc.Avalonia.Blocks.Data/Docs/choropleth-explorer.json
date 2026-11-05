@@ -1,0 +1,56 @@
+{
+  "slug": "choropleth-explorer",
+  "nameZh": "分级设色探索器",
+  "summary": "等面积瓦片地图按地区给收入、增长或渗透率着色，配分级色阶图例、同步排名列表与国家切换，可缩放查看单个地区。",
+  "purpose": [
+    "当需要比较各地区的收入或增长、又不想让真实地理面积误导判断时，用 choropleth explorer：每个地区占一格等面积瓦片，颜色深浅表示数值高低。",
+    "国家切换（US / DE / JP 等）会换掉整套地区与数值；指标切换（Revenue / Growth / Penetration）更换色阶单位与格式；右侧排名列表与地图同步，选中一行地图会聚焦对应地区。",
+    "图例按四到五级分档并给出每档的数值区间，避免只靠颜色猜数字；相机支持以指针为中心缩放，读到更细的地区。"
+  ],
+  "whenToUse": [
+    "按地区比较收入、增长或渗透率时。",
+    "真实地理面积会误导判断、需要等面积瓦片时。",
+    "需要图例与排名列表辅助精确读数时。"
+  ],
+  "whenNotToUse": [
+    "需要展示真实地理形状与边界时，用地图类专用图。",
+    "时间趋势是重点时，用 line-chart 或 revenue-explorer。",
+    "只需要几个地区的数字时，用 metric-card 或数据表。"
+  ],
+  "variants": [
+    { "key": "layout-choropleth", "label": "整体布局", "note": "瓦片地图、图例、排名列表与国家切换并置" },
+    { "key": "variant-tile-map", "label": "Tile map", "note": "等面积瓦片与按数值着色的地区格" },
+    { "key": "variant-legend", "label": "Legend", "note": "分级色阶与每档的数值区间" },
+    { "key": "variant-ranked-list", "label": "Ranked list", "note": "与地图同步的地区排名" },
+    { "key": "variant-country-switch", "label": "Country", "note": "国家与指标的切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "segmented-control", "note": "指标切换用分段控件" },
+    { "type": "uses", "target": "select", "note": "国家选择用下拉选择" },
+    { "type": "uses", "target": "card", "note": "地图与排名列表各用一张卡片承载" },
+    { "type": "alternative", "target": "revenue-globe", "note": "需要用三维地球讲全球叙事时，改用 revenue globe" }
+  ],
+  "contrasts": [
+    {
+      "target": "revenue-globe",
+      "title": "Choropleth explorer 与 Revenue globe",
+      "rows": [
+        { "dimension": "地图", "self": "等面积瓦片，颜色即数值", "other": "点阵三维地球，光点与弧线" },
+        { "dimension": "读数", "self": "色阶图例加排名列表，可精确比较", "other": "以叙事为主，数值在右侧明细" },
+        { "dimension": "交互", "self": "切国家与指标、缩放、选中地区", "other": "回放时钟逐小时揭开市场" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,300\">\n  <charts:ArcChoroplethMap Height=\"268\" />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：数值与格式",
+      "language": "csharp",
+      "code": "var values = BuildValues(country, metric);\nvar map = new ArcChoroplethMap(country.Regions, values, metricLabel, formatter, zoom)\n{\n    Height = 268\n};\n\n// 排名列表与地图共用同一份 values\nranked.ItemsSource = values.OrderByDescending(pair => pair.Value);"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "slug": "glass-card",
+  "nameZh": "玻璃卡片",
+  "summary": "照片主导的人物或内容卡片：边缘高光跟着指针，倾斜时卡片按弹簧回正；点击或按 Enter 把玻璃面板展开成详情，露出正文与两个行动。",
+  "purpose": [
+    "当照片本身承担识别、细节可以等一次点击时用它：落地页上的人物卡、发现网格里的房源或创作者。",
+    "卡片的照片是主体，玻璃面板承载姓名、副标题、评分与副行动；展开时标题头保持不动，面板在原位长高，正文淡入、照片轻微放大。",
+    "指针经过时倾斜与边缘高光按弹簧跟随，离开时平滑回正；所有内容仍有真实按钮语义，键盘可以展开、收起并把焦点留在标题头上。"
+  ],
+  "whenToUse": [
+    "落地页或发现网格里以照片为主的人物、房源、创作者卡片。",
+    "需要「先看人/物，再看细节」的渐进披露，细节不必常驻时。",
+    "希望卡片本身有轻微倾斜与边缘光、但内容仍可键盘操作时。"
+  ],
+  "whenNotToUse": [
+    "只需要静态图片加标题时用 card，倾斜与边缘高光反而分散注意力。",
+    "内容是纯文字、没有主导照片时用 expandable-card 或 card。",
+    "卡片要同时展开多个、或细节需要固定可见时，用卡片网格加详情页更合适。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "玻璃面板展开，显示正文与两个行动" },
+    { "key": "variant-rim", "label": "Rim highlight", "note": "边缘高光停在指针位置，静止时仍有渐变" },
+    { "key": "variant-rating", "label": "Rating", "note": "Aside 在标题行右侧给出 4.9 评分" },
+    { "key": "variant-actions", "label": "Actions", "note": "主行动 Follow 与次行动 Message" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "card", "note": "静态内容卡用 card，照片主导且细节可展开时用玻璃卡片" },
+    { "type": "alternative", "target": "hover-card", "note": "只做悬停预览用 hover card，卡片本体可展开时用玻璃卡片" }
+  ],
+  "contrasts": [
+    {
+      "target": "card",
+      "title": "Glass card 与 Card",
+      "rows": [
+        { "dimension": "主体", "self": "照片占满卡片，玻璃面板浮在其上", "other": "内容与图片按常规排版并列" },
+        { "dimension": "细节", "self": "正文收在可展开的玻璃面板里", "other": "内容通常全部直接可见" },
+        { "dimension": "动效", "self": "指针倾斜、边缘高光与展开变形", "other": "以悬停阴影或抬升为主" },
+        { "dimension": "适用", "self": "人物、房源、创作者这类照片主导的卡片", "other": "通用内容卡片" }
+      ]
+    },
+    {
+      "target": "hover-card",
+      "title": "Glass card 与 Hover card",
+      "rows": [
+        { "dimension": "触发", "self": "点击或 Enter 展开卡片本身", "other": "指针悬停即出现，移开消失" },
+        { "dimension": "内容量", "self": "可容纳正文与多个行动", "other": "只够一段摘要或少量信息" },
+        { "dimension": "焦点", "self": "展开后焦点进入详情，Esc 收起", "other": "通常不抢焦点" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明卡片",
+      "language": "xaml",
+      "code": "<gl:ArcGlassCard xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                  Title=\"Jasmine Brooks\"\n                  Subtitle=\"Design lead, Lisbon\"\n                  Aside=\"4.9\"\n                  ActionLabel=\"Follow\"\n                  SecondaryLabel=\"Message\"\n                  IsOpen=\"True\" />"
+    },
+    {
+      "title": "正文、场景与展开回调",
+      "language": "csharp",
+      "code": "var card = new ArcGlassCard\n{\n    Title = \"Jasmine Brooks\",\n    Subtitle = \"Design lead, Lisbon\",\n    Aside = \"4.9\",\n    Body = \"Leads the design system at Meridian. Hosts the Thursday critique.\",\n    ActionLabel = \"Follow\",\n    SecondaryLabel = \"Message\",\n    ImageAlt = \"Portrait of Jasmine Brooks\",\n    Scene = ArcGlassScene.Villa,\n    IsOpen = false\n};\n\ncard.OpenChanged += (_, open) => Console.WriteLine(open ? \"expanded\" : \"collapsed\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcGlassCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "卡片标题，同时用于标题行的读屏名称",
+      "Subtitle": "标题下方的一行说明",
+      "Aside": "标题行右侧的小读数，例如评分 4.9",
+      "Body": "展开后显示的正文",
+      "ActionLabel": "展开面板里的主行动文字，默认 Follow",
+      "SecondaryLabel": "展开面板里的次行动文字，默认 Message",
+      "ImageAlt": "照片的无障碍替代文本",
+      "Tilt": "指针倾斜的最大角度，默认 6",
+      "IsOpen": "是否展开详情；点击标题或按 Enter 切换",
+      "Scene": "用令牌绘制的照片场景，默认 Studio",
+      "OpenChanged": "展开或收起时触发，参数为当前状态"
+    }
+  }
+}

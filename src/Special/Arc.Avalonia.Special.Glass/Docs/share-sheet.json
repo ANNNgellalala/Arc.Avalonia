@@ -1,0 +1,81 @@
+{
+  "slug": "share-sheet",
+  "nameZh": "分享面板",
+  "summary": "从 Share 按钮展开的玻璃分享面板：同一块形状在按钮、面板与发送确认之间弹簧变形；面板里可以复制链接、切换访问级别、发布到渠道，并挑几个人发送——选中的人变成 chip。",
+  "purpose": [
+    "当文档、设计或看板头部有一个经常被点的 Share 按钮时用它：链接复制、访问级别、发送给几个人，都能在一个面板里完成。",
+    "面板由 Share 按钮的矩形长出来：复制、访问选项、渠道与人物选择区按顺序排列；发送后同一形状折成「已发送」确认。",
+    "键盘与指针一致：Enter/空格打开、Esc 收起并回到按钮；方向键在访问选项间移动，Tab 走复制、访问、渠道、人物与发送；每次变化都通过礼貌的状态行播报。"
+  ],
+  "whenToUse": [
+    "文档、设计或看板头部的 Share 按钮，分享是高频动作时。",
+    "分享流程同时包含复制链接、访问级别与发给最近几个人时。",
+    "希望分享面板以按钮为起点展开、并以确认收口的紧凑流程。"
+  ],
+  "whenNotToUse": [
+    "只需要复制链接时用 copy-button，不必打开整个面板。",
+    "要从大量成员里挑选时用 user-menu 或邀请对话框，面板里的人选只适合最近几个。",
+    "需要完整权限管理页时用 share-access 或设置页，分享面板只做一次分享。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "面板从 Share 按钮展开，复制、访问、渠道与发送都在" },
+    { "key": "variant-access", "label": "Access", "note": "访问级别选项：Team 与 Anyone with the link" },
+    { "key": "variant-people-chip", "label": "People chips", "note": "已选人物变成 chip，并计入发送数量" },
+    { "key": "variant-channels", "label": "Channels", "note": "Slack 与 Email 两个渠道行，完成时显示 Posted / Sent" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dialog", "note": "通用确认用 dialog，专门分享一个对象时用分享面板" },
+    { "type": "alternative", "target": "user-menu", "note": "选择更多成员用 user menu，分享面板只放最近几个人" },
+    { "type": "complement", "target": "copy-button", "note": "面板里的复制链接行与独立的复制按钮可以互相替代使用" }
+  ],
+  "contrasts": [
+    {
+      "target": "dialog",
+      "title": "Share sheet 与 Dialog",
+      "rows": [
+        { "dimension": "起点", "self": "从 Share 按钮自己的矩形变形展开", "other": "在屏幕中央淡入" },
+        { "dimension": "内容", "self": "复制、访问、渠道、人物与发送的固定流程", "other": "任意内容与自定义按钮" },
+        { "dimension": "收口", "self": "同一形状折成已发送确认", "other": "关闭或执行主行动" },
+        { "dimension": "适用", "self": "单次分享动作", "other": "确认、表单与说明" }
+      ]
+    },
+    {
+      "target": "user-menu",
+      "title": "Share sheet 与 User menu",
+      "rows": [
+        { "dimension": "目的", "self": "分享当前对象并设置访问级别", "other": "切换身份、账户或打开设置" },
+        { "dimension": "人物", "self": "最近几个人作为快捷 chip", "other": "菜单项，不是人选集" },
+        { "dimension": "结果", "self": "发送确认与渠道状态", "other": "导航或执行菜单项" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明分享面板",
+      "language": "xaml",
+      "code": "<gl:ArcShareSheet xmlns:gl=\"clr-namespace:Arc.Avalonia.Special.Glass.Controls;assembly=Arc.Avalonia.Special.Glass\"\n                   Label=\"Share\"\n                   Title=\"Q3 roadmap\"\n                   Link=\"https://example.com/d/q3-roadmap\"\n                   AccessValue=\"team\"\n                   IsOpen=\"True\" />"
+    },
+    {
+      "title": "访问级别、渠道与选中人物",
+      "language": "csharp",
+      "code": "var sheet = new ArcShareSheet\n{\n    Label = \"Share\",\n    Title = \"Q3 roadmap\",\n    Link = \"https://example.com/d/q3-roadmap\",\n    AccessValue = \"team\",\n    People = new List<ArcSharePerson>\n    {\n        new() { Id = \"ana\", Name = \"Ana Ruiz\" },\n        new() { Id = \"sam\", Name = \"Sam Lee\" },\n        new() { Id = \"noah\", Name = \"Noah Park\" }\n    },\n    Access = new List<ArcShareAccessOption>\n    {\n        new() { Value = \"team\", Label = \"Team\", Description = \"Anyone on the team can view\", Icon = \"lock\" },\n        new() { Value = \"public\", Label = \"Anyone with the link\", Description = \"Can view and comment\", Icon = \"globe\" }\n    },\n    Channels = new List<ArcShareChannel>\n    {\n        new() { Id = \"slack\", Label = \"Slack\", Icon = \"message-circle\", DoneLabel = \"Posted\" },\n        new() { Id = \"email\", Label = \"Email\", Icon = \"mail\", DoneLabel = \"Sent\" }\n    }\n};\n\nsheet.Pick(\"ana\"); // 预选一个人，变成 chip\nsheet.IsOpen = true;\n\nsheet.Copied += (_, link) => Console.WriteLine(link);\nsheet.Sent += (_, _) => Console.WriteLine(\"sent\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Glass.Controls.ArcShareSheet",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "被分享对象的标题，默认 Q3 roadmap",
+      "Link": "复制行与发送使用的链接",
+      "People": "最近可发送的人；每项包含 Id 与 Name",
+      "Access": "访问级别选项；每项包含 Value、Label、Description 与 Icon",
+      "Channels": "可发布到的渠道；每项包含 Id、Label、Icon 与 DoneLabel",
+      "AccessValue": "当前访问级别的 Value",
+      "IsOpen": "面板是否展开；点击 Share 按钮或按 Enter 切换",
+      "Label": "Share 按钮与面板的无障碍名称，默认 Share",
+      "Pick": "以程序方式选中一个人，例如 Pick(\"ana\")",
+      "Sent": "发送成功后触发",
+      "Copied": "复制链接后触发，参数是链接"
+    }
+  }
+}

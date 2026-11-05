@@ -1,0 +1,48 @@
+{
+  "slug": "logo-marquee",
+  "nameZh": "客户标志墙",
+  "summary": "安静平移的客户标志行：两行副本无缝衔接，带一个暂停按钮与一行规模说明。",
+  "purpose": [
+    "用一行缓慢移动的客户标志做社会证明，不抢注意力：两行相同的标志按同一速度平移，接缝处循环，不会出现跳变。",
+    "暂停按钮是真实按钮：点一下停在原处并把状态文案改成 Paused，再点继续；「减少动效」打开时整行保持首帧并禁用按钮，状态文案说明原因。",
+    "组成依赖：整块装在 card 里，暂停控件用 button，规模说明用 badge；标志是示例文字与图标，不代表真实客户背书。"
+  ],
+  "whenToUse": [
+    "首屏之下的社会证明带，客户名字比标志更重要时。",
+    "希望有一点动效但又不希望它抢走注意力时。",
+    "收尾处重复客户列表时。"
+  ],
+  "whenNotToUse": [
+    "需要用数字证明规模时，改用 stats-band。",
+    "客户标志需要链接到案例页、逐个可点时，用普通网格而不是滚动行。",
+    "页面已经很长、观众不会看完时，可以省略这一块。"
+  ],
+  "variants": [
+    { "key": "variant-row", "label": "Marquee row", "note": "两行副本平移的标志行" },
+    { "key": "variant-pause-control", "label": "Pause control", "note": "Pause / Play 按钮与 Moving 状态文案" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Pause / Play 控件是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "规模说明用 ArcBadge 呈现在底部" },
+    { "type": "uses", "target": "card", "note": "整块标志墙装在 ArcCard 里" },
+    { "type": "alternative", "target": "stats-band", "note": "用数字而不是标志做证明时改用 stats band" }
+  ],
+  "contrasts": [
+    {
+      "target": "stats-band",
+      "title": "Logo marquee 与 Stats band",
+      "rows": [
+        { "dimension": "证明方式", "self": "一排客户标志与名称", "other": "四个带趋势与变化的数字" },
+        { "dimension": "动效", "self": "持续平移，可暂停", "other": "数字滚动一次即停" },
+        { "dimension": "阅读成本", "self": "一眼扫过", "other": "需要读标签、数值与变化" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "标志行与暂停控件",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <c:ArcCard Padding=\"26,22,26,20\">\n    <StackPanel Spacing=\"14\">\n      <StackPanel Spacing=\"3\">\n        <TextBlock Text=\"Trusted by product teams at\" Classes=\"arc-caption\" />\n        <TextBlock Text=\"Quiet software for teams that ship\" Classes=\"arc-heading\" />\n      </StackPanel>\n      <TextBlock Text=\"Northwind · Cobalt · Fieldkit · Meridian · Halcyon · Parcel\"\n                 Classes=\"arc-body-sm arc-secondary\"\n                 TextWrapping=\"Wrap\" />\n      <Grid ColumnDefinitions=\"Auto,*,Auto,Auto\">\n        <TextBlock Text=\"Sample customer marks\" Classes=\"arc-caption\" />\n        <c:ArcBadge Grid.Column=\"2\" Content=\"4,000 teams · 38 countries\" Tone=\"Neutral\" />\n        <c:ArcButton Grid.Column=\"3\" Content=\"Pause\" Variant=\"Secondary\" Size=\"Sm\" Margin=\"12,0,0,0\" />\n      </Grid>\n    </StackPanel>\n  </c:ArcCard>\n</Window>"
+    }
+  ]
+}

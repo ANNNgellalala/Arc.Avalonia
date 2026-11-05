@@ -1,0 +1,51 @@
+{
+  "slug": "sidebar-rail",
+  "nameZh": "侧边导航栏",
+  "summary": "侧边导航栏：产品应用的外壳，导航分组就地展开，按括号键可折成 64px 图标栏，面包屑与内容跟随所选路由。",
+  "purpose": [
+    "当区块需要承担整个产品应用外壳时用它：左侧导航按分组展开，右侧是顶栏面包屑、指标与内容区。",
+    "导航分组就地展开与收起，当前路由在导航、面包屑和内容标题三处同步；按括号键或底部按钮可以把侧栏折成 64px 图标栏。",
+    "内容是样本数据（指标、最近活动），用来展示外壳的比例与节奏；窄宽度的导航 sheet 是已知近似，不做为独立页面。"
+  ],
+  "whenToUse": [
+    "产品应用的完整外壳，需要导航、面包屑与内容区时。",
+    "导航有嵌套分组、需要就地展开而不是新开页面时。",
+    "希望侧栏可折成图标栏、为内容让出宽度的应用。"
+  ],
+  "whenNotToUse": [
+    "多工作区切换更重要时用 workspace-sidebar，它把工作区切换器放在首位。",
+    "文档站导航用 docs-sidebar。",
+    "只有几个页面、不需要分组的应用，用简单的 tabs 或顶部导航即可。"
+  ],
+  "variants": [
+    { "key": "variant-expanded-groups", "label": "Expanded groups", "note": "设计 / 开发两个分组就地展开" },
+    { "key": "variant-app-content", "label": "App content", "note": "右侧指标卡片与最近活动" },
+    { "key": "variant-breadcrumb", "label": "Breadcrumb", "note": "顶栏面包屑跟随当前路由" },
+    { "key": "state-active", "label": "Active route", "note": "Overview 路由在导航与内容标题同步高亮" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "导航行、分组标题、折叠按钮与内容动作" },
+    { "type": "uses", "target": "avatar", "note": "底部账户区与活动流的头像" },
+    { "type": "uses", "target": "badge", "note": "Pro 计划与指标增减用徽标标出" },
+    { "type": "alternative", "target": "docs-sidebar", "note": "产品外壳的侧栏与文档站的导航树职责不同" }
+  ],
+  "contrasts": [
+    {
+      "target": "docs-sidebar",
+      "title": "Sidebar rail 与 Docs sidebar",
+      "rows": [
+        { "dimension": "导航", "self": "产品路由分组，可就地展开与折叠", "other": "文档页面树，可过滤与版本切换" },
+        { "dimension": "内容区", "self": "指标、活动流等应用内容", "other": "带大纲的文章正文" },
+        { "dimension": "折叠", "self": "可折成 64px 图标栏", "other": "固定三栏，不参与折叠" },
+        { "dimension": "适用", "self": "产品应用外壳", "other": "文档站" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "应用外壳的两栏结构",
+      "language": "xaml",
+      "code": "<Grid xmlns=\"https://github.com/avaloniaui\" ColumnDefinitions=\"236,*\">\n  <Border Grid.Column=\"0\" Padding=\"10\">\n    <StackPanel Spacing=\"6\">\n      <StackPanel Spacing=\"1\" />\n      <Button Content=\"Collapse sidebar\" HorizontalAlignment=\"Stretch\" />\n    </StackPanel>\n  </Border>\n  <Grid Grid.Column=\"1\" RowDefinitions=\"Auto,*,Auto\" RowSpacing=\"10\">\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"6\" />\n    <StackPanel Grid.Row=\"1\" Spacing=\"10\" />\n    <StackPanel Grid.Row=\"2\" Spacing=\"8\" />\n  </Grid>\n</Grid>"
+    }
+  ]
+}

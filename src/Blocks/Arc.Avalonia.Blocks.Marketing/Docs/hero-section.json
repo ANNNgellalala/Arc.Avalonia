@@ -1,0 +1,50 @@
+{
+  "slug": "hero-section",
+  "nameZh": "首屏主视觉",
+  "summary": "落地页的第一屏：三种设计覆盖「产品截图 + 漂浮网底」「工作流逐节点演示」「编辑式大字排版」。",
+  "purpose": [
+    "首屏要在几秒内说清「这是什么、给谁用、下一步做什么」。这里的三种设计是同一产品的三种讲法：截图派展示真实界面，工作流派展示一次事件如何穿过流水线，编辑派只用一句大字与氛围。",
+    "三种设计共享同一套内容骨架：一个徽标、一个标题、一句正文、两个行动；差别在背景与下方那块「证据」。网底是 token 渐变的近似实现，工作流状态按 Done / Running / Waiting 用文字加颜色双重表达。",
+    "组成依赖：行动用 button，标题上的发布徽标与「Done/Running」状态用 badge，截图卡里的成员用 avatar，趋势用 sparkline。"
+  ],
+  "whenToUse": [
+    "SaaS 落地页首屏，产品界面本身就是卖点时。",
+    "开发者工具、自动化与基础设施产品，需要展示「跑起来是什么样」时。",
+    "发布页想用一句有把握的话加一层氛围、不堆功能时。"
+  ],
+  "whenNotToUse": [
+    "首屏的唯一目标是收集邮箱、进入候补名单时，改用 hero-signup。",
+    "页面已经有完整产品截图与文档入口时，首屏不必再放截图，直接用 page-header 进入内容。",
+    "面向回访用户的登录或应用入口，不需要营销首屏，用登录页或应用外壳。"
+  ],
+  "variants": [
+    { "key": "variant-dashboard", "label": "Dashboard", "note": "产品截图从底边升起，网底缓慢漂移" },
+    { "key": "variant-workflow", "label": "Workflow", "note": "一次事件逐节点走完图形，状态文字可见" },
+    { "key": "variant-mesh", "label": "Mesh editorial", "note": "编辑式大字压在网底渐变上" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "两种设计里的主行动与次行动都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "发布徽标与工作流 Done / Running 状态用 ArcBadge" },
+    { "type": "uses", "target": "avatar", "note": "截图卡头部的成员头像用 ArcAvatar" },
+    { "type": "uses", "target": "sparkline", "note": "截图卡里的趋势条用共享的 sparkline" },
+    { "type": "alternative", "target": "hero-signup", "note": "首屏只收集邮箱时改用 hero signup" }
+  ],
+  "contrasts": [
+    {
+      "target": "hero-signup",
+      "title": "Hero section 与 Hero signup",
+      "rows": [
+        { "dimension": "目标", "self": "解释产品并引导进入", "other": "收集邮箱、进入候补名单" },
+        { "dimension": "内容", "self": "标题、正文、两个行动加一块产品证据", "other": "标题、一个邮箱字段与一个按钮" },
+        { "dimension": "背景", "self": "网底上叠产品截图或大字", "other": "柔和漂移的网底本身即主角" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "截图式首屏的内容骨架",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"12\" Margin=\"40,34,40,0\" HorizontalAlignment=\"Center\">\n    <c:ArcBadge Content=\"Arc 3.0 is out\" Tone=\"Accent\" HorizontalAlignment=\"Center\" />\n    <TextBlock Text=\"Revenue you can explain.\"\n               Classes=\"arc-title-sm\" TextAlignment=\"Center\" />\n    <TextBlock Text=\"Every number traces back to an event, a customer and a decision.\"\n               Classes=\"arc-body-sm arc-secondary\"\n               TextAlignment=\"Center\" MaxWidth=\"470\" TextWrapping=\"Wrap\" />\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"10\" HorizontalAlignment=\"Center\">\n      <c:ArcButton Content=\"Start free trial\" />\n      <c:ArcButton Content=\"Book a demo\" Variant=\"Secondary\" />\n    </StackPanel>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

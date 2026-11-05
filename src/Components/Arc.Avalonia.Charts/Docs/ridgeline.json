@@ -1,0 +1,78 @@
+{
+  "slug": "ridgeline",
+  "nameZh": "山脊图",
+  "summary": "重叠的分布山脊图：每组一条核密度曲线，像山脊一样上下叠放，悬停某个山脊会把它抬到最前并读出四分位。",
+  "purpose": [
+    "当你要比较若干组的「分布」而不是均值时，箱线图太抽象、柱状图只能画一个数；山脊图把每组一整个分布画成一条起伏的曲线，重叠处仍能看出各自的形状。",
+    "所有山脊共用同一强调色系，只有当前悬停或 HighlightIndex 指定的那条使用完整强度；其余保持低饱和，视觉焦点始终只有一个。",
+    "悬停一条山脊会显示它的中位数与中间一半的范围，方便比较不同组的典型值与离散程度。",
+    "它适合 3 到 8 组、每组有一段连续观测值的场景，例如各接口的延迟分布、各城市的房价分布。"
+  ],
+  "whenToUse": [
+    "要比较多个组的分布形状、离散程度与重叠情况时。",
+    "每组的观测值数量足够画核密度（几十个点以上）时。",
+    "想用一张图代替多张直方图、并保持可读的重叠时。",
+    "需要突出其中一组、其余作为背景对照时。"
+  ],
+  "whenNotToUse": [
+    "每组只有一个汇总值（均值或合计）时改用 bar-chart。",
+    "要看总量构成随时间的变化时改用 streamgraph。",
+    "要精确读取某个分位数时改用 data-grid 的表格。",
+    "组数超过八组时山脊会挤在一起，难以分辨。"
+  ],
+  "variants": [
+    { "key": "variant-five-ridges", "label": "五条山脊", "note": "五个接口的延迟分布，默认第一位使用完整强调色" },
+    { "key": "variant-three-ridges", "label": "三条山脊", "note": "只留三组时每条曲线更舒展" },
+    { "key": "state-no-highlight", "label": "不强调", "note": "HighlightIndex=-1，所有山脊同级" },
+    { "key": "state-empty", "label": "空数据", "note": "没有分布时画出 No distributions" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "bar-chart", "note": "只需要比较每组的单一汇总值时用 bar chart" },
+    { "type": "alternative", "target": "streamgraph", "note": "要看构成随时间变化时用 streamgraph" },
+    { "type": "alternative", "target": "line-chart", "note": "要看一条序列随时间的走势时用 line chart" },
+    { "type": "complement", "target": "activity-heatmap", "note": "热力图看活动密度，山脊图看数值分布" }
+  ],
+  "contrasts": [
+    {
+      "target": "bar-chart",
+      "title": "Ridgeline 与 Bar chart",
+      "rows": [
+        { "dimension": "数据形态", "self": "每组一条完整的分布曲线", "other": "每组一个汇总值" },
+        { "dimension": "能回答的问题", "self": "分布形状、离散程度、重叠", "other": "组与组的高低比较" },
+        { "dimension": "数据要求", "self": "每组需要几十个观测值", "other": "每组一个数值即可" },
+        { "dimension": "空间占用", "self": "纵向叠放，越高越挤", "other": "按类别数横向扩展" }
+      ]
+    },
+    {
+      "target": "streamgraph",
+      "title": "Ridgeline 与 Streamgraph",
+      "rows": [
+        { "dimension": "横轴含义", "self": "观测值的大小（分布域）", "other": "时间" },
+        { "dimension": "纵轴含义", "self": "各组堆叠的位置与密度", "other": "各类别的厚度" },
+        { "dimension": "是否要求合计", "self": "不要求，各组可以独立", "other": "层厚相加就是总量" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "各接口的延迟分布",
+      "language": "csharp",
+      "code": "var ridges = new ArcRidgeline\n{\n    Series = new[]\n    {\n        new ChartSeries(\"API\", apiLatency),\n        new ChartSeries(\"Web\", webLatency),\n        new ChartSeries(\"Mobile\", mobileLatency),\n        new ChartSeries(\"Batch\", batchLatency)\n    },\n    Unit = \" ms\",\n    HighlightIndex = 0,\n    Height = 220\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcRidgeline x:Name=\"Latency\"\n                       Height=\"220\"\n                       Unit=\" ms\"\n                       HighlightIndex=\"0\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcRidgeline",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Series": "每条山脊对应一组观测值，组名用于悬停提示",
+      "Unit": "悬停读数中的单位，例如 \" ms\"",
+      "ValueFormat": "自定义分位数数值格式",
+      "HighlightIndex": "使用完整强调色的山脊序号；-1 表示都不强调"
+    }
+  }
+}

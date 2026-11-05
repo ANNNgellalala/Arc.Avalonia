@@ -1,0 +1,171 @@
+{
+  "slug": "data-grid",
+  "nameZh": "数据网格",
+  "summary": "可编辑的结构化数据表格：点击表头循环排序、拖动调整列宽、勾选行区间、单元格内联编辑、列显隐菜单、页脚合计与空态一应俱全。",
+  "purpose": [
+    "让用户在同一张表里查看并修改多条结构化记录：预算、库存、价格表、任务清单都适合。你不需要为每类数据写一个控件，列用 ArcGridColumn 描述，行用 ArcGridRow 的 Values 字典按列 Key 填值。",
+    "排序、列宽、选择与编辑都是内建交互：点击表头在升序、降序、不排序之间循环，拖动表头右缘调整列宽，勾选框配合 Shift 连续选择，Enter、F2 或双击进入内联编辑，Esc 取消。",
+    "右对齐的列按数值排序，并自动在页脚给出 Σ 合计；DefaultSort 决定初始排序，SortChanged、SelectionChanged、CellEdited 三个事件把变化交回你的代码。",
+    "它是独立的 Avalonia 实现：不含填充柄、剪贴板矩阵、撤销、分组、CSV/XLSX 导出、服务端数据源、固定列与行虚拟化。列共享可用宽度，因此不出现横向滚动。"
+  ],
+  "whenToUse": [
+    "用户需要在多行多列的表格里就地改值，并且希望改完立刻看到页脚合计。",
+    "需要一次勾选多行做批量操作，并保持稳定的选择顺序时。",
+    "需要按列排序、按需显隐列，并为「没有匹配行」提供可解释空态时。",
+    "同一批记录既要能被阅读，也要能被编辑，且字段数量在桌面宽度内放得下时。"
+  ],
+  "whenNotToUse": [
+    "只是展示只读记录、按列排序即可时改用 sortable-data-table，它的列模型更轻。",
+    "行有父子层级、需要展开折叠时改用 tree-table，data grid 是平表。",
+    "需要二维区域选择、复制粘贴矩阵或填充柄的电子表格场景超出本移植范围，请改用专门的表格控件。",
+    "只有一两行记录时用 card 或定义列表，不必为了排版引入表格。"
+  ],
+  "variants": [
+    {
+      "key": "variant-basic",
+      "label": "Basic",
+      "note": "列定义 + 行数据，斑马纹与页脚合计"
+    },
+    {
+      "key": "variant-selected",
+      "label": "Selected rows",
+      "note": "SelectedIds 打开即选中若干行，左侧强调条与计数同步"
+    },
+    {
+      "key": "variant-computed",
+      "label": "Computed column",
+      "note": "ValueGetter 生成的只读列，例如预算 × 进度得到的 Spent"
+    },
+    {
+      "key": "state-readonly",
+      "label": "Read-only",
+      "note": "Editable=false，不进入内联编辑"
+    },
+    {
+      "key": "state-no-selection",
+      "label": "No selector",
+      "note": "Selectable=false，去掉勾选列"
+    },
+    {
+      "key": "state-no-totals",
+      "label": "No totals",
+      "note": "ShowTotals=false，隐藏页脚"
+    },
+    {
+      "key": "state-plain",
+      "label": "No zebra stripes",
+      "note": "Zebra=false，行只靠发丝线分隔"
+    },
+    {
+      "key": "state-empty",
+      "label": "Empty",
+      "note": "行集合为空时显示 EmptyMessage / EmptyDescription"
+    }
+  ],
+  "relations": [
+    {
+      "type": "extends",
+      "target": "sortable-data-table",
+      "note": "在只读排序表的基础上增加编辑、勾选、列宽与合计"
+    },
+    {
+      "type": "alternative",
+      "target": "tree-table",
+      "note": "行需要层级与展开折叠时选 tree table，data grid 是平表"
+    },
+    {
+      "type": "complement",
+      "target": "filter-toolbar",
+      "note": "筛选栏常放在网格上方，负责缩小数据集，网格负责展示与编辑"
+    }
+  ],
+  "contrasts": [
+    {
+      "target": "sortable-data-table",
+      "title": "Data grid 与 Sortable data table",
+      "rows": [
+        {
+          "dimension": "编辑",
+          "self": "单元格内联编辑（Enter、F2 或双击），提交后触发 CellEdited",
+          "other": "只读，不支持就地修改"
+        },
+        {
+          "dimension": "行选择",
+          "self": "复选框列 + Shift 连续区间，SelectedIds 双向同步",
+          "other": "没有行选择模型"
+        },
+        {
+          "dimension": "列与合计",
+          "self": "拖拽列宽、列显隐菜单、右对齐列自动求和",
+          "other": "固定列宽，没有显隐菜单与页脚合计"
+        },
+        {
+          "dimension": "数据模型",
+          "self": "ArcGridColumn + ArcGridRow.Values 字典",
+          "other": "轻量列定义 + 记录列表"
+        }
+      ]
+    },
+    {
+      "target": "tree-table",
+      "title": "Data grid 与 Tree table",
+      "rows": [
+        {
+          "dimension": "行结构",
+          "self": "平表，行之间没有父子关系",
+          "other": "嵌套行，按层级缩进并可展开折叠"
+        },
+        {
+          "dimension": "排序",
+          "self": "点击表头在升序、降序、关之间循环",
+          "other": "排序在每一层内部进行，保留父子结构"
+        },
+        {
+          "dimension": "选择",
+          "self": "复选框列 + Shift 连续选择",
+          "other": "三态选择：父节点选中即子节点全选"
+        },
+        {
+          "dimension": "适用数据",
+          "self": "预算、库存、价格表这类二维记录",
+          "other": "文件夹、组织架构、分类树这类层级数据"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明表格的外壳",
+      "language": "xaml",
+      "code": "<Window xmlns:data=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\">\n  <data:ArcDataGrid x:Name=\"Budget\"\n                    Label=\"Q3 budget\"\n                    Zebra=\"True\"\n                    Selectable=\"True\"\n                    ShowTotals=\"True\"\n                    MaxBodyHeight=\"360\"\n                    EmptyMessage=\"No rows match\" />\n</Window>"
+    },
+    {
+      "title": "列、行与计算列：在 C# 里组装",
+      "language": "csharp",
+      "code": "var grid = new ArcDataGrid\n{\n    Label = \"Q3 budget\",\n    Zebra = true,\n    DefaultSort = new ArcGridSort { Key = \"budget\", Descending = true },\n    Columns = new List<ArcGridColumn>\n    {\n        new() { Key = \"project\", Header = \"Project\", Width = 0, MinWidth = 120 },\n        new() { Key = \"budget\", Header = \"Budget\", Width = 140, Align = ArcGridAlign.Right },\n        new()\n        {\n            Key = \"spent\",\n            Header = \"Spent\",\n            Width = 120,\n            Align = ArcGridAlign.Right,\n            ValueGetter = row => row[\"budget\"] is double budget && row[\"progress\"] is double progress\n                ? budget * progress / 100\n                : null\n        }\n    },\n    Rows = new List<ArcGridRow>\n    {\n        new() { Id = \"r1\", Values = { [\"project\"] = \"Atlas redesign\", [\"budget\"] = 48250d, [\"progress\"] = 64d } }\n    }\n};\n\ngrid.CellEdited += (_, edit) =>\n    Console.WriteLine($\"{edit.Column.Header}: {edit.OldValue} → {edit.NewValue}\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcDataGrid",
+    "exclude": [
+      "TemplatedParent"
+    ],
+    "descriptions": {
+      "Columns": "列定义列表，顺序即显示顺序；修改后调用 Refresh()",
+      "Rows": "行数据；Id 必须唯一且稳定，选择和排序才能保持位置",
+      "Label": "表格的无障碍名称，同时显示在工具栏左侧",
+      "DefaultSort": "初始排序，null 表示不排序；点击表头会循环 升序 → 降序 → 不排序",
+      "SelectedIds": "已勾选行的 Id；可预设初始选择，选中变化时会被更新",
+      "Selectable": "显示复选框列、全选与已选计数，默认 true",
+      "Zebra": "为每隔一行加柔和底色，默认 false",
+      "MaxBodyHeight": "可滚动内容区的最大高度（px），默认 400",
+      "EmptyMessage": "空态主标题，默认 No rows yet",
+      "EmptyDescription": "空态说明文字，告诉用户下一步可以做什么",
+      "ShowTotals": "显示页脚的行数与数值合计，默认 true",
+      "Editable": "允许 Enter、F2 或双击进入内联编辑，默认 true",
+      "SortChanged": "排序变化后触发；参数为 null 表示已取消排序",
+      "SelectionChanged": "勾选变化后触发，参数是当前选中行的 Id 列表",
+      "CellEdited": "内联编辑提交后触发，带上行、列、旧值与新值"
+    }
+  }
+}

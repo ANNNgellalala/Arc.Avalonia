@@ -1,0 +1,75 @@
+{
+  "slug": "empty-state",
+  "nameZh": "空状态",
+  "summary": "没有内容时的解释与出口：图标、标题、一句说明，以及一主一次两个可选行动。",
+  "purpose": [
+    "把「这里是空的」变成有用的信息：图标给出类别，Title 说明发生了什么，Description 解释为什么以及可以做什么。",
+    "Action 与 SecondaryAction 是两个内容插槽，通常放一个主按钮与一个次按钮；没有可做的事时可以都不给，只保留解释。",
+    "它是一块流式内容，通常装进 card 或表格的空白区；Icon 默认是 folder，搜索无结果等场景应换成更具体的图标。"
+  ],
+  "whenToUse": [
+    "列表、表格、筛选结果为空，需要解释原因并给出下一步。",
+    "首次使用时还没有任何数据，需要引导创建第一条内容。",
+    "错误或权限不足导致内容不可见，需要说明补救方式。"
+  ],
+  "whenNotToUse": [
+    "数据还在加载时，改用 skeleton 占位，不要先显示「空」。",
+    "需要强调错误严重性并要求立即处理时，改用 alert。",
+    "只是页面里的一段说明文字，不需要图标与行动时，用普通排版。"
+  ],
+  "variants": [
+    { "key": "variant-icon", "label": "Icon", "note": "图标给出空状态的类别" },
+    { "key": "variant-actions", "label": "Action", "note": "一个主行动作为出口" },
+    { "key": "variant-secondary-action", "label": "Secondary action", "note": "主行动旁再给一个次要出口" },
+    { "key": "variant-minimal", "label": "Minimal", "note": "只有标题与说明，没有图标与按钮" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "card", "note": "空状态通常装进卡片或空白表格区" },
+    { "type": "alternative", "target": "skeleton", "note": "还在加载时用 skeleton，而不是空状态" },
+    { "type": "alternative", "target": "alert", "note": "需要表达错误严重性并强调处置时改用 alert" }
+  ],
+  "contrasts": [
+    {
+      "target": "skeleton",
+      "title": "Empty state 与 Skeleton",
+      "rows": [
+        { "dimension": "使用时机", "self": "已经确定没有内容", "other": "内容还在加载" },
+        { "dimension": "信息", "self": "解释原因并给出行动", "other": "只占住最终版式" },
+        { "dimension": "结束方式", "self": "用户点击行动离开", "other": "数据到达后自动消失" }
+      ]
+    },
+    {
+      "target": "alert",
+      "title": "Empty state 与 Alert",
+      "rows": [
+        { "dimension": "位置", "self": "占据内容区域本身", "other": "嵌入页面流的一条消息" },
+        { "dimension": "语气", "self": "解释与邀请行动", "other": "提示风险或错误" },
+        { "dimension": "行动数量", "self": "最多两个出口", "other": "通常只有一个行动" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "搜索无结果",
+      "language": "csharp",
+      "code": "var empty = new ArcEmptyState\n{\n    Icon = \"search\",\n    Title = \"No matches\",\n    Description = \"Try a shorter search, or clear the filters to see everything again.\",\n    Action = new ArcButton { Content = \"Clear filters\", Variant = ArcButtonVariant.Primary },\n    SecondaryAction = new ArcButton { Content = \"Search tips\", Variant = ArcButtonVariant.Ghost },\n    Label = \"No search results\"\n};"
+    },
+    {
+      "title": "放进卡片",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <c:ArcCard Width=\"360\" Padding=\"8\">\n    <fb:ArcEmptyState Icon=\"folder\"\n                      Title=\"No projects yet\"\n                      Description=\"Create the first project to get started.\" />\n  </c:ArcCard>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcEmptyState",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "主标题，说明这里为什么是空的",
+      "Description": "一句说明，解释原因并给出下一步",
+      "Icon": "Lucide 图标名，默认 folder；搜索场景换成 search",
+      "Action": "主行动插槽，通常是主按钮",
+      "SecondaryAction": "次行动插槽，通常是幽灵按钮或链接式按钮",
+      "Label": "整块区域的无障碍名称"
+    }
+  }
+}

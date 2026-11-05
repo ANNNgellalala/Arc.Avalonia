@@ -11,6 +11,12 @@ public sealed class DataFlowPage : ArcItemPage
 {
     public override string ItemSlug => "data-flow";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-mid-flow",
+        "variant-sources", "variant-core", "variant-destinations", "variant-records", "variant-legend"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A hero or feature section explaining how data moves through a product.",

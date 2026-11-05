@@ -1,0 +1,52 @@
+{
+  "slug": "blog-grid",
+  "nameZh": "博客列表",
+  "summary": "博客索引：一篇精选、分类筛选、三张卡片、分页，以及不离开页面就能打开的阅读视图。",
+  "purpose": [
+    "它把「写过的文章」组织成可浏览的索引：顶部是标题与分类 chip，第一行用整宽卡片突出精选文章，下面三张卡片按分类排布，底部是分页。",
+    "点开任意文章时索引原地换成阅读视图，阅读视图带返回按钮；回来后仍停在此前的筛选位置，不重新加载页面。",
+    "组成依赖：卡片与返回按钮用 button，分类筛选用 chip-group，翻页用 pagination，作者标识用 avatar，分类徽标用 badge。"
+  ],
+  "whenToUse": [
+    "营销站的博客索引，存在一篇值得重点推荐的文章时。",
+    "文章跨几个分类、用户希望筛选后仍留在页面内时。",
+    "希望读者不用跳转路由就能读完全文、再回到索引时。"
+  ],
+  "whenNotToUse": [
+    "文章数量很少（少于三篇）时，直接用卡片列表，不需要分页与筛选。",
+    "内容是产品功能展示而不是文章时，改用 feature-bento 或 spotlight-grid。",
+    "需要站内搜索与归档页时，blog-grid 只负责索引，搜索用 search-field 另行组合。"
+  ],
+  "variants": [
+    { "key": "variant-feed", "label": "Index", "note": "精选加三张卡片与分页的索引视图" },
+    { "key": "variant-featured", "label": "Featured post", "note": "第一行整宽突出当前分类的第一篇" },
+    { "key": "variant-category-filter", "label": "Category filter", "note": "分类 chip 行，切换后重建索引" },
+    { "key": "variant-reader", "label": "Reader", "note": "原地打开全文，带返回按钮与正文" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "文章卡片、精选卡与阅读视图的返回按钮都是 ArcButton" },
+    { "type": "uses", "target": "chip-group", "note": "分类筛选用 chip group" },
+    { "type": "uses", "target": "pagination", "note": "底部分页用 ArcPagination" },
+    { "type": "uses", "target": "avatar", "note": "作者标识用 ArcAvatar" },
+    { "type": "uses", "target": "badge", "note": "分类标签用 ArcBadge" },
+    { "type": "alternative", "target": "spotlight-grid", "note": "内容以功能卡片而非文章为主时改用 spotlight grid" }
+  ],
+  "contrasts": [
+    {
+      "target": "spotlight-grid",
+      "title": "Blog grid 与 Spotlight grid",
+      "rows": [
+        { "dimension": "内容单元", "self": "文章：标题、摘要、作者与阅读时长", "other": "功能：标题、说明与可操作的实时小演示" },
+        { "dimension": "浏览方式", "self": "分类筛选与分页", "other": "网格浏览，点击卡片进入详情" },
+        { "dimension": "阅读路径", "self": "在页面内打开全文再返回", "other": "详情面板在卡片原位展开" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "索引的组成",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"12\" Margin=\"24,20,24,18\">\n    <TextBlock Text=\"Writing from the team\" Classes=\"arc-heading\" />\n    <c:ArcChipGroup Label=\"Categories\" Multiple=\"False\" />\n    <StackPanel Spacing=\"12\">\n      <c:ArcCard>\n        <StackPanel Spacing=\"8\">\n          <c:ArcBadge Content=\"Product\" Tone=\"Neutral\" />\n          <TextBlock Text=\"The case for fewer, longer bets\" Classes=\"arc-heading\" />\n          <TextBlock Text=\"Why the roadmap works better with three live bets.\"\n                     Classes=\"arc-body-sm arc-secondary\" TextWrapping=\"Wrap\" />\n        </StackPanel>\n      </c:ArcCard>\n      <c:ArcPagination Page=\"1\" PageCount=\"3\" Label=\"Blog pages\" HorizontalAlignment=\"Right\" />\n    </StackPanel>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

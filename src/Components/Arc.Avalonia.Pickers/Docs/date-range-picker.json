@@ -1,0 +1,83 @@
+{
+  "slug": "date-range-picker",
+  "nameZh": "日期区间选择器",
+  "summary": "字段式区间选择器：打开后是预设栏加一到两个月，选中的起止是一份草稿，按 Apply 才提交，Escape 或 Cancel 丢弃。",
+  "purpose": [
+    "当你要选一段起止日期（报表周期、预订、筛选范围）时，range picker 把两个月与预设栏一起收进一个字段，收起时只占一行。",
+    "面板里的选择是草稿：第一次点选起点，第二次点选终点，悬停时区间实时预览；只有 Apply 才把草稿写回 Range 并触发 RangeChanged。",
+    "预设栏默认给出 Today、Last 7 days、Last 30 days 与 This month；面板底部显示区间摘要与包含的天数。"
+  ],
+  "whenToUse": [
+    "需要选一段起止日期，并且经常复用几个常用周期时。",
+    "同一张表单里日期区间只是筛选条件的一部分时。",
+    "需要一眼看到两个月的日历分布时。"
+  ],
+  "whenNotToUse": [
+    "只选一天时，改用 date-picker。",
+    "日期需要始终可见、作为页面主体时，改用 calendar。",
+    "只选时间而不是日期时，改用 time-picker。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "空字段", "note": "显示占位提示，没有应用过的区间" },
+    { "key": "state-filled", "label": "已应用区间", "note": "字段显示两端日期摘要" },
+    { "key": "state-open", "label": "打开", "note": "面板锚定在字段下方，两个月并排" },
+    { "key": "panel-preset", "label": "预设高亮", "note": "预设栏中当前区间对应的一项被选中" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "date-picker", "note": "只需要一个日期时，用更简单的 date-picker" },
+    { "type": "alternative", "target": "calendar", "note": "月历需要一直可见时，直接用内联 calendar" },
+    { "type": "complement", "target": "filter-toolbar", "note": "在数据视图里，日期区间常与筛选栏并列作为筛选条件" }
+  ],
+  "contrasts": [
+    {
+      "target": "date-picker",
+      "title": "Date range picker 与 Date picker",
+      "rows": [
+        { "dimension": "选择粒度", "self": "一个起止区间", "other": "一天" },
+        { "dimension": "面板结构", "self": "预设栏加一到两个月", "other": "单月月历" },
+        { "dimension": "确认方式", "self": "先选草稿，按 Apply 才提交", "other": "点中日期立刻生效" },
+        { "dimension": "字段显示", "self": "起止两端的日期摘要", "other": "一个格式化日期或占位提示" }
+      ]
+    },
+    {
+      "target": "calendar",
+      "title": "Date range picker 与 Calendar",
+      "rows": [
+        { "dimension": "可见性", "self": "默认收起在字段里", "other": "月历始终可见" },
+        { "dimension": "预设", "self": "附带常用周期快捷栏", "other": "没有预设，逐日浏览" },
+        { "dimension": "提交模型", "self": "草稿加 Apply，可取消", "other": "点中即生效" },
+        { "dimension": "适用场景", "self": "报表周期、筛选条件", "other": "日程与预约页" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中设置报表周期",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcDateRangePicker Label=\"Report period\"\n                              Width=\"320\"\n                              Range=\"{Binding Period}\"\n                              Months=\"Two\" />\n</Window>"
+    },
+    {
+      "title": "用代码设定默认区间与预设",
+      "language": "csharp",
+      "code": "var picker = new ArcDateRangePicker\n{\n    Label = \"Report period\",\n    Width = 320,\n    Range = new ArcDateRange(DateTime.Today.AddDays(-13), DateTime.Today),\n    Presets = ArcDateRangePreset.Defaults,\n    Months = ArcRangeMonths.Two\n};\n\npicker.RangeChanged += (_, range) =>\n    statusText.Text = $\"{range.Start:yyyy-MM-dd} - {range.End:yyyy-MM-dd} ({range.Days} days)\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcDateRangePicker",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Range": "已提交的起止区间；面板里的选择在 Apply 之前只是草稿",
+      "DefaultRange": "非受控模式下的初始区间",
+      "Presets": "预设栏的快捷项，默认 Today / Last 7 days / Last 30 days / This month",
+      "MinDate": "可选范围的下界",
+      "MaxDate": "可选范围的上界",
+      "WeekStartsOn": "一周从周几开始，默认 Sunday",
+      "Months": "面板显示几个月：Auto、One 或 Two",
+      "RangeChanged": "按下 Apply 提交区间后触发",
+      "IsDropDownOpen": "面板是否展开；Escape 或 Apply 后关闭并把焦点还给字段",
+      "Label": "字段上方的标签",
+      "Placeholder": "未选区间时字段里的提示文字",
+      "Description": "字段下方的辅助说明"
+    }
+  }
+}

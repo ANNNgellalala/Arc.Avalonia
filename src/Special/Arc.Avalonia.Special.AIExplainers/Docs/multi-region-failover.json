@@ -1,0 +1,66 @@
+{
+  "slug": "multi-region-failover",
+  "nameZh": "多区域故障转移插画",
+  "summary": "在 2.5D 舞台上解释多区域故障转移：用户经全局负载均衡进入两区域，主区域降级、连挂三项健康检查后退出轮换，流量平滑切走，恢复后重新热机加回。",
+  "purpose": [
+    "把「为什么用户感知不到一次区域故障」画成一段可读的故事：每一幕都有标题与一句旁白（Steady、Degrading、Shift、Recovering、Warming、Rebalanced），阶段选择器可以跳着看任意一幕。",
+    "画面左侧是请求与负载均衡器，右侧是两块区域平台；平台上的六个实例格、状态码与健康检查数会随幕变化，中间偏下的策略面板明确写出「每 10 s 检查、连续 3 次失败切走、连续 3 次通过才回」。",
+    "开启减弱动效时舞台固定在 Steady 一幕（两区域各 50% 流量）。预览展示的就是这一帧，声明的变体都是帧内同时可见的元素；交互上可用阶段选择器、方向键或 Home/End 跳到任意一幕。"
+  ],
+  "whenToUse": [
+    "基础设施、SRE 或平台产品的营销页需要解释多区域容灾与流量切换。",
+    "文档页介绍健康检查、权重、热机与恢复阈值等概念时，需要一张有阶段感的示意图。",
+    "复盘或发布说明里需要让读者理解「故障期间请求去了哪里」。"
+  ],
+  "whenNotToUse": [
+    "需要真实实时指标与请求曲线时，改用 realtime-stream 或 line-chart。",
+    "只需要一个健康状态数值时，改用 gauge。",
+    "只需要单点状态徽章、不需要解释跨区域流程时，改用 badge 即可。"
+  ],
+  "variants": [
+    { "key": "state-steady", "label": "Steady", "note": "默认帧：两块区域各承担 50% 流量，全部健康" },
+    { "key": "variant-balancer", "label": "Balancer", "note": "Users → 全局负载均衡器，以及 50/50 的权重条与两侧百分比" },
+    { "key": "variant-platforms", "label": "Platforms", "note": "US East 与 EU West 两块 2.5D 平台，各六个实例格与状态文案" },
+    { "key": "variant-policy", "label": "Policy", "note": "故障转移策略面板：检查间隔、失败阈值与恢复阈值" },
+    { "key": "variant-stats", "label": "Stats", "note": "请求量、延迟与错误率统计行" },
+    { "key": "variant-stage-pills", "label": "Stage pills", "note": "六段阶段选择器，当前阶段高亮" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "realtime-stream", "note": "需要真实实时数据流时改用 realtime stream" },
+    { "type": "complement", "target": "gauge", "note": "插画讲流程，真实健康指标用 gauge 展示" },
+    { "type": "complement", "target": "payment-flow", "note": "同为流程叙事插画：一条讲支付链路，一条讲基础设施容灾" }
+  ],
+  "contrasts": [
+    {
+      "target": "realtime-stream",
+      "title": "Multi-region failover 与 Realtime stream",
+      "rows": [
+        { "dimension": "数据性质", "self": "固定剧本与示例数值", "other": "持续流入的真实数据点" },
+        { "dimension": "时间轴", "self": "六幕循环，可手动跳到任一幕", "other": "滚动时间窗，不可跳幕" },
+        { "dimension": "用途", "self": "解释机制与阈值", "other": "监控当下状态" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcMultiRegionFailover Height=\"410\" />\n</Window>"
+    },
+    {
+      "title": "进页暂停、离页继续",
+      "language": "csharp",
+      "code": "var failover = new ArcMultiRegionFailover { Height = 410 };\n\n// 阅读型页面通常让它自己播；需要截图或嵌入滚动页面时先暂停。\nfailover.SetPaused(true);\n\n// 键盘用户可以按左右键跳幕，点击阶段药丸会停在那一幕。\nvoid JumpToLastStage()\n{\n    // 没有公开的 SetStage；需要精确停帧时用 SetPaused(true) 后由用户点选阶段。\n    failover.SetPaused(true);\n}"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcMultiRegionFailover",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 410，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停时仍会缓动权重条到当前阶段目标",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

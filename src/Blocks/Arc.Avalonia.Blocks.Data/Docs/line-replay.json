@@ -1,0 +1,58 @@
+{
+  "slug": "line-replay",
+  "nameZh": "折线回放",
+  "summary": "一天的流量折线按播放头逐段回放：播放头前端给出当前读数，时间轴可拖动、速度可切换，关键时刻在经过时打上标注。",
+  "purpose": [
+    "当叙事需要「让时间自己走一遍」时，用 line replay：折线已经画好，但只有播放头之前的部分是实色，之后的部分淡化，播放头随回放推进。",
+    "播放头尖端显示当前值与时刻；时间轴滑块可以直接跳到任意时刻，速度切换（1x / 2x / 4x）控制推进节奏；关键事件（newsletter、发布、事故、修复）在播放头经过时才点亮。",
+    "顶部三块磁贴给出播放头处的值、当日峰值与累计访问；它和 realtime-stream 的区别是数据是固定的一天，回放是确定性的，不依赖真实时间。"
+  ],
+  "whenToUse": [
+    "需要讲「一天里发生了什么」、让时间按节奏展开时。",
+    "关键时刻需要与折线位置对应时。",
+    "希望用户可以自己拖动时间轴复盘时。"
+  ],
+  "whenNotToUse": [
+    "实时到达的数据流，用 realtime-stream。",
+    "只需要静态趋势图时，用 line-chart。",
+    "需要逐步编辑或对比任意窗口时，用 revenue-explorer。"
+  ],
+  "variants": [
+    { "key": "layout-replay", "label": "整体布局", "note": "折线、播放头、时间轴与读数磁贴并置" },
+    { "key": "variant-playhead", "label": "Playhead", "note": "停在 10:00 的播放头与当前读数" },
+    { "key": "variant-scrubber", "label": "Scrubber", "note": "时间轴滑块与已播放 / 未播放的分界" },
+    { "key": "variant-annotations", "label": "Events", "note": "关键时刻的标注随播放头点亮" },
+    { "key": "variant-speed", "label": "Speed", "note": "1x / 2x / 4x 的回放速度切换" },
+    { "key": "variant-metric-tiles", "label": "Metrics", "note": "当前值、峰值与累计访问磁贴" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "回放主体是一条带播放头的折线" },
+    { "type": "uses", "target": "slider", "note": "时间轴用滑块定位播放头" },
+    { "type": "uses", "target": "segmented-control", "note": "回放速度用分段控件切换" },
+    { "type": "uses", "target": "card", "note": "图表与磁贴由卡片承载" },
+    { "type": "alternative", "target": "realtime-stream", "note": "数据持续到达、不能事先画完时，改用 realtime stream" }
+  ],
+  "contrasts": [
+    {
+      "target": "realtime-stream",
+      "title": "Line replay 与 Realtime stream",
+      "rows": [
+        { "dimension": "数据来源", "self": "已固定的完整一天，可反复回放", "other": "持续到达的真实数据" },
+        { "dimension": "时间控制", "self": "播放头、时间轴与速度都可控", "other": "跟随时钟滚动，只可暂停视图" },
+        { "dimension": "用途", "self": "叙事与事后复盘", "other": "监控与实时观测" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"12\">\n  <charts:ArcReplayLine Height=\"240\" /> <!-- 播放头停在 10:00 -->\n  <arc:ArcSlider Minimum=\"0\" Maximum=\"143\" Value=\"60\" />\n  <arc:ArcSegmentedControl SelectedValue=\"2x\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：事件与播放头",
+      "language": "csharp",
+      "code": "var events = new List<ReplayEvent>\n{\n    new(24, \"Newsletter\"),\n    new(62, \"Launch post\"),\n    new(96, \"Incident\"),\n    new(124, \"Fix shipped\")\n};\n\nvar chart = new ArcReplayLine(values, labels, events, \"visitors\", head: 60)\n{\n    Height = 240\n};\n\nchart.HeadChanged += (_, index) => RefreshStats(index);"
+    }
+  ]
+}

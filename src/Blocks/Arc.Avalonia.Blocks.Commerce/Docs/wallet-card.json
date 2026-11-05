@@ -1,0 +1,54 @@
+{
+  "slug": "wallet-card",
+  "nameZh": "钱包卡片",
+  "summary": "账户余额卡：可梳理的余额折线、隐藏余额、Send / Deposit / Swap / Buy 操作区与可搜索的近期活动。",
+  "purpose": [
+    "当页面要同时表达“有多少钱”和“刚刚发生了什么”时，钱包卡把余额、主账户与备用账户、一个小折线图放在一起。",
+    "余额可以一键隐藏；四个操作里 Send 会就地在卡片下方展开金额输入与快捷金额，Deposit 同理，Swap 与 Buy 各自给出对应表单。",
+    "近期活动按名称可搜索，只显示最近三条；右侧另有 Statements 与预留账户等辅助卡片。"
+  ],
+  "whenToUse": [
+    "个人或企业账户的余额概览与快捷转账入口。",
+    "需要在同一块里显示余额走势与近期流水时。",
+    "想给余额提供隐藏开关、适合公共场合展示时。"
+  ],
+  "whenNotToUse": [
+    "订阅账单、发票与计划时，用 billing-overview。",
+    "只需要一个大的金额数字与趋势时，用 metric-card 或 sparkline。",
+    "需要完整的交易流水页与筛选时，用更完整的表格区块。"
+  ],
+  "variants": [
+    { "key": "layout-wallet", "label": "整体布局", "note": "余额、图表、操作区与近期活动同一张卡" },
+    { "key": "variant-balance-chart", "label": "余额折线", "note": "可拖动的 sparkline 与当前余额标签" },
+    { "key": "variant-actions", "label": "操作区", "note": "Send / Deposit / Swap / Buy 四个动作" },
+    { "key": "variant-activity", "label": "近期活动", "note": "三条流水，正负金额与来源图标" },
+    { "key": "variant-send-form", "label": "Send 表单", "note": "选中 Send 时就地展开金额输入与快捷金额" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "money-input", "note": "Send 与 Deposit 的金额用带快捷金额的货币输入" },
+    { "type": "uses", "target": "sparkline", "note": "余额走势用一条小型折线表达" },
+    { "type": "uses", "target": "search-field", "note": "近期活动可以按名称搜索" },
+    { "type": "uses", "target": "segmented-control", "note": "主账户与备用账户用分段控件切换" },
+    { "type": "uses", "target": "button", "note": "四个动作、隐藏余额与发送都是按钮" },
+    { "type": "alternative", "target": "billing-overview", "note": "需要计划、发票与订阅设置时，改用 billing-overview" }
+  ],
+  "contrasts": [
+    {
+      "target": "billing-overview",
+      "title": "Wallet card 与 Billing overview",
+      "rows": [
+        { "dimension": "数据", "self": "可用余额、流水与账户", "other": "计划、用量、支付方式与发票" },
+        { "dimension": "主要动作", "self": "转账、存款、兑换与买入", "other": "改计划、换卡、下载发票" },
+        { "dimension": "时间范围", "self": "当下余额与近期三条流水", "other": "本月用量与历史发票" },
+        { "dimension": "信息密度", "self": "一张紧凑卡片", "other": "整页多卡片设置面" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "余额、走势与操作区",
+      "language": "xaml",
+      "code": "<arc:ArcCard Padding=\"20\" Width=\"640\">\n  <StackPanel Spacing=\"14\">\n    <Grid ColumnDefinitions=\"*,Auto\">\n      <StackPanel Spacing=\"2\">\n        <TextBlock Text=\"Main account\" Classes=\"arc-caption\" />\n        <TextBlock Text=\"$12,480.32\" Classes=\"arc-title-sm\" />\n      </StackPanel>\n      <arc:ArcButton Grid.Column=\"1\" Content=\"Hide balance\" Variant=\"Ghost\" />\n    </Grid>\n    <charts:ArcSparkline Height=\"48\" />\n    <!-- Send / Deposit / Swap / Buy -->\n    <arc:ArcMoneyInput Currency=\"$\" Step=\"2500\" />\n    <TextBlock Text=\"Recent activity\" Classes=\"arc-label\" />\n  </StackPanel>\n</arc:ArcCard>"
+    }
+  ]
+}

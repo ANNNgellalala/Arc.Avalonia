@@ -11,6 +11,12 @@ public sealed class AgentLoopPage : ArcItemPage
 {
     public override string ItemSlug => "agent-loop";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-verifying",
+        "variant-ring", "variant-stations", "variant-model", "variant-context", "variant-tool-call", "variant-verdict"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Docs and landing pages that teach how an agent gathers, acts and verifies.",
@@ -43,9 +49,15 @@ public sealed class AgentLoopPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcAgentLoop
+    // The context and tool-call panels are drawn for a 1068 px column; the docs preview is 860 px wide, so
+    // scale the figure to fit rather than squeezing the right-hand panels.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 395,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcAgentLoop
+        {
+            Width = 960,
+            Height = 395,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

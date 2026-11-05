@@ -15,6 +15,11 @@ public sealed class SheetStackPage : ArcItemPage
 {
     public override string ItemSlug => "sheet-stack";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-sheet", "state-nested", "variant-toggle-rows", "variant-footer"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

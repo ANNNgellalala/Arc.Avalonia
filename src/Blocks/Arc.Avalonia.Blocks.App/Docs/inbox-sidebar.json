@@ -1,0 +1,53 @@
+{
+  "slug": "inbox-sidebar",
+  "nameZh": "收件箱侧栏",
+  "summary": "邮件应用外壳：文件夹筛选消息列表、每行带快捷动作、消息在阅读面板打开，Compose 会长成可以用键盘发送的撰写窗口。",
+  "purpose": [
+    "当你需要一个完整的三栏邮件外壳时用它：左侧文件夹与标签，中间消息列表，右侧阅读面板；文件夹切换会过滤中间的列表。",
+    "列表行上有快捷动作与未读徽标，Compose 从按钮长成撰写窗口，Cmd/Ctrl+Enter 发送、Escape 存草稿，阅读面板里的邮件与列表选中项同步。",
+    "它是布局与状态的样板：文件夹、邮件、联系人均为样本数据，不会真的投递；折叠、撰写与快捷键是真实交互，方便你按需替换数据层。"
+  ],
+  "whenToUse": [
+    "邮件或消息应用的外壳，需要文件夹、列表与阅读面板三栏时。",
+    "邮件客户端需要行内快捷动作与可展开的撰写窗口时。",
+    "团队需要先看一个完整可跑通的邮件布局再替换数据时。"
+  ],
+  "whenNotToUse": [
+    "做一次一条的专注分诊时用 inbox-triage，不需要三栏常驻。",
+    "系统通知用 notification-center，不要与邮件混合。",
+    "只需要消息列表、没有阅读面板时用更简单的列表区块。"
+  ],
+  "variants": [
+    { "key": "variant-folder-list", "label": "Folders", "note": "左侧文件夹与标签，带未读计数" },
+    { "key": "variant-message-list", "label": "Message list", "note": "中间列表，未读加粗，行上带快捷动作" },
+    { "key": "variant-reading-pane", "label": "Reading pane", "note": "右侧阅读面板显示当前邮件" },
+    { "key": "state-unread", "label": "Unread", "note": "未读行加粗并带 Unread 徽标" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar", "note": "联系人头像出现在列表行与阅读面板" },
+    { "type": "uses", "target": "badge", "note": "未读与文件夹计数用徽标标出" },
+    { "type": "uses", "target": "input", "note": "撰写窗口的收件人与主题字段" },
+    { "type": "uses", "target": "textarea", "note": "撰写窗口的正文输入区" },
+    { "type": "uses", "target": "button", "note": "文件夹、快捷动作、发送与草稿都是按钮" },
+    { "type": "alternative", "target": "inbox-triage", "note": "三栏常驻邮箱与一次一条的分诊队列是两种取舍" }
+  ],
+  "contrasts": [
+    {
+      "target": "inbox-triage",
+      "title": "Inbox sidebar 与 Inbox triage",
+      "rows": [
+        { "dimension": "布局", "self": "三栏常驻：文件夹、列表、阅读面板", "other": "单列队列，一次聚焦一条消息" },
+        { "dimension": "处理方式", "self": "浏览式阅读，行内快捷动作", "other": "归档、稍后、恢复的分诊动作与快捷键" },
+        { "dimension": "撰写", "self": "右下角的撰写窗口", "other": "通常不承担撰写" },
+        { "dimension": "适用", "self": "日常邮箱与消息客户端", "other": "清空收件箱的专注流程" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三栏邮件骨架",
+      "language": "xaml",
+      "code": "<Grid xmlns=\"https://github.com/avaloniaui\" ColumnDefinitions=\"196,304,*\">\n  <Border Grid.Column=\"0\" Padding=\"10\">\n    <StackPanel Spacing=\"3\" />\n  </Border>\n  <Border Grid.Column=\"1\" Padding=\"10\">\n    <StackPanel Spacing=\"9\">\n      <TextBox Watermark=\"Search mail\" />\n      <StackPanel Spacing=\"0\" />\n    </StackPanel>\n  </Border>\n  <ScrollViewer Grid.Column=\"2\" Padding=\"18\">\n    <StackPanel Spacing=\"9\" />\n  </ScrollViewer>\n</Grid>"
+    }
+  ]
+}

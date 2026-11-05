@@ -16,6 +16,12 @@ public sealed class AgentStatusPage : ArcItemPage
 {
     public override string ItemSlug => "agent-status";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-expanded",
+        "state-working", "state-needs-input", "state-paused", "state-done", "state-failed"
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var status = new ArcAgentStatus

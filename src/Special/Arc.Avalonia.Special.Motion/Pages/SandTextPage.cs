@@ -12,6 +12,11 @@ public sealed class SandTextPage : ArcItemPage
 {
     public override string ItemSlug => "sand-text";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-formed", "variant-grain-fine", "variant-grain-coarse"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -67,12 +72,22 @@ public sealed class SandTextPage : ArcItemPage
 
         var stage = SmPage.Stage(sand, height: 320, background: ArcTokens.SurfaceMuted);
 
+        // A second word at a coarser grain, so the grain-size variant is visible without changing the slider.
+        var coarse = new ArcSandText
+        {
+            Text = "ARC",
+            Grain = 4.2,
+            DigRadius = 20
+        };
+        var coarseStage = SmPage.Stage(coarse, height: 220, background: ArcTokens.SurfaceMuted);
+
         return new StackPanel
         {
             Spacing = 12,
             Children =
             {
                 stage,
+                coarseStage,
                 SmPage.Hint(
                     "Hover or drag through the letters to dig; the grains tumble away and the letters heal as the pointer rests.",
                     again,

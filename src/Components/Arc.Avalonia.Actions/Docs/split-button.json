@@ -1,0 +1,76 @@
+{
+  "slug": "split-button",
+  "nameZh": "分体按钮",
+  "summary": "一个默认行动加一组邻近备选：主段直接执行，尾部的 chevron 才展开菜单，菜单永远从静止的锚点打开。",
+  "purpose": [
+    "当同一个对象上有一个高频的默认行动，外加几个不常出现但必须可达的备选时，用 split button：主段一直可见，备选藏在 chevron 后面，用户不必先打开菜单才能用默认选择。",
+    "主段与 chevron 共享同一块视觉表面，中间以发丝线分隔。按下主段只缩放主段，菜单段保持静止，因此菜单总是从稳定的锚点弹出，不会跟着按压抖动。",
+    "键盘上 Tab 先到主段，按 Down 直接展开备选；chevron 本身也是可聚焦按钮，读屏名称是「<Label> more actions」。"
+  ],
+  "whenToUse": [
+    "一个主要行动加 2–5 个相近备选，例如「发布」与「发布并通知」「存为草稿」。",
+    "备选较短、希望用户一眼看到默认选择时，把所有行动塞进 dropdown menu 反而藏起了主行动。",
+    "工具栏横向空间紧张，但主行动不能被折叠。"
+  ],
+  "whenNotToUse": [
+    "没有任何备选：直接用 button。",
+    "主行动不明确、所有选项地位相当：改用 dropdown-menu 或 button-group。",
+    "操作有破坏性、需要先确认：改用 confirm-morph。"
+  ],
+  "variants": [
+    { "key": "variant-primary", "label": "Primary", "note": "主要行动，主段与菜单段都取主色" },
+    { "key": "variant-secondary", "label": "Secondary", "note": "中等强调，用于工具栏" },
+    { "key": "variant-icon", "label": "Icon", "note": "主段带前置图标，便于扫读" },
+    { "key": "state-closed", "label": "Closed", "note": "默认态，只显示主段与 chevron" },
+    { "key": "state-open", "label": "Open", "note": "备选菜单展开，chevron 翻转" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "button", "note": "没有备选时用更简单的 Button" },
+    { "type": "alternative", "target": "dropdown-menu", "note": "几乎所有行动都藏在菜单里时用 Dropdown menu" },
+    { "type": "complement", "target": "button-group", "note": "工具栏里并列多个行动时，可与 Button group 相邻使用" }
+  ],
+  "contrasts": [
+    {
+      "target": "button",
+      "title": "Split button 与 Button",
+      "rows": [
+        { "dimension": "行动数量", "self": "一个主行动加一组备选", "other": "一个按钮一个行动" },
+        { "dimension": "视觉结构", "self": "主段与菜单段以发丝线分隔", "other": "单一表面" },
+        { "dimension": "适用场景", "self": "备选不常出现、但必须可达", "other": "绝大多数单次行动" }
+      ]
+    },
+    {
+      "target": "dropdown-menu",
+      "title": "Split button 与 Dropdown menu",
+      "rows": [
+        { "dimension": "默认行动可见性", "self": "主段直出，不必打开菜单", "other": "只有触发器，所有行动都在菜单里" },
+        { "dimension": "备选项数量", "self": "适合 2–5 个紧邻备选", "other": "可以承载更长、分组的命令列表" },
+        { "dimension": "操作成本", "self": "一次按压即可执行主行动", "other": "必须先展开菜单再选择" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "C# 里挂上备选",
+      "language": "csharp",
+      "code": "var publish = new ArcSplitButton\n{\n    Label = \"Publish\",\n    Icon = \"upload\",\n    Variant = ArcSplitButtonVariant.Primary,\n    Actions = new[]\n    {\n        new ArcMenuItem { Label = \"Publish and notify\", Icon = \"bell\" },\n        new ArcMenuItem { Label = \"Publish as draft\", Icon = \"file\" },\n        new ArcMenuItem { Label = \"Discard changes\", IsDestructive = true, SeparatorBefore = true }\n    }\n};\npublish.Click += (_, _) => PublishNow();"
+    },
+    {
+      "title": "XAML 结构",
+      "language": "xaml",
+      "code": "<arc:ArcSplitButton Label=\"Export\" Icon=\"download\" Variant=\"Secondary\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcSplitButton",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "主行动文案，同时是主段的可访问名称",
+      "Icon": "主段前置的 Lucide 图标名",
+      "Actions": "chevron 展开的备选菜单项集合",
+      "Variant": "视觉层级：Primary / Secondary",
+      "IsOpen": "备选菜单是否展开；可设置以便静态展示打开态",
+      "Click": "主段被按下时触发"
+    }
+  }
+}

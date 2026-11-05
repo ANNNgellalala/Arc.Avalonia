@@ -1,0 +1,85 @@
+{
+  "slug": "select",
+  "nameZh": "选择器",
+  "summary": "紧凑的单选字段：触发区常驻当前值，点击或按 Enter / Space 展开浮层，高亮块滑到选中行。",
+  "purpose": [
+    "在固定、较短的选项集合里选一个值，同时让当前值一直留在字段里——它占用的高度与 input 一致，便于表单里上下对齐。",
+    "浮层挂在触发器下方，宽度跟随触发器（最小 160 px、上限 384 px）；高亮块在行间用弹簧滑动，鼠标与键盘共享同一套选中逻辑。",
+    "未选择时触发器回退到 Placeholder 并降低文字对比度；选中后同步 Value 并触发 ValueChanged，按 Escape 关闭时丢弃本次移动。"
+  ],
+  "whenToUse": [
+    "地区、货币、排序方式、计费周期等短固定列表的单选。",
+    "字段宽度有限，需要当前值一直可见的表单。",
+    "希望键盘用户能完成整套操作：Enter / Space 打开、方向键移动、Enter 选中、Escape 取消。"
+  ],
+  "whenNotToUse": [
+    "列表很长、用户知道名字并想输入过滤时，改用 combobox。",
+    "一次要选多个值时，改用 multi-select。",
+    "只有 2–4 个应常驻可见的选项时，改用 segmented-control。",
+    "选项需要用卡片承载图标、价格或描述时，改用 radio-cards。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑表单" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型单一字段" },
+    { "key": "state-empty", "label": "Empty", "note": "未选择时显示 placeholder" },
+    { "key": "state-selected", "label": "Selected", "note": "触发器显示已选标签" },
+    { "key": "state-error", "label": "Error", "note": "危险色边框与错误文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可展开，也不响应键盘" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "combobox", "note": "列表很长需要输入过滤时改用 combobox" },
+    { "type": "alternative", "target": "multi-select", "note": "一次选多个值改用 multi-select" },
+    { "type": "alternative", "target": "segmented-control", "note": "2–4 个常驻可见选项改用 segmented control" },
+    { "type": "alternative", "target": "morph-select", "note": "希望触发器长大成列表的动效改用 morph select" },
+    { "type": "uses", "target": "dropdown-menu", "note": "浮层与菜单项复用菜单的样式与定位" }
+  ],
+  "contrasts": [
+    {
+      "target": "combobox",
+      "title": "Select 与 Combobox",
+      "rows": [
+        { "dimension": "选择方式", "self": "展开后逐项移动，不能打字过滤", "other": "直接在字段里输入，列表随关键词过滤" },
+        { "dimension": "适用列表", "self": "固定、短，一屏内可读完", "other": "长列表，用户知道关键词或别名" },
+        { "dimension": "清除当前值", "self": "只能重新选一项，没有独立清除按钮", "other": "有清除按钮，可丢弃当前选择" }
+      ]
+    },
+    {
+      "target": "multi-select",
+      "title": "Select 与 Multi-select",
+      "rows": [
+        { "dimension": "选择数量", "self": "一次一个值", "other": "一次多个值" },
+        { "dimension": "触发器呈现", "self": "显示单个标签", "other": "多枚标签，超出折叠为 +N" },
+        { "dimension": "Value 类型", "self": "string", "other": "字符串集合" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcSelect Label=\"地区\"\n                 Placeholder=\"请选择地区\"\n                 Options=\"{Binding Regions}\"\n                 Value=\"{Binding Region, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "选项、禁用项与值变化",
+      "language": "csharp",
+      "code": "var regions = new ArcSelect\n{\n    Label = \"地区\",\n    Placeholder = \"请选择地区\",\n    Options = new[]\n    {\n        new ArcSelectOption(\"us\", \"United States\"),\n        new ArcSelectOption(\"eu\", \"Europe\"),\n        new ArcSelectOption(\"ap\", \"Asia Pacific\", disabled: true)\n    },\n    Value = \"eu\"\n};\n\nregions.ValueChanged += (_, _) => Save(regions.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcSelect",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "选项集合，元素是 ArcSelectOption（Value / Label / Disabled）",
+      "Value": "当前选中项的 Value，未选择时为 null",
+      "Placeholder": "未选择时显示的占位文案，默认 Select an option",
+      "IsOpen": "浮层是否展开；键盘与指针都会写回这个属性",
+      "Label": "可见标签，同时参与无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时触发器边框取危险色",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm 36 / Md 44 / Lg 50，默认 Md",
+      "ValueChanged": "选中或改值后触发，此时 Value 与 IsOpen 都已更新"
+    }
+  }
+}

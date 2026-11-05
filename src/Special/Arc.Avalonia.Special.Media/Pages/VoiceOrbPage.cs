@@ -1,21 +1,28 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Avalonia.Layout;
-using Arc.Avalonia.Controls;
+using Avalonia.Media;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Special.Media.Controls;
-using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Special.Media.Pages;
 
-/// <summary>Voice orb: the four session states, transcript and call controls, driven by demo state buttons.</summary>
+/// <summary>
+/// Voice orb's completeness preview: the four session states laid out as still frames so Listening,
+/// Thinking, Speaking and Muted are all visible without any input. Declared state keys match
+/// Docs/voice-orb.json so the audit can compare the two lists.
+/// </summary>
 public sealed class VoiceOrbPage : ArcItemPage
 {
     public override string ItemSlug => "voice-orb";
 
     public override bool DemoOnCanvas => false;
+
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-listening", "state-thinking", "state-speaking", "variant-muted"
+    };
 
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
@@ -47,53 +54,61 @@ public sealed class VoiceOrbPage : ArcItemPage
 
     protected override Control BuildDemo(ArcDemoContext context)
     {
-        var orb = new ArcVoiceOrb
-        {
-            Width = 540,
-            Height = 470,
-            Transcript = "The studio opens at nine. Shall I book a table for two?",
-            State = ArcVoiceOrbState.Listening
-        };
+        var grid = new WrapPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Left };
 
-        var states = new StackPanel { Spacing = 8, Width = 260, Margin = new Thickness(24, 12, 0, 0) };
-        states.Children.Add(new TextBlock { Text = "Session states", Classes = { "arc-label" } });
-        states.Children.Add(Caption("Listening draws the microphone level and two ripples; thinking contracts; speaking brightens."));
-        foreach (var state in new[]
-                 {
-                     ArcVoiceOrbState.Listening, ArcVoiceOrbState.Thinking, ArcVoiceOrbState.Speaking, ArcVoiceOrbState.Idle
-                 })
-        {
-            var value = state;
-            var button = new ArcButton
-            {
-                Content = state == ArcVoiceOrbState.Idle ? "End call" : state.ToString(),
-                Variant = ArcButtonVariant.Secondary,
-                Size = ArcButtonSize.Sm,
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            };
-            button.Click += (_, _) =>
-            {
-                orb.State = value;
-                if (value == ArcVoiceOrbState.Idle)
-                {
-                    orb.Elapsed = 0;
-                }
-            };
-            states.Children.Add(button);
-        }
+        grid.Children.Add(StateOrb(
+            ArcVoiceOrbState.Listening, false,
+            "Listening：随模拟电平呼吸，外扩两圈涟漪，胶囊显示计时与挂断。",
+            12, "The studio opens at nine. Shall I book a table for two?"));
 
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Children = { orb, states }
-        };
-        return row;
+        grid.Children.Add(StateOrb(
+            ArcVoiceOrbState.Thinking, false,
+            "Thinking：球体收缩到 92%，弹性最小，边缘转一段强调色光带。",
+            12, "Checking the calendar…"));
+
+        grid.Children.Add(StateOrb(
+            ArcVoiceOrbState.Speaking, false,
+            "Speaking：亮度与波动幅度提高，表示助手正在说话。",
+            21, "There is a table at nine. I can hold it for you."));
+
+        grid.Children.Add(StateOrb(
+            ArcVoiceOrbState.Listening, true,
+            "Muted：球体与胶囊转中性色，麦克风上画一道强调色斜杠。",
+            34, "The studio opens at nine. Shall I book a table for two?"));
+
+        return grid;
     }
 
-    private static TextBlock Caption(string text) => new()
+    /// <summary>One state as a still: the orb is 418px wide so two fit per row with the copy underneath.</summary>
+    private static Control StateOrb(
+        ArcVoiceOrbState state, bool muted, string caption, double elapsed, string transcript)
     {
-        Text = text,
-        Classes = { "arc-caption" },
-        TextWrapping = TextWrapping.Wrap
-    };
+        var orb = new ArcVoiceOrb
+        {
+            Width = 418,
+            Height = 430,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            State = state,
+            Muted = muted,
+            Elapsed = elapsed,
+            Transcript = transcript
+        };
+
+        var panel = new StackPanel
+        {
+            Spacing = 8,
+            Margin = new Thickness(0, 0, 10, 16),
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        panel.Children.Add(orb);
+        panel.Children.Add(new TextBlock
+        {
+            Text = caption,
+            Classes = { "arc-caption" },
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 418,
+            HorizontalAlignment = HorizontalAlignment.Left
+        });
+        return panel;
+    }
 }

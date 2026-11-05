@@ -11,6 +11,12 @@ public sealed class PromptCachePage : ArcItemPage
 {
     public override string ItemSlug => "prompt-cache";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-partial-hit",
+        "variant-requests", "variant-segments", "variant-cache-panel", "variant-savings", "variant-edit-pill"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A docs page or post that explains why a stable prefix is cheaper and faster.",
@@ -43,9 +49,15 @@ public sealed class PromptCachePage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcPromptCache
+    // The cache panel starts at 644 px and needs the wider canvas it was drawn for, so scale it into the
+    // 860 px docs column instead of letting the panel text overflow.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 400,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcPromptCache
+        {
+            Width = 1000,
+            Height = 400,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

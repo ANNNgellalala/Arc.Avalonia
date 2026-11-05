@@ -1,0 +1,51 @@
+{
+  "slug": "cancel-flow",
+  "nameZh": "取消订阅流程",
+  "summary": "订阅取消流程：原因步骤、挽留报价与 Hold to confirm 的确认步骤，取消后给出恢复入口与数据导出。",
+  "purpose": [
+    "当用户要离开时，取消流程先问原因、再给一个针对性的挽留报价，最后才进入确认，避免一个误点就失去订阅。",
+    "步骤条固定为 Reason、Offer、Confirm 三步；原因卡是单选，备注可选；挽留报价会显示原价、折后价与下一步。",
+    "确认步骤用按住确认而不是普通点击，取消后给出恢复订阅与导出数据的入口，并说明访问权限保留到什么时候。"
+  ],
+  "whenToUse": [
+    "订阅产品的取消入口，需要先了解原因并尝试挽留时。",
+    "要提供折扣、暂停或降级等不同挽留选项时。",
+    "取消是不可逆动作、需要比单击更强的确认时。"
+  ],
+  "whenNotToUse": [
+    "只需要一个危险动作的确认时，用 hold-to-confirm。",
+    "用户只想暂停一个月时，直接用暂停功能而不是取消流程。",
+    "已经确定流失、只需要收集反馈时，用一个简短的调研表单即可。"
+  ],
+  "variants": [
+    { "key": "layout-reason-step", "label": "原因步骤", "note": "原因卡、可选备注与 Continue" },
+    { "key": "variant-step-indicator", "label": "步骤条", "note": "Reason、Offer、Confirm 三段的 stepper" },
+    { "key": "variant-reasons", "label": "原因单选", "note": "四张原因卡，首个默认选中" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "textarea", "note": "可选的离开原因用多行输入收集" },
+    { "type": "uses", "target": "stepper", "note": "三步流程用步骤条指示当前位置" },
+    { "type": "uses", "target": "button", "note": "原因卡、Continue 与恢复订阅都是按钮" },
+    { "type": "uses", "target": "badge", "note": "挽留报价与状态用徽章和标签标出" },
+    { "type": "alternative", "target": "hold-to-confirm", "note": "只需要一个不可逆动作的确认时，改用 hold-to-confirm，不必带整个挽留流程" }
+  ],
+  "contrasts": [
+    {
+      "target": "hold-to-confirm",
+      "title": "Cancel flow 与 Hold to confirm",
+      "rows": [
+        { "dimension": "范围", "self": "原因、挽留、确认的完整流程", "other": "一个按住即确认的动作" },
+        { "dimension": "确认方式", "self": "最后一步才按住确认", "other": "按住本身就是确认" },
+        { "dimension": "分支", "self": "折扣、暂停、降级等挽留分支", "other": "没有分支，只有取消或不取消" },
+        { "dimension": "适用", "self": "订阅流失场景", "other": "删除数据等单步危险动作" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三步取消流程的骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"16\" MaxWidth=\"640\">\n  <arc:ArcStepper Label=\"Cancellation steps\" />\n  <TextBlock Text=\"Why are you leaving?\" Classes=\"arc-heading\" />\n  <!-- 四张原因卡，单选 -->\n  <arc:ArcTextarea Placeholder=\"Anything we should know? Optional\" MaxLength=\"240\" />\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n    <arc:ArcButton Content=\"Continue\" Variant=\"Primary\" />\n    <arc:ArcButton Content=\"Back to billing\" Variant=\"Ghost\" />\n  </StackPanel>\n  <!-- 挽留报价与 Hold to confirm 出现在后续步骤 -->\n</StackPanel>"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "slug": "api-keys",
+  "nameZh": "API 密钥",
+  "summary": "API 密钥管理区块：按环境列出密钥、作用域与最后使用时间，创建时一次性展示 secret，逐行可显示/隐藏、复制与两步撤销。",
+  "purpose": [
+    "开发者设置页需要让人放心地管理凭证：每把 key 属于哪个环境、能做什么、上次何时被用过，以及 secret 只出现一次。API 密钥区块把这些信息排成可扫读的列表。",
+    "列表行显示名称、环境徽章、作用域、最后使用时间与负责人；掩码固定为 12 个点，点击眼睛图标切换显示，复制按钮单独给可见值。",
+    "创建流程在列表上方展开：名称、环境、作用域勾选与敏感说明，提交后顶部出现一次性 secret 横幅，带复制与完成按钮，提示“现在复制，之后无法恢复”。",
+    "撤销是两步的：第一次点击进入确认态，第二次才真正移除，避免误删生产 key。"
+  ],
+  "whenToUse": [
+    "API 产品的开发者设置页，需要按环境管理凭证时。",
+    "创建密钥后只展示一次 secret 的安全流程中。",
+    "需要给密钥分配作用域、并展示最后使用时间时。"
+  ],
+  "whenNotToUse": [
+    "管理回调地址与签名密钥时改用 webhooks。",
+    "管理用户与角色的访问权限时改用 roles-permissions。",
+    "管理普通配置项而不是凭证时改用 env-variables。"
+  ],
+  "variants": [
+    { "key": "variant-key-list", "label": "密钥列表", "note": "三把 key 的名称、环境、作用域与最后使用" },
+    { "key": "state-revealed-secret", "label": "已显示 secret", "note": "CI pipeline 行展开真实 secret" },
+    { "key": "state-masked-secret", "label": "掩码状态", "note": "Support console 行显示 12 位掩码" },
+    { "key": "variant-environment-badge", "label": "环境徽章", "note": "Production 与 Development 用徽章区分" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "copy-button", "note": "复制可见 secret 与一次性 secret 横幅" },
+    { "type": "uses", "target": "input", "note": "创建表单里的密钥名称输入" },
+    { "type": "uses", "target": "checkbox", "note": "创建表单用复选框选择 Read / Write / Admin 作用域" },
+    { "type": "uses", "target": "select", "note": "创建表单里选择密钥所属环境" },
+    { "type": "uses", "target": "button", "note": "创建、显示/隐藏、撤销与 Done 都是按钮" },
+    { "type": "uses", "target": "badge", "note": "环境与作用域用徽章表达" },
+    { "type": "alternative", "target": "webhooks", "note": "管理出站事件端点时用 webhooks" }
+  ],
+  "contrasts": [
+    {
+      "target": "webhooks",
+      "title": "API keys 与 Webhooks",
+      "rows": [
+        { "dimension": "管理对象", "self": "调用 API 的密钥", "other": "接收事件回调的端点" },
+        { "dimension": "安全动作", "self": "一次性展示 secret、显示/隐藏与撤销", "other": "掩码签名密钥与重试投递" },
+        { "dimension": "列表信息", "self": "环境、作用域、最后使用", "other": "事件类型、状态码与耗时" },
+        { "dimension": "失败处理", "self": "撤销后请求即失败", "other": "失败投递可重试" }
+      ]
+    },
+    {
+      "target": "copy-button",
+      "title": "API keys 与 Copy button",
+      "rows": [
+        { "dimension": "职责", "self": "密钥生命周期与安全展示的完整组合", "other": "只复制一段已有文本" },
+        { "dimension": "安全约束", "self": "secret 默认掩码、创建后仅展示一次", "other": "不感知敏感数据" },
+        { "dimension": "状态", "self": "显示/隐藏、确认撤销、环境与作用域", "other": "复制成功后的短暂反馈" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "密钥行与作用域",
+      "language": "csharp",
+      "code": "var environment = new ArcBadge { Content = \"Production\", Tone = ArcBadgeTone.Accent };\nvar scopes = new ArcBadge { Content = \"Read, Write\", Tone = ArcBadgeTone.Neutral };\nvar secret = new ArcCopyButton { Value = \"arc_live_8f3c2a91d4b7\", Label = \"Copy\", IconOnly = true };\nvar name = new ArcInput { Placeholder = \"Key name, for example CI pipeline\", Width = 260 };\nvar readScope = new ArcCheckbox { Label = \"Read\", Checked = true };"
+    },
+    {
+      "title": "开发者设置页的结构（XAML 示意）",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"10\">\n  <TextBlock Text=\"API keys\" Classes=\"arc-heading\" />\n  <Border Padding=\"14,10\" CornerRadius=\"16\" BorderThickness=\"1\" BorderBrush=\"{DynamicResource ArcBorder}\">\n    <Grid ColumnDefinitions=\"*,Auto,Auto,Auto\">\n      <StackPanel Spacing=\"2\">\n        <TextBlock Text=\"CI pipeline\" Classes=\"arc-label\" />\n        <TextBlock Text=\"arc_live_8f3c2a91d4b7\" Classes=\"arc-mono\" />\n      </StackPanel>\n      <arc:ArcBadge Grid.Column=\"1\" Content=\"Production\" />\n      <arc:ArcCopyButton Grid.Column=\"2\" Label=\"Copy\" IconOnly=\"True\" />\n      <arc:ArcButton Grid.Column=\"3\" Content=\"Revoke\" Variant=\"Ghost\" Size=\"Sm\" />\n    </Grid>\n  </Border>\n</StackPanel>"
+    }
+  ]
+}

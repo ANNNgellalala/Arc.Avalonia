@@ -1,0 +1,64 @@
+{
+  "slug": "pagination",
+  "nameZh": "分页",
+  "summary": "长集合的分页控件：上一页与下一页箭头夹着最多五页的窗口，当前页用强调色，窗口跳过的地方显示省略号。",
+  "purpose": [
+    "当一个集合长到需要翻页时，pagination 给出一致的入口：前一页、五页窗口、后一页，当前页用强调色标出。",
+    "它是完全受控的：页码变化通过 PageChanged 报告给你，由你的状态驱动 Page；到第一页或最后一页时对应的箭头自动禁用。",
+    "总页数不超过七页时列出全部页码；超过时保留首页与末页，并在窗口跳过的位置显示省略号。"
+  ],
+  "whenToUse": [
+    "表格、搜索结果或列表的页码翻动，且总页数对用户有意义时。",
+    "需要让用户直接跳到第一页、最后一页或中间某页时。",
+    "每页内容固定、总条数已知时。"
+  ],
+  "whenNotToUse": [
+    "只需要顺次加载更多时，用列表底部的“加载更多”，而不是页码。",
+    "内容按时间连续流动、不需要定位时，用无限滚动。",
+    "用户只需要知道自己在层级里的位置时，用 breadcrumb。"
+  ],
+  "variants": [
+    { "key": "state-first", "label": "第一页", "note": "上一页箭头禁用" },
+    { "key": "state-middle", "label": "中间页", "note": "首尾保留，窗口两侧出现省略号" },
+    { "key": "state-last", "label": "最后一页", "note": "下一页箭头禁用" },
+    { "key": "variant-short", "label": "短集合", "note": "七页以内列出全部页码，没有省略号" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "breadcrumb", "note": "两者都帮用户定位：breadcrumb 表达层级，pagination 翻动同一集合的页码" },
+    { "type": "complement", "target": "data-grid", "note": "长表格通常在底部放一排分页，与行数统计一起使用" }
+  ],
+  "contrasts": [
+    {
+      "target": "breadcrumb",
+      "title": "Pagination 与 Breadcrumb",
+      "rows": [
+        { "dimension": "翻动对象", "self": "同一个集合的页", "other": "层级里的页面路径" },
+        { "dimension": "结构", "self": "箭头加五页窗口，跳过处显示省略号", "other": "一条从根到当前的路径" },
+        { "dimension": "当前项", "self": "当前页是强调色按钮，仍可点回", "other": "最后一级是当前页，不可点击" },
+        { "dimension": "位置", "self": "通常贴在列表或表格下方", "other": "通常与页面标题同排在页头" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中绑定页码",
+      "language": "xaml",
+      "code": "<Window xmlns:nav=\"clr-namespace:Arc.Avalonia.Navigation.Controls;assembly=Arc.Avalonia.Navigation\">\n  <nav:ArcPagination Label=\"搜索结果分页\"\n                    Page=\"{Binding Page}\"\n                    PageCount=\"{Binding PageCount}\" />\n</Window>"
+    },
+    {
+      "title": "用代码响应翻页",
+      "language": "csharp",
+      "code": "var pager = new ArcPagination\n{\n    Label = \"Search results\",\n    Page = 1,\n    PageCount = 12\n};\n\npager.PageChanged += (_, page) => LoadPage(page);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Navigation.Controls.ArcPagination",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Page": "当前页，从 1 开始；超出范围时自动夹到有效区间",
+      "PageCount": "总页数；0 时不渲染任何按钮",
+      "Label": "分页控件的可访问名称，默认 Pagination",
+      "PageChanged": "请求翻页时触发，携带目标页码"
+    }
+  }
+}

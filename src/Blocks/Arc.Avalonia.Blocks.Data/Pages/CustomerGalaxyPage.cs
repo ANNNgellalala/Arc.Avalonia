@@ -18,6 +18,11 @@ public sealed class CustomerGalaxyPage : ArcItemPage
 {
     public override string ItemSlug => "customer-galaxy";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-galaxy", "variant-clusters", "variant-grouping", "variant-book-panel", "variant-legend"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

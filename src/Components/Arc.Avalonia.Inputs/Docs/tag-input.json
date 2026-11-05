@@ -1,0 +1,83 @@
+{
+  "slug": "tag-input",
+  "nameZh": "标签输入",
+  "summary": "把键入文字变成可删除标签的字段：Enter 或逗号添加，Backspace 删除，方向键挑选标签后 Delete 精确移除。",
+  "purpose": [
+    "收集一组自由文本标签（主题、技能、收件人分组），每个标签都是独立 chip，带一个删除按钮，既能看到全部值又能逐条去掉。",
+    "添加路径有两条：键入后按 Enter 或逗号提交，或失焦时自动提交草稿；重复标签不会新增，而是选中已存在的那一枚。",
+    "键盘路径完整：空输入时 Backspace 删除最后一枚，方向键在标签间移动选中，Delete 删除选中标签，Escape 取消选中。"
+  ],
+  "whenToUse": [
+    "值是一组自由文本、数量与内容都无法预先枚举：主题标签、技能、邮件收件组。",
+    "用户需要看到全部已添加项，并能逐条删除的场景。",
+    "希望用 Enter / 逗号快速连续录入多个标签。"
+  ],
+  "whenNotToUse": [
+    "候选值是固定集合时改用 multi-select，避免拼写不一致。",
+    "标签用于筛选区域展示、而非作为表单值时改用 chip-group。",
+    "只需要一个值、不需要成组时改用 input。",
+    "需要 @ 提及人员或 # 引用频道时改用 mention-input。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑表单" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型字段" },
+    { "key": "state-empty", "label": "Empty", "note": "只有占位文案" },
+    { "key": "state-filled", "label": "Filled", "note": "多枚标签与末尾输入框" },
+    { "key": "state-error", "label": "Error", "note": "错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "标签保留可见，但不可增删" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "multi-select", "note": "候选值固定时改用 multi select" },
+    { "type": "alternative", "target": "chip-group", "note": "标签用于筛选展示时改用 chip group" },
+    { "type": "alternative", "target": "mention-input", "note": "需要 @ 人员或 # 频道时改用 mention input" },
+    { "type": "complement", "target": "input", "note": "标签字段的外壳与尺寸沿用 input 的字段体系" },
+    { "type": "uses", "target": "button", "note": "每枚标签的删除按钮复用 button 的图标按钮" }
+  ],
+  "contrasts": [
+    {
+      "target": "multi-select",
+      "title": "Tag input 与 Multi-select",
+      "rows": [
+        { "dimension": "值来源", "self": "用户自由键入文本", "other": "从预置选项里挑，值受约束" },
+        { "dimension": "添加方式", "self": "Enter / 逗号 / 失焦提交草稿", "other": "展开列表逐项点选" },
+        { "dimension": "一致性", "self": "可能出现同义或拼写不同的标签", "other": "值始终来自同一个选项集合" }
+      ]
+    },
+    {
+      "target": "chip-group",
+      "title": "Tag input 与 Chip group",
+      "rows": [
+        { "dimension": "角色", "self": "表单字段，产出字符串集合", "other": "筛选控件，绑定固定选项" },
+        { "dimension": "能否新增", "self": "可输入任意新标签", "other": "只能在已有选项中选择" },
+        { "dimension": "布局", "self": "输入框随标签换行，末尾总有草稿输入位", "other": "标签平铺，可折叠为 +N" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcTagInput Label=\"主题\"\n                   Placeholder=\"输入后按 Enter 添加\"\n                   Description=\"Enter 或逗号添加，Backspace 删除最后一个。\"\n                   Value=\"{Binding Topics, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "监听标签增删",
+      "language": "csharp",
+      "code": "var topics = new ArcTagInput\n{\n    Label = \"标签\",\n    Value = new[] { \"design\", \"motion\", \"tokens\" },\n    Placeholder = \"添加标签\"\n};\n\ntopics.ValueChanged += (_, _) =>\n{\n    TopicCount.Text = $\"{topics.Value?.Count ?? 0} 个标签\";\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcTagInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前标签列表；每次增删都会替换整个集合",
+      "Placeholder": "没有标签时显示在草稿输入位，默认 Add a tag",
+      "Label": "可见标签，同时作为草稿输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖",
+      "Error": "错误文案；有值时字段进入错误态",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "ValueChanged": "每次添加或删除标签后触发"
+    }
+  }
+}

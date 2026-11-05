@@ -14,6 +14,11 @@ public sealed class GlassCardPage : ArcItemPage
 {
     public override string ItemSlug => "glass-card";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-rim", "variant-rating", "variant-actions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,115 +1,70 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia.Controls;
-using Avalonia.LogicalTree;
-using Arc.Avalonia.Demo;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Gallery;
 
 /// <summary>
-/// Checks that every catalog entry (component, block or special component) is reachable from the gallery:
-/// either it has its own ArcItemPage, or an existing demo page has a section heading with the same title.
-/// Run with `dotnet Arc.Avalonia.Gallery.dll --audit`.
+/// Documentation audit: every catalog entry must have a Chinese document and an item page, required sections
+/// must be present, relations and contrasts must resolve, preview states must match the document, and every
+/// page must build. Run with `dotnet Arc.Avalonia.Gallery.dll --audit`; exit code 0 means clean.
 /// </summary>
 public static class CatalogAudit
 {
     public static int Run()
     {
-        var pages = ArcPageRegistry.Discover();
-        var context = new ArcDemoContext(ArcColorScheme.Light, ArcAccent.Neutral);
-        var headings = new HashSet<string>(StringComparer.Ordinal);
-        var itemPages = new Dictionary<string, ArcPage>(StringComparer.Ordinal);
-        var failures = new List<string>();
+        var issues = ArcDocValidator.Validate();
+        var errors = issues.Where(issue => issue.IsError).ToList();
+        var warnings = issues.Where(issue => !issue.IsError).ToList();
 
-        foreach (var page in pages)
+        var docPages = ArcDocValidator.ItemPages();
+        var failures = new List<string>();
+        var context = new ArcDemoContext(ArcColorScheme.Light, ArcAccent.Neutral);
+        foreach (var page in docPages.Values)
         {
             try
             {
-                var content = page.Build(context);
-                if (page is ArcItemPage itemPage)
-                {
-                    itemPages[itemPage.ItemSlug] = page;
-                }
-
-                CollectHeadings(content, headings);
+                _ = page.BuildPreview(context);
             }
             catch (Exception exception)
             {
-                failures.Add($"{page.Title}: {exception.GetType().Name}: {exception.Message}");
+                failures.Add($"{page.ItemSlug}: {exception.GetType().Name}: {exception.Message}");
             }
         }
 
-        var pageTitles = new HashSet<string>(pages.Select(page => page.Title), StringComparer.Ordinal);
-        var missing = new List<ArcCatalogItem>();
-        var byItemPage = 0;
-        var bySection = 0;
-        var byAlias = 0;
-        foreach (var item in ArcCatalog.AllItems)
+        var withDocs = ArcCatalog.AllItems.Count(item => ArcDocStore.Get(item.Slug) is not null);
+        Console.WriteLine(
+            $"CATALOG AUDIT: items={ArcCatalog.AllItems.Count} docs={withDocs} pages={docPages.Count} " +
+            $"errors={errors.Count} warnings={warnings.Count} pageFailures={failures.Count}");
+
+        foreach (var group in errors.GroupBy(issue => issue.Code).OrderByDescending(group => group.Count()))
         {
-            if (itemPages.ContainsKey(item.Slug))
+            Console.WriteLine($"AUDIT ERROR {group.Key}: {group.Count()}");
+            foreach (var issue in group.Take(4))
             {
-                byItemPage++;
-            }
-            else if (headings.Contains(Normalize(item.Title)))
-            {
-                bySection++;
-            }
-            else if (ArcCatalogAliases.PageTitles(item.Slug).Any(pageTitles.Contains))
-            {
-                byAlias++;
-            }
-            else
-            {
-                missing.Add(item);
+                Console.WriteLine($"  {issue.Slug}: {issue.Message}");
             }
         }
 
-        Console.WriteLine($"CATALOG AUDIT: pages={pages.Count} items={ArcCatalog.AllItems.Count} itemPages={byItemPage} matchedBySection={bySection} matchedByAlias={byAlias} missing={missing.Count} pageFailures={failures.Count}");
-        foreach (var group in missing.GroupBy(item => item.Kind + " / " + item.Category))
+        foreach (var group in warnings.GroupBy(issue => issue.Code).OrderByDescending(group => group.Count()))
         {
-            Console.WriteLine($"MISSING {group.Key}: {string.Join(", ", group.Select(item => item.Slug))}");
+            Console.WriteLine($"AUDIT WARN {group.Key}: {group.Count()}");
+        }
+
+        foreach (var error in ArcDocStore.Errors)
+        {
+            Console.WriteLine($"AUDIT DOC LOAD {error.Source}: {error.Message}");
         }
 
         foreach (var failure in failures.Take(20))
         {
-            Console.WriteLine("PAGE FAILED " + failure);
+            Console.WriteLine("AUDIT PAGE FAILED " + failure);
         }
 
-        return missing.Count == 0 && failures.Count == 0 ? 0 : 1;
-    }
-
-    private static void CollectHeadings(ILogical root, HashSet<string> headings)
-    {
-        if (root is TextBlock text
-            && text.Classes.Contains("arc-heading")
-            && !string.IsNullOrWhiteSpace(text.Text))
-        {
-            headings.Add(Normalize(text.Text));
-        }
-
-        foreach (var child in root.LogicalChildren)
-        {
-            CollectHeadings(child, headings);
-        }
-    }
-
-    private static string Normalize(string value)
-    {
-        var buffer = new System.Text.StringBuilder(value.Length);
-        foreach (var character in value)
-        {
-            if (char.IsLetterOrDigit(character))
-            {
-                buffer.Append(char.ToLowerInvariant(character));
-            }
-        }
-
-        return buffer.ToString();
+        var ok = errors.Count == 0 && failures.Count == 0 && ArcDocStore.Errors.Count == 0;
+        Console.WriteLine(ok ? "AUDIT OK" : "AUDIT FAILED");
+        return ok ? 0 : 1;
     }
 }
-
-
-

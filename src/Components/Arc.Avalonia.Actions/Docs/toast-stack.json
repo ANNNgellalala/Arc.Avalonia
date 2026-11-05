@@ -1,0 +1,59 @@
+{
+  "slug": "toast-stack",
+  "nameZh": "轻提示堆栈",
+  "summary": "轻提示的宿主：在面板右下角依次堆叠多条 toast，调用 Show 添加、关闭时自动移除。",
+  "purpose": [
+    "把「消息从哪来、放在哪、什么时候移除」集中到一个宿主里：页面放一个 ArcToastHost，之后调用 Show(title, description, actionLabel, action, duration) 即可。",
+    "宿主内部用一个右下角对齐的 StackPanel，新消息追加在末尾，每条自己计时离开，离开时由宿主动手移除。",
+    "模板应用前调用 Show 的消息会先进入待处理队列，等模板生成后再一次性挂上，所以页面初始化阶段就可以安排消息。"
+  ],
+  "whenToUse": [
+    "应用里需要一个全局或页面级的通知出口时。",
+    "同一时刻可能出现多条短暂的确认消息，需要按顺序堆叠时。",
+    "想把 toast 的摆放与移除逻辑从业务代码里收走时。"
+  ],
+  "whenNotToUse": [
+    "只有一条持久消息时，直接用 alert，不需要宿主。",
+    "站点级横幅或公告，改用 announcement-bar。",
+    "需要用户确认或选择才能继续时，用 dialog，而不是会自己消失的 toast。"
+  ],
+  "variants": [
+    { "key": "stack-two", "label": "Two toasts", "note": "两条消息依次堆叠" },
+    { "key": "stack-three", "label": "Three toasts", "note": "三条消息，验证顺序与间距" },
+    { "key": "stack-action", "label": "With action", "note": "堆栈中混入带行动的 toast" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "toast", "note": "宿主内部堆叠的就是 toast 控件" },
+    { "type": "alternative", "target": "alert", "note": "需要持久提示时改用 alert" }
+  ],
+  "contrasts": [
+    {
+      "target": "toast",
+      "title": "Toast stack 与 Toast",
+      "rows": [
+        { "dimension": "角色", "self": "负责堆叠与移除的宿主", "other": "单条消息控件" },
+        { "dimension": "摆放", "self": "固定在宿主面板右下角依次排列", "other": "由使用方决定放在哪个容器" },
+        { "dimension": "使用方式", "self": "调用 Show 方法添加，关闭时自动移除", "other": "直接实例化并设置属性" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面初始化时排队两条消息",
+      "language": "csharp",
+      "code": "var host = new ArcToastHost();\nhost.Show(\"Changes saved\", \"Your billing email is updated.\", \"Undo\", null, 4500);\nhost.Show(\"Invite sent to Sam\");\n\n// 页面里放一个宿主即可：panel.Children.Add(host);"
+    },
+    {
+      "title": "在 XAML 中放置宿主",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\n        xmlns:ac=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\">\n  <Panel>\n    <ac:ArcToastHost x:Name=\"Notifications\" />\n  </Panel>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcToastHost",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "TemplateApplied": "模板就绪后把队列里待显示的 toast 一次性挂入堆栈"
+    }
+  }
+}

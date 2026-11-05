@@ -1,0 +1,58 @@
+{
+  "slug": "agent-memory",
+  "nameZh": "智能体记忆",
+  "summary": "助手记得什么：按分组列出的记忆条目、62% 的容量条、两个保存开关，以及一条「刚刚记下」的捕获提示；忘掉、归档、暂停都能就地把列表改掉。",
+  "purpose": [
+    "它回答「它到底记住了我什么」：三条示例记忆（单位与时间偏好、所在城市、包管理器偏好）逐行列出，每行带来源与时间，分组标签可以筛选。",
+    "顶部右侧是容量条：62% full 的进度条与文字提醒预算快满了，这会直接影响「还能不能继续记新东西」的判断。",
+    "两个开关控制记忆策略：一个管是否保存新事实，一个管是否允许引用最近对话；关掉保存时列表上方会出现「Saved memories are off」的提示行，捕获提示也随之消失。",
+    "记忆可以在原地管理：捕获 pill 用来确认「刚记下的一条」并一键 Save，行内动作可以忘掉或归档，底部还有一个输入框手动添加一条记忆——所有改动只发生在本页。"
+  ],
+  "whenToUse": [
+    "助手会跨会话保留用户偏好与事实，需要让用户查看、纠正或删除。",
+    "记忆有容量上限、需要提示用了多少时。",
+    "需要区分「保存新记忆」与「引用最近对话」两种策略时。"
+  ],
+  "whenNotToUse": [
+    "检索的是团队文档库、面向问答召回时，用 knowledge-base。",
+    "需要审批智能体将要执行的工具调用时，用 agent-approvals。",
+    "只是列出会话历史、不做长期记忆时，用 ai-chat 的线程即可。"
+  ],
+  "variants": [
+    { "key": "variant-memory-list", "label": "Memory list", "note": "三条记忆与分组筛选，行内可忘掉或归档" },
+    { "key": "variant-capacity", "label": "Capacity", "note": "62% full 的容量条与文字" },
+    { "key": "variant-switches", "label": "Switches", "note": "保存新记忆与引用最近对话两个开关" },
+    { "key": "variant-capture", "label": "Capture", "note": "刚记下一条的捕获 pill 与底部手动添加" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "保存、忘掉、归档、筛选 chip 与添加都是 ArcButton" },
+    { "type": "uses", "target": "switch", "note": "保存新记忆与引用最近对话两个开关是 ArcSwitch" },
+    { "type": "uses", "target": "progress", "note": "容量条用 ArcProgress 表达已用比例" },
+    { "type": "uses", "target": "input", "note": "底部手动添加记忆使用 ArcInput" },
+    { "type": "alternative", "target": "knowledge-base", "note": "面向文档检索的长期知识改用 knowledge base" }
+  ],
+  "contrasts": [
+    {
+      "target": "knowledge-base",
+      "title": "Agent memory 与 Knowledge base",
+      "rows": [
+        { "dimension": "记忆对象", "self": "关于用户本人的偏好与事实", "other": "团队文档切块后的知识库" },
+        { "dimension": "容量", "self": "有上限与 62% 容量条", "other": "按来源与 chunk 数计，通常持续增长" },
+        { "dimension": "治理", "self": "逐条忘掉、归档，两个策略开关", "other": "按来源重新入库、调 chunk 与重排" },
+        { "dimension": "可见性", "self": "用户自己查看与修改", "other": "面向问答的检索结果" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "记忆页骨架",
+      "language": "csharp",
+      "code": "var content = K.Stack(6,\n    K.Row(6,\n        K.Stack(2, K.Text(\"Memory\", \"arc-heading\"), K.Caption(\"What Claude remembers between chats\")),\n        K.Stack(2, capacity, capacityBar)),   // 62% full + ArcProgress\n    K.Divider(2),\n    K.Columns(\"*,*\",\n        K.Stack(2, savedSwitch, K.Caption(\"Facts it keeps and reuses in later chats\")),\n        K.Stack(2, historySwitch, K.Caption(\"Let it quote from recent conversations\"))),\n    filterRow,        // All / About / Preferences / Projects\n    capturedPill,     // 「Noted: you prefer pnpm over npm」+ Save\n    listNote,\n    K.Scroller(list, 228),\n    addRow,           // ArcInput + Save\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 760 }, new Thickness(22, 16, 22, 16));"
+    },
+    {
+      "title": "关掉保存后的列表提示",
+      "language": "csharp",
+      "code": "var saved = true;\n\nvoid RenderSwitches()\n{\n    // 关闭保存时，捕获提示消失，列表上方出现说明\n    capturedPill.IsVisible = captured && saved;\n    listNote.IsVisible = !saved;\n    if (!saved)\n    {\n        status.Text = \"Saved memories are off. The assistant will not keep new facts.\";\n    }\n}\n\nvar capturedPill = new Border\n{\n    CornerRadius = new CornerRadius(12),\n    Padding = new Thickness(10, 6, 6, 6),\n    Child = K.Row(7,\n        new ArcIcon { Icon = \"sparkles\", Size = 13, Foreground = K.Brush(ArcTokens.Accent) },\n        K.Text(\"Noted: you prefer pnpm over npm\", \"arc-caption\"),\n        K.Chip(\"Save\", icon: \"plus\"))\n};"
+    }
+  ]
+}

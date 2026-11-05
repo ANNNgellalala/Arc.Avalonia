@@ -1,0 +1,56 @@
+{
+  "slug": "knowledge-base",
+  "nameZh": "知识库",
+  "summary": "文档来源从解析、切块、嵌入到索引的摄入流水线，加上一个测试问题：返回三个 chunk 及其相似度，重排开关会把同一批结果按顺序重排。",
+  "purpose": [
+    "它把 RAG 的两端放在一页：上半是来源与摄入状态（3 sources · 382 chunks · 512 token chunks），每行显示该来源走到 parse / chunk / embed / index 的哪一步；下半是测试问题与检索结果。",
+    "摄入是逐步可见的：刚添加的来源会停在解析进度上，已完成的来源显示 chunk 数与索引状态；Add source 与切块设置入口在头部，模拟一次添加就能看到新行进入流水线。",
+    "检索结果给出可判断的依据：每个 chunk 带相似度分数、来源与文本，Hybrid search on · top 3 说明当前的检索策略；打开重排开关只是把同一批结果重新排序，不会重新检索。",
+    "所有检索都是示例数据：Search 返回固定的三个 chunk、相似度 0.87，状态行会说明这是模拟检索，接入真实后端时替换成你的向量库即可。"
+  ],
+  "whenToUse": [
+    "团队文档需要入库、切块供问答检索，并且要能看见摄入进度时。",
+    "要调试检索质量：看返回的 chunk、分数与重排前后的顺序时。",
+    "需要向用户解释「答案是从哪些片段里来的」的配置页或调试页。"
+  ],
+  "whenNotToUse": [
+    "记忆的是用户个人偏好而不是团队文档时，用 agent-memory。",
+    "管理可调用的工具服务器时，用 mcp-servers。",
+    "要从单份票据里抽取字段时，用 document-extract。"
+  ],
+  "variants": [
+    { "key": "variant-sources", "label": "Sources", "note": "来源行与 parse / chunk / embed / index 流水线" },
+    { "key": "variant-search", "label": "Search", "note": "测试问题、Search 与 Hybrid / 重排开关" },
+    { "key": "variant-results", "label": "Results", "note": "返回的 chunk、相似度分数与重排后的顺序" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Add source、Search 与切块设置都是 ArcButton" },
+    { "type": "uses", "target": "switch", "note": "Hybrid 检索与重排开关是 ArcSwitch" },
+    { "type": "uses", "target": "input", "note": "测试问题由 ArcInput 收集" },
+    { "type": "alternative", "target": "agent-memory", "note": "记忆用户偏好时改用 agent memory" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-memory",
+      "title": "Knowledge base 与 Agent memory",
+      "rows": [
+        { "dimension": "记忆对象", "self": "团队文档切块后的知识库", "other": "关于用户本人的偏好与事实" },
+        { "dimension": "容量", "self": "按来源与 chunk 数计，通常持续增长", "other": "有上限与 62% 容量条" },
+        { "dimension": "治理", "self": "按来源重新入库、调 chunk 与重排", "other": "逐条忘掉、归档，两个策略开关" },
+        { "dimension": "可见性", "self": "面向问答的检索结果", "other": "用户自己查看与修改" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "知识库页骨架",
+      "language": "csharp",
+      "code": "var content = K.Stack(9,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(2, K.Text(\"Support knowledge base\", \"arc-heading\"),\n                K.Caption(\"3 sources · 382 chunks · 512 token chunks\")),\n            K.Row(4, addSource, K.IconBtn(\"sliders-horizontal\", \"Chunking settings\"))\n        }\n    },\n    K.Caption(\"Sources\"),\n    sourceHost,          // 每行一个来源与摄入步骤\n    K.Divider(2),\n    searchRow,           // ArcInput + Search\n    K.Row(8, rerankSwitch, K.Caption(\"Hybrid search on · top 3\")),\n    resultHost,          // 返回的 chunk、分数与重排顺序\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 900 }, new Thickness(20, 12, 20, 12));"
+    },
+    {
+      "title": "重排只改顺序，不重新检索",
+      "language": "csharp",
+      "code": "void RenderResults()\n{\n    resultHost.Children.Clear();\n    var ordered = rerank\n        ? chunks.OrderByDescending(chunk => chunk.Score * 0.6 + chunk.LexicalMatch * 0.4)\n        : chunks.OrderByDescending(chunk => chunk.Score);\n\n    foreach (var chunk in ordered.Take(3))\n    {\n        resultHost.Children.Add(K.Panel(K.Stack(4,\n            K.Row(6, K.Text(chunk.Title, \"arc-label\"), K.Pill($\"{chunk.Score:0.00}\", ArcBadgeTone.Neutral)),\n            K.Text(chunk.Text, \"arc-body-sm\", 640),\n            K.Caption($\"{chunk.Source} · {chunk.Tokens} tokens\")),\n            12));\n    }\n}"
+    }
+  ]
+}

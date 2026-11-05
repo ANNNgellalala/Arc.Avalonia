@@ -1,0 +1,77 @@
+{
+  "slug": "tool-call",
+  "nameZh": "工具调用列表",
+  "summary": "一轮对话里全部工具调用的折叠清单：每行给出工具、动作与状态，展开任意一行即可看到入参与结果，等待授权时就地 Allow / Deny。",
+  "purpose": [
+    "把智能体这一轮调过的工具收成一组：头部一句「Used 5 tools · 9.2s」，下面逐行是调用（工具标记 + 标题 + 摘要或耗时 + 状态字形）。列表默认展开，行本身默认收起，只有 DefaultOpenId 指定的那一行带着入参与结果。",
+    "每个状态都有自己的字形，不只靠颜色：Running 是转动的指示、Success 是勾、Error 是告警圆并附 Retry、Approval 用强调色描边并在行尾直接给 Allow / Deny、Denied 用 ban 图标并把说明留在行里。",
+    "展开行分两段：Input 是 Key / Value 参数表，Output 是带 Lead 与 Tag 的结果条目列表，最多先展示前三条、其余折叠成「Show N more rows」；每个分节右侧都有一个复制按钮，点一下图标就变成勾作为确认（本移植版不写入系统剪贴板）。",
+    "它只负责把调用记录读清楚。本移植版的 Allow、Deny、Retry 都在页面里就地改写这一行的状态，不会回传到你的 agent loop——真正的执行结果仍由宿主决定。"
+  ],
+  "whenToUse": [
+    "对话或智能体记录里要说明「它刚才用了哪些工具」，并让人能核对参数与结果。",
+    "写数据库、发消息、改外部系统这类调用必须先允许或拒绝，且拒绝原因要留在记录里。",
+    "调试与审计视图，需要展开查看并复制原始入参与输出。"
+  ],
+  "whenNotToUse": [
+    "只关心整轮运行的状态（在跑、在等、跑完多久）时，改用 agent-status，它把整轮压成一行。",
+    "要看多次调用在时间上的先后、并发与智能体之间的交接时，改用 agent-timeline。",
+    "要编辑、批准整份计划而不是单次调用时，改用 agent-plan。"
+  ],
+  "variants": [
+    { "key": "state-expanded", "label": "Expanded row", "note": "展开行：Input 参数表与 Output 结果列表" },
+    { "key": "state-success", "label": "Success", "note": "勾字形、摘要与耗时" },
+    { "key": "state-running", "label": "Running", "note": "转动的指示，标题用进行时" },
+    { "key": "state-error", "label": "Error", "note": "告警圆、失败说明与 Retry" },
+    { "key": "state-approval", "label": "Approval", "note": "强调描边行与 Allow / Deny" },
+    { "key": "state-denied", "label": "Denied", "note": "ban 字形与拒绝说明" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "agent-status", "note": "状态胶囊报告整轮运行，工具调用行给出每次调用的参数与结果" },
+    { "type": "alternative", "target": "agent-timeline", "note": "要按时间回放并发与交接时改用 agent timeline" },
+    { "type": "complement", "target": "agent-plan", "note": "计划批准之后，具体执行落成一条条工具调用" },
+    { "type": "uses", "target": "button", "note": "Allow、Deny 与 Retry 都是 ArcButton" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-status",
+      "title": "Tool call 与 Agent status",
+      "rows": [
+        { "dimension": "表示对象", "self": "一次工具调用", "other": "一整轮运行的状态" },
+        { "dimension": "内容深度", "self": "调用参数与完整输出", "other": "活动、计数、计时与步骤摘要" },
+        { "dimension": "批准粒度", "self": "对单次调用批准、拒绝或重试", "other": "在胶囊内对整轮运行批准或拒绝" }
+      ]
+    },
+    {
+      "target": "agent-timeline",
+      "title": "Tool call 与 Agent timeline",
+      "rows": [
+        { "dimension": "组织方式", "self": "按调用顺序的清单，可逐行展开", "other": "按时间的泳道图，调用是其中一段 span" },
+        { "dimension": "并发呈现", "self": "只能从行尾耗时看出重叠", "other": "并发、等待与交接直接画在时间轴上" },
+        { "dimension": "适合问题", "self": "这次调用传了什么、返回了什么", "other": "这轮流怎么跑、谁等了谁、慢在哪" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "一轮对话里的四次调用",
+      "language": "xaml",
+      "code": "<arc:ArcToolCall xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                 DefaultOpenId=\"gh\"\n                 Calls=\"{Binding Calls}\" />"
+    },
+    {
+      "title": "展开行、失败与等待授权",
+      "language": "csharp",
+      "code": "var calls = new ArcToolCall\n{\n    DefaultOpenId = \"gh\",\n    Calls = new List<ArcToolCallData>\n    {\n        new()\n        {\n            Id = \"gh\",\n            Tool = \"github\",\n            Title = \"Searched issues in arc-ui/web\",\n            Status = ArcToolCallStatus.Success,\n            Summary = \"3 results\",\n            DurationSeconds = 1.2,\n            Input = new List<ArcToolArgument>\n            {\n                new() { Key = \"repo\", Value = \"arc-ui/web\" },\n                new() { Key = \"query\", Value = \"is:open label:release-blocker\" }\n            },\n            Output = new List<ArcToolListItem>\n            {\n                new() { Lead = \"#1284\", Title = \"Checkout button stays disabled after a coupon is removed\", Tag = \"checkout\" }\n            }\n        },\n        new()\n        {\n            Id = \"sql\",\n            Tool = \"postgres\",\n            Title = \"Queried orders by plan\",\n            RunningTitle = \"Querying orders by plan\",\n            Status = ArcToolCallStatus.Running,\n            Summary = \"reading rows\"\n        },\n        new()\n        {\n            Id = \"slack\",\n            Tool = \"slack\",\n            Title = \"Posted a summary to #release\",\n            ApprovalTitle = \"Post a summary to #release\",\n            Status = ArcToolCallStatus.Approval,\n            Message = \"Allows the agent to post one message in this channel\"\n        },\n        new()\n        {\n            Id = \"web\",\n            Tool = \"web\",\n            Title = \"Fetched the pricing page\",\n            Status = ArcToolCallStatus.Error,\n            Message = \"Timed out after 8s\",\n            DurationSeconds = 8\n        }\n    }\n};\n\n// 只保留逐行清单、不显示“Used N tools”头部\ncalls.ShowHeader = false;\n// 折叠整个列表\ncalls.IsOpen = false;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcToolCall",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Calls": "一轮对话里的调用集合，元素是 ArcToolCallData（工具、标题、状态、入参、输出、摘要、耗时）",
+      "ShowHeader": "是否显示「Used N tools」头部与工具标记叠层，默认 true",
+      "IsOpen": "整份清单是否展开，默认 true",
+      "DefaultOpenId": "默认展开哪一行调用的 Id，用来直接露出参数与结果"
+    }
+  }
+}

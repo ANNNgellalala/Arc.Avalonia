@@ -22,6 +22,12 @@ public sealed class WorkspaceSidebarPage : ArcItemPage
 {
     public override string ItemSlug => "workspace-sidebar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-workspace-header", "variant-search", "variant-favorites",
+        "variant-project-list", "variant-content-pane"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

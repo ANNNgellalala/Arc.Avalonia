@@ -1,0 +1,52 @@
+{
+  "slug": "product-listing",
+  "nameZh": "商品列表页",
+  "summary": "电商集合页：筛选栏、排序控件与商品网格合在一页，卡片带促销与库存徽章，筛选与排序都在内存里即时重排。",
+  "purpose": [
+    "当买家要在几十件商品里按颜色、尺码、价格与库存收窄范围时，区块把筛选栏放在左侧，右侧网格随条件重排。",
+    "每张商品卡是一块固定画框的照片占位，加上名称、价格与徽章；指针悬停时照片在同一个框里换一张，价格与网格不会跳版。",
+    "它只负责浏览与快速加购：商品详情留给 product-detail，购物袋与结算分别交给 cart-drawer 与 checkout-summary。"
+  ],
+  "whenToUse": [
+    "店铺的分类页或搜索结果页需要筛选、排序与库存提示时。",
+    "商品较多、颜色与尺码是主要筛选维度时。",
+    "希望从列表直接完成快速加购、少一次跳转时。"
+  ],
+  "whenNotToUse": [
+    "展示单个商品的完整介绍与规格时，用 product-detail。",
+    "已经在购物袋里、准备付款时，用 cart-drawer 或 checkout-summary。",
+    "商品很少（三件以内）时，直接排一个小网格即可，不必放筛选栏。"
+  ],
+  "variants": [
+    { "key": "layout-collection", "label": "整体布局", "note": "左侧筛选栏加右侧网格，中间是计数与排序工具条" },
+    { "key": "variant-filter-rail", "label": "筛选栏", "note": "颜色色板、尺码 chips、仅看有货与价格上限滑块" },
+    { "key": "variant-sort-control", "label": "排序", "note": "featured / newest / price-asc / price-desc 的分段控件" },
+    { "key": "variant-product-grid", "label": "商品网格", "note": "带 Sale / In stock 徽章、价格与悬停换图的卡片" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "card", "note": "每件商品用卡片承载照片、名称、价格与徽章" },
+    { "type": "uses", "target": "button", "note": "快速加购、通知与清除筛选都是按钮或按钮式链接" },
+    { "type": "uses", "target": "slider", "note": "价格上限用单手柄滑块收窄" },
+    { "type": "uses", "target": "segmented-control", "note": "排序方式用分段控件切换" },
+    { "type": "alternative", "target": "product-detail", "note": "需要单品详情而不是浏览集合时，改用 product-detail" }
+  ],
+  "contrasts": [
+    {
+      "target": "product-detail",
+      "title": "Product listing 与 Product detail",
+      "rows": [
+        { "dimension": "浏览范围", "self": "几十件商品同时比较", "other": "聚焦一件商品" },
+        { "dimension": "信息深度", "self": "照片、名称、价格与徽章", "other": "相册、变体、库存、评价与参数" },
+        { "dimension": "主要动作", "self": "筛选、排序与快速加购", "other": "选好变体后加入购物袋" },
+        { "dimension": "布局", "self": "筛选栏加多列网格", "other": "左图右文的单列" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "集合页骨架：筛选栏加网格",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"240,*\" ColumnSpacing=\"24\">\n  <StackPanel Spacing=\"16\">\n    <TextBlock Text=\"Colour\" Classes=\"arc-label\" />\n    <WrapPanel> <!-- 色板按钮 --> </WrapPanel>\n    <TextBlock Text=\"Size\" Classes=\"arc-label\" />\n    <WrapPanel> <!-- 尺码 chips --> </WrapPanel>\n  </StackPanel>\n  <StackPanel Grid.Column=\"1\" Spacing=\"14\">\n    <Grid ColumnDefinitions=\"*,Auto\">\n      <TextBlock Text=\"Home goods\" Classes=\"arc-subtitle\" />\n      <arc:ArcSegmentedControl Grid.Column=\"1\" />\n    </Grid>\n    <ItemsControl ItemsSource=\"{Binding Products}\"> <!-- 商品卡网格 --> </ItemsControl>\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

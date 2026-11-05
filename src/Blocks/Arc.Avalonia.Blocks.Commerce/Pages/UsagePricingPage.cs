@@ -23,6 +23,11 @@ public sealed class UsagePricingPage : ArcItemPage
 {
     public override string ItemSlug => "usage-pricing";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-calculator", "variant-plan-card", "variant-breakdown", "variant-billing-period"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

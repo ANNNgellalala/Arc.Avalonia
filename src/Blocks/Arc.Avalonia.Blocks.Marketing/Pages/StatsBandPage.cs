@@ -25,6 +25,11 @@ public sealed class StatsBandPage : ArcItemPage
 {
     public override string ItemSlug => "stats-band";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-hairline", "state-plain"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -65,7 +70,7 @@ public sealed class StatsBandPage : ArcItemPage
         var gridHost = new ContentControl();
         var hairline = true;
 
-        void Rebuild()
+        Control BuildBand(bool hairline)
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,*,*,*") };
             for (var index = 0; index < Stats.Length; index++)
@@ -75,8 +80,10 @@ public sealed class StatsBandPage : ArcItemPage
                 grid.Children.Add(cell);
             }
 
-            gridHost.Content = grid;
+            return grid;
         }
+
+        void Rebuild() => gridHost.Content = BuildBand(hairline);
 
         Rebuild();
 
@@ -94,7 +101,17 @@ public sealed class StatsBandPage : ArcItemPage
         head.Children.Add(toggle);
 
         var band = new Border { Padding = new Thickness(24, 18, 24, 16), Child = Mk.Stack(14, head, gridHost) };
-        return Mk.Surface(band);
+
+        // The plain treatment is otherwise only reachable through the switch; a static copy keeps it visible.
+        var plainSpecimen = Mk.Surface(new Border
+        {
+            Padding = new Thickness(24, 18, 24, 16),
+            Child = Mk.Stack(12,
+                Mk.Caption("Plain treatment: no hairline dividers"),
+                BuildBand(false))
+        });
+
+        return Mk.Stack(16, new ArcCard { Padding = new Thickness(0), Content = band }, plainSpecimen);
     }
 
     private static Control Cell(Stat stat, bool hairline, bool divider)

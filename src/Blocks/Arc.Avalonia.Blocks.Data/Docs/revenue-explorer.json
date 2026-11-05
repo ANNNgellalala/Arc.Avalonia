@@ -1,0 +1,57 @@
+{
+  "slug": "revenue-explorer",
+  "nameZh": "收入探索器",
+  "summary": "二十四个月 MRR 的探索页：总览刷选缩放时间窗口，上一周期对比、MRR 组成切换，以及跟随窗口变化的合计。",
+  "purpose": [
+    "当财务或增长团队需要在一段较长历史里来回看收入时，用 revenue explorer：底部一条二十四个月的总览刷，拖到哪里，上方主图与合计就跟着缩放到哪段。",
+    "主图可以叠加上一周期对比；MRR 组成（新签、扩展、流失）用可切换的序列表达，合计与徽章随窗口重算，让「这段时间涨了多少」有直接答案。",
+    "它是收入这一条线的专用探索器；产品指标看板与 KPI 展开是另外两种问题，分别由 metrics-dashboard 与 kpi-drilldown 承担。"
+  ],
+  "whenToUse": [
+    "需要在一到两年的历史里自由缩放查看 MRR 时。",
+    "要同时看净收入、新签、扩展与流失的构成时。",
+    "希望合计数字跟随所选窗口变化时。"
+  ],
+  "whenNotToUse": [
+    "日常产品指标总览用 metrics-dashboard。",
+    "只需要解释某个月 MRR 变动的来源时，用 mrr-waterfall。",
+    "只需要一张趋势图时，用 line-chart。"
+  ],
+  "variants": [
+    { "key": "layout-explorer", "label": "整体布局", "note": "主图、总览刷、组成切换与合计并置" },
+    { "key": "variant-brush", "label": "Overview brush", "note": "二十四个月的总览条与可拖动的选区" },
+    { "key": "variant-comparison", "label": "Comparison", "note": "上一周期以虚线叠在主图上" },
+    { "key": "variant-composition", "label": "Composition", "note": "新签 / 扩展 / 流失的组成序列与切换" },
+    { "key": "variant-totals", "label": "Totals", "note": "窗口合计与变化徽章跟随选区重算" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "line-chart", "note": "主图是 MRR 折线，对比序列叠在上面" },
+    { "type": "uses", "target": "switch", "note": "对比上一周期由一个开关驱动" },
+    { "type": "uses", "target": "badge", "note": "窗口变化与状态用徽章标出" },
+    { "type": "uses", "target": "button", "note": "组成开关与跳转都是按钮" },
+    { "type": "alternative", "target": "metrics-dashboard", "note": "产品指标总览用 metrics dashboard" }
+  ],
+  "contrasts": [
+    {
+      "target": "metrics-dashboard",
+      "title": "Revenue explorer 与 Metrics dashboard",
+      "rows": [
+        { "dimension": "时间操作", "self": "底部总览刷自由缩放任意窗口", "other": "预设 7 / 30 / 90 天的范围切换" },
+        { "dimension": "指标", "self": "只围绕收入及其组成", "other": "访问、注册、收入、流失四个并列 KPI" },
+        { "dimension": "用途", "self": "财务与增长的收入复盘", "other": "产品团队的日常总览" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <arc:ArcLineChart Height=\"260\" /> <!-- 当前窗口的 MRR -->\n  <arc:ArcButton Content=\"Compare previous period\" Variant=\"Ghost\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：总览刷与窗口",
+      "language": "csharp",
+      "code": "var brush = new ArcOverviewBrush(mrr, 0, 1);\n\nbrush.RangeChanged += (_, range) =>\n{\n    // 主图与合计只画选区内的月份\n    chart.Series = Slice(components, range.Start, range.End);\n    totals.Text = Format(Sum(mrr, range));\n};"
+    }
+  ]
+}

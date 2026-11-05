@@ -1,0 +1,77 @@
+{
+  "slug": "copy-button",
+  "nameZh": "复制按钮",
+  "summary": "把一段值写入剪贴板，并在按钮内就地确认：图标变成勾、文案变成 Copied，约两秒后安静地回到复制前的样子。",
+  "purpose": [
+    "当一段值（API key、安装命令、链接、代码）需要被快速带走时，用 copy button：一次按压完成复制，成功与否都用按钮自身的一面回答。",
+    "它默认是 Secondary 加 Sm 的轻量外观，可以只显示图标（此时标签转入 tooltip 与读屏名），也可以换成 Ghost 融进行内。",
+    "复制失败不会抛异常，而是切到 Failed 面（Could not copy），因此你可以把它放在任何不能吞错的位置；倒计时结束后它自己回到 Idle。"
+  ],
+  "whenToUse": [
+    "值很短、复制就是全部目的：API key、安装命令、分享链接。",
+    "代码块、表格单元格或设置项右侧的复制入口。",
+    "希望复制失败时仍有明确反馈，而不是静默失败。"
+  ],
+  "whenNotToUse": [
+    "只是切换图标、不做剪贴板写入：改用 icon-morph。",
+    "复制只是附带能力、主体是别的行动：用普通 button 并在 Click 里自己调用剪贴板。",
+    "复制后需要长期展示结果或撤销：改用 action-button 或 toast。"
+  ],
+  "variants": [
+    { "key": "state-idle", "label": "Idle", "note": "待复制，显示复制图标与原标签" },
+    { "key": "state-copied", "label": "Copied", "note": "勾图标加 Copied 文案，约两秒后回 Idle" },
+    { "key": "state-failed", "label": "Failed", "note": "警示图标加失败文案" },
+    { "key": "variant-icon-only", "label": "Icon only", "note": "方形按钮，标签进入 tooltip 与读屏名" },
+    { "key": "variant-ghost", "label": "Ghost", "note": "低强调，融进行内或工具栏" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "button", "note": "不复制、只触发普通行动时用 Button" },
+    { "type": "alternative", "target": "icon-morph", "note": "只需要图标对切换、不写剪贴板时用它" },
+    { "type": "complement", "target": "code-block", "note": "代码块右上角的复制入口就是它" }
+  ],
+  "contrasts": [
+    {
+      "target": "button",
+      "title": "Copy button 与 Button",
+      "rows": [
+        { "dimension": "行为", "self": "内置剪贴板写入与失败处理", "other": "只触发 Click，行为由你实现" },
+        { "dimension": "确认反馈", "self": "按钮内 Copied / Failed 面自动回位", "other": "需要你自己切换内容或弹提示" },
+        { "dimension": "外观", "self": "固定 Sm，可退化为纯图标", "other": "尺寸与变体自由选择" }
+      ]
+    },
+    {
+      "target": "icon-morph",
+      "title": "Copy button 与 Icon morph",
+      "rows": [
+        { "dimension": "剪贴板", "self": "真的写入剪贴板并处理失败", "other": "只做图标形态切换，没有副作用" },
+        { "dimension": "反馈", "self": "文案同步变为 Copied / Could not copy", "other": "没有文字反馈，状态由外层说明" },
+        { "dimension": "命中与可访问性", "self": "是可聚焦按钮，自带名称与状态播报", "other": "装饰性控件，不参与命中测试" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带标签与纯图标",
+      "language": "xaml",
+      "code": "<arc:ArcCopyButton Value=\"{Binding ApiKey}\" Label=\"Copy key\" />\n<arc:ArcCopyButton Value=\"{Binding InstallCommand}\" Label=\"Copy command\" IconOnly=\"True\" />"
+    },
+    {
+      "title": "C# 里接成功回调",
+      "language": "csharp",
+      "code": "var copy = new ArcCopyButton\n{\n    Value = apiKey,\n    Label = \"Copy key\",\n    CopiedLabel = \"Copied\",\n    Variant = ArcButtonVariant.Ghost\n};\ncopy.Copied += (_, _) => UsageHint.Text = \"已复制到剪贴板\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcCopyButton",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "写入剪贴板的文本",
+      "Label": "待命文案与可访问名称，默认 Copy",
+      "IconOnly": "只显示图标，标签转入 tooltip 与读屏名",
+      "State": "当前面：Idle / Copied / Failed，可设置以便静态展示",
+      "CopiedLabel": "成功文案，默认 Copied",
+      "FailedLabel": "失败文案，默认 Could not copy",
+      "Copied": "复制成功后触发"
+    }
+  }
+}

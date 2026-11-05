@@ -1,0 +1,80 @@
+{
+  "slug": "button-group",
+  "nameZh": "按钮组",
+  "summary": "把 2–5 个同级行动并入同一块表面的按钮组：分段之间是发丝线，指针或焦点移动时一个高亮在分段之间滑行。",
+  "purpose": [
+    "当多个行动作用于同一个对象、且彼此地位相当时（审批、对齐、缩放），用 button group 把它们压进一个表面，而不是并排堆几个独立按钮。",
+    "组内每一次悬停或聚焦都会让共享高亮滑向该分段，分段本身不缩放。可选的 Menu 会在尾部追加一个 chevron 段，把不常用的行动收进去，同时不与主行动抢视觉。",
+    "Variant 决定强调层级：Outline 站在中性表面上，Solid 用于视图的主行动；Size 有 Sm 与 Md；Orientation 为 Vertical 时整个组转成窄列，方向键也随之变成上下。"
+  ],
+  "whenToUse": [
+    "同一个对象上有 2–5 个权重相近的行动，例如审批、对齐、缩放。",
+    "工具栏需要紧凑，但你又希望每个行动都有文字标签。",
+    "需要在组尾挂一个「更多」菜单，同时不削弱组内主行动。"
+  ],
+  "whenNotToUse": [
+    "一个主行动带若干备选：改用 split-button。",
+    "希望按钮彼此独立、留白更宽、悬浮在画布之上：改用 floating-button-group。",
+    "行动数量超过 6，或行动跨多个对象：改用 dropdown-menu。"
+  ],
+  "variants": [
+    { "key": "variant-outline", "label": "Outline", "note": "中性表面，安静的分段" },
+    { "key": "variant-solid", "label": "Solid", "note": "取主色，用于视图的主要行动" },
+    { "key": "size-sm", "label": "Small", "note": "紧凑工具栏" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "orientation-horizontal", "label": "Horizontal", "note": "横向一排，左右方向键漫游" },
+    { "key": "orientation-vertical", "label": "Vertical", "note": "纵向窄列，上下方向键漫游" },
+    { "key": "state-closed", "label": "Closed", "note": "没有展开的尾部菜单" },
+    { "key": "state-open", "label": "Open", "note": "尾部菜单展开，chevron 翻转" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "组内每个分段都由 ArcButton 构建" },
+    { "type": "alternative", "target": "split-button", "note": "一个主行动带备选时用 Split button" },
+    { "type": "alternative", "target": "floating-button-group", "note": "希望按钮彼此独立并悬浮时用它" }
+  ],
+  "contrasts": [
+    {
+      "target": "split-button",
+      "title": "Button group 与 Split button",
+      "rows": [
+        { "dimension": "行动地位", "self": "分段同级并列，没有默认行动", "other": "一个主行动加一组备选" },
+        { "dimension": "视觉分隔", "self": "发丝线分隔的共享表面", "other": "主段与菜单段以发丝线分隔" },
+        { "dimension": "键盘", "self": "左右或上下方向键在分段间漫游", "other": "主段回车执行，Down 展开菜单" }
+      ]
+    },
+    {
+      "target": "floating-button-group",
+      "title": "Button group 与 Floating button group",
+      "rows": [
+        { "dimension": "表面", "self": "所有分段共享一块表面", "other": "托盘里是彼此独立的软按钮" },
+        { "dimension": "强调方式", "self": "高亮在分段之间滑行", "other": "高亮在按钮之间移动，托盘不重排" },
+        { "dimension": "适用场景", "self": "一段连续、紧密相关的操作", "other": "画布、选区、编辑器上方的浮动工具栏" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "横向分段加尾部菜单",
+      "language": "csharp",
+      "code": "var actions = new ArcButtonGroup\n{\n    Label = \"Document actions\",\n    Variant = ArcButtonGroupVariant.Outline,\n    Size = ArcButtonGroupSize.Md,\n    Items = new[]\n    {\n        new ArcButtonGroupItem { Label = \"Share\", Icon = \"link\" },\n        new ArcButtonGroupItem { Label = \"Duplicate\", Icon = \"copy\" },\n        new ArcButtonGroupItem { Label = \"Archive\", Icon = \"archive\" }\n    }\n};"
+    },
+    {
+      "title": "纯图标与纵向列",
+      "language": "xaml",
+      "code": "<arc:ArcButtonGroup Label=\"Zoom controls\" Orientation=\"Vertical\" Size=\"Sm\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcButtonGroup",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Items": "分段的顺序与内容；每段是一个 ArcButtonGroupItem",
+      "Label": "组的可访问名称，例如「Document actions」",
+      "Menu": "在尾部追加 chevron 分段，展开更多行动",
+      "Variant": "Outline / Solid",
+      "Size": "Sm / Md",
+      "Orientation": "Horizontal / Vertical，决定方向键漫游轴",
+      "IsOpen": "尾部菜单是否展开；可设置以便静态展示打开态"
+    }
+  }
+}

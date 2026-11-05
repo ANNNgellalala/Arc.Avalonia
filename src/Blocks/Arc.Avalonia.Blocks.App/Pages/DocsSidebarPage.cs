@@ -23,6 +23,11 @@ public sealed class DocsSidebarPage : ArcItemPage
 {
     public override string ItemSlug => "docs-sidebar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-nav-tree", "variant-version-switcher", "variant-on-this-page", "variant-article"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

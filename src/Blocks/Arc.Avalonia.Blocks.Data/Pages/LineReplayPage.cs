@@ -21,6 +21,12 @@ public sealed class LineReplayPage : ArcItemPage
 {
     public override string ItemSlug => "line-replay";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-replay", "variant-playhead", "variant-scrubber", "variant-annotations",
+        "variant-speed", "variant-metric-tiles"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

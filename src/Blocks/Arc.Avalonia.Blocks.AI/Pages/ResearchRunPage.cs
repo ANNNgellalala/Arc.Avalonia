@@ -23,6 +23,14 @@ public sealed class ResearchRunPage : ArcItemPage
 {
     public override string ItemSlug => "research-run";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-plan-steps",
+        "variant-answer",
+        "variant-source-rail",
+        "variant-actions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -58,7 +66,7 @@ public sealed class ResearchRunPage : ArcItemPage
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var status = K.Caption("Researched for 7s, 12 sources read. All results are simulated.");
-        var stepsBody = new StackPanel { Spacing = 5, IsVisible = false };
+        var stepsBody = new StackPanel { Spacing = 5, IsVisible = true };
         foreach (var (query, count) in new[]
                  {
                      ("support ticket deflection benchmarks 2026", "6 sites"),
@@ -236,7 +244,9 @@ public sealed class ResearchRunPage : ArcItemPage
             Children =
             {
                 K.Stack(3,
-                    K.Text("How do support teams measure ticket deflection?", "arc-heading", 620),
+                    K.Row(8,
+                        K.Text("How do support teams measure ticket deflection?", "arc-heading", 620),
+                        K.Pill("Simulated", ArcBadgeTone.Neutral)),
                     K.Caption("Deep research · 7s · 12 sources")),
                 K.Row(6, stepsToggle),
                 stepsBody,

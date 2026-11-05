@@ -23,6 +23,11 @@ public sealed class BillingOverviewPage : ArcItemPage
 {
     public override string ItemSlug => "billing-overview";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-settings", "variant-plan-card", "variant-usage-meters", "variant-payment-method", "variant-invoices"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

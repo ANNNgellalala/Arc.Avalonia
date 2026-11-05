@@ -16,14 +16,50 @@ public sealed class InkFluidPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcInkFluid
+    public override IReadOnlyList<string> ImplementedStates => new[]
     {
-        Height = 342,
-        Title = "Ship interfaces that feel alive",
-        Subtitle = "A live ink wash behind the hero, stirred by the pointer and calm when left alone. It follows the theme and the accent, and it stops still under reduced motion.",
-        PrimaryLabel = "Start building",
-        SecondaryLabel = "See the components"
+        "variant-hero", "variant-quiet", "variant-neutral-ink"
     };
+
+    protected override Control BuildDemo(ArcDemoContext context)
+    {
+        var hero = new ArcInkFluid
+        {
+            Height = 342,
+            Title = "Ship interfaces that feel alive",
+            Subtitle = "A live ink wash behind the hero, stirred by the pointer and calm when left alone. It follows the theme and the accent, and it stops still under reduced motion.",
+            PrimaryLabel = "Start building",
+            SecondaryLabel = "See the components"
+        };
+
+        var quiet = new ArcInkFluid
+        {
+            Height = 340,
+            Title = "A quieter take",
+            Subtitle = null,
+            PrimaryLabel = null,
+            SecondaryLabel = null
+        };
+
+        var neutral = new ArcInkFluid
+        {
+            Height = 340,
+            Title = "Neutral ink",
+            Subtitle = "Tint 0 keeps every stroke in the foreground palette.",
+            PrimaryLabel = null,
+            SecondaryLabel = null,
+            Tint = 0
+        };
+
+        var panel = new StackPanel { Spacing = 16 };
+        panel.Children.Add(Sv.Caption("Hero：标题、副标题与两个行动按钮"));
+        panel.Children.Add(hero);
+        panel.Children.Add(Sv.Caption("Quiet：只有标题，没有副标题与 CTA"));
+        panel.Children.Add(quiet);
+        panel.Children.Add(Sv.Caption("Neutral ink：Tint 为 0，墨迹不吃强调色"));
+        panel.Children.Add(neutral);
+        return panel;
+    }
 
     public override IReadOnlyList<string>? WhenToUse => new[]
     {

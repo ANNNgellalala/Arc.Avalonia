@@ -1,0 +1,91 @@
+{
+  "slug": "number-field",
+  "nameZh": "数字字段",
+  "summary": "有上下界的数字输入：步进按钮支持长按连发，方向键逐格、PageUp 大步，键入的值按 Enter 或失焦提交并自动夹到区间内。",
+  "purpose": [
+    "把一个有范围的数字收进表单：座位数、百分比、数量。控件负责解析、夹取与格式化，你只管读 Value。",
+    "调整方式分三路：点按或长按步进按钮（400 ms 后进入 80 ms 连发）、方向键按 Step 移动、PageUp/PageDown 与 Shift+方向键按 LargeStep 跳一大步；Home/End 直接到区间两端。",
+    "到达边界时不会越界：值被夹在 Min/Max 内，并在标签旁短暂显示「Max 500」这类上限提示，让用户明白为什么按不动了。"
+  ],
+  "whenToUse": [
+    "数值有明确上下界，且用户可能想用步进微调：座位数、重试次数、百分比。",
+    "需要同时支持键入与键盘步进的可访问数字输入。",
+    "希望在界面上直接说明范围（ShowLimitHint）而不是提交后报错。"
+  ],
+  "whenNotToUse": [
+    "值可以是任意文本（邮编、型号）时改用 input，数字字段会吞掉非数字字符。",
+    "金额需要按货币格式化、以最小单位存储时改用 money-input。",
+    "需要在连续区间里拖动取值时改用 slider，数字字段更适合精确定值。",
+    "属性面板里要求拖拽标签微调、支持算术表达式的紧凑场景，改用 scrub-input。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑工具条" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型字段" },
+    { "key": "variant-prefix", "label": "Prefix", "note": "值前显示 $ 之类的前缀" },
+    { "key": "variant-suffix", "label": "Suffix", "note": "值后显示单位，如 seats / %" },
+    { "key": "state-range", "label": "Range", "note": "Min/Max 有界，到达上限时步进按钮变灰" },
+    { "key": "state-float", "label": "Float step", "note": "Step 0.5，按小数格式化" },
+    { "key": "state-error", "label": "Error", "note": "外部错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "只读展示当前值" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "任意文本改用 input" },
+    { "type": "alternative", "target": "money-input", "note": "金额改用 money input 以按货币格式化" },
+    { "type": "alternative", "target": "slider", "note": "在连续区间里拖动取值改用 slider" },
+    { "type": "alternative", "target": "scrub-input", "note": "属性面板里按手感拖拽微调改用 scrub input" },
+    { "type": "uses", "target": "button", "note": "步进按钮复用 button 的图标按钮" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Number field 与 Input",
+      "rows": [
+        { "dimension": "值类型", "self": "double，受 Min/Max 约束", "other": "任意字符串" },
+        { "dimension": "调整方式", "self": "键入之外还有步进按钮、方向键与 Home/End", "other": "只能逐字键入" },
+        { "dimension": "非法输入", "self": "解析失败时回退到上一个合法值并夹取区间", "other": "原样保留文本" }
+      ]
+    },
+    {
+      "target": "scrub-input",
+      "title": "Number field 与 Scrub input",
+      "rows": [
+        { "dimension": "主要交互", "self": "点按/长按步进按钮与方向键", "other": "拖拽标签擦洗，Shift 粗调、Alt 精调" },
+        { "dimension": "键入内容", "self": "纯数字与小数", "other": "可带单位，也可输入 (100-24)/2 这类算式" },
+        { "dimension": "典型位置", "self": "表单与设置项", "other": "设计工具属性面板" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcNumberField Label=\"座位数\"\n                      Min=\"1\"\n                      Max=\"500\"\n                      Step=\"1\"\n                      Suffix=\" seats\"\n                      Value=\"{Binding Seats, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "小数步进与读值",
+      "language": "csharp",
+      "code": "var opacity = new ArcNumberField\n{\n    Label = \"不透明度\",\n    Min = 0,\n    Max = 100,\n    Step = 0.5,\n    Suffix = \"%\",\n    Value = 60\n};\n\nopacity.ValueChanged += (_, _) => Preview(opacity.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcNumberField",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前数值，始终落在 Min–Max 之间",
+      "Min": "下界，默认 double.MinValue",
+      "Max": "上界，默认 double.MaxValue",
+      "Step": "方向键与步进按钮的单步距离，默认 1",
+      "LargeStep": "PageUp/PageDown 与 Shift+方向键的距离；未设时等于 10 × Step",
+      "Prefix": "值前的固定前缀，如 $",
+      "Suffix": "值后的固定后缀，如 % / seats",
+      "ShowLimitHint": "到界时在标签旁短暂显示上限/下限提示，默认 true",
+      "Label": "可见标签，同时作为输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖",
+      "Error": "错误文案；有值时字段进入错误态",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "IsInputFocused": "只读，内部输入框是否持有焦点",
+      "ValueChanged": "提交值变化后触发"
+    }
+  }
+}

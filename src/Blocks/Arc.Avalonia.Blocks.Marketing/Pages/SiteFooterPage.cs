@@ -20,6 +20,11 @@ public sealed class SiteFooterPage : ArcItemPage
 {
     public override string ItemSlug => "site-footer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-full", "variant-mark", "variant-minimal"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -144,16 +149,8 @@ public sealed class SiteFooterPage : ArcItemPage
             columns.Children.Add(column);
         }
 
-        var status = Mk.Row(6,
-            new Border
-            {
-                Width = 7,
-                Height = 7,
-                CornerRadius = new CornerRadius(4),
-                Background = Mk.Brush(ArcTokens.Success),
-                VerticalAlignment = VerticalAlignment.Center
-            },
-            Mk.Caption("All systems normal"));
+        var status = Mk.Pill("All systems normal", ArcBadgeTone.Success, dot: true);
+
 
         var socials = Mk.Row(2,
             Mk.IconBtn("globe", "Website"),
@@ -231,8 +228,25 @@ public sealed class SiteFooterPage : ArcItemPage
         var columnSwitch = new ArcSwitch { Label = "Link columns", Checked = true };
         columnSwitch.CheckedChanged += (_, _) => columns.IsVisible = columnSwitch.Checked;
 
+        // A static copy of the one-row layout, so minimal and full both read in the preview without a click.
+        var minimalSpecimen = new Border
+        {
+            Background = Mk.Brush(ArcTokens.Surface),
+            BorderBrush = Mk.Brush(ArcTokens.BorderSubtle),
+            BorderThickness = new Thickness(1),
+            Padding = new Thickness(20, 14, 20, 14),
+            Child = Mk.Row(16,
+                Mk.Logo("Acme", "layers", 22, 14),
+                Mk.Caption("© 2026 Acme Labs"),
+                Mk.Caption("Privacy"),
+                Mk.Caption("Terms"),
+                Mk.IconBtn("globe", "Website"))
+        };
+
         return Mk.Stack(14,
             Mk.Row(20, minimalSwitch, columnSwitch),
-            Mk.Frame("acme.com", body));
+            Mk.Frame("acme.com", body),
+            Mk.Caption("Minimal one-row layout, for app shells and docs"),
+            minimalSpecimen);
     }
 }

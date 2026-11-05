@@ -1,0 +1,72 @@
+{
+  "slug": "avatar",
+  "nameZh": "头像",
+  "summary": "人物或实体的圆形标识：有照片用照片，没有照片用姓名首字母，可在右下角带一个在线状态点。",
+  "purpose": [
+    "把一个人或一个实体压缩成一块方形区域：五档尺寸从 24 px 到 88 px，圆角或方形由 Shape 决定，圆角时圆角值随直径取半。",
+    "有 Src 且图片可读时显示照片；读不到、没提供或加载失败时自动退回姓名首字母，所以列表不会因为缺图而破版。",
+    "Status 为 Online 或 Offline 时在右下角画一个带描边的圆点，颜色分别是成功色与静默色；状态只是辅助，名称与状态同时写进无障碍名称。"
+  ],
+  "whenToUse": [
+    "人名旁边、评论作者、成员列表、任务负责人等需要快速识别身份的位置。",
+    "照片缺失率高的数据源，首字母回退能保证版面整齐。",
+    "需要同时表达「是谁」和「在不在线」的紧凑位置。"
+  ],
+  "whenNotToUse": [
+    "要在一小块空间里表示一群人时，改用 avatar-group 并带溢出计数。",
+    "要表示实时在场、谁在输入时，改用 presence-stack。",
+    "只是展示缩略图或封面而不是身份时，用普通图片控件，不要让它读成人物。"
+  ],
+  "variants": [
+    { "key": "size-xs", "label": "Xs", "note": "24 px（默认），行内与密集列表" },
+    { "key": "size-sm", "label": "Sm", "note": "28 px，列表行与评论头" },
+    { "key": "size-md", "label": "Md", "note": "40 px，常规头像" },
+    { "key": "size-lg", "label": "Lg", "note": "56 px，详情页与卡片头" },
+    { "key": "size-xl", "label": "Xl", "note": "88 px，资料页主头像" },
+    { "key": "variant-photo", "label": "Photo", "note": "Src 可读时显示照片" },
+    { "key": "variant-initials", "label": "Initials", "note": "无照片时回退到姓名首字母" },
+    { "key": "shape-round", "label": "Round", "note": "默认圆形，用于人物" },
+    { "key": "shape-square", "label": "Square", "note": "圆角方形，用于团队、项目与机器人" },
+    { "key": "status-online", "label": "Online", "note": "右下角成功色圆点" },
+    { "key": "status-offline", "label": "Offline", "note": "右下角静默色圆点" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "avatar-group", "note": "一组人改用 avatar-group" },
+    { "type": "complement", "target": "presence-stack", "note": "实时在场信息用 presence-stack 呈现" },
+    { "type": "complement", "target": "badge", "note": "头像旁的计数或角色标签用 badge" }
+  ],
+  "contrasts": [
+    {
+      "target": "avatar-group",
+      "title": "Avatar 与 Avatar group",
+      "rows": [
+        { "dimension": "人数", "self": "一个人", "other": "一组人，可超出显示数量后折叠为 +N" },
+        { "dimension": "尺寸选择", "self": "五档尺寸逐个指定", "other": "一个 Size 应用到整组" },
+        { "dimension": "典型位置", "self": "作者、负责人、成员行", "other": "协作面板、评论区头部、卡片角标" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "照片、首字母与状态",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"12\">\n    <fb:ArcAvatar DisplayName=\"Maya Chen\" Src=\"avares://App/Assets/maya.png\" Size=\"Md\" Status=\"Online\" />\n    <fb:ArcAvatar DisplayName=\"Leo Park\" Size=\"Md\" />\n    <fb:ArcAvatar DisplayName=\"Sara Ruiz\" Shape=\"Square\" Size=\"Lg\" />\n  </StackPanel>\n</Window>"
+    },
+    {
+      "title": "在列表里复用同一尺寸",
+      "language": "csharp",
+      "code": "var avatar = new ArcAvatar\n{\n    DisplayName = member.Name,\n    Src = member.AvatarUrl,\n    Size = ArcAvatarSize.Sm,\n    Status = member.IsOnline ? ArcAvatarStatus.Online : ArcAvatarStatus.Offline\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcAvatar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "DisplayName": "完整姓名；决定首字母与无障碍名称",
+      "Src": "照片路径或 avares URI，读不到时回退首字母",
+      "Size": "尺寸：Xs 24（默认）/ Sm 28 / Md 40 / Lg 56 / Xl 88",
+      "Status": "在线状态：None / Online / Offline，决定右下角圆点",
+      "Shape": "Round 圆形（人物）或 Square 圆角方形（团队、项目）"
+    }
+  }
+}

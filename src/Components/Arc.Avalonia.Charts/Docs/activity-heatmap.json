@@ -1,0 +1,75 @@
+{
+  "slug": "activity-heatmap",
+  "nameZh": "活动热力图",
+  "summary": "日历式的活动热力图：七行对应星期几、一列一周，五档强调色深浅表示当天活动量的高低，并带月份与星期标签。",
+  "purpose": [
+    "用颜色深浅记录每天的活动量，像一张贡献日历：一眼看出哪段时间密集、哪段时间安静，而不需要读任何数字。",
+    "五档深浅由强调色的透明度推导，周末的空白同样有信息量；悬停或键盘移动到某一天会弹出日期与该天的计数。",
+    "StartDate 决定左上角格子的日期，设置到周边界月份标签才稳定；Values 的长度决定显示多少周，十六周与整年都是常见规模。",
+    "它适合展示「频率与节奏」而不是「精确趋势」；要读某一天的具体数值，靠提示即可，不必再加一张折线。"
+  ],
+  "whenToUse": [
+    "要展示一年或几个月里每天的活跃密度，例如提交、登录、发布。",
+    "读者关心的是节奏与空档，而不是某一天的具体数值时。",
+    "希望用一张紧凑的图占据比折线更少的垂直空间时。",
+    "数据本身带有「每天一次」的天然粒度时。"
+  ],
+  "whenNotToUse": [
+    "要看趋势的形状或拐点、并读取具体数值时改用 line-chart。",
+    "要比较若干类别在同一时段的总量时改用 bar-chart。",
+    "要展示构成随时间的变化时改用 streamgraph。",
+    "时间粒度不是「天」、或者数据点很少（例如每月一条）时，热力图会显得空荡。"
+  ],
+  "variants": [
+    { "key": "variant-sixteen-weeks", "label": "十六周", "note": "最近十六周的活动，配合月份标签" },
+    { "key": "variant-full-year", "label": "整年", "note": "五十二周，一年四季的密度变化" },
+    { "key": "state-empty", "label": "空数据", "note": "Values 为空时画出 No activity" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "bar-chart", "note": "要比较每天的具体数值时用 bar chart" },
+    { "type": "alternative", "target": "line-chart", "note": "要看趋势形状时用 line chart" },
+    { "type": "complement", "target": "timeline", "note": "热力图给密度，timeline 给事件本身" }
+  ],
+  "contrasts": [
+    {
+      "target": "bar-chart",
+      "title": "Activity heatmap 与 Bar chart",
+      "rows": [
+        { "dimension": "时间跨度", "self": "一年也只需一张图", "other": "几十根柱子后就拥挤" },
+        { "dimension": "读数方式", "self": "靠颜色深浅看密度，数值靠悬停", "other": "柱高直接对应数值" },
+        { "dimension": "空档表达", "self": "空格子天然表示没有活动", "other": "零值柱不可见" },
+        { "dimension": "垂直空间", "self": "七行固定，很矮", "other": "随数值范围需要更高的绘图区" }
+      ]
+    },
+    {
+      "target": "line-chart",
+      "title": "Activity heatmap 与 Line chart",
+      "rows": [
+        { "dimension": "阅读目标", "self": "密度与节奏", "other": "趋势与拐点" },
+        { "dimension": "数值精度", "self": "分档着色，只到档位", "other": "纵轴与十字准线可读精确值" },
+        { "dimension": "时间粒度", "self": "按天，天然对齐星期", "other": "任意采样间隔" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "最近十六周的活动",
+      "language": "csharp",
+      "code": "var heatmap = new ArcChartActivityHeatmap\n{\n    Values = activityCounts,\n    StartDate = new DateTime(2025, 12, 29),\n    Unit = \"contributions\",\n    Height = 190\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcChartActivityHeatmap x:Name=\"Activity\"\n                                  Height=\"190\"\n                                  Unit=\"contributions\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcChartActivityHeatmap",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Values": "每天的计数，从最早开始，按从左到右、从上到下放入格子",
+      "StartDate": "左上角格子的日期；设到周边界可让月份标签稳定",
+      "Unit": "悬停提示里使用的名词，默认 activity"
+    }
+  }
+}

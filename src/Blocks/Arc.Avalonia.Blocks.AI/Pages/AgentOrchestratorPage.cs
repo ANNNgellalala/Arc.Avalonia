@@ -23,6 +23,14 @@ public sealed class AgentOrchestratorPage : ArcItemPage
 {
     public override string ItemSlug => "agent-orchestrator";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-plan",
+        "variant-lanes",
+        "variant-concurrency",
+        "variant-totals"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -200,7 +208,8 @@ public sealed class AgentOrchestratorPage : ArcItemPage
                 K.Row(7,
                     new ArcIcon { Icon = "target", Size = 13, Foreground = K.Brush(ArcTokens.Accent) },
                     K.Caption("Plan"),
-                    K.Caption("4 subtasks · one retry on Check enterprise terms")),
+                    K.Caption("4 subtasks · one retry on Check enterprise terms"),
+                    K.Pill("1 retry", ArcBadgeTone.Warning)),
                 lanesHost,
                 new Border
                 {

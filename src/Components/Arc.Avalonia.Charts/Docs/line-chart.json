@@ -1,0 +1,180 @@
+{
+  "slug": "line-chart",
+  "nameZh": "折线图",
+  "summary": "多条序列的趋势折线图：克制的坐标轴、可选的面积填充、点击即可隐藏的图例，以及跟随指针吸附到最近点的十字准线提示。",
+  "purpose": [
+    "把按等间隔采样的数值画成趋势线，让人一眼看出上升、下滑、平台或季节性。它通常出现在指标卡、仪表板面板和报表的一角，而不是独占整页。",
+    "同一张图里可以叠多条序列：本期与上期、实际与目标。较次要的序列用虚线画，读者不看图例也能分清主次。",
+    "颜色全部取自 Arc 语义令牌，明暗主题与强调色切换时图表自动重绘；坐标轴克制、数值使用等宽数字，不与正文抢注意力。",
+    "交互是内建的：指针划过时十字准线吸附到最近的点并给出提示，点击图例项隐藏或恢复一条序列，聚焦后可以用方向键与 Home、End 逐点移动。"
+  ],
+  "whenToUse": [
+    "你有每周、每天或每小时采样的序列，需要展示随时间变化的连续趋势。",
+    "要把本期与上期、实际与目标放在一起对比，并让读者一眼分出主次时。",
+    "趋势需要嵌在指标卡、窄面板或报表的局部，同时还要保留悬停读数。",
+    "需要在同一张图里展示两到四条相关序列，并允许读者临时隐藏其中一条时。"
+  ],
+  "whenNotToUse": [
+    "比较离散类别（周一到周日、各渠道）时改用 bar-chart，长度比折线角度更容易读。",
+    "只关心一个整体里各部分的占比时改用 donut-chart，不要用多条折线硬凑比例。",
+    "只需要一个很小的趋势、不需要坐标轴与图例时改用 sparkline。",
+    "只比较前后两个时点（Q3 到 Q4）时改用 slope-chart，斜率比两点折线更直观。",
+    "需要堆叠看总量构成随时间变化时改用 streamgraph，它才有叠层的总高度。"
+  ],
+  "variants": [
+    {
+      "key": "variant-single",
+      "label": "Single series",
+      "note": "只有一条线，不显示图例"
+    },
+    {
+      "key": "variant-multi",
+      "label": "Multi series",
+      "note": "本期与上期并列，顶部图例可点击"
+    },
+    {
+      "key": "variant-dashed",
+      "label": "Dashed series",
+      "note": "目标或上期画成虚线，不与主序列争夺注意力"
+    },
+    {
+      "key": "state-area",
+      "label": "Area fill",
+      "note": "ShowArea 开启时第一条可见序列下方有 10% 透明填充"
+    },
+    {
+      "key": "state-no-area",
+      "label": "No fill",
+      "note": "ShowArea=false 时只保留线条"
+    },
+    {
+      "key": "state-smooth",
+      "label": "Smooth",
+      "note": "Smooth=true，单调三次曲线不会越过数据点"
+    },
+    {
+      "key": "state-straight",
+      "label": "Straight",
+      "note": "Smooth=false，按点直连"
+    },
+    {
+      "key": "state-no-grid",
+      "label": "No grid",
+      "note": "ShowGrid=false，只留底部轴线与刻度值"
+    },
+    {
+      "key": "state-empty",
+      "label": "Empty",
+      "note": "Series 为空时画出 No data 而不是崩溃"
+    }
+  ],
+  "relations": [
+    {
+      "type": "alternative",
+      "target": "bar-chart",
+      "note": "离散类别之间的比较交给 bar chart，长度比角度更好读"
+    },
+    {
+      "type": "alternative",
+      "target": "sparkline",
+      "note": "只要一条很小的趋势、不需要坐标轴时改用 sparkline"
+    },
+    {
+      "type": "alternative",
+      "target": "slope-chart",
+      "note": "只对比前后两个时点时，slope chart 的斜率更直观"
+    },
+    {
+      "type": "alternative",
+      "target": "streamgraph",
+      "note": "要看多序列堆叠构成随时间变化时改用 streamgraph"
+    },
+    {
+      "type": "complement",
+      "target": "metric-card",
+      "note": "指标卡常把关键数字和一条 line chart 趋势线放在一起"
+    }
+  ],
+  "contrasts": [
+    {
+      "target": "bar-chart",
+      "title": "Line chart 与 Bar chart",
+      "rows": [
+        {
+          "dimension": "数据形状",
+          "self": "连续序列，点与点之间用线连接",
+          "other": "离散类别，一个类别一根柱"
+        },
+        {
+          "dimension": "读数方式",
+          "self": "十字准线吸附到最近的点并弹出提示",
+          "other": "悬停单根柱读取其数值"
+        },
+        {
+          "dimension": "适合回答",
+          "self": "随时间怎么变",
+          "other": "各类别之间谁高谁低"
+        },
+        {
+          "dimension": "多序列",
+          "self": "多条折线共用同一值轴，可叠面积",
+          "other": "并排或堆叠的柱组"
+        }
+      ]
+    },
+    {
+      "target": "sparkline",
+      "title": "Line chart 与 Sparkline",
+      "rows": [
+        {
+          "dimension": "坐标轴",
+          "self": "有值轴刻度、类别标签和图例",
+          "other": "没有坐标轴与图例，只画趋势"
+        },
+        {
+          "dimension": "尺寸",
+          "self": "常见 200 px 以上，给悬停读数留出空间",
+          "other": "通常只有几十像素高，嵌在数值旁边"
+        },
+        {
+          "dimension": "交互",
+          "self": "十字准线、图例开关、键盘逐点移动",
+          "other": "最多一个末端高亮，不提供逐点提示"
+        },
+        {
+          "dimension": "适用场景",
+          "self": "报表和面板里的主图",
+          "other": "指标卡、列表行里的趋势点缀"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放一张趋势图",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcLineChart x:Name=\"Signups\"\n                       Height=\"220\"\n                       ValueSuffix=\" signups\"\n                       ShowArea=\"True\"\n                       Smooth=\"True\" />\n</Window>"
+    },
+    {
+      "title": "本期与上期：用虚线区分主次",
+      "language": "csharp",
+      "code": "var chart = new ArcLineChart\n{\n    Labels = new[] { \"Sep 1\", \"Sep 8\", \"Sep 15\", \"Sep 22\", \"Sep 29\" },\n    Series = new[]\n    {\n        new ChartSeries(\"This period\", new double[] { 42, 58, 51, 74, 68 }),\n        new ChartSeries(\"Previous\", new double[] { 36, 44, 49, 55, 61 }, Dashed: true)\n    },\n    ValueSuffix = \" signups\",\n    ShowGrid = true,\n    ShowArea = true\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcLineChart",
+    "exclude": [
+      "TemplatedParent"
+    ],
+    "descriptions": {
+      "Series": "线条按此顺序绘制；每条序列的 Name 用于提示和图例，Dashed 画成虚线",
+      "Labels": "图下方的类别标签，每个数据点对应一个",
+      "ShowGrid": "绘制四条安静的水平网格线与值轴，默认 true",
+      "ShowLegend": "序列多于一条时在顶部显示图例，默认 true；点击图例项隐藏或恢复该序列",
+      "ShowArea": "在第一条可见序列下方填充 10% 透明区域，默认 true",
+      "Smooth": "true 使用单调三次曲线（不会越过数据点），false 逐点直连，默认 true",
+      "ValueSuffix": "追加在提示数值后的单位，例如 \"ms\" 或 \" signups\"",
+      "ValueFormat": "自定义提示数值格式的函数，例如把 0.42 显示成 42%"
+    }
+  }
+}

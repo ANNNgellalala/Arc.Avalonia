@@ -23,6 +23,11 @@ public sealed class HelpCenterPage : ArcItemPage
 {
     public override string ItemSlug => "help-center";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-help-home", "variant-search", "variant-topics", "variant-popular"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,74 @@
+{
+  "slug": "theme-switch",
+  "nameZh": "主题切换",
+  "summary": "在明暗两种外观之间切换的按钮：日 / 月图标就地互换，模式词跟着改，点击后通过 ArcThemeManager 应用下一种外观。",
+  "purpose": [
+    "当页面需要把明暗外观交给用户时，用 theme switch 把它做成一个按钮：带标签时显示 Light / Dark 与日 / 月图标，IconOnly 时收成一个方形图标按钮。",
+    "它继承自 ArcButton，因此外观、焦点环、禁用态与尺寸都与其他按钮一致；点击时它自己翻转 Scheme、调用 ArcThemeManager.SetScheme，并通过 ThemeChanged 事件把下一种外观告诉你。",
+    "它是「外观」这一件事的专用入口。如果明暗只是众多偏好之一，把它嵌进 user-menu 会比在顶栏并排两个按钮更省空间。"
+  ],
+  "whenToUse": [
+    "顶栏或设置页需要一枚常驻的明暗切换入口。",
+    "希望按钮外观与库内其他按钮完全一致时。",
+    "需要在切换后自行播放页面过渡，因此要订阅 ThemeChanged。"
+  ],
+  "whenNotToUse": [
+    "明暗只是众多设置项之一、设置页已经很长：把它放进 user-menu。",
+    "需要「跟随系统 / 明 / 暗」三态：改用 segmented-control 或 radio-group。",
+    "需要的是通用开关而不是外观专用控制：改用 switch。"
+  ],
+  "variants": [
+    { "key": "variant-light-labelled", "label": "Light labelled", "note": "显示太阳与 Light，点击切到暗色" },
+    { "key": "variant-dark-labelled", "label": "Dark labelled", "note": "显示月亮与 Dark，点击切到明色" },
+    { "key": "variant-light-icon-only", "label": "Light icon", "note": "方形纯图标，明色态" },
+    { "key": "variant-dark-icon-only", "label": "Dark icon", "note": "方形纯图标，暗色态" }
+  ],
+  "relations": [
+    { "type": "extends", "target": "button", "note": "主题切换是 Button 的外观专用特化，复用其全部外观与焦点行为" },
+    { "type": "alternative", "target": "switch", "note": "通用开关也能表达明暗，但没有日 / 月图标与模式词" },
+    { "type": "alternative", "target": "segmented-control", "note": "需要把跟随系统也作为选项时用它" },
+    { "type": "complement", "target": "user-menu", "note": "用户菜单里内嵌的明暗切换就是它" }
+  ],
+  "contrasts": [
+    {
+      "target": "switch",
+      "title": "Theme switch 与 Switch",
+      "rows": [
+        { "dimension": "语义", "self": "外观专用，显示日 / 月图标与 Light / Dark", "other": "通用开 / 关，语义由你定义" },
+        { "dimension": "副作用", "self": "点击即调用 ArcThemeManager 应用下一种外观", "other": "只翻转 IsChecked，副作用由你接" },
+        { "dimension": "可访问名称", "self": "自动播报「Switch to dark mode」与当前外观", "other": "需要你提供标签" }
+      ]
+    },
+    {
+      "target": "segmented-control",
+      "title": "Theme switch 与 Segmented control",
+      "rows": [
+        { "dimension": "选项可见性", "self": "一次只显示当前外观，另一态靠点击揭示", "other": "所有选项常驻，一眼可见" },
+        { "dimension": "状态数", "self": "只有明 / 暗两态", "other": "可以放「跟随系统 / 明 / 暗」三态" },
+        { "dimension": "占用空间", "self": "单个按钮宽度", "other": "需要为每个选项留出宽度" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "顶栏里的两枚形态",
+      "language": "csharp",
+      "code": "var labelled = new ArcThemeSwitcher();\nvar compact = new ArcThemeSwitcher { IconOnly = true };\n\n// 控件的 Scheme 只在点击时翻转；如果页面需要自己的过渡，订阅 ThemeChanged。\nlabelled.ThemeChanged += (_, next) => PlayPageTransition(next);"
+    },
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcThemeSwitcher IconOnly=\"True\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcThemeSwitcher",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Scheme": "当前外观：Light / Dark；控件按它显示日或月图标",
+      "IconOnly": "隐藏模式词，收成方形图标按钮",
+      "ThemeChanged": "点击后触发，参数是应当应用的下一种外观",
+      "IsEnabled": "禁用后仍保留当前外观面"
+    }
+  }
+}

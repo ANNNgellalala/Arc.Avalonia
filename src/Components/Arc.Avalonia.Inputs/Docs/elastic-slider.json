@@ -1,0 +1,84 @@
+{
+  "slug": "elastic-slider",
+  "nameZh": "弹性滑块",
+  "summary": "带橡皮筋手感的滑块：越过两端时轨道被拉伸并回弹，数值标签随拖拽摆动，刻度变成会吸附的卡点。",
+  "purpose": [
+    "给「一个凭手感调的设置」用：音量、亮度、播放速度。拖动时数值标签跟在拇指上方并随速度轻微摆动，松手后摆回水平。",
+    "越过两端不是硬停：轨道以阻力被拉出最多约 14 px，松手后弹簧回位，所以「已经到头了」是能被手感知到的，而不是靠数值不变去猜。",
+    "Marks 在这里不只是刻度：指针进入某刻度 7 px 范围内，拇指会吸附上去并停住，带 Label 的刻度还会在轨道下方印出文字（1x / 1.5x / 2x）。",
+    "StartIcon / EndIcon 在两端提供减号、加号之类的提示，越界时会被向外推开。Readout 由 Format 决定，ShowValue 关闭后只保留拖动标签。"
+  ],
+  "whenToUse": [
+    "单一设置项，用户会反复拖动试手感（音量、亮度、缩放）。",
+    "需要在有限档位之间选择、又希望保留拖动体验（0.5x / 1x / 1.5x / 2x）。",
+    "希望「到头了」有物理反馈，而不是数值悄悄不再变化。"
+  ],
+  "whenNotToUse": [
+    "只需精确键入或微调数值时，改用 number-field 或 slider；弹性手感不适合精确输入。",
+    "要选一个区间而不是单值时，改用 range-histogram-slider。",
+    "需要显示数据分布（价格区间）时，改用 range-histogram-slider，它把直方图做进轨道。"
+  ],
+  "variants": [
+    { "key": "state-default", "label": "Default", "note": "标签、读数、轨道与填充" },
+    { "key": "variant-marks", "label": "Marked detents", "note": "刻度点带文字标签，并可吸附" },
+    { "key": "variant-icons", "label": "End icons", "note": "两端的 Lucide 图标，越界时被推开" },
+    { "key": "variant-without-value", "label": "No readout", "note": "ShowValue=false，只保留拖动标签" },
+    { "key": "variant-format", "label": "Format", "note": "Format 决定读数与标签的格式" },
+    { "key": "state-disabled", "label": "Disabled", "note": "整体降低不透明度且不响应指针" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "slider", "note": "需要简单的跟手轨道、不要回弹时改用 slider" },
+    { "type": "alternative", "target": "range-histogram-slider", "note": "要选一个区间并展示数据分布时改用 range histogram slider" }
+  ],
+  "contrasts": [
+    {
+      "target": "slider",
+      "title": "Elastic slider 与 Slider",
+      "rows": [
+        { "dimension": "越界反馈", "self": "轨道被拉伸并弹簧回弹", "other": "到端点即停" },
+        { "dimension": "刻度", "self": "吸附点，可带文字标签", "other": "4 px 圆点，仅作参考" },
+        { "dimension": "数值标签", "self": "拖动时悬在拇指上方并随速度摆动", "other": "拖动时显示静态气泡" }
+      ]
+    },
+    {
+      "target": "range-histogram-slider",
+      "title": "Elastic slider 与 Range histogram slider",
+      "rows": [
+        { "dimension": "取值", "self": "单个数值", "other": "一段区间（Start 与 End）" },
+        { "dimension": "视觉主体", "self": "轨道、填充与拇指", "other": "数据直方图加两个拇指" },
+        { "dimension": "数据来源", "self": "不依赖数据，只需 Min / Max", "other": "需要原始 Data 才能画出分布" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcElasticSlider Label=\"Volume\"\n                        Min=\"0\"\n                        Max=\"100\"\n                        Value=\"{Binding Volume, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "刻度吸附、两端图标与格式化",
+      "language": "csharp",
+      "code": "var speed = new ArcElasticSlider\n{\n    Label = \"Playback speed\",\n    Width = 300,\n    Min = 0.5,\n    Max = 2,\n    Step = 0.25,\n    Value = 1.25,\n    StartIcon = \"minus\",\n    EndIcon = \"plus\",\n    Marks = new List<ArcSliderMark>\n    {\n        new(1, \"1x\"),\n        new(1.5, \"1.5x\"),\n        new(2, \"2x\")\n    },\n    Format = value => value.ToString(\"0.##\") + \"x\"\n};\n\nspeed.ValueCommitted += (_, _) => Save(speed.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcElasticSlider",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "轨道上方的可见标签，同时作为无障碍名称",
+      "Value": "当前值，默认 50",
+      "Min": "下界，默认 0",
+      "Max": "上界，默认 100",
+      "Step": "方向键步进，默认 1",
+      "LargeStep": "Page 键与 Shift+方向键的步进；默认取量程的十分之一",
+      "Marks": "刻度与吸附点，元素是 ArcSliderMark（Value / Label）",
+      "ShowValue": "是否在右上角显示读数，默认 true",
+      "StartIcon": "轨道起点前的 Lucide 图标名",
+      "EndIcon": "轨道终点后的 Lucide 图标名",
+      "Format": "格式化读数、拖动标签与读屏文本的函数",
+      "ValueChanged": "拖动或按键改变值时触发",
+      "ValueCommitted": "松手或按键确认后触发，适合保存"
+    }
+  }
+}

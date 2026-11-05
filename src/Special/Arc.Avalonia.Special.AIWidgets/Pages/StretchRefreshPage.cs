@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Special.AIWidgets.Controls;
 
@@ -14,24 +15,74 @@ public sealed class StretchRefreshPage : ArcItemPage
 {
     public override string ItemSlug => "stretch-refresh";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-idle", "state-pulling", "state-armed"
+    };
+
+    private static List<ArcFeedItem> Feed() => new()
+    {
+        new() { Id = "1", Icon = "code", Title = "Mina opened a pull request in arc-ui/web", Meta = "Review requested · 3 files", Time = "09:41" },
+        new() { Id = "2", Icon = "message-circle", Title = "Rowan replied in #design-system", Meta = "The radii look right on the nested cards", Time = "09:12" },
+        new() { Id = "3", Icon = "bell", Title = "Nightly visual regression finished", Meta = "412 of 412 snapshots match", Time = "08:30" },
+        new() { Id = "4", Icon = "box", Title = "Arc 4.1.2 was published", Meta = "Patch · motion fixes", Time = "07:58" }
+    };
+
     protected override Control BuildDemo(ArcDemoContext context)
     {
-        var feed = new ArcStretchRefresh
+        var idle = new ArcStretchRefresh
         {
             Title = "Inbox",
             Subtitle = "Updated 14 min ago",
             Threshold = 72,
-            Items = new List<ArcFeedItem>
-            {
-                new() { Id = "1", Icon = "code", Title = "Mina opened a pull request in arc-ui/web", Meta = "Review requested · 3 files", Time = "09:41" },
-                new() { Id = "2", Icon = "message-circle", Title = "Rowan replied in #design-system", Meta = "The radii look right on the nested cards", Time = "09:12" },
-                new() { Id = "3", Icon = "bell", Title = "Nightly visual regression finished", Meta = "412 of 412 snapshots match", Time = "08:30" },
-                new() { Id = "4", Icon = "box", Title = "Arc 4.1.2 was published", Meta = "Patch · motion fixes", Time = "07:58" }
-            }
+            Items = Feed()
         };
 
-        feed.HoldPreview(1.15);
-        return feed;
+        var pulling = new ArcStretchRefresh
+        {
+            Title = "Inbox",
+            Subtitle = "Updated 14 min ago",
+            Threshold = 72,
+            Items = Feed()
+        };
+        pulling.HoldPreview(0.55);
+
+        var armed = new ArcStretchRefresh
+        {
+            Title = "Inbox",
+            Subtitle = "Updated 14 min ago",
+            Threshold = 72,
+            Items = Feed()
+        };
+        armed.HoldPreview(1.15);
+
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,*"),
+            RowDefinitions = new RowDefinitions("Auto,Auto"),
+            ColumnSpacing = 16,
+            RowSpacing = 16,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        grid.Children.Add(WithCaption("Idle：没有拉动，缺口为零", idle));
+
+        var topRight = WithCaption("Pulling：线还没到阈值，文案是 Pull to refresh", pulling);
+        Grid.SetColumn(topRight, 1);
+        grid.Children.Add(topRight);
+
+        var bottomLeft = WithCaption("Armed：线满且变强调色，松手即刷新", armed);
+        Grid.SetRow(bottomLeft, 1);
+        grid.Children.Add(bottomLeft);
+
+        return grid;
+    }
+
+    private static Control WithCaption(string caption, Control content)
+    {
+        var stack = new StackPanel { Spacing = 6 };
+        stack.Children.Add(Sv.Caption(caption));
+        stack.Children.Add(content);
+        return stack;
     }
 
     public override IReadOnlyList<string>? WhenToUse => new[]

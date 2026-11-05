@@ -23,6 +23,14 @@ public sealed class AgentMemoryPage : ArcItemPage
 {
     public override string ItemSlug => "agent-memory";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-memory-list",
+        "variant-capacity",
+        "variant-switches",
+        "variant-capture"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

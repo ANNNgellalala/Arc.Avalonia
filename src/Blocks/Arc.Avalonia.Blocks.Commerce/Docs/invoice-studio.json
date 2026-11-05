@@ -1,0 +1,53 @@
+{
+  "slug": "invoice-studio",
+  "nameZh": "发票工作台",
+  "summary": "发票编辑工作台：客户信息、可编辑行项目、实时小计、税费与合计，以及带 pending 与 saved 状态的保存草稿。",
+  "purpose": [
+    "当你要现场起草一张发票或报价单时，工作台把 From / To 客户块、编号与行项目放在左侧，合计与动作放在右侧。",
+    "每行可改描述、数量与费率，金额、8% 税费与合计在输入时立刻重算；行可以增删，校验要求每行都有描述。",
+    "保存草稿是短异步动作：按钮在自身宽度里显示 Saving，成功后变成 Saved，再回到可编辑态。"
+  ],
+  "whenToUse": [
+    "创建或编辑发票、报价单，需要实时合计时。",
+    "行项目数量不固定、允许增删时。",
+    "需要草稿保存与后续预览的流程时。"
+  ],
+  "whenNotToUse": [
+    "只读的发票历史与下载时，用 billing-overview。",
+    "订阅计费与计划变更时，用 usage-billing。",
+    "只需要一行金额与税费时，用 checkout-summary。"
+  ],
+  "variants": [
+    { "key": "layout-editor", "label": "编辑布局", "note": "左侧客户与行项目，右侧合计与保存" },
+    { "key": "variant-client-details", "label": "客户信息", "note": "From 与 To 两块抬头信息" },
+    { "key": "variant-line-items", "label": "行项目", "note": "描述、数量、费率与金额四列，可增删" },
+    { "key": "variant-totals", "label": "合计", "note": "Subtotal、8% Tax 与 Total 三行汇总" },
+    { "key": "state-save-idle", "label": "保存待命", "note": "Save draft 按钮初始可点态" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "描述、数量与费率都用文本输入，值变化即重算" },
+    { "type": "uses", "target": "button", "note": "保存、添加行与删除行都是按钮" },
+    { "type": "uses", "target": "badge", "note": "草稿与保存状态用徽章标出" },
+    { "type": "uses", "target": "card", "note": "客户块与合计块各用一张卡片承载" },
+    { "type": "alternative", "target": "billing-overview", "note": "查看与下载已有发票时，改用 billing-overview" }
+  ],
+  "contrasts": [
+    {
+      "target": "billing-overview",
+      "title": "Invoice studio 与 Billing overview",
+      "rows": [
+        { "dimension": "方向", "self": "创建与编辑发票", "other": "查看与支付已有发票" },
+        { "dimension": "可编辑内容", "self": "客户、描述、数量、费率", "other": "计划、卡片与用量" },
+        { "dimension": "合计", "self": "随行项目实时重算", "other": "由后端账单固定" },
+        { "dimension": "主要动作", "self": "保存草稿、预览、提交", "other": "支付、下载、改支付方式" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "行项目与合计的编辑器骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,16,*\">\n  <StackPanel Spacing=\"14\">\n    <TextBlock Text=\"Draft 0241\" Classes=\"arc-subtitle\" />\n    <!-- From / To 客户块 -->\n    <Grid ColumnDefinitions=\"*,92,100,92,30\">\n      <arc:ArcInput Placeholder=\"Describe the work\" />\n      <arc:ArcInput Grid.Column=\"1\" Value=\"1\" />\n      <arc:ArcInput Grid.Column=\"2\" Value=\"2400\" />\n    </Grid>\n    <arc:ArcButton Content=\"Add a line\" Variant=\"Ghost\" />\n  </StackPanel>\n  <StackPanel Grid.Column=\"2\" Spacing=\"10\">\n    <!-- Subtotal / Tax / Total -->\n    <arc:ArcButton Content=\"Save draft\" Variant=\"Primary\" />\n  </StackPanel>\n</Grid>"
+    }
+  ]
+}

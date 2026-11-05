@@ -1,0 +1,52 @@
+{
+  "slug": "command-palette",
+  "nameZh": "命令面板",
+  "summary": "应用级命令面板：在遮罩上打开的分组命令列表，一次只移动一个高亮，每行带快捷键提示，Cmd/Ctrl+K 随时唤起。",
+  "purpose": [
+    "把「跳转页面、新建条目、运行动作」收进一个输入框：用户不必记住菜单层级，键入关键词就能把命令筛出来。",
+    "命令按组排列（例如 Navigate、Create、Settings），每组有标签；结果行右侧是快捷键，底部是 ↑↓、↵、esc 的操作提示，高亮在结果之间平滑移动。",
+    "它是一个区块而不是控件：面板固定在块内的遮罩上渲染，所以在截图里可见；参考实现只给出内联结构，弹窗层由调用方自行放置。"
+  ],
+  "whenToUse": [
+    "应用内任意页面都需要一键跳转或执行命令时。",
+    "命令在十几到几十条、可以用关键词与分组快速缩小范围时。",
+    "桌面端以键盘为主，Cmd/Ctrl+K 已是团队熟悉的入口时。"
+  ],
+  "whenNotToUse": [
+    "在表单里选择具体值时用 select 或 combobox，命令面板不承担值选择。",
+    "动作只有三五个时用 dropdown-menu，整块面板过重。",
+    "移动端没有键盘快捷键习惯时，改用搜索页或底部导航。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "面板打开，遮罩压住后面的工作区" },
+    { "key": "variant-grouped-commands", "label": "Grouped commands", "note": "命令按分组标签排列，组间留白" },
+    { "key": "variant-shortcut-hints", "label": "Shortcut hints", "note": "每行右侧的快捷键键帽与页脚提示" },
+    { "key": "state-highlight", "label": "Highlight", "note": "单一高亮停在第二行，随方向键移动" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "search-field", "note": "顶部的筛选输入框决定显示哪些命令" },
+    { "type": "uses", "target": "button", "note": "结果行与页脚操作以真实按钮承载，可聚焦可回车" },
+    { "type": "uses", "target": "badge", "note": "命令状态与分组计数用徽标标出" },
+    { "type": "uses", "target": "avatar", "note": "人员类结果行显示头像" },
+    { "type": "alternative", "target": "search-results", "note": "只要一次跳转用命令面板，要浏览多种结果用搜索页" }
+  ],
+  "contrasts": [
+    {
+      "target": "search-results",
+      "title": "Command palette 与 Search results",
+      "rows": [
+        { "dimension": "搜索范围", "self": "命令与动作，不返回文档或文件", "other": "文档、人员、文件等混合结果" },
+        { "dimension": "呈现", "self": "遮罩上的浮层，一次只移动一个高亮", "other": "整页结果列表加预览面板" },
+        { "dimension": "结果数量", "self": "十几到几十条，靠分组与关键词缩小", "other": "可以成百条，需要筛选与排序" },
+        { "dimension": "入口", "self": "Cmd/Ctrl+K 随时唤起", "other": "搜索页路由或搜索框提交" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "分层命令与高亮",
+      "language": "csharp",
+      "code": "var field = AppKit.Search(\"Search commands\", query => Filter(query), 460, null, \"⌘K\");\n\nvar list = new StackPanel { Spacing = 1 };\nforeach (var group in commands.GroupBy(command => command.Group))\n{\n    list.Children.Add(AppKit.Caption(group.Key));\n    foreach (var command in group)\n    {\n        list.Children.Add(AppKit.Pressable(row: command, selected: index == active, run: command.Run));\n    }\n}\n\nvar panel = AppKit.Floating(new StackPanel\n{\n    Spacing = 8,\n    Children = { field, AppKit.Divider(), list, AppKit.Divider(), AppKit.KeycapHint(\"↑ ↓ move  ↵ run  esc close\") }\n}, 12, 16, 480);\n\nvar layer = new Panel { Children = { AppKit.Pressable(scrim, Close), panel } };\nreturn AppKit.Screen(layer, 520);"
+    }
+  ]
+}

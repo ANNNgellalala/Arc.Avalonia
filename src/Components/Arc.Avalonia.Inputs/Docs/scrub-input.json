@@ -1,0 +1,91 @@
+{
+  "slug": "scrub-input",
+  "nameZh": "擦洗输入",
+  "summary": "属性面板式的紧凑数值：拖拽标签左右擦洗（Shift 粗调、Alt 精调），点击可键入带单位的值或 (100-24)/2 这类算式。",
+  "purpose": [
+    "为「凭手感调数值」设计：按住标签左右拖动即可连续改变值，Shift 走粗步长、Alt 走细步长，松开时提交一次 ValueCommitted，适合反复试参数的场景。",
+    "点击后变成可键入的输入框，允许带单位（px、%、°）并支持加减乘除与括号，键入 100-24 会直接算成 76；双击标签回到 ResetValue。",
+    "有界时用一条低调的轨道显示当前值的位置；单位列有多项时，单位按钮按顺序循环切换并触发 UnitChanged。"
+  ],
+  "whenToUse": [
+    "设计工具、画布编辑器、属性面板里的数值微调（宽高、间距、旋转、不透明度）。",
+    "需要同时支持拖拽连续调整、键入精确值、输入简单算式的场景。",
+    "数值有界、希望在紧凑控件里同时表达位置（轨道）与数值时。"
+  ],
+  "whenNotToUse": [
+    "普通表单里的数字（座位数、重试次数）改用 number-field，擦洗手势在表单里不易被发现。",
+    "需要在连续区间里直观拖动并看到刻度时改用 slider。",
+    "金额输入改用 money-input，擦洗输入不处理货币格式与最小单位。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "紧凑尺寸，属性面板常用" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "variant-unit", "label": "Single unit", "note": "固定单位，如 %" },
+    { "key": "variant-units", "label": "Unit cycle", "note": "Units 提供多个单位，单位按钮循环切换" },
+    { "key": "variant-wrap", "label": "Wrap", "note": "旋转类数值在 Min/Max 之间环绕" },
+    { "key": "state-precision", "label": "Precision", "note": "Precision 固定小数位，如 2 位" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可擦洗也不可键入" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "number-field", "note": "普通表单数字改用 number field" },
+    { "type": "alternative", "target": "slider", "note": "需要刻度与连续拖动时改用 slider" },
+    { "type": "uses", "target": "button", "note": "单位切换与重置动作复用 button 的图标按钮" }
+  ],
+  "contrasts": [
+    {
+      "target": "number-field",
+      "title": "Scrub input 与 Number field",
+      "rows": [
+        { "dimension": "调整手势", "self": "拖拽标签擦洗，Shift 粗调、Alt 精调", "other": "点按步进按钮与方向键" },
+        { "dimension": "键入能力", "self": "可带单位、可输入算式", "other": "纯数字与小数" },
+        { "dimension": "呈现", "self": "标签 + 数值 + 单位 + 可选轨道", "other": "输入框 + 上下步进按钮" }
+      ]
+    },
+    {
+      "target": "slider",
+      "title": "Scrub input 与 Slider",
+      "rows": [
+        { "dimension": "取值方式", "self": "以数值为准，擦洗是快捷方式", "other": "以位置为准，拖动即取值" },
+        { "dimension": "精度", "self": "Step / FineStep / CoarseStep 与 Precision 控制", "other": "Step 与刻度 Marks 控制" },
+        { "dimension": "占用空间", "self": "单行紧凑，适合属性面板", "other": "需要轨道与标签空间" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcScrubInput Label=\"W\"\n                     Min=\"0\"\n                     Max=\"1000\"\n                     Step=\"1\"\n                     Unit=\"px\"\n                     ResetValue=\"240\"\n                     Value=\"{Binding Width, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "旋转、环绕与单位循环",
+      "language": "csharp",
+      "code": "var rotation = new ArcScrubInput\n{\n    Label = \"R\",\n    Min = 0,\n    Max = 360,\n    Wrap = true,\n    FineStep = 0.1,\n    Unit = \"°\",\n    Units = new List<string> { \"°\" },\n    ResetValue = 0,\n    Size = ArcScrubInputSize.Sm\n};\n\nrotation.ValueCommitted += (_, e) => ApplyRotation(e.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcScrubInput",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "擦洗手柄上的文字；图标标签需另配无障碍名称",
+      "Value": "当前数值",
+      "Min": "下界，默认负无穷",
+      "Max": "上界，默认正无穷",
+      "Step": "单步距离，默认 1",
+      "FineStep": "Alt 与精细拖拽的步长；未设时为 Step / 10",
+      "CoarseStep": "Shift 与粗拖的步长；未设时为 Step × 10",
+      "Precision": "保留的小数位，-1 表示由 Step 推导",
+      "PixelsPerStep": "擦洗时每步对应的指针位移，默认 2 px",
+      "Wrap": "在 Min/Max 之间环绕，适合旋转角",
+      "Unit": "当前单位，如 px / % / °",
+      "Units": "可切换的单位列表；单位按钮按顺序循环",
+      "ResetValue": "双击标签恢复到的值；NaN 表示不启用",
+      "Track": "是否显示数值在区间中的位置，默认 true",
+      "Size": "尺寸：Sm / Md，默认 Md",
+      "Format": "自定义读数格式化函数",
+      "ValueChanged": "每次变化（含擦洗过程）触发",
+      "ValueCommitted": "一次调整结束时触发（松手、Enter、失焦、按键或重置）",
+      "UnitChanged": "单位变化时触发"
+    }
+  }
+}

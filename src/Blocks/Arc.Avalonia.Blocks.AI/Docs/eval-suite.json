@@ -1,0 +1,57 @@
+{
+  "slug": "eval-suite",
+  "nameZh": "评测套件",
+  "summary": "候选版本对基线的整批评测：分数、提升点数、回归数与成本时间在一行里，下面是按分类的 rubric 条与历史 sparkline，最后列出三条回归用例并可就地分诊。",
+  "purpose": [
+    "它回答「这一版比上一版好还是坏」：顶部写明 v12 candidate · Sonnet 5.5 vs v11 baseline · Sonnet 5.5 · judge Opus 5.5，右侧是 History 与 Run，让评分口径与裁判模型一开始就清楚。",
+    "汇总行给四个关键数字：Score 88.5%、vs baseline +3.1 pts、Regressions 3、Cost and time $1.42 · 4m 12s，再用一条 sparkline 画出最近几次的分数走势——单点数字与趋势放在一起看。",
+    "分类网格把「好在哪里」拆开：每个类别一条 rubric 条，显示新分数并带一个基线刻度，低于基线会显出来；这是从总分回到具体能力的关键一层。",
+    "回归用例是可以动作的：三条回退用例逐条给出输入、Baseline 与 Candidate 的回答与裁判理由，可以 Mark as expected（承认是有意变化）或 Open issue（登记问题）；筛选器切换回归 / 提升用例。"
+  ],
+  "whenToUse": [
+    "有一组固定用例、要比较两个版本的评分与回归时。",
+    "需要按分类看能力变化，而不只是一个总分时。",
+    "要逐条分诊回归用例并把结果归档时。"
+  ],
+  "whenNotToUse": [
+    "只是编辑一份提示词并试跑一条用例时，用 prompt-studio。",
+    "要盲测两条回答、由人投票做偏好比较时，用 model-arena。",
+    "只需要跟踪一个业务指标的变化时，用 metric-card 或 line-chart。"
+  ],
+  "variants": [
+    { "key": "variant-summary", "label": "Summary", "note": "分数、提升点数、回归数、成本时间与历史 sparkline" },
+    { "key": "variant-category-grid", "label": "Category grid", "note": "分类 rubric 条与基线刻度" },
+    { "key": "variant-regressions", "label": "Regressions", "note": "回归用例：输入、两版回答、裁判理由与分诊动作" },
+    { "key": "variant-filters", "label": "Filters", "note": "在回归与提升用例之间切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Run、History、Mark as expected 与 Open issue 都是 ArcButton" },
+    { "type": "uses", "target": "progress", "note": "分类 rubric 条与基线刻度用 ArcProgress 表达" },
+    { "type": "uses", "target": "sparkline", "note": "最近几次评测的分数走势用 ArcSparkline 画在汇总行右侧" },
+    { "type": "alternative", "target": "prompt-studio", "note": "只编辑并试跑单条用例时改用 prompt studio" }
+  ],
+  "contrasts": [
+    {
+      "target": "prompt-studio",
+      "title": "Eval suite 与 Prompt studio",
+      "rows": [
+        { "dimension": "对象", "self": "一个候选版本在一组用例上的得分", "other": "一份提示词模板及其版本" },
+        { "dimension": "动作", "self": "跑整套评测、按分类看分数与回归", "other": "编辑、试跑一条用例、提升版本" },
+        { "dimension": "输出", "self": "汇总分数、分类网格与回归用例列表", "other": "一条回复与单次成本" },
+        { "dimension": "节奏", "self": "跑批—对比基线—分诊的评测循环", "other": "编辑—试跑—发布的小循环" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "评测页骨架",
+      "language": "csharp",
+      "code": "var content = K.Stack(9,\n    new Grid\n    {\n        ColumnDefinitions = new ColumnDefinitions(\"*,Auto\"),\n        Children =\n        {\n            K.Stack(2,\n                K.Text(\"Support agent evals\", \"arc-heading\"),\n                K.Caption(\"v12 candidate · Sonnet 5.5   vs   v11 baseline · Sonnet 5.5   ·   judge Opus 5.5\")),\n            K.Row(6, K.Chip(\"History\", icon: \"clock\"), run)\n        }\n    },\n    K.Divider(2),\n    K.Row(22,\n        K.Stack(1, K.Caption(\"Score\"), score),\n        K.Stack(1, K.Caption(\"vs baseline\"), delta),\n        K.Stack(1, K.Caption(\"Regressions\"), K.Text(\"3\", \"arc-body-sm\")),\n        K.Stack(1, K.Caption(\"Cost and time\"), K.Text(\"$1.42 · 4m 12s\", \"arc-body-sm\")),\n        new ArcSparkline { Values = new[] { 82.0, 84.0, 83.0, 85.0, 86.0, 86.1, 88.3 }, Width = 130, Height = 34, ShowArea = true }),\n    grid,           // 分类 rubric 条\n    K.Divider(2),\n    filterRow,\n    caseHost,       // 回归用例与分诊动作\n    status);\n\nreturn K.Surface(new Border { Child = content, MaxWidth = 900 }, new Thickness(20, 12, 20, 12));"
+    },
+    {
+      "title": "分类 rubric 条带基线刻度",
+      "language": "csharp",
+      "code": "foreach (var category in Categories)\n{\n    var bar = K.Bar(category.Candidate, 100, ArcProgressSize.Sm);\n    bar.Baseline = category.Baseline;      // 基线刻度，落在条上\n    var delta = category.Candidate - category.Baseline;\n\n    grid.Children.Add(K.Stack(3,\n        K.Row(6,\n            K.Text(category.Name, \"arc-label\"),\n            K.Caption($\"{category.Candidate:0.0}% · {(delta >= 0 ? \"+\" : \"\")}{delta:0.0}\")),\n        bar));\n}"
+    }
+  ]
+}

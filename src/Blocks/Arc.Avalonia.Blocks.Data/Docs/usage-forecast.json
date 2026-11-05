@@ -1,0 +1,57 @@
+{
+  "slug": "usage-forecast",
+  "nameZh": "用量预测",
+  "summary": "计费周期的花费预测页：实际支出之后接出预测锥与预算线，拖动预算线会标出越线的日期，旁边还有提醒规则与预测摘要。",
+  "purpose": [
+    "当用量计费的产品需要提前知道「这个月会不会超预算」时，用 usage forecast：已发生的支出是实线，未来是带上下界的预测锥，预算是一条可拖动的横线。",
+    "预算线与预测锥的交点会算出越线日期，摘要给出预计总额、与预算的差额，以及是否需要提前提醒；三条提醒规则（80% 邮件、100% 邮件、120% Slack）中有一条是关闭态，说明规则可以逐条开关。",
+    "它回答的是「将会怎样」，而 usage-billing 回答「已经花了多少」——两者常成对出现在账单页与成本页。"
+  ],
+  "whenToUse": [
+    "用量计费产品需要按当前速度预测期末支出时。",
+    "预算是一条会移动的目标线、需要知道何时会被越过时。",
+    "要同时展示提醒规则与预计超额金额时。"
+  ],
+  "whenNotToUse": [
+    "查看已发生的账单、限额与发票时，用 usage-billing。",
+    "只是解释某段时间的花费构成时，用 revenue-explorer。",
+    "只需要一个百分比进度时，用 progress。"
+  ],
+  "variants": [
+    { "key": "layout-forecast", "label": "整体布局", "note": "支出图、预测锥、预算线、提醒规则与摘要并置" },
+    { "key": "variant-cone", "label": "Cone", "note": "预测区间以半透明锥形铺在实际值之后" },
+    { "key": "variant-budget-line", "label": "Budget", "note": "可拖动的预算横线与越线日期标注" },
+    { "key": "variant-alert-rules", "label": "Alerts", "note": "三条提醒规则，其中一条为关闭态" },
+    { "key": "variant-summary", "label": "Summary", "note": "预计总额、预算差额与建议的摘要读数" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "badge", "note": "预算状态与提醒渠道用徽章标出" },
+    { "type": "uses", "target": "progress", "note": "预算占用与提醒阈值用进度条表达" },
+    { "type": "uses", "target": "switch", "note": "每条提醒规则是一个开关，可逐条启用或停用" },
+    { "type": "uses", "target": "card", "note": "图表、提醒与摘要分别由卡片承载" },
+    { "type": "alternative", "target": "usage-billing", "note": "查看已发生的账单、限额与发票时，改用 usage billing" }
+  ],
+  "contrasts": [
+    {
+      "target": "usage-billing",
+      "title": "Usage forecast 与 Usage billing",
+      "rows": [
+        { "dimension": "时间方向", "self": "面向未来：预测期末花费与越线日期", "other": "面向过去：已发生的账单、限额与发票" },
+        { "dimension": "核心控件", "self": "预测锥与可拖动的预算线", "other": "限额进度与提醒规则列表" },
+        { "dimension": "主要问题", "self": "这个月会不会超预算", "other": "这个月已经花了多少" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\">\n  <charts:ArcForecastCone Height=\"240\" /> <!-- 实际 + 预测锥 + 预算线 -->\n  <arc:ArcProgress Value=\"6400\" Maximum=\"8000\" />\n  <arc:ArcSwitch Content=\"Email at 80%\" IsChecked=\"True\" />\n</StackPanel>"
+    },
+    {
+      "title": "代码构建：预算与越线",
+      "language": "csharp",
+      "code": "var days = 30;\nvar budget = 8000.0;\n\nvar chart = new ArcForecastCone(actual, forecast, low, high, budget);\nchart.BudgetChanged += (_, value) =>\n{\n    // 交点日期与摘要随预算线重算\n    summary.Text = CrossingLabel(value);\n};"
+    }
+  ]
+}

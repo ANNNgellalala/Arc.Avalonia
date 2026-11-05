@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Special.Motion.Controls;
 using Arc.Avalonia.Theme;
@@ -10,6 +11,11 @@ namespace Arc.Avalonia.Special.Motion.Pages;
 public sealed class BookingPillPage : ArcItemPage
 {
     public override string ItemSlug => "booking-pill";
+
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-party", "state-date", "state-time", "state-review", "state-booked"
+    };
 
     public override bool DemoOnCanvas => false;
 
@@ -60,6 +66,7 @@ public sealed class BookingPillPage : ArcItemPage
             Children =
             {
                 stage,
+                Steps(),
                 SmPage.Hint(
                     "The ticket is the review step: back up through time, date and party to watch the pill reshape. Escape steps back.",
                     party,
@@ -67,5 +74,30 @@ public sealed class BookingPillPage : ArcItemPage
                     ticket)
             }
         };
+    }
+
+    /// <summary>
+    /// The other steps pinned statically in small stages, so every declared step is on screen at once instead of
+    /// only reachable through the interactive pill above.
+    /// </summary>
+    private static Control Steps()
+    {
+        var grid = new WrapPanel { Orientation = Orientation.Horizontal };
+        foreach (var step in new[]
+                 {
+                     ArcBookingStep.Party, ArcBookingStep.Date, ArcBookingStep.Time, ArcBookingStep.Booked
+                 })
+        {
+            grid.Children.Add(new Border
+            {
+                Width = 424,
+                Height = 330,
+                Margin = new Thickness(0, 0, 12, 12),
+                Background = DemoUi.Brush(ArcTokens.SurfaceMuted),
+                Child = new ArcBookingPill { Step = step }
+            });
+        }
+
+        return grid;
     }
 }

@@ -20,6 +20,11 @@ public sealed class PageHeaderPage : ArcItemPage
 {
     public override string ItemSlug => "page-header";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-expanded", "variant-tabs", "variant-members", "state-folded"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -142,13 +147,32 @@ public sealed class PageHeaderPage : ArcItemPage
         Grid.SetColumn(compactHost, 1);
         tabRow.Children.Add(compactHost);
 
-        return Mk.Surface(new StackPanel
+        // The folded bar is otherwise only reachable through the switch; a static copy keeps it visible.
+        var foldedSpecimen = Mk.Surface(new StackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 14,
-            Margin = new Thickness(26, 22, 26, 20),
-            Children = { head, Mk.Divider(), tabRow }
+            Spacing = 10,
+            Margin = new Thickness(24, 14, 24, 12),
+            Children =
+            {
+                Mk.Row(10,
+                    Mk.Text("Atlas design system", "arc-heading", 420),
+                    Mk.Pill("In progress", ArcBadgeTone.Warning, dot: true),
+                    Mk.Caption("62% to 14 Mar")),
+                Mk.Caption("Overview · Issues · Releases · Roadmap")
+            }
         });
+
+        return Mk.Stack(16,
+            Mk.Surface(new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 14,
+                Margin = new Thickness(26, 22, 26, 20),
+                Children = { head, Mk.Divider(), tabRow }
+            }),
+            Mk.Caption("Folded compact bar, past the scroll threshold"),
+            foldedSpecimen);
     }
 }
 

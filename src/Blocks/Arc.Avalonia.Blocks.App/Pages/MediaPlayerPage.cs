@@ -23,6 +23,11 @@ public sealed class MediaPlayerPage : ArcItemPage
 {
     public override string ItemSlug => "media-player";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-playing", "variant-seek-bar", "variant-volume", "variant-playlist"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

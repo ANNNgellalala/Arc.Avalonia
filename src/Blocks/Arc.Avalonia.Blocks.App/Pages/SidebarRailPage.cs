@@ -21,6 +21,11 @@ public sealed class SidebarRailPage : ArcItemPage
 {
     public override string ItemSlug => "sidebar-rail";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-expanded-groups", "variant-app-content", "variant-breadcrumb", "state-active"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

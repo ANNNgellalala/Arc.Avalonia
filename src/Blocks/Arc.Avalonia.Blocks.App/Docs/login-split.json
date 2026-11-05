@@ -1,0 +1,53 @@
+{
+  "slug": "login-split",
+  "nameZh": "分栏登录页",
+  "summary": "分栏登录页：左侧是邮箱优先的登录表单，右侧是带引语与头像的品牌面板；第二步在左侧就地换成密码输入，不跳页。",
+  "purpose": [
+    "当产品想同时展示登录表单与品牌图时用它：左栏表单、右栏品牌面板，两栏在同一高度里平衡。",
+    "第一阶段只问邮箱，识别出账号后在原位换成密码输入，并保留「Keep me signed in」与找回密码链接；错误就地提示，不打断页面。",
+    "右侧品牌面板用令牌渐变代替摄影图，引语与头像叠在上方；两张卡片的宽度在步骤切换时保持稳定，只有高度与内容变化。"
+  ],
+  "whenToUse": [
+    "密码登录，并且希望用一半画面承载品牌图与引语时。",
+    "登录流程需要先确认账号再问密码、但不想跳转页面时。",
+    "桌面端优先、有足够横向空间放两栏时。"
+  ],
+  "whenNotToUse": [
+    "passkey 优先的登录用 login-centered。",
+    "魔法链接或极简的登录页用 login-immersive。",
+    "窄屏或应用内嵌登录时用 sign-in，分栏在窄容器里会失去意义。"
+  ],
+  "variants": [
+    { "key": "state-email-step", "label": "Email step", "note": "第一步：工作邮箱输入与继续按钮" },
+    { "key": "variant-brand-panel", "label": "Brand panel", "note": "右栏渐变、引语与头像" },
+    { "key": "variant-split-layout", "label": "Split layout", "note": "左表单右品牌的两栏结构" },
+    { "key": "variant-providers", "label": "Providers", "note": "邮箱步骤下方的单点登录按钮组" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "邮箱与密码步骤的输入框" },
+    { "type": "uses", "target": "checkbox", "note": "Keep me signed in 复选框" },
+    { "type": "uses", "target": "avatar", "note": "品牌面板上的引语头像与账号摘要" },
+    { "type": "uses", "target": "password-field", "note": "第二步的密码输入" },
+    { "type": "uses", "target": "button", "note": "继续、登录、第三方登录与文字链接" },
+    { "type": "alternative", "target": "login-immersive", "note": "密码分栏布局与魔法链接的沉浸布局是两种登录取舍" }
+  ],
+  "contrasts": [
+    {
+      "target": "login-immersive",
+      "title": "Login split 与 Login immersive",
+      "rows": [
+        { "dimension": "验证方式", "self": "邮箱确认后输入密码", "other": "发送魔法链接，不在页面输密码" },
+        { "dimension": "布局", "self": "左表单右品牌图的两栏", "other": "单卡浮在整页黄昏背景上" },
+        { "dimension": "品牌呈现", "self": "品牌面板占一半画面，带引语", "other": "背景承担氛围，卡片保持中性" },
+        { "dimension": "适用", "self": "密码登录、桌面端", "other": "无密码登录、营销感强的页面" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "左右分栏",
+      "language": "xaml",
+      "code": "<Grid xmlns=\"https://github.com/avaloniaui\" ColumnDefinitions=\"460,*\">\n  <Border Grid.Column=\"0\" Padding=\"32\">\n    <StackPanel Spacing=\"12\">\n      <TextBlock Text=\"Sign in\" Classes=\"arc-title-sm\" />\n      <TextBox Watermark=\"Work email\" />\n      <CheckBox Content=\"Keep me signed in\" IsChecked=\"True\" />\n      <Button Content=\"Continue\" HorizontalAlignment=\"Stretch\" />\n    </StackPanel>\n  </Border>\n  <Border Grid.Column=\"1\" Background=\"{DynamicResource ArcSurfaceMutedBrush}\">\n    <StackPanel Spacing=\"10\" VerticalAlignment=\"Bottom\" Margin=\"28\">\n      <TextBlock Text=\"“The light is the product.”\" Classes=\"arc-subtitle\" />\n      <TextBlock Text=\"Ana Duarte · Head of design, Northwind\" Classes=\"arc-caption\" />\n    </StackPanel>\n  </Border>\n</Grid>"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "slug": "morph-loader",
+  "nameZh": "形变加载指示器",
+  "summary": "会变形的小加载标记：点、条、环、方四种形态循环，成功或失败时原地折成勾或叉，尺寸 16–32 px，适合塞进按钮、行与字段里。",
+  "purpose": [
+    "给「很快会结束的小操作」一个就地反馈：保存、发布、上传时不用整页 loading，标记在原位转，结果也在同一个位置揭晓，布局不跳。",
+    "形态是状态的一部分：Loading 时可选 Dots / Bars / Ring / Square 四种笔触，转成 Success 时循环淡出、笔画依次画出勾，Error 时画叉；颜色之外还有形状，所以色觉差异也能分辨。",
+    "Tone 决定收口颜色：开启时勾取成功色、叉取危险色，关闭则跟随前景色，便于放在已经有颜色的按钮里。",
+    "它的尺寸就是它的用法：默认 24 px，16–32 px 之间可内联到按钮、输入框右侧或列表行尾；系统开启减少动效时，每种状态只画一帧静止形状。"
+  ],
+  "whenToUse": [
+    "按钮、行或字段内的行内进度，且结果显示在同一位置时。",
+    "很快就结束、且一定有明确成败的操作，例如保存、发布、上传。",
+    "任何需要一枚极小、清晰、与品牌一致的加载标记的地方。"
+  ],
+  "whenNotToUse": [
+    "已知百分比或剩余时间时，改用 progress，它能表达「到哪了」。",
+    "内容是整块布局在加载时，改用 skeleton-morph，用骨架占住版面。",
+    "等待是长时间的整页状态时，改用带文案与取消动作的加载页，而不是一枚小标记。"
+  ],
+  "variants": [
+    { "key": "variant-dots", "label": "Dots", "note": "点状循环，最轻" },
+    { "key": "variant-bars", "label": "Bars", "note": "条状依次起伏" },
+    { "key": "variant-ring", "label": "Ring", "note": "环状旋转、弧线呼吸" },
+    { "key": "variant-square", "label": "Square", "note": "方框四分之一圈翻滚" },
+    { "key": "state-loading", "label": "Loading", "note": "循环运行中" },
+    { "key": "state-success", "label": "Success", "note": "折成勾，可配成功色" },
+    { "key": "state-error", "label": "Error", "note": "折成叉，可配危险色" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "progress", "note": "已知百分比时改用 progress" },
+    { "type": "alternative", "target": "skeleton-morph", "note": "内容按布局加载时改用骨架形变" },
+    { "type": "complement", "target": "action-button", "note": "按钮内置的加载标记等结果，按钮负责触发" }
+  ],
+  "contrasts": [
+    {
+      "target": "progress",
+      "title": "Morph loader 与 Progress",
+      "rows": [
+        { "dimension": "进度信息", "self": "只有「在进行」，没有百分比", "other": "有确定进度与剩余量" },
+        { "dimension": "形态", "self": "四种循环标记，结束时折成勾或叉", "other": "线性或环形进度条，按比例填充" },
+        { "dimension": "尺寸", "self": "16–32 px，可内联进行内", "other": "通常独占一行或一个区域" }
+      ]
+    },
+    {
+      "target": "skeleton-morph",
+      "title": "Morph loader 与 Skeleton morph",
+      "rows": [
+        { "dimension": "占位对象", "self": "一枚标记，不占版面", "other": "按真实布局摊开骨架块" },
+        { "dimension": "结束方式", "self": "标记折成勾或叉", "other": "骨架逐块替换成内容" },
+        { "dimension": "适合时长", "self": "亚秒到数秒的小操作", "other": "整块内容加载的短暂等待" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：四种形态与两种结果",
+      "language": "xaml",
+      "code": "<arc:ArcMorphLoader xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n                 Variant=\"Ring\"\n                 Width=\"26\"\n                 Height=\"26\"\n                 Status=\"Loading\"\n                 SuccessLabel=\"Published\"\n                 ErrorLabel=\"Publish failed\" />"
+    },
+    {
+      "title": "在代码里切换状态",
+      "language": "csharp",
+      "code": "var loader = new ArcMorphLoader\n{\n    Variant = ArcMorphLoaderVariant.Ring,\n    Width = 26,\n    Height = 26,\n    Status = ArcMorphLoaderStatus.Loading,\n    Label = \"Publishing\",\n    SuccessLabel = \"Published\",\n    ErrorLabel = \"Publish failed\",\n    Tone = true\n};\n\n// 发布结束后原地收口；标签同时用于读屏与帮助文本\nloader.Status = ArcMorphLoaderStatus.Success;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcMorphLoader",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Variant": "加载时的形状：Dots / Bars / Ring / Square",
+      "Status": "Loading 循环 / Success 折成勾 / Error 折成叉",
+      "Label": "Loading 时用于读屏与帮助文本的说明，默认 Loading",
+      "SuccessLabel": "成功时的无障碍文案，默认 Done",
+      "ErrorLabel": "失败时的无障碍文案，默认 Failed",
+      "Tone": "是否让勾取成功色、叉取危险色，默认 true"
+    }
+  }
+}

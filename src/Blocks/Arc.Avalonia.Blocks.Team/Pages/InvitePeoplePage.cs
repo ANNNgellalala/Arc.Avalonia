@@ -31,6 +31,11 @@ public sealed class InvitePeoplePage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-chip-field", "variant-directory-suggestions", "variant-dotenv-import", "state-seat-meter"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Inviting several people at once by name or email, with a role for each.",

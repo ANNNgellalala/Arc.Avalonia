@@ -22,6 +22,11 @@ public sealed class MetricExplorerPage : ArcItemPage
 {
     public override string ItemSlug => "metric-explorer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-explorer", "variant-kpi-cards", "variant-open-card", "variant-chart", "variant-metric-tabs"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

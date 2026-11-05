@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\*.json" />
+  </ItemGroup>
 </Project>

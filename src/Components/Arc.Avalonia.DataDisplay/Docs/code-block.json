@@ -1,0 +1,63 @@
+{
+  "slug": "code-block",
+  "nameZh": "代码块",
+  "summary": "带文件名、语言标签、行号与轻量语法着色（tint）的源码面板：一键复制、长文件折叠为 Show all，用于文档片段与安装命令。",
+  "purpose": [
+    "当页面需要展示一段可复制的源码时用它：文档示例、安装命令、配置片段。Code 是唯一必填内容，Filename 与 Language 决定头部标签与着色模式。",
+    "行号、文件名与语言标签都属于头部信息；右上角的复制按钮把 Code 原样写入剪贴板，并在 1.5 秒内显示已复制。",
+    "MaxLines 大于 0 且内容更长时折叠为前若干行，底部出现 Show all 切换；展开后不再折叠，页面上不会出现两个滚动条。"
+  ],
+  "whenToUse": [
+    "文档与指南里需要展示一段可复制的代码时。",
+    "需要让读者确认文件名与语言，并保留行号时。",
+    "长文件希望默认折叠、让读者自行展开时。"
+  ],
+  "whenNotToUse": [
+    "要看结构化数据的层级与路径时用 json-viewer，代码块只做原文展示。",
+    "需要编辑源码时用 rich-text-editor 或真正的编辑器组件，代码块是只读的。",
+    "只是行内的一小段代码时用行内 code 样式，不必引入带头部与行号的块。"
+  ],
+  "variants": [
+    { "key": "variant-filename", "label": "Filename", "note": "文件名 + 语言标签 + 行号 + 复制" },
+    { "key": "variant-collapsed", "label": "Collapsed", "note": "MaxLines 折叠长文件，底部出现 Show all" },
+    { "key": "variant-no-filename", "label": "No filename", "note": "Filename 留空，头部显示默认标题" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "json-viewer", "note": "看原文用 code block，看结构化层级用 JSON viewer" },
+    { "type": "complement", "target": "copy-button", "note": "复制按钮与代码块常成对出现：块外的复制按钮可以复制任意文本" }
+  ],
+  "contrasts": [
+    {
+      "target": "json-viewer",
+      "title": "Code block 与 JSON viewer",
+      "rows": [
+        { "dimension": "展示对象", "self": "任意语言的源码原文", "other": "JSON 数据的树形结构" },
+        { "dimension": "表达式", "self": "行号 + 语法着色 + 折叠", "other": "类型着色 + 分支展开 + 搜索" },
+        { "dimension": "复制", "self": "整段复制", "other": "复制单个值或路径" },
+        { "dimension": "适用", "self": "文档示例、安装命令、配置", "other": "API 负载、Webhook 事件" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明代码块",
+      "language": "xaml",
+      "code": "<arc:ArcCodeBlock xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n                 Filename=\"use-uploads.ts\"\n                 Language=\"tsx\"\n                 MaxLines=\"12\" />"
+    },
+    {
+      "title": "在代码里设置源码",
+      "language": "csharp",
+      "code": "var block = new ArcCodeBlock\n{\n    Code = \"\"\"\n        export function useUploads() {\n          const [uploads, setUploads] = useState<Upload[]>([]);\n          return { uploads };\n        }\n        \"\"\",\n    Filename = \"use-uploads.ts\",\n    Language = \"tsx\",\n    MaxLines = 12\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcCodeBlock",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Code": "展示并复制的源码；换行会被保留",
+      "Filename": "头部显示的文件名；留空时显示默认标题",
+      "Language": "头部语言标签与着色模式，默认 tsx",
+      "MaxLines": "折叠阈值；大于 0 且内容更长时显示 Show all 切换"
+    }
+  }
+}

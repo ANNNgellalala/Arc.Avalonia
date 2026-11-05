@@ -1,0 +1,76 @@
+{
+  "slug": "text-shimmer",
+  "nameZh": "文字微光",
+  "summary": "一条会掠过微光的状态文案：工作持续时有一道安静的光带扫过文字，完成时停止并恢复纯色。",
+  "purpose": [
+    "生成摘要、建立索引这类持续一段时间的工作，需要让读者知道“还在进行”，但又不该用进度条假装知道百分比。文字微光用一道缓慢扫过的光带表达进行中，比转圈更安静。",
+    "Active=true 时按 Duration 的节奏循环扫光，文案底色仍可读；Active=false 时完全停止并恢复为前景色，表示已经完成。",
+    "改 Text 会让新文案从下方升起并替换旧文案，适合从“Generating summary”过渡到“Summary ready”这类状态变化。",
+    "它是状态区域而非进度条：只表达进行中/已完成，不表达完成了多少；控件被禁用时暂停，减少动效时完全不扫光。"
+  ],
+  "whenToUse": [
+    "有明确起止、但没有可靠百分比的工作状态行，例如生成摘要、建立索引。",
+    "希望在加载期间保持文字可读、而不是用骨架屏替换全部内容时。",
+    "状态文案需要从进行中切换到已完成时。",
+    "需要一条安静、不抢注意力的进行中提示时。"
+  ],
+  "whenNotToUse": [
+    "有真实进度可以展示时改用 progress。",
+    "内容结构未知、需要用占位骨架等待时改用 skeleton。",
+    "文案会在几个状态之间变形切换、而不只是进行中/完成时改用 text-morph。",
+    "提示需要引起立即注意（错误、警告）时用 alert，微光太轻。"
+  ],
+  "variants": [
+    { "key": "variant-active", "label": "进行中", "note": "Active=true，光带循环扫过文字" },
+    { "key": "variant-settled", "label": "已完成", "note": "Active=false，文字恢复纯色" },
+    { "key": "variant-h3", "label": "标题级别", "note": "Level=H3，放在区块标题位置" },
+    { "key": "variant-paragraph", "label": "段落级别", "note": "Level=Paragraph，放在正文状态行" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "skeleton", "note": "内容结构未知、需要占位块时用 skeleton" },
+    { "type": "alternative", "target": "progress", "note": "有真实百分比时用 progress 更诚实" },
+    { "type": "complement", "target": "text-morph", "note": "进行中配微光、完成时切文案，两者常接力" }
+  ],
+  "contrasts": [
+    {
+      "target": "skeleton",
+      "title": "Text shimmer 与 Skeleton",
+      "rows": [
+        { "dimension": "内容", "self": "已有真实文案，只是进行中", "other": "内容尚未就绪，用占位块代替" },
+        { "dimension": "可读性", "self": "文字始终可读", "other": "占位块不承载文字" },
+        { "dimension": "适用阶段", "self": "生成、索引等有明确文案的工作", "other": "首屏或列表加载" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "Text shimmer 与 Progress",
+      "rows": [
+        { "dimension": "表达精度", "self": "只表达进行中/完成", "other": "表达已完成的比例" },
+        { "dimension": "视觉形态", "self": "文字上的光带", "other": "条或环的填充" },
+        { "dimension": "适用场景", "self": "无法预估时长的工作", "other": "有可靠进度的工作" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "生成中与已完成",
+      "language": "csharp",
+      "code": "var status = new ArcTextShimmer\n{\n    Text = \"Generating summary\",\n    Active = true,\n    Duration = 1.8,\n    Level = ArcTextLevel.Paragraph\n};\n\n// 完成时：光带停止，文案切到结果\nstatus.Active = false;\nstatus.Text = \"Summary ready\";"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcTextShimmer x:Name=\"Status\"\n                          Text=\"Generating summary\"\n                          Active=\"True\"\n                          Duration=\"1.8\"\n                          Level=\"Paragraph\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcTextShimmer",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "一行状态文案；改值会让新文案从下方升起",
+      "Active": "true 时光带循环扫过；false 停止并恢复纯色，默认 true",
+      "Duration": "一次扫光经过文字的秒数，默认 1.8",
+      "Level": "类型层级，决定字号与语义标签，默认 Span"
+    }
+  }
+}

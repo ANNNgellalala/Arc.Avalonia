@@ -22,6 +22,11 @@ public sealed class MultiStepFormPage : ArcItemPage
 {
     public override string ItemSlug => "multi-step-form";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-step-one", "variant-stepper", "variant-footer-actions", "variant-aside"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -25,6 +25,11 @@ public sealed class TeamShowcasePage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-gallery", "variant-spotlight", "variant-detail-strip", "state-selected-card"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "About or company pages that introduce the team with portraits.",
@@ -173,7 +178,7 @@ public sealed class TeamShowcasePage : ArcItemPage
             TeamKit.Divider(),
             detail);
 
-        return TeamKit.Root(new Border
+        var surface = new Border
         {
             Background = TeamKit.Brush(ArcTokens.Surface),
             BorderBrush = TeamKit.Brush(ArcTokens.Border),
@@ -182,7 +187,48 @@ public sealed class TeamShowcasePage : ArcItemPage
             ClipToBounds = true,
             Padding = new Thickness(24),
             Child = content
-        });
+        };
+
+        return TeamKit.Root(TeamKit.Stack(16, surface, SpotlightSample()));
+    }
+
+    /// <summary>
+    /// A static spotlight layout so both documented layouts are visible in the preview without switching the
+    /// segmented control.
+    /// </summary>
+    private static Control SpotlightSample()
+    {
+        var person = TeamData.Person("Jonas Weber");
+        var image = TeamKit.Portrait(person, 332, 236, 20, 56);
+
+        var copy = new StackPanel { Spacing = 12 };
+        copy.Children.Add(TeamKit.Caption("Spotlight layout"));
+        copy.Children.Add(new TextBlock { Text = person.Name, Classes = { "arc-subtitle" } });
+        copy.Children.Add(TeamKit.Label(person.Role));
+        copy.Children.Add(TeamKit.Body(person.Focus, 460));
+        copy.Children.Add(TeamKit.Row(14,
+            TeamKit.Meta("map-pin", $"{person.Location} · {person.Timezone}"),
+            TeamKit.Meta("mail", person.Email)));
+        copy.Children.Add(TeamKit.Row(8,
+            TeamKit.Btn("Copy email", ArcButtonVariant.Secondary, ArcButtonSize.Sm),
+            TeamKit.Btn("Open profile", ArcButtonVariant.Ghost, ArcButtonSize.Sm, icon: "arrow-up-right")));
+
+        var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("332,*") };
+        grid.Children.Add(image);
+        var copyHost = new Border { Padding = new Thickness(22, 6, 0, 0), Child = copy };
+        Grid.SetColumn(copyHost, 1);
+        grid.Children.Add(copyHost);
+
+        return new Border
+        {
+            Background = TeamKit.Brush(ArcTokens.Surface),
+            BorderBrush = TeamKit.Brush(ArcTokens.Border),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(26),
+            ClipToBounds = true,
+            Padding = new Thickness(24),
+            Child = grid
+        };
     }
 
     private static Control BuildDetailCopy(TeamPerson person)

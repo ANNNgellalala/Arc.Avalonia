@@ -1,0 +1,67 @@
+{
+  "slug": "agent-loop",
+  "nameZh": "智能体循环插画",
+  "summary": "解释智能体循环的插画：一个亮头部绕环经过 Gather context、Take action、Verify 三个站点，每圈积累上下文、发起工具调用并给出校验结论。",
+  "purpose": [
+    "把「智能体不是一次问答，而是反复收集、行动、验证」讲清楚：环上的亮头部每圈经过三个站点，中心模型卡始终显示当前是第几圈（loop n of 3），右上角状态在 Gathering / Acting / Verifying 之间切换。",
+    "每圈都会在右侧 Context 面板填进一块上下文（Build log、Workflow file、Deploy log）并在底部累加 token 数；Take action 下方会掉出一张工具调用卡，显示调用与返回结果；左下角给出 Check passed 或 Retry 的判定。",
+    "开启减弱动效时停在第二轮校验的代表帧（相位 0.62）：模型卡显示 loop 2 of 3，两块上下文已收集、工具调用已返回。预览展示这一帧，声明的变体都是帧内同时可见的元素。"
+  ],
+  "whenToUse": [
+    "AI 产品页需要解释 agent 为什么会自主多步执行、失败会重试。",
+    "文档页介绍上下文累积、工具调用与校验这三个阶段时，需要一张有阶段感的示意图。",
+    "需要向用户解释「一次请求背后发生了什么」而不用暴露真实日志。"
+  ],
+  "whenNotToUse": [
+    "需要展示真实运行状态与步骤进度时，改用 agent-status。",
+    "需要展示单次工具调用的参数与结果时，改用 tool-call。",
+    "只需要一段对话记录时，改用 chat-thread。"
+  ],
+  "variants": [
+    { "key": "state-verifying", "label": "Verifying", "note": "默认帧：第二轮循环，状态为 Verifying" },
+    { "key": "variant-ring", "label": "Ring", "note": "环形轨道、方向箭头与随头部渐隐的拖尾" },
+    { "key": "variant-stations", "label": "Stations", "note": "Gather context / Take action / Verify 三个站点与各自的副标签" },
+    { "key": "variant-model", "label": "Model", "note": "中心模型卡（Opus 5.5）与 loop 2 of 3 计数" },
+    { "key": "variant-context", "label": "Context", "note": "右侧 Context 面板：两块已收集、一块等待下一次，底部 token 累计" },
+    { "key": "variant-tool-call", "label": "Tool call", "note": "Take action 下方掉出的工具调用卡与返回结果" },
+    { "key": "variant-verdict", "label": "Verdict", "note": "左下 Check passed / Retry 判定与底部叙事文案" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "agent-status", "note": "需要真实运行状态与步骤进度时改用 agent status" },
+    { "type": "complement", "target": "tool-call", "note": "插画里的工具调用卡在真实产品中由 tool call 承担" },
+    { "type": "complement", "target": "reasoning-tree", "note": "同属 AI explainers：一个讲循环执行，一个讲分支搜索" }
+  ],
+  "contrasts": [
+    {
+      "target": "agent-status",
+      "title": "Agent loop 与 Agent status",
+      "rows": [
+        { "dimension": "角色", "self": "解释机制的教学插画", "other": "绑定真实运行状态的状态胶囊" },
+        { "dimension": "数据", "self": "固定三轮示例剧本", "other": "真实步骤、计数与耗时" },
+        { "dimension": "交互", "self": "Space 暂停/继续，阶段由动画推进", "other": "展开面板、Pause/Stop、批准或重试" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcAgentLoop Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "暂停循环",
+      "language": "csharp",
+      "code": "var loop = new ArcAgentLoop { Height = 400 };\n\n// 阅读型页面通常让它自己播；需要定格讲解时先暂停。\nloop.SetPaused(true);\n\n// 恢复播放：\nloop.TogglePlay();"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcAgentLoop",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停后画面停在当前帧",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

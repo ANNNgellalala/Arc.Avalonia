@@ -17,6 +17,11 @@ public sealed class LayoutMorphPage : ArcItemPage
 {
     public override string ItemSlug => "layout-morph";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-grid", "layout-masonry", "layout-list", "layout-fan", "layout-carousel", "layout-helix"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -99,10 +104,31 @@ public sealed class LayoutMorphPage : ArcItemPage
             }
         };
 
+        // The other five arrangements pinned in small stages, so every declared layout is visible statically.
+        var previews = new WrapPanel { Orientation = Orientation.Horizontal };
+        foreach (var option in Layouts)
+        {
+            if (option.Key == "grid")
+            {
+                continue;
+            }
+
+            previews.Children.Add(new StackPanel
+            {
+                Spacing = 4,
+                Margin = new Thickness(0, 0, 10, 10),
+                Children =
+                {
+                    new ArcLayoutMorph { Layout = option.Key, Width = 182, Height = 132 },
+                    DataKit.Caption(option.Label)
+                }
+            });
+        }
+
         return DataKit.Specimen(new StackPanel
         {
             Spacing = 10,
-            Children = { header, card, notes, status }
+            Children = { header, card, previews, notes, status }
         }, 16);
     }
 }

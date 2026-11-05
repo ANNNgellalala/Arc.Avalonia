@@ -12,6 +12,12 @@ public sealed class NowPlayingPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-expanded", "variant-waveform", "variant-progress",
+        "variant-controls", "variant-artwork"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Media that keeps playing while people browse, such as music, podcasts or audio lessons.",

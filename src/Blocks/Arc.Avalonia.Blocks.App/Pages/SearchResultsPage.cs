@@ -22,6 +22,11 @@ public sealed class SearchResultsPage : ArcItemPage
 {
     public override string ItemSlug => "search-results";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-highlight", "variant-query-bar", "variant-facets", "variant-filter-chips", "variant-preview-pane"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

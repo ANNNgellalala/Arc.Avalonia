@@ -1,0 +1,51 @@
+{
+  "slug": "sign-in",
+  "nameZh": "登录卡片",
+  "summary": "登录卡片：从邮箱到六位验证码再到已登录账号的紧凑卡片，带单点登录与 passkey 入口；验证码与 passkey 都是模拟。",
+  "purpose": [
+    "当登录卡需要嵌在已有页面里、而不是整页占满时用它：一张 380px 宽的卡片完成邮箱、验证码与已登录三步。",
+    "第一步提供单点登录、工作邮箱与 passkey；验证码由六位数字槽承载，验证成功后卡片换成账号摘要与「进入工作区」。",
+    "它尺寸稳定、步骤高度只做必要变化，因此适合放在登录页中央、侧栏或应用入口弹层里；所有验证都在本地模拟。"
+  ],
+  "whenToUse": [
+    "应用入口需要一张紧凑登录卡、周围还有品牌或说明内容时。",
+    "登录同时提供邮箱验证码、单点登录与 passkey 入口时。",
+    "需要在登录后展示账号摘要与进入工作区的下一步时。"
+  ],
+  "whenNotToUse": [
+    "整页登录、需要大背景与品牌氛围时用 login-centered、login-split 或 login-immersive。",
+    "创建账号用 signup-form。",
+    "只需要一个密码输入时，用 password-field 与 button 单独组合即可。"
+  ],
+  "variants": [
+    { "key": "state-email-step", "label": "Email step", "note": "第一步：提供方、邮箱与 passkey 入口" },
+    { "key": "variant-providers", "label": "Providers", "note": "单点登录按钮组与分隔线" },
+    { "key": "variant-passkey", "label": "Passkey", "note": "Sign in with a passkey 幽灵按钮" },
+    { "key": "variant-compact-card", "label": "Compact card", "note": "380px 宽的卡片与固定宽度布局" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "工作邮箱输入框" },
+    { "type": "uses", "target": "button", "note": "提供方、发送验证码、验证与 passkey 都是按钮" },
+    { "type": "uses", "target": "avatar", "note": "已登录步骤的账号摘要显示头像" },
+    { "type": "alternative", "target": "login-centered", "note": "紧凑登录卡与整页居中登录是同一种流程的两种规模" }
+  ],
+  "contrasts": [
+    {
+      "target": "login-centered",
+      "title": "Sign in 与 Login centered",
+      "rows": [
+        { "dimension": "范围", "self": "单张 380px 卡片，可嵌入任意页面", "other": "整页居中，含背景与页面级布局" },
+        { "dimension": "登录方式", "self": "邮箱验证码、单点登录与 passkey 并列", "other": "passkey 优先，验证码兜底" },
+        { "dimension": "步骤高度", "self": "卡片宽度固定，高度只做必要变化", "other": "卡片高度跟随步骤滑动" },
+        { "dimension": "适用", "self": "应用入口或内嵌登录", "other": "独立登录页" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "紧凑登录卡",
+      "language": "csharp",
+      "code": "var card = new Border\n{\n    Width = 380,\n    Padding = new Thickness(20),\n    CornerRadius = new CornerRadius(20),\n    Background = AppKit.Brush(ArcTokens.Surface),\n    BorderBrush = AppKit.Brush(ArcTokens.Border),\n    BorderThickness = new Thickness(1),\n    BoxShadow = AppKit.Shadow(ArcTokens.ShadowRaised),\n    Child = host\n};\n\nhost.Content = new StackPanel\n{\n    Spacing = 12,\n    Children =\n    {\n        new TextBlock { Text = \"Sign in to Northwind\", Classes = { \"arc-subtitle\" } },\n        AppKit.Providers(provider => Go(2)),\n        AppKit.Field(\"Work email\", AppKit.Input(\"maya@northwind.co\", email, value => email = value)),\n        AppKit.Btn(\"Email me a code\", ArcButtonVariant.Primary, ArcButtonSize.Md, SendCode, height: 40, stretch: true),\n        AppKit.Btn(\"Sign in with a passkey\", ArcButtonVariant.Ghost, ArcButtonSize.Md, Passkey, height: 36, stretch: true)\n    }\n};\n\nreturn AppKit.Screen(new Panel { Children = { AppKit.Wash(ArcGlassScene.Studio), card } }, 508);"
+    }
+  ]
+}

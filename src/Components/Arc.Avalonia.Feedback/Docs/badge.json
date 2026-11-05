@@ -1,0 +1,65 @@
+{
+  "slug": "badge",
+  "nameZh": "徽标",
+  "summary": "紧凑的状态标签：五种色调、可选前置圆点，用来标记状态、数量或角色，不承担点击。",
+  "purpose": [
+    "把「当前是什么状态」压缩成一个小胶囊：五种色调覆盖中性、强调、成功、警告与危险，文字可以是一句话、一个数字或一个角色名。",
+    "Dot 打开时在文字前加一个 6 px 圆点，让状态在纯文字之外多一个颜色线索；胶囊圆角固定，尺寸由内边距与字号决定。",
+    "它只读、不参与点击，所以可以安全地放在卡片标题、表格行、头像旁，不会抢走主行动的焦点。"
+  ],
+  "whenToUse": [
+    "标记状态（进行中、已发布、失败）或数量（3 条评论、+2）。",
+    "在卡片、表格行、标题旁补充一个轻量的分类或角色。",
+    "需要颜色区分但不能打断阅读节奏的位置。"
+  ],
+  "whenNotToUse": [
+    "需要一段完整说明与行动按钮时，改用 alert 或 description 文本。",
+    "需要点击触发筛选时，改用 chip-group 或按钮，徽标本身不可交互。",
+    "只是数字统计、且要强调变化趋势时，改用 metric-card。"
+  ],
+  "variants": [
+    { "key": "tone-neutral", "label": "Neutral", "note": "默认中性色，用于未分类或次要信息" },
+    { "key": "tone-accent", "label": "Accent", "note": "强调色，用于新、推荐、当前" },
+    { "key": "tone-success", "label": "Success", "note": "成功色，用于已发布、已通过" },
+    { "key": "tone-warning", "label": "Warning", "note": "警告色，用于待处理、快到期" },
+    { "key": "tone-danger", "label": "Danger", "note": "危险色，用于失败、被拒绝" },
+    { "key": "variant-dot", "label": "Dot", "note": "文字前的颜色圆点" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "avatar", "note": "头像旁标记在线状态或角色" },
+    { "type": "complement", "target": "card", "note": "卡片标题旁的状态标签" },
+    { "type": "alternative", "target": "alert", "note": "需要整句说明与行动时改用 alert" }
+  ],
+  "contrasts": [
+    {
+      "target": "alert",
+      "title": "Badge 与 Alert",
+      "rows": [
+        { "dimension": "体积", "self": "一个胶囊，通常几个字", "other": "整块消息区域，可含标题与说明" },
+        { "dimension": "行动", "self": "不可点击，没有按钮", "other": "可带一个行动按钮与关闭" },
+        { "dimension": "使用位置", "self": "标题旁、表格行、头像角标", "other": "页面流中的持久提示" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "状态与角色",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n    <c:ArcBadge Content=\"Pro\" Tone=\"Accent\" />\n    <c:ArcBadge Content=\"Published\" Tone=\"Success\" />\n    <c:ArcBadge Content=\"Draft\" Tone=\"Neutral\" />\n    <c:ArcBadge Content=\"Failed\" Tone=\"Danger\" Dot=\"True\" />\n  </StackPanel>\n</Window>"
+    },
+    {
+      "title": "数量徽标",
+      "language": "csharp",
+      "code": "var count = new ArcBadge\n{\n    Content = \"+2\",\n    Tone = ArcBadgeTone.Warning,\n    Dot = true\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Controls.ArcBadge",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Tone": "色调：Neutral（默认）/ Accent / Success / Warning / Danger",
+      "Dot": "在文字前显示 6 px 颜色圆点，默认 false",
+      "Content": "徽标文字，可以是一句话、数字或角色名"
+    }
+  }
+}

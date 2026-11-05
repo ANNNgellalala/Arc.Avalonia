@@ -1,0 +1,67 @@
+{
+  "slug": "skeleton",
+  "nameZh": "骨架屏",
+  "summary": "加载占位：用行、矩形或圆形提前占住内容的最终尺寸，数据到达后原地淡入真实内容。",
+  "purpose": [
+    "在数据到达前先画出内容将要占据的形状：默认是几条文本行，Avatar 加行可以拼出「头像 + 姓名」的人物行，Rect 与 Circle 覆盖媒体与图标位。",
+    "占位与内容是同一块空间的两个状态：Loading 为 true 时显示占位，切到 false 后占位消失、Content 淡入，周围布局不跳动。",
+    "它不提供百分比也不承诺时长——只负责让「等待」看起来像即将出现的内容，而不是一片空白或一个转圈。"
+  ],
+  "whenToUse": [
+    "列表、详情页、卡片在首次取数时保留布局，避免内容到达后的跳动。",
+    "你想让加载状态与最终版式一致（同样的行数、同样的头像位）。",
+    "首屏骨架比 spinner 更能表达「这里将出现什么」的页面。"
+  ],
+  "whenNotToUse": [
+    "已经知道完成比例时，改用 progress 展示真实进度。",
+    "加载会在 200 ms 内结束、骨架反而闪一下时，直接用内容或留空更安静。",
+    "结果为空、需要解释为什么没有内容时，改用 empty-state。"
+  ],
+  "variants": [
+    { "key": "variant-text", "label": "Text lines", "note": "默认的 1–6 条文本行" },
+    { "key": "variant-avatar", "label": "Avatar and lines", "note": "圆形头像位加文本行" },
+    { "key": "shape-rect", "label": "Rect", "note": "媒体块、缩略图或图表位" },
+    { "key": "shape-circle", "label": "Circle", "note": "图标或独立圆形占位" },
+    { "key": "state-loaded", "label": "Loaded", "note": "Loading 关闭后真实内容淡入" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "progress", "note": "有真实百分比时改用 progress" },
+    { "type": "complement", "target": "empty-state", "note": "加载结束后如果结果为空，用 empty-state 收尾" },
+    { "type": "complement", "target": "card", "note": "骨架通常放进卡片，保持与最终内容相同的容器" }
+  ],
+  "contrasts": [
+    {
+      "target": "progress",
+      "title": "Skeleton 与 Progress",
+      "rows": [
+        { "dimension": "信息量", "self": "只表示「将要出现什么」", "other": "给出完成比例与剩余量" },
+        { "dimension": "版式", "self": "与最终内容同形的占位", "other": "一条独立的进度条" },
+        { "dimension": "结束时", "self": "占位消失、内容淡入", "other": "停在 100% 或对勾上" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "人物行与媒体块",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:fb=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <StackPanel Spacing=\"16\" Width=\"320\">\n    <fb:ArcSkeleton Avatar=\"True\" Lines=\"3\" Label=\"Loading profile\" />\n    <fb:ArcSkeleton Shape=\"Rect\" Height=\"88\" />\n    <fb:ArcSkeleton Shape=\"Circle\" Height=\"56\" />\n  </StackPanel>\n</Window>"
+    },
+    {
+      "title": "数据到达后切换到内容",
+      "language": "csharp",
+      "code": "var skeleton = new ArcSkeleton\n{\n    Avatar = true,\n    Lines = 3,\n    Label = \"Loading profile\"\n};\n\nvar profile = await LoadProfileAsync();\nskeleton.Content = new TextBlock { Text = profile.Name };\nskeleton.Loading = false;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Feedback.Controls.ArcSkeleton",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "加载状态的无障碍名称，默认 Loading content",
+      "Lines": "文本行数，夹在 1–6 之间，默认 3",
+      "Avatar": "在文本行前加一个圆形头像占位",
+      "Shape": "占位形状：Text 行 / Rect 矩形 / Circle 圆形",
+      "Loading": "true 时显示占位，false 时占位消失并显示 Content",
+      "Content": "加载完成后要显示的内容"
+    }
+  }
+}

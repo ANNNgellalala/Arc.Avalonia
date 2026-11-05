@@ -31,6 +31,11 @@ public sealed class ReleaseReadinessPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-checklist", "state-blocking", "state-readiness-meter", "state-notify-toggle"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A pre-launch or handoff gate where several checks must be done before one action unlocks.",

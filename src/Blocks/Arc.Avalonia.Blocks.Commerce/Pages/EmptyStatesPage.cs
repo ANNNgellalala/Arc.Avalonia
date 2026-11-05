@@ -21,6 +21,11 @@ public sealed class EmptyStatesPage : ArcItemPage
 {
     public override string ItemSlug => "empty-states";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-no-results", "variant-offline", "variant-inbox-zero", "variant-missing-page"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -155,6 +160,22 @@ public sealed class EmptyStatesPage : ArcItemPage
 
         Render(0, false);
 
+        // Static strip for the documentation preview: the tab strip shows one scene at a time, so the four
+        // scenes are repeated small here to keep every declared variant visible without interaction.
+        var allScenes = new WrapPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
+        for (var slot = 0; slot < Scenes.Length; slot++)
+        {
+            var tile = new StackPanel { Spacing = 4, Margin = new Thickness(6, 0, 6, 0) };
+            tile.Children.Add(new Border
+            {
+                Width = 150,
+                Height = 88,
+                Child = new ArcEmptyScene { Scene = slot, HeightHint = 88 }
+            });
+            tile.Children.Add(Ck.Caption(Scenes[slot].Label));
+            allScenes.Children.Add(tile);
+        }
+
         return Ck.Specimen(new StackPanel
         {
             Spacing = 12,
@@ -167,6 +188,8 @@ public sealed class EmptyStatesPage : ArcItemPage
                     Children = { tabs }
                 },
                 stage,
+                Ck.Caption("四种场景（静态展示，便于一次看全）"),
+                allScenes,
                 new StackPanel
                 {
                     Orientation = Orientation.Horizontal,

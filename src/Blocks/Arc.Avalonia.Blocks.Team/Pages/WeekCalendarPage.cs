@@ -48,6 +48,11 @@ public sealed class WeekCalendarPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-week-grid", "variant-all-day-row", "variant-event-detail"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Scheduling and planning screens where people read and rearrange time blocks across a week.",

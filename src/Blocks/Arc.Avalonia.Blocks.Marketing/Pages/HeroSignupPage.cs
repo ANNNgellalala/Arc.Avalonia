@@ -21,6 +21,11 @@ public sealed class HeroSignupPage : ArcItemPage
 {
     public override string ItemSlug => "hero-signup";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-form", "state-confirmation"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -131,7 +136,26 @@ public sealed class HeroSignupPage : ArcItemPage
         var stage = new Grid { Height = 330 };
         stage.Children.Add(content);
 
-        return Mk.Wash(stage, radius: 26, drift: true, intensity: 0.85);
+        // The joined state is otherwise only reachable by submitting; a static copy keeps it visible.
+        var confirmationSpecimen = Mk.Stack(8,
+            Mk.Caption("After joining: the form becomes a confirmation"),
+            Mk.Surface(new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Children =
+                {
+                    Mk.Row(8,
+                        Mk.Disc("circle-check", 34, 16, accent: true),
+                        Mk.Text("You're in. You're #1,284 in line.", "arc-body-lg arc-medium")),
+                    Mk.Caption("We'll email you the moment an invite opens.")
+                }
+            }));
+
+        return Mk.Stack(18,
+            Mk.Wash(stage, radius: 26, drift: true, intensity: 0.85),
+            confirmationSpecimen);
     }
 }
 

@@ -1,0 +1,79 @@
+{
+  "slug": "split-bar",
+  "nameZh": "百分比分割条",
+  "summary": "一条百分之百的构成条：按份额切成若干段，上方读数静止时显示合计、悬停时显示那一段，图例给出精确百分比。",
+  "purpose": [
+    "当整体就是百分之百、各部分只是它的切分时，一条水平分割条是最紧凑的表达：不需要值轴，也不占用正方形区域。",
+    "悬停某段或图例行时，上方读数从合计切换到该段的名称与数值，其余段变淡，读者能确认自己指的是哪一块。",
+    "TotalLabel 与 Unit 负责读数的语义（总额、座位数、预算），ValueFormat 控制数值格式；段数少时标签可以直接排在段内。",
+    "它与 donut-chart 表达同一类数据，但分割条更适合扁平、窄长的容器，例如表格行、侧栏与列表项。"
+  ],
+  "whenToUse": [
+    "展示 2 到 6 个部分占整体的百分之百，且容器窄长时。",
+    "需要把合计与某一段的数值都清楚地说出来时。",
+    "想用一行高度替代一整张环形图时。",
+    "各部分之间没有时间维度，只是同一个整体的拆分时。"
+  ],
+  "whenNotToUse": [
+    "有五个以上部分、又希望每段都有足够空间时改用 donut-chart 或 treemap。",
+    "需要按格子数百分比、让小份额更醒目时改用 waffle-chart。",
+    "各部分不构成整体、只是独立数值时改用 bar-chart。",
+    "要展示单个值在区间中的位置时改用 gauge。"
+  ],
+  "variants": [
+    { "key": "variant-budget", "label": "预算构成", "note": "五个科目，图例给出百分比" },
+    { "key": "variant-two-way", "label": "两段构成", "note": "只分「回访」与「新访」两段" },
+    { "key": "state-no-legend", "label": "无图例", "note": "ShowLegend=false，只留分割条与读数" },
+    { "key": "state-empty", "label": "空数据", "note": "Segments 为空时画出 No data" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "donut-chart", "note": "容器是正方形、想强调合计时用 donut chart" },
+    { "type": "alternative", "target": "waffle-chart", "note": "想用一百格表达百分比时用 waffle chart" },
+    { "type": "alternative", "target": "treemap", "note": "类别更多、需要方形面积时用 treemap" },
+    { "type": "alternative", "target": "gauge", "note": "单值对区间而不是构成时用 gauge" }
+  ],
+  "contrasts": [
+    {
+      "target": "donut-chart",
+      "title": "Split bar 与 Donut chart",
+      "rows": [
+        { "dimension": "形状", "self": "一条水平构成条", "other": "圆环扇区" },
+        { "dimension": "空间", "self": "扁长，适合窄栏与表格行", "other": "接近正方形，占卡片中央" },
+        { "dimension": "中心信息", "self": "读数在条的上方", "other": "合计在圆环中心" },
+        { "dimension": "段数容忍", "self": "2 到 6 段最清楚", "other": "3 到 6 段最清楚" }
+      ]
+    },
+    {
+      "target": "waffle-chart",
+      "title": "Split bar 与 Waffle chart",
+      "rows": [
+        { "dimension": "比例编码", "self": "段长连续变化", "other": "每格固定 1%，可逐格数" },
+        { "dimension": "小份额", "self": "很小的一段会缩到几乎看不见", "other": "小份额仍占若干格" },
+        { "dimension": "读数", "self": "图例直接给出百分比", "other": "读格数再加图例百分比" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "预算构成",
+      "language": "csharp",
+      "code": "var bar = new ArcSplitBar\n{\n    Segments = new[]\n    {\n        new ChartValue(\"Payroll\", 412),\n        new ChartValue(\"Cloud\", 96.5),\n        new ChartValue(\"Marketing\", 74.2),\n        new ChartValue(\"Software\", 18.9),\n        new ChartValue(\"Other\", 9.3)\n    },\n    TotalLabel = \"Q4 budget\",\n    Unit = \"$\",\n    ValueFormat = value => value.ToString(\"N0\") + \"k\"\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcSplitBar x:Name=\"Budget\"\n                      Height=\"196\"\n                      TotalLabel=\"Q4 budget\"\n                      ShowLegend=\"True\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcSplitBar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Segments": "按顺序切分整体的一些部分",
+      "ShowLegend": "在条下方显示各段名称与百分比，默认 true",
+      "TotalLabel": "读数上方对整体的称呼，默认 Total",
+      "Unit": "读数的单位，例如 $ 或 seats",
+      "ValueFormat": "自定义读数与图例的数值格式"
+    }
+  }
+}

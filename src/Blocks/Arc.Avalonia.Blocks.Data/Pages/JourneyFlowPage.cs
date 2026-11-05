@@ -19,6 +19,11 @@ public sealed class JourneyFlowPage : ArcItemPage
 {
     public override string ItemSlug => "journey-flow";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-journey", "variant-sankey", "variant-channel-switch", "variant-stages", "variant-metric-tiles"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

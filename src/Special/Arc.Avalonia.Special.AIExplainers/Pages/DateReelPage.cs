@@ -11,6 +11,12 @@ public sealed class DateReelPage : ArcItemPage
 {
     public override string ItemSlug => "date-reel";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-default",
+        "variant-reels", "variant-lens", "variant-summary", "variant-presets", "variant-confirm"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Scheduling a send, reminder or post where a phone style wheel is familiar.",
@@ -43,9 +49,15 @@ public sealed class DateReelPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
-    protected override Control BuildDemo(ArcDemoContext context) => new ArcDateReel
+    // The summary panel is drawn from 600 px outwards and needs the wider canvas, so scale the reel into the
+    // 860 px docs column rather than truncating the quick picks.
+    protected override Control BuildDemo(ArcDemoContext context) => new Viewbox
     {
-        Height = 400,
-        HorizontalAlignment = HorizontalAlignment.Stretch
+        Child = new ArcDateReel
+        {
+            Width = 1000,
+            Height = 400,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        }
     };
 }

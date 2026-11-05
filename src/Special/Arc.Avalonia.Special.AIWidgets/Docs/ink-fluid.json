@@ -1,0 +1,77 @@
+{
+  "slug": "ink-fluid",
+  "nameZh": "墨迹流体",
+  "summary": "会随指针流动的装饰性墨迹背景：150 个粒子在 curl 场里被搅动，新鲜墨迹先吃强调色再褪成中性，静止时缓慢漂移，文字与按钮浮在它上面。",
+  "purpose": [
+    "给 hero、登录页或空状态加一层「活的」背景，但不需要视频：一块表面、一层柔和的品牌渐变，加上 150 个被 curl 噪声场推动的软粒子，就构成了墨迹。",
+    "指针移动会把墨迹搅开：冲量按 Force 缩放、按距离衰减，所以快速划过是扫出的笔触，慢慢移动只是涟漪；无人操作时 Ambient 决定环境漂移的强度。",
+    "墨迹的颜色随时间与新鲜度变化：新鲜粒子按 Tint 的比例取强调色，越旧越退回前景中性色，于是新笔触带颜色、旧笔触变灰，形成层次而不会糊成一片。",
+    "内容始终在墨迹之上：标题、副标题、两个 ArcButton 与一行提示按 MaxWidth 520 排布，墨迹本身不接收点击，也不会挡住按钮；系统开启减少动效时只画一帧预热好的静态构图。"
+  ],
+  "whenToUse": [
+    "落地页 hero 或登录页需要一点生气，但不想用视频或重图形时。",
+    "空状态、等待页希望在等待期间用温和的交互背景回报好奇心。",
+    "演示或 changelog 里需要一张一眼能看出「这是会动的东西」的静帧时。"
+  ],
+  "whenNotToUse": [
+    "需要可读的数据可视化背景时，改用 dot-grid，它的点阵更安静、不会与文字争注意力。",
+    "需要指针驱动的强交互场（粒子吸附、拖拽力场）时，改用 gravity-well。",
+    "背景之上还有大量表单或密集文本时，改用纯色或玻璃卡片，墨迹会降低可读性。"
+  ],
+  "variants": [
+    { "key": "variant-hero", "label": "Hero", "note": "标题、副标题与两个行动按钮的完整 hero" },
+    { "key": "variant-quiet", "label": "Quiet", "note": "只有标题，没有副标题与 CTA" },
+    { "key": "variant-neutral-ink", "label": "Neutral ink", "note": "Tint 为 0：墨迹全取中性色，不吃强调色" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dot-grid", "note": "需要更安静、不抢注意力的装饰背景时改用 dot grid" },
+    { "type": "alternative", "target": "gravity-well", "note": "需要更强的指针力场交互时改用 gravity well" },
+    { "type": "complement", "target": "hero-section", "note": "墨迹常用作营销 hero 区块的底层背景" }
+  ],
+  "contrasts": [
+    {
+      "target": "dot-grid",
+      "title": "Ink fluid 与 Dot grid",
+      "rows": [
+        { "dimension": "视觉分量", "self": "柔和的成片墨迹，占据大面积", "other": "细小点阵，几乎是一层纹理" },
+        { "dimension": "指针反馈", "self": "搅出笔触，墨迹被推开并慢慢淡出", "other": "点被指针轻微吸引或避让" },
+        { "dimension": "适合承载", "self": "少量大字号文案与一两个 CTA", "other": "可以压在更多内容下面" }
+      ]
+    },
+    {
+      "target": "gravity-well",
+      "title": "Ink fluid 与 Gravity well",
+      "rows": [
+        { "dimension": "交互强度", "self": "柔和搅动，背景始终是背景", "other": "明确的引力场，指针是主要交互" },
+        { "dimension": "视觉结果", "self": "随机的墨迹笔触与颜色层次", "other": "粒子沿轨道聚散，有中心与轨迹" },
+        { "dimension": "典型用途", "self": "hero 与登录页的氛围层", "other": "演示型交互与品牌动效" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：hero 背景",
+      "language": "xaml",
+      "code": "<arc:ArcInkFluid xmlns:arc=\"using:Arc.Avalonia.Special.AIWidgets.Controls\"\n               Height=\"342\"\n               Title=\"Ship interfaces that feel alive\"\n               Subtitle=\"A live ink wash behind the hero, stirred by the pointer.\"\n               PrimaryLabel=\"Start building\"\n               SecondaryLabel=\"See the components\" />"
+    },
+    {
+      "title": "调墨色与搅动强度",
+      "language": "csharp",
+      "code": "var ink = new ArcInkFluid\n{\n    Height = 340,\n    Title = \"A quieter take\",\n    Subtitle = null,\n    PrimaryLabel = null,\n    SecondaryLabel = null,\n    Intensity = 0.75,   // 墨色更重（0–1）\n    Tint = 0.2,         // 只有少量新鲜墨迹吃强调色\n    Force = 0.8,        // 指针搅动更明显\n    Ambient = false     // 无人时不漂移\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIWidgets.Controls.ArcInkFluid",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "表面上的主标题，同时作为无障碍名称",
+      "Subtitle": "标题下方的副标题，留空则不渲染",
+      "PrimaryLabel": "主按钮文案，留空则不出现按钮",
+      "SecondaryLabel": "次按钮文案，留空则不出现按钮",
+      "Intensity": "墨色深浅，0–1，默认 0.55；同时影响墨迹透明度",
+      "Tint": "新鲜墨迹取强调色的比例，0–1，默认 0.85；0 即全中性墨",
+      "Force": "指针搅动的力度，0–1，默认 0.55",
+      "Ambient": "无人操作时是否保留缓慢环境漂移，默认 true"
+    }
+  }
+}

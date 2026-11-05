@@ -1,0 +1,49 @@
+{
+  "slug": "comparison-table",
+  "nameZh": "对比表",
+  "summary": "「我们与他们」的对比矩阵：Arc 列被高亮，可切换为只显示有差异的行，表头带一个行动入口。",
+  "purpose": [
+    "把「为什么换到我们」从一段话变成一张可扫读的表：左边是功能维度，右边三列分别是我们与两个替代方案，Arc 列用一整块高亮表面区分。",
+    "「Only differences」开关会过滤掉三家都一样的行，只留下真正的差异；行数变化后高亮表面与分隔线一起重排，不会留下空行。",
+    "组成依赖：过滤开关用 switch，表头的行动按钮用 button，Arc 列头的「Best value」用 badge；其余是 token 化的表格布局。"
+  ],
+  "whenToUse": [
+    "替换竞品的落地页，差异本身就是卖点时。",
+    "需要把长功能列表压缩成一次扫读的表格时。",
+    "发布页要正面回答「为什么换」的问题时。"
+  ],
+  "whenNotToUse": [
+    "比较的是不同套餐、需要逐项配置时，改用 plan-comparison。",
+    "差异可以用两三句话说清时，用一段正文加 cta-section，不必上表格。",
+    "需要按用量估算价格时，改用 pricing-calculator。"
+  ],
+  "variants": [
+    { "key": "variant-full", "label": "Full matrix", "note": "完整行集，包含三家一致的行" },
+    { "key": "variant-highlight", "label": "Arc column", "note": "Arc 列被一整块表面高亮" },
+    { "key": "state-differences-only", "label": "Differences only", "note": "过滤掉所有方案一致的行" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "switch", "note": "Only differences 过滤开关是 ArcSwitch" },
+    { "type": "uses", "target": "button", "note": "表头的 Start free 行动是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "Arc 列头的 Best value 用 ArcBadge 标出" },
+    { "type": "alternative", "target": "plan-comparison", "note": "比较套餐与价格时改用 plan comparison" }
+  ],
+  "contrasts": [
+    {
+      "target": "plan-comparison",
+      "title": "Comparison table 与 Plan comparison",
+      "rows": [
+        { "dimension": "对比对象", "self": "我们与两个替代方案", "other": "自家两三个套餐之间" },
+        { "dimension": "行动", "self": "表头一个 Start free", "other": "每个套餐一个选择行动" },
+        { "dimension": "筛选", "self": "只看有差异的行", "other": "月付与年付切换、只看差异" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "表头与开关",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <StackPanel Spacing=\"14\" Margin=\"24,22,24,18\">\n    <Grid ColumnDefinitions=\"*,Auto,Auto\">\n      <StackPanel Spacing=\"4\">\n        <TextBlock Text=\"Why teams switch\" Classes=\"arc-heading\" />\n        <TextBlock Text=\"Sample comparison. Alternatives are illustrative.\" Classes=\"arc-caption\" />\n      </StackPanel>\n      <c:ArcSwitch Grid.Column=\"1\" Label=\"Only differences\" />\n      <c:ArcButton Grid.Column=\"2\" Content=\"Start free\" Size=\"Sm\" Margin=\"12,0,0,0\" />\n    </Grid>\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\" HorizontalAlignment=\"Center\">\n      <TextBlock Text=\"Arc\" Classes=\"arc-body-sm arc-medium\" />\n      <c:ArcBadge Content=\"Best value\" Tone=\"Accent\" />\n    </StackPanel>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

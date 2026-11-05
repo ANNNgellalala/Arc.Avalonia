@@ -42,6 +42,11 @@ public sealed class AvailabilityPickerPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-day-strip", "variant-slot-grid", "variant-booking-summary", "variant-time-zones"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "Picking a meeting time that works for several attendees.",

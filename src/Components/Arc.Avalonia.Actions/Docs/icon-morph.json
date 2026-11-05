@@ -1,0 +1,80 @@
+{
+  "slug": "icon-morph",
+  "nameZh": "图标变形",
+  "summary": "在两种状态之间变形的图标：菜单折成关闭、播放分叉成暂停、复制变成勾选，切换时两层图标交叉淡出并带弹簧转动。",
+  "purpose": [
+    "图标本身没有文字，却要表达状态翻转时（menu ↔ close、play ↔ pause、copy ↔ check、sun ↔ moon、chevron 转向），用 icon morph 让变化过程有因果感，而不是硬切两张图。",
+    "因为 Avalonia 的图标是路径数据而不是可插值的 SVG，真正的路径插值被近似为「旧层淡出、转动、缩小，新层从反方向到位」的弹簧过渡；这保留了 Arc 的方向感，又不要求把每条路径重写成关键帧。",
+    "它是装饰性控件：不参与命中测试、不获取焦点，外层按钮必须承担可访问名称并把当前状态讲给读屏。"
+  ],
+  "whenToUse": [
+    "菜单、折叠面板、播放器、主题切换等只有两种状态的控件。",
+    "希望图标切换有方向感、而不是瞬间替换时。",
+    "图标不承载文字、可以由外层控件命名时。"
+  ],
+  "whenNotToUse": [
+    "图标本身需要被点击：改用 button，把图标作为 Content 并自己维护 State。",
+    "需要表示三种以上状态：改用 action-swap，或在同一个按钮上换图标族。",
+    "需要文字与图标一起变形：改用 text-morph。"
+  ],
+  "variants": [
+    { "key": "state-first", "label": "First", "note": "第一种形态，例如 menu、play、plus、sun" },
+    { "key": "state-second", "label": "Second", "note": "第二种形态，例如 close、pause、check、moon" },
+    { "key": "pair-menu", "label": "Menu", "note": "菜单折成关闭" },
+    { "key": "pair-play", "label": "Play", "note": "播放分叉成暂停" },
+    { "key": "pair-plus", "label": "Plus", "note": "加号转成勾选" },
+    { "key": "pair-copy", "label": "Copy", "note": "复制变成勾选" },
+    { "key": "pair-theme", "label": "Theme", "note": "太阳换月亮" },
+    { "key": "pair-chevron", "label": "Chevron", "note": "同一枚 chevron 的转向" },
+    { "key": "chevron-pointing-right", "label": "Right", "note": "chevron 静止时朝右，展开时转 90°" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "text-morph", "note": "需要文字与图标一起变形时用它" },
+    { "type": "alternative", "target": "morph-loader", "note": "需要加载中的形状变形时用它" },
+    { "type": "complement", "target": "button", "note": "外层 Button 提供命中区域与可访问名称" }
+  ],
+  "contrasts": [
+    {
+      "target": "text-morph",
+      "title": "Icon morph 与 Text morph",
+      "rows": [
+        { "dimension": "变形对象", "self": "两条图标路径之间的形态切换", "other": "文字字符与排版之间的变形" },
+        { "dimension": "状态来源", "self": "一个 bool State 表示两种形态", "other": "由文本内容或启用状态驱动" },
+        { "dimension": "可访问性", "self": "装饰性，名称由外层按钮承担", "other": "文字本身参与读屏内容" }
+      ]
+    },
+    {
+      "target": "morph-loader",
+      "title": "Icon morph 与 Morph loader",
+      "rows": [
+        { "dimension": "变形意图", "self": "表达状态翻转，如关闭、暂停", "other": "表达加载中的连续形变" },
+        { "dimension": "驱动方式", "self": "由你的 bool 状态驱动，一次一换", "other": "自行循环，与进度无关" },
+        { "dimension": "停留时间", "self": "两种形态都会长期停住", "other": "持续变形直到加载结束" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "菜单按钮里的图标",
+      "language": "csharp",
+      "code": "var menuIcon = new ArcIconMorph\n{\n    Icon = ArcIconMorphName.Menu,\n    Size = 18,\n    StrokeWidth = 1.75\n};\n\nvar button = new ArcButton\n{\n    Variant = ArcButtonVariant.Ghost,\n    Compact = true,\n    Content = menuIcon\n};\nbutton.Click += (_, _) => menuIcon.State = !menuIcon.State;"
+    },
+    {
+      "title": "朝右的 chevron",
+      "language": "xaml",
+      "code": "<arc:ArcIconMorph Icon=\"Chevron\" Pointing=\"Right\" Turn=\"90\" Size=\"16\" />"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcIconMorph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Icon": "选择图标对：Menu / Play / Plus / Copy / Theme / Chevron",
+      "State": "false 显示第一种形态，true 显示第二种",
+      "Size": "渲染尺寸，默认 24",
+      "StrokeWidth": "描边宽度，默认 1.75",
+      "Turn": "Chevron 在 State 为 true 时旋转的角度，默认 180",
+      "Pointing": "Chevron 静止时的朝向：Down / Right"
+    }
+  }
+}

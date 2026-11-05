@@ -1,0 +1,75 @@
+{
+  "slug": "expandable-card",
+  "nameZh": "可展开卡片",
+  "summary": "默认收成一张紧凑卡片，展开时高度与可选的宽度一起平滑生长，把细节就地铺开；收起时细节先淡出，盒子再收回。",
+  "purpose": [
+    "概览卡片（订阅、设置、摘要）默认只显示标题与一行描述，展开后补充明细。收起时卡片保持紧凑，展开时盒子为主体让出更多空间，所以一屏里可以并排好几张。",
+    "增长时高度与可选的宽度由同一条平滑弹簧驱动：CollapsedWidth 是收起时的宽度上限，ExpandedWidth 是展开后的上限；两者都留空（NaN）时卡片填满容器，只在高度上展开。文本因此不会在展开时被拉宽。",
+    "整块头部都是开关，Enter 与 Space 同样有效；焦点在卡内时按 Escape 收起。IsExpanded 可受控，ExpandedChanged 报告变化；细节的淡入发生在盒子让出空间之后，收起时则先淡出再收缩。"
+  ],
+  "whenToUse": [
+    "概览卡片默认只显示标题与一行描述，展开后补充明细。",
+    "需要在原地展开更多信息，而不是跳到新页面或弹窗。",
+    "条目各自独立、可以同时展开多个，不需要手风琴的单开约束。"
+  ],
+  "whenNotToUse": [
+    "一组同构的问答需要一次只开一行时，改用 accordion。",
+    "只是长文本需要按行数折叠时，改用 expandable-text。",
+    "展开内容是完整页面或复杂表单、需要横向空间时，改用 drawer 或 dialog。"
+  ],
+  "variants": [
+    { "key": "state-collapsed", "label": "Collapsed", "note": "只显示标题行与描述，细节不占高" },
+    { "key": "state-expanded", "label": "Expanded", "note": "细节铺开，标题箭头旋转，盒子变高" },
+    { "key": "variant-fixed-width", "label": "Fixed width", "note": "CollapsedWidth / ExpandedWidth 固定宽度上限" },
+    { "key": "variant-fluid-width", "label": "Fluid width", "note": "宽度留空，卡片填满父容器，仅在高度上展开" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "accordion", "note": "同构问答需要一次只开一行时用 accordion" },
+    { "type": "alternative", "target": "expandable-text", "note": "只折叠纯文本时用 expandable text" },
+    { "type": "extends", "target": "card", "note": "展开卡片在 card 的表面、圆角与阴影之上增加开合与宽度变化" }
+  ],
+  "contrasts": [
+    {
+      "target": "accordion",
+      "title": "Expandable card 与 Accordion",
+      "rows": [
+        { "dimension": "展开策略", "self": "每张卡片独立开合，可以同时展开多个", "other": "一次只开一行，打开新行会收起上一行" },
+        { "dimension": "视觉形态", "self": "每张卡片有自己的边框、圆角与阴影", "other": "共用一个列表表面，行间只有发丝分隔线" },
+        { "dimension": "宽度变化", "self": "可以设置展开后的宽度上限", "other": "宽度始终撑满列表" }
+      ]
+    },
+    {
+      "target": "card",
+      "title": "Expandable card 与 Card",
+      "rows": [
+        { "dimension": "状态", "self": "有收起与展开两种尺寸，需要切换", "other": "固定尺寸，始终显示完整内容" },
+        { "dimension": "交互", "self": "整块头部是开关，支持键盘开合", "other": "可以是静态容器，也可以整体可点击" },
+        { "dimension": "内容密度", "self": "收起时只留标题与摘要，细节按需出现", "other": "内容一次呈现完整" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "固定宽度的订阅卡片",
+      "language": "csharp",
+      "code": "var card = new ArcExpandableCard\n{\n    Title = \"Pro plan\",\n    Description = \"Billed yearly, renews 4 March\",\n    CollapsedWidth = 440,\n    ExpandedWidth = 470,\n    Content = new StackPanel\n    {\n        Spacing = 8,\n        Children =\n        {\n            DetailRow(\"Seats\", \"12 of 20 used\"),\n            DetailRow(\"Renews\", \"4 March 2027\")\n        }\n    }\n};\n\ncard.ExpandedChanged += (_, expanded) => status.Text = expanded ? \"Details open\" : \"Details closed\";"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia\">\n  <effects:ArcExpandableCard Title=\"Pro plan\"\n                             Description=\"Billed yearly, renews 4 March\"\n                             CollapsedWidth=\"440\"\n                             ExpandedWidth=\"470\"\n                             IsExpanded=\"{Binding IsDetailsOpen, Mode=TwoWay}\">\n    <StackPanel Spacing=\"8\">\n      <arc:ArcIcon Icon=\"users\" Size=\"16\" />\n      <TextBlock Text=\"12 of 20 seats used\" />\n    </StackPanel>\n  </effects:ArcExpandableCard>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcExpandableCard",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Title": "卡片标题，同时作为头部按钮的无障碍名称",
+      "Description": "标题下的一行摘要；变化时新文案淡入",
+      "IsExpanded": "细节面板是否展开，可由页面或 ViewModel 控制",
+      "CollapsedWidth": "收起时的宽度上限（px），NaN 表示填满容器",
+      "ExpandedWidth": "展开时的宽度上限（px），NaN 表示保持收起宽度",
+      "ExpandedChanged": "展开状态变化时触发，参数为新的布尔值"
+    }
+  }
+}

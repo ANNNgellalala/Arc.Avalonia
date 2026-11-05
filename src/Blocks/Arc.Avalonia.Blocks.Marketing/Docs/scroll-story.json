@@ -1,0 +1,48 @@
+{
+  "slug": "scroll-story",
+  "nameZh": "滚动故事",
+  "summary": "功能叙事区块：左侧是四步说明与行动，右侧预览跟随所选步骤切换，代替参考实现里的滚动钉住。",
+  "purpose": [
+    "把一个功能讲成一个四步故事：连接、映射、自动化、度量。左侧列出四步与当前步骤的说明，右侧是会被替换的产品预览。",
+    "参考实现在页面滚动时钉住预览、逐步推进；这一版把步骤做成真实按钮，点击后在原位切换预览，保留同样的阅读顺序、键盘路径与减少动效行为。",
+    "组成依赖：步骤与主行动用 button，当前步骤与状态用 badge，预览里的数字趋势用 sparkline；预览是四段独立的小界面。"
+  ],
+  "whenToUse": [
+    "单个功能需要分四步讲清、且每步都值得一块产品预览时。",
+    "希望读者按顺序理解价值，而不是扫一眼就走时。",
+    "需要把功能叙事与一个明确行动绑定时。"
+  ],
+  "whenNotToUse": [
+    "功能之间彼此独立、顺序不重要时，改用 spotlight-grid 或 feature-bento。",
+    "已经在页面里放了真实产品截图与文档入口时，不需要再用故事重复一遍。",
+    "内容很短、两步就能讲完时，用两栏区块即可。"
+  ],
+  "variants": [
+    { "key": "variant-steps", "label": "Steps", "note": "左侧四步按钮，当前步骤高亮" },
+    { "key": "variant-preview", "label": "Preview", "note": "右侧产品预览随步骤切换" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "四个步骤与行动入口都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "步骤状态与预览标签用 ArcBadge" },
+    { "type": "uses", "target": "sparkline", "note": "预览里的数字趋势用 shared sparkline" },
+    { "type": "alternative", "target": "feature-bento", "note": "功能彼此独立、没有顺序时改用 feature bento" }
+  ],
+  "contrasts": [
+    {
+      "target": "feature-bento",
+      "title": "Scroll story 与 Feature bento",
+      "rows": [
+        { "dimension": "叙事方式", "self": "四步顺序推进，一次看一步", "other": "六格并置，各自独立" },
+        { "dimension": "布局", "self": "左文案、右预览", "other": "大小不一的便当网格" },
+        { "dimension": "切换", "self": "点步骤切换右侧预览", "other": "悬停触发格内演示" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "步骤列表与预览宿主",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\">\n  <Grid ColumnDefinitions=\"0.9*,1.1*\" Margin=\"26,24,26,24\">\n    <StackPanel Spacing=\"14\">\n      <TextBlock Text=\"From event to answer\" Classes=\"arc-heading\" />\n      <StackPanel Spacing=\"8\">\n        <c:ArcButton Content=\"1 · Connect\" Variant=\"Secondary\" HorizontalAlignment=\"Stretch\" HorizontalContentAlignment=\"Left\" />\n        <c:ArcButton Content=\"2 · Map\" Variant=\"Ghost\" HorizontalAlignment=\"Stretch\" HorizontalContentAlignment=\"Left\" />\n        <c:ArcButton Content=\"3 · Automate\" Variant=\"Ghost\" HorizontalAlignment=\"Stretch\" HorizontalContentAlignment=\"Left\" />\n        <c:ArcButton Content=\"4 · Measure\" Variant=\"Ghost\" HorizontalAlignment=\"Stretch\" HorizontalContentAlignment=\"Left\" />\n      </StackPanel>\n      <c:ArcBadge Content=\"Step 1 of 4\" Tone=\"Accent\" />\n    </StackPanel>\n    <ContentControl Grid.Column=\"1\" Margin=\"24,0,0,0\" />\n  </Grid>\n</Window>"
+    }
+  ]
+}

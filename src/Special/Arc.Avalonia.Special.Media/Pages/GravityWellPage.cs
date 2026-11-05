@@ -12,6 +12,11 @@ public sealed class GravityWellPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-bend", "variant-wall", "variant-halo", "variant-depth"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A team, customer or moodboard wall where playfulness is the point.",

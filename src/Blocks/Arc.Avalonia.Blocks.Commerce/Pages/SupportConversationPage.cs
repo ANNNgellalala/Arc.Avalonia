@@ -23,6 +23,11 @@ public sealed class SupportConversationPage : ArcItemPage
 {
     public override string ItemSlug => "support-conversation";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-thread", "variant-quick-replies", "variant-resolve", "variant-composer"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

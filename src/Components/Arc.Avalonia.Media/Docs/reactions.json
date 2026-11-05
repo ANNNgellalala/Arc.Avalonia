@@ -1,0 +1,75 @@
+{
+  "slug": "reactions",
+  "nameZh": "回应",
+  "summary": "一键表态的胶囊条：已回应的胶囊取强调色，计数用等宽数字滚动到新值，加号打开一个键盘可导航的表情托盘。",
+  "purpose": [
+    "评论、发布说明与分享页里的轻量反馈：点一下加入，再点取消，计数随变化滚动，阅读位置不会被抢走。",
+    "Options 定义托盘里可选的回应（id / label / icon），Value 受控、DefaultValue 交给组件自管；每次变化通过 ValueChanged 带回完整列表与这一次的单条变化。",
+    "计数为 0 的回应自动离开，只留下加号入口；托盘是一个轻量关闭的 Popup，打开后方向键在选项间移动、Home/End 跳到首尾、Escape 关闭并把焦点还给加号。"
+  ],
+  "whenToUse": [
+    "评论、发布说明、帖子下的一键表态，尤其希望用户不离开当前阅读位置就能回应。",
+    "需要展示每类回应的人数，并允许同一颗胶囊再点一次取消。",
+    "需要在一行里并列点赞、爱心、庆祝等多种轻量情绪。"
+  ],
+  "whenNotToUse": [
+    "需要用户给出分值或结构化评价时，改用 rating。",
+    "需要在预定义集合中多选标签、并把选择显示成可删除的 chip 时，改用 chip-group。",
+    "回应需要附带文字内容时，改用 comment-thread 里的输入框。"
+  ],
+  "variants": [
+    { "key": "state-unreacted", "label": "Unreacted", "note": "胶囊只有计数，没有你的回应" },
+    { "key": "state-reacted", "label": "Reacted", "note": "你已经回应：强调色描边与淡底，读屏追加 including yours" },
+    { "key": "state-empty", "label": "Empty", "note": "还没有任何回应，只显示加号入口" },
+    { "key": "variant-multiple", "label": "Multiple", "note": "同一行并列多个不同回应" },
+    { "key": "variant-large-count", "label": "Large count", "note": "三位数计数仍保持等宽、不跳字" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "rating", "note": "需要分值而不是轻量表态时用 rating" },
+    { "type": "alternative", "target": "chip-group", "note": "需要在预定义集合里多选并支持删除时用 chip group" },
+    { "type": "complement", "target": "comment-thread", "note": "评论与回应常成对出现：正文在 thread 里，态度收在这一条里" }
+  ],
+  "contrasts": [
+    {
+      "target": "rating",
+      "title": "Reactions 与 Rating",
+      "rows": [
+        { "dimension": "输出", "self": "每种回应的计数与「我是否回应」", "other": "单一分值或星级" },
+        { "dimension": "可选项", "self": "多个并列情绪，可以同时选多个", "other": "一条连续刻度，只能取一个值" },
+        { "dimension": "典型场景", "self": "评论、帖子下的轻量反馈", "other": "商品、服务或体验的评分" }
+      ]
+    },
+    {
+      "target": "chip-group",
+      "title": "Reactions 与 Chip group",
+      "rows": [
+        { "dimension": "选中含义", "self": "表态，数量由所有人累计，可取消", "other": "筛选或标签，只代表当前用户的选择" },
+        { "dimension": "显示内容", "self": "图标 + 计数，没有文本输入", "other": "标签文本，可带删除按钮" },
+        { "dimension": "状态模型", "self": "每颗胶囊独立的 reacted 布尔值与 count", "other": "一组值集合，支持多选或单选" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "受控的回应列表",
+      "language": "csharp",
+      "code": "var bar = new ArcReactions\n{\n    Label = \"Reactions on the design review\",\n    Options = new List<ArcReactionOption>\n    {\n        new(\"like\", \"Like\", \"thumbs-up\"),\n        new(\"love\", \"Love\", \"heart\"),\n        new(\"party\", \"Celebrate\", \"star\")\n    },\n    DefaultValue = new List<ArcReaction>\n    {\n        new(\"like\", 12),\n        new(\"love\", 4, reacted: true)\n    }\n};\n\nbar.ValueChanged += (_, args) =>\n{\n    // args.Change 只有这一条变化，args.Next 是变化后的完整列表。\n    status.Text = $\"{args.Change.Id} {(args.Change.Reacted ? \"added\" : \"removed\")}.\";\n};"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcReactions Label=\"Reactions\">\n    <media:ArcReactions.Options>\n      <media:ArcReactionOption Id=\"like\" Label=\"Like\" Icon=\"thumbs-up\" />\n      <media:ArcReactionOption Id=\"love\" Label=\"Love\" Icon=\"heart\" />\n    </media:ArcReactions.Options>\n    <media:ArcReactions.DefaultValue>\n      <media:ArcReaction Id=\"like\" Count=\"12\" />\n    </media:ArcReactions.DefaultValue>\n  </media:ArcReactions>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcReactions",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "托盘里可选的回应集合（id / label / icon）",
+      "Value": "受控的回应列表；计数为 0 的项不会显示",
+      "DefaultValue": "非受控的初始回应列表",
+      "Label": "整条回应栏的无障碍名称",
+      "ValueChanged": "回应新增、移除或取消后触发，携带变化后的列表与单次变化"
+    }
+  }
+}

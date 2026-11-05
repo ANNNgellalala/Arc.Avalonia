@@ -16,6 +16,12 @@ public sealed class GlassMenuPage : ArcItemPage
 {
     public override string ItemSlug => "glass-menu";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-trigger",
+        "variant-groups", "variant-submenu", "variant-checked", "variant-danger", "variant-shortcut"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

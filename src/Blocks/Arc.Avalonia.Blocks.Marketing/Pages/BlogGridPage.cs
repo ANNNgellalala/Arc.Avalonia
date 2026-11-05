@@ -23,6 +23,11 @@ public sealed class BlogGridPage : ArcItemPage
 {
     public override string ItemSlug => "blog-grid";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-feed", "variant-featured", "variant-category-filter", "variant-reader"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -205,13 +210,19 @@ public sealed class BlogGridPage : ArcItemPage
             Mk.Heading("Writing from the team", 420),
             Mk.Caption("Notes on building calm software.")));
 
-        return Mk.Surface(new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 12,
-            Margin = new Thickness(24, 20, 24, 18),
-            Children = { header, chips, body }
-        });
+        // The reader swaps in by click; a static specimen keeps it visible in the documentation preview.
+        var readerSpecimen = Mk.Surface(Reader(Posts[0], () => { }));
+
+        return Mk.Stack(16,
+            Mk.Surface(new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 12,
+                Margin = new Thickness(24, 20, 24, 18),
+                Children = { header, chips, body }
+            }),
+            Mk.Caption("Reader view, opened in place from a post card"),
+            readerSpecimen);
     }
 
     private static Control Card(Post post, Action open)

@@ -1,0 +1,52 @@
+{
+  "slug": "changelog-feed",
+  "nameZh": "更新日志",
+  "summary": "按月份分组的更新日志：类型筛选带计数，条目就地展开看细节，订阅控件展开为邮箱表单并在提交后变成确认。",
+  "purpose": [
+    "当产品想公开节奏化的更新时，更新日志按月份分组，每条带类型徽章、标题与一行摘要，默认展开一条展示细节。",
+    "类型筛选（全部、功能、修复、改进）带计数，切换后列表与计数同时更新；条目点击在行内展开与收起，不离开页面。",
+    "右上角的订阅控件先是一个按钮，点开后变成邮箱输入与 Join，提交后就地变成已订阅的确认，不再占一行。"
+  ],
+  "whenToUse": [
+    "产品更新、版本发布记录的公开页面。",
+    "需要按功能 / 修复 / 改进筛选发布条目的场景。",
+    "希望访客订阅后续更新的页面。"
+  ],
+  "whenNotToUse": [
+    "面向市场的长文章与图片列表时，用 blog-grid。",
+    "产品内部的活动时间线时，用 timeline。",
+    "只有一条公告、不需要历史列表时，用 announcement-bar。"
+  ],
+  "variants": [
+    { "key": "layout-feed", "label": "整体布局", "note": "标题、订阅控件与按月份分组的条目" },
+    { "key": "variant-filters", "label": "类型筛选", "note": "All / Feature / Fix / Improvement，带计数" },
+    { "key": "state-expanded", "label": "展开条目", "note": "默认展开 hooks 条目，显示细节与代码块" },
+    { "key": "variant-subscribe", "label": "订阅控件", "note": "Subscribe 按钮展开为邮箱表单" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "code-block", "note": "展开的条目里用代码块展示 webhook 示例" },
+    { "type": "uses", "target": "input", "note": "订阅表单用邮箱输入收集地址" },
+    { "type": "uses", "target": "button", "note": "筛选、展开与订阅都是按钮" },
+    { "type": "uses", "target": "badge", "note": "Feature / Fix / Improvement 类型用徽章标出" },
+    { "type": "alternative", "target": "blog-grid", "note": "图文并茂的博客与文章卡片用 blog-grid，而不是更新日志" }
+  ],
+  "contrasts": [
+    {
+      "target": "blog-grid",
+      "title": "Changelog feed 与 Blog grid",
+      "rows": [
+        { "dimension": "内容", "self": "短小、按版本或日期记录的更新", "other": "带封面图的完整文章" },
+        { "dimension": "组织", "self": "按月份分组，类型可筛选", "other": "按标签或分类的卡片网格" },
+        { "dimension": "交互", "self": "条目就地展开，筛选带计数", "other": "点卡片进入文章页" },
+        { "dimension": "目标", "self": "让现有用户知道改了什么", "other": "吸引新读者阅读内容" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "筛选、分组与订阅控件",
+      "language": "xaml",
+      "code": "<StackPanel Spacing=\"14\" MaxWidth=\"860\">\n  <Grid ColumnDefinitions=\"*,Auto\">\n    <StackPanel Spacing=\"2\">\n      <TextBlock Text=\"Changelog\" Classes=\"arc-subtitle\" />\n      <TextBlock Text=\"Release notes, two or three times a month\" Classes=\"arc-caption\" />\n    </StackPanel>\n    <arc:ArcButton Grid.Column=\"1\" Content=\"Subscribe\" Variant=\"Secondary\" />\n  </Grid>\n  <WrapPanel> <!-- All / Feature / Fix / Improvement 筛选 chips --> </WrapPanel>\n  <TextBlock Text=\"October 2026\" Classes=\"arc-caption\" />\n  <!-- 条目行，展开时显示摘要与代码块 -->\n</StackPanel>"
+    }
+  ]
+}

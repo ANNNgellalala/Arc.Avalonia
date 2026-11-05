@@ -24,6 +24,14 @@ public sealed class PromptStudioPage : ArcItemPage
 {
     public override string ItemSlug => "prompt-studio";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-header",
+        "variant-template",
+        "variant-run-output",
+        "variant-versions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -23,6 +23,11 @@ public sealed class InboxSidebarPage : ArcItemPage
 {
     public override string ItemSlug => "inbox-sidebar";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-folder-list", "variant-message-list", "variant-reading-pane", "state-unread"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

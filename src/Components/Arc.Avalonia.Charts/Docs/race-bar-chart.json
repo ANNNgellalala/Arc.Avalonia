@@ -1,0 +1,78 @@
+{
+  "slug": "race-bar-chart",
+  "nameZh": "动态排名条",
+  "summary": "随时间变化的排名条形图：每一期一次播放，条形互相超越、数值在期间滚动、期号以大字号滚入，底部时间轴可以播放、暂停与拖拽；行沿缓动轨道移动，所以超越是一段连续滑动。",
+  "purpose": [
+    "当排名会随时间变化、而你想讲一个「谁超过了谁」的故事时用它：产品收入、城市人口、球队积分。",
+    "Frames 每期一条记录（实体 → 数值），TopN 决定同时显示几名；FrameIndex 可以直接落到某一期，IsPlaying 控制是否播放。",
+    "ValueFormat 同时用于条上数值、轴与提示；ShowControls 可以收起播放键与时间轴，把图变成一张静态快照。"
+  ],
+  "whenToUse": [
+    "需要表达排名随时间此消彼长，而不是只看某一期的横截面。",
+    "期数在 5 到 15 期、实体数量在 5 到 10 个之间。",
+    "演示、发布会或数据故事里，需要一段可控节奏的动画。"
+  ],
+  "whenNotToUse": [
+    "只比较某一期的数值时用 bar-chart，静态条形更直接。",
+    "要看整体趋势而不是排名变化时用 line-chart。",
+    "期数很多（几十期以上）、实体也很多时，动画会变成噪声，改用小多图或表格。"
+  ],
+  "variants": [
+    { "key": "variant-first-period", "label": "First period", "note": "FrameIndex=0，所有条目从第一期起跑" },
+    { "key": "variant-final-period", "label": "Final period", "note": "FrameIndex=7，落到最后一期" },
+    { "key": "variant-top-3", "label": "Top 3", "note": "TopN=3，只保留前三名" },
+    { "key": "state-controls", "label": "Controls", "note": "ShowControls=true，播放键与时间轴可见" },
+    { "key": "state-no-controls", "label": "No controls", "note": "ShowControls=false，收起时间轴" }
+  ],
+  "relations": [
+    { "type": "extends", "target": "bar-chart", "note": "静态条形图的动态版本：加时间轴、排名移动与数值滚动" },
+    { "type": "alternative", "target": "line-chart", "note": "看排名更替用动态排名，看单一指标趋势用折线图" }
+  ],
+  "contrasts": [
+    {
+      "target": "bar-chart",
+      "title": "Race bar chart 与 Bar chart",
+      "rows": [
+        { "dimension": "时间", "self": "多期帧，播放或拖拽时间轴", "other": "一次只表达一期" },
+        { "dimension": "排名", "self": "行随时间移动，超越是连续滑动", "other": "条的顺序固定" },
+        { "dimension": "数值", "self": "数值在期间滚动，期号大字滚入", "other": "数值静态标注" },
+        { "dimension": "适用", "self": "讲排名更替的故事", "other": "精确比较某一期的数值" }
+      ]
+    },
+    {
+      "target": "line-chart",
+      "title": "Race bar chart 与 Line chart",
+      "rows": [
+        { "dimension": "读的是什么", "self": "名次与相对差距随时间的更替", "other": "每个实体随时间的连续趋势" },
+        { "dimension": "实体数量", "self": "TopN 截断，通常五到十个", "other": "序列数量不限，可叠加" },
+        { "dimension": "交互", "self": "播放、暂停、拖拽时间轴", "other": "悬停读点" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明排名条",
+      "language": "xaml",
+      "code": "<arc:ArcRaceBarChart xmlns:arc=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\"\n                    TopN=\"6\"\n                    ShowControls=\"True\"\n                    IsPlaying=\"False\"\n                    Height=\"244\" />"
+    },
+    {
+      "title": "构造帧并落到指定一期",
+      "language": "csharp",
+      "code": "var race = new ArcRaceBarChart\n{\n    Frames = new[]\n    {\n        new ArcRaceFrame(\"January\", new Dictionary<string, double>\n        {\n            [\"Oak chair\"] = 14000, [\"Linen sofa\"] = 12000, [\"Arc lamp\"] = 8000\n        }),\n        new ArcRaceFrame(\"February\", new Dictionary<string, double>\n        {\n            [\"Oak chair\"] = 17000, [\"Linen sofa\"] = 21000, [\"Arc lamp\"] = 9000\n        }),\n        new ArcRaceFrame(\"March\", new Dictionary<string, double>\n        {\n            [\"Oak chair\"] = 22000, [\"Linen sofa\"] = 25000, [\"Arc lamp\"] = 15000\n        })\n    },\n    TopN = 3,\n    ShowControls = true,\n    IsPlaying = false\n};\n\nrace.FrameIndex = 1; // 落到第二期；置 0 回到开头"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcRaceBarChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Frames": "按时间排列的帧；每帧包含期号与该期各实体的数值，缺失实体按 0 处理",
+      "TopN": "同时显示的条数，默认 6；低于截断线的实体滑出视野",
+      "ShowControls": "绘制播放键与时间轴，默认 true",
+      "IsPlaying": "是否推进；空格或播放键切换，默认 false",
+      "FrameDuration": "播放时每期停留的毫秒数，默认 1400",
+      "FrameIndex": "当前期号；赋值会直接跳到该期而不播放",
+      "ValueSuffix": "数值后的单位，例如 \" visits\"",
+      "ValueFormat": "格式化条上数值、轴与提示"
+    }
+  }
+}

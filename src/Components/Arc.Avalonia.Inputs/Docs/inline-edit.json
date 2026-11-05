@@ -1,0 +1,86 @@
+{
+  "slug": "inline-edit",
+  "nameZh": "行内编辑",
+  "summary": "平时是只读文字，点击或按 Enter 就地变成输入框：Enter 保存、Escape 回滚，保存中与校验错误都显示在下方消息槽。",
+  "purpose": [
+    "处理「读远多于改」的单个值：项目名、看板名、标题。静止态就是一行文字，只有当用户真的想改时才变成字段，页面因此保持安静。",
+    "编辑态与静止态在原位互换，不弹对话框、不跳页面。按 Enter 或失焦提交，Escape 恢复上次保存的值；多行变体里 Shift+Enter 插入换行、Enter 提交。",
+    "保存可以异步：页面代码在 Save 事件里把一个 Task 交给 Pending，控件自动进入保存态、暂时禁用编辑，失败时保留草稿并显示错误，方便直接重试。"
+  ],
+  "whenToUse": [
+    "标题、项目名、文件名等单个、短小、修改频率低的值。",
+    "希望用户不用离开当前页面就能改名，同时保留完整的键盘路径（Enter 编辑、Enter 保存、Escape 取消）。",
+    "保存需要一次网络请求，且希望把保存中与失败状态留在原地时。"
+  ],
+  "whenNotToUse": [
+    "表单一开始就要求填写、且与其它字段一起提交时改用 input。",
+    "需要多行备注且通常完整编辑时改用 textarea，行内编辑的多行变体适合短描述而非长文档。",
+    "需要展示富文本或带格式的标题时改用 rich-text-editor。"
+  ],
+  "variants": [
+    { "key": "state-resting", "label": "Resting", "note": "只读文字，悬停/聚焦才露出可编辑提示" },
+    { "key": "state-empty", "label": "Empty", "note": "无值时回退到占位文字" },
+    { "key": "variant-title", "label": "Title", "note": "标题字号 22 px 的变体" },
+    { "key": "variant-body", "label": "Body", "note": "正文字号 14 px 的变体" },
+    { "key": "state-editing", "label": "Editing", "note": "原位替换为输入框，自动全选" },
+    { "key": "state-multiline", "label": "Multiline", "note": "换行并增高，Shift+Enter 换行" },
+    { "key": "state-invalid", "label": "Invalid", "note": "校验未通过，草稿保留并显示错误" },
+    { "key": "state-saving", "label": "Saving", "note": "保存中显示 spinner，暂时只读" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可进入编辑态" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "始终可编辑的表单字段改用 input" },
+    { "type": "alternative", "target": "textarea", "note": "完整编辑长文本改用 textarea" },
+    { "type": "uses", "target": "button", "note": "编辑态的保存与取消复用 button" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Inline edit 与 Input",
+      "rows": [
+        { "dimension": "静止态", "self": "显示为只读文字，不占输入框外观", "other": "始终是输入框外观" },
+        { "dimension": "提交方式", "self": "Enter 或失焦即保存，Escape 回滚", "other": "随表单统一提交" },
+        { "dimension": "适合的值", "self": "读多改少的标题与名字", "other": "需要填写的一组字段" }
+      ]
+    },
+    {
+      "target": "textarea",
+      "title": "Inline edit 与 Textarea",
+      "rows": [
+        { "dimension": "显示形态", "self": "静止态是一段文字，多行变体也会增高", "other": "始终显示多行输入框" },
+        { "dimension": "编辑边界", "self": "一次只改一个值，Enter 提交", "other": "作为表单字段持续编辑" },
+        { "dimension": "保存反馈", "self": "内置保存中、失败重试与已保存标记", "other": "由表单提交统一反馈" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcInlineEdit Label=\"项目名称\"\n                     Value=\"{Binding Name, Mode=TwoWay}\"\n                     Variant=\"Title\"\n                     Placeholder=\"未命名项目\"\n                     Save=\"OnNameSave\" />\n</Window>"
+    },
+    {
+      "title": "校验与异步保存",
+      "language": "csharp",
+      "code": "var name = new ArcInlineEdit\n{\n    Label = \"团队名称\",\n    Value = team.Name,\n    Validate = draft => string.IsNullOrWhiteSpace(draft) ? \"名称不能为空\" : null\n};\n\nname.Save += async (_, e) =>\n{\n    try\n    {\n        await api.RenameTeamAsync(e.Value);\n        team.Name = e.Value;\n    }\n    catch (Exception exception)\n    {\n        e.Error = \"保存失败：\" + exception.Message;\n    }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcInlineEdit",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前保存值；保存成功后写回，静止态显示它",
+      "Label": "无障碍名称；静止态读作「label: value」",
+      "Placeholder": "无值时的回退文字，默认 Untitled",
+      "Multiline": "允许换行并增高；Shift+Enter 插入换行，Enter 仍提交",
+      "Variant": "排版变体 Title（标题字号）/ Body（正文字号）",
+      "Validate": "保存前调用的校验函数，返回错误文案可阻止提交",
+      "IsEditing": "只读，是否处于编辑态",
+      "Save": "提交时触发；设置 Error 可阻止保存，设置 Pending 进入保存态",
+      "ValueChanged": "Value 变化（保存或代码写入）时触发",
+      "BeginEdit": "进入编辑态，用于页面自己的快捷键",
+      "Commit": "提交当前草稿",
+      "CancelEdit": "取消编辑并恢复上次保存的值"
+    }
+  }
+}

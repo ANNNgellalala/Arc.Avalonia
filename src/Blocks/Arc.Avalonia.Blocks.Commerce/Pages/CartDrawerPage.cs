@@ -26,6 +26,11 @@ public sealed class CartDrawerPage : ArcItemPage
 {
     public override string ItemSlug => "cart-drawer";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-drawer-open", "layout-storefront", "variant-cart-lines", "variant-checkout-footer"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

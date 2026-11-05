@@ -11,6 +11,12 @@ public sealed class OrbitMenuPage : ArcItemPage
 {
     public override string ItemSlug => "orbit-menu";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-open", "variant-actions", "variant-danger",
+        "variant-trigger", "variant-label", "variant-note"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

@@ -1,0 +1,74 @@
+{
+  "slug": "time-dial",
+  "nameZh": "时间表盘",
+  "summary": "24 小时旋转表盘：选出 UTC 时刻，同时读出纽约、伦敦、东京的本地时间，并用高亮弧与 at work 胶囊标出共享工作时段。",
+  "purpose": [
+    "为跨时区协作选时间：拖动表盘或按方向键以 15 分钟为步长转动，中心读数固定显示「家城市」的当地时间与 UTC；三个城市各有一条指针贴在表盘边缘，选中哪个城市方便就点哪一行把它设为家城市。",
+    "工作时段 09:00–18:00 用一段高亮弧画在表盘上，城市行也各带一枚 at work / off hours 胶囊，因此「谁还在上班」不靠颜色猜；右侧 Team cities 面板同时给出各城市的 UTC 偏移。",
+    "表盘与时间戳由控件状态直接绘制，不依赖动画时钟，所以任何时刻的画面都是确定的。预览展示默认的 UTC 14:30（家城市 New York，10:30），声明的变体都是这一帧里同时可见的元素。"
+  ],
+  "whenToUse": [
+    "需要在两到五个城市之间约会议、发布或交接时间。",
+    "分布式团队希望一眼看出谁在工作时段内。",
+    "希望用键盘完成整套操作：方向键 15 分钟、PageUp/PageDown 一小时、Home/End 到当天两端。"
+  ],
+  "whenNotToUse": [
+    "只需要选一个本地时间时，改用 time-picker。",
+    "日期比小时更重要时，改用 calendar 或 date-picker。",
+    "需要按日期加时间一起选时，改用 date-reel 或 date-picker。"
+  ],
+  "variants": [
+    { "key": "state-default", "label": "Default", "note": "默认帧：UTC 14:30，家城市 New York 为 10:30（at work）" },
+    { "key": "variant-dial", "label": "Dial", "note": "24 小时表盘、主刻度小时数与贴在边缘的城市指针" },
+    { "key": "variant-working-band", "label": "Working band", "note": "09:00–18:00 的高亮弧与 working hours 说明" },
+    { "key": "variant-centre", "label": "Centre readout", "note": "中心家城市时间、at work 胶囊与 UTC 读数" },
+    { "key": "variant-city-rows", "label": "City rows", "note": "Team cities 三行：本地时间、UTC 偏移、at work 与 Home 标记" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "time-picker", "note": "只需要一个本地时间时改用 time picker" },
+    { "type": "alternative", "target": "date-reel", "note": "需要按日期加时间选时改用 date reel" },
+    { "type": "complement", "target": "calendar", "note": "跨天规划时用 calendar 看整月，再用表盘定时段" }
+  ],
+  "contrasts": [
+    {
+      "target": "time-picker",
+      "title": "Time dial 与 Time picker",
+      "rows": [
+        { "dimension": "目标", "self": "跨城市比较时刻，不是单个时间输入", "other": "为本地时间产生一个值" },
+        { "dimension": "读数", "self": "表盘 + 多城市本地时间 + 工作时段", "other": "单一时间字段" },
+        { "dimension": "交互", "self": "拖动表盘或方向键，点城市切换家城市", "other": "滚动列表或键入" }
+      ]
+    },
+    {
+      "target": "date-reel",
+      "title": "Time dial 与 Date reel",
+      "rows": [
+        { "dimension": "选择维度", "self": "一天内的小时，跨时区比较", "other": "日期与具体时刻的整体选择" },
+        { "dimension": "呈现", "self": "环形表盘与城市指针", "other": "四列滚轮与透镜" },
+        { "dimension": "典型场景", "self": "约跨时区会议", "other": "定时发送、提醒" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcTimeDial Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "暂停与嵌入规划页",
+      "language": "csharp",
+      "code": "var dial = new ArcTimeDial\n{\n    Height = 400,\n    HorizontalAlignment = HorizontalAlignment.Stretch\n};\n\n// 表盘本身不随时间流逝，暂停只为与同一页的其它插画保持一致。\ndial.SetPaused(true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcTimeDial",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；表盘状态不依赖它",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

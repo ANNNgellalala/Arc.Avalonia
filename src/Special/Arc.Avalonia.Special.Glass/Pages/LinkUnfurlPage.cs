@@ -12,6 +12,11 @@ public sealed class LinkUnfurlPage : ArcItemPage
 {
     public override string ItemSlug => "link-unfurl";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-expanded", "variant-two-cards", "variant-samples"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

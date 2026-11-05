@@ -1,0 +1,75 @@
+{
+  "slug": "text-morph",
+  "nameZh": "文字变形",
+  "summary": "让一个短标签在原地变形成下一个状态：旧文案上移模糊退出，新文案从下方变清晰，外框宽度弹性过渡。",
+  "purpose": [
+    "按钮文案、状态标签、步骤名经常在几个短词之间切换。直接替换会让文字“跳”一下，读者容易错过变化；文字变形把旧标签上移模糊、新标签从下方清晰进入，宽度同时弹性过渡。",
+    "它只关心 Text 这一个值：改值即变形，不需要手动触发；标签不换行，因此适合按钮、状态胶囊和工具栏这类短文案。",
+    "Level 把标签映射到类型层级，既控制字号也保持语义；减少动效时新旧文案直接交换、不做位移与模糊。",
+    "与 text-reveal 不同，它处理的是同一位置的“状态变化”，而不是首次出现；与 shimmer 不同，它表达一次切换，而不是持续的进行中。"
+  ],
+  "whenToUse": [
+    "按钮或状态标签会在“发布 / 发布中 / 已发布”这类短文案之间切换时。",
+    "同一位置的文案会随数据更新而变化，希望读者注意到变化时。",
+    "文案很短、宽度变化需要弹性过渡时。",
+    "减少动效时需要直接交换、不牺牲可读性时。"
+  ],
+  "whenNotToUse": [
+    "文案是首次出现、不需要从旧值切换时改用 text-reveal。",
+    "数字在变化、需要滚动到新值时改用 animated-counter。",
+    "加载中的状态行需要持续微光提示时改用 text-shimmer。",
+    "文案较长、可能换行时不要使用，它假设标签不换行。"
+  ],
+  "variants": [
+    { "key": "variant-idle", "label": "待发布", "note": "Text=Publish，默认 H3 之外的 Span 级别" },
+    { "key": "variant-busy", "label": "发布中", "note": "Text=Publishing，宽度随标签变长" },
+    { "key": "variant-done", "label": "已发布", "note": "Text=Published，状态收束" },
+    { "key": "variant-h1", "label": "大号标题", "note": "Level=H1，用于页面级状态文案" },
+    { "key": "variant-paragraph", "label": "段落级别", "note": "Level=Paragraph，用于正文中的状态词" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "text-reveal", "note": "首次出现的文案用 text reveal" },
+    { "type": "alternative", "target": "animated-counter", "note": "变化的是一串数字时用 animated counter" },
+    { "type": "complement", "target": "text-shimmer", "note": "“进行中”配微光、“完成”切文案，两者常接力" }
+  ],
+  "contrasts": [
+    {
+      "target": "text-reveal",
+      "title": "Text morph 与 Text reveal",
+      "rows": [
+        { "dimension": "触发原因", "self": "Text 的值变化", "other": "元素首次出现" },
+        { "dimension": "内容", "self": "旧文案退出、新文案进入", "other": "同一段文案逐步显现" },
+        { "dimension": "宽度", "self": "外框宽度弹性过渡", "other": "按终态占位，不改变布局" }
+      ]
+    },
+    {
+      "target": "animated-counter",
+      "title": "Text morph 与 Animated counter",
+      "rows": [
+        { "dimension": "内容类型", "self": "任意短文案", "other": "数值" },
+        { "dimension": "动效", "self": "文字上移、模糊、宽度弹性", "other": "数字从旧值滚动到新值" },
+        { "dimension": "格式", "self": "不参与数字格式化", "other": "支持小数、前后缀与自定义格式" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "发布状态标签",
+      "language": "csharp",
+      "code": "var label = new ArcTextMorph\n{\n    Text = \"Publish\",\n    Level = ArcTextLevel.H3\n};\n\nlabel.Text = \"Publishing\"; // 旧文案上移模糊，新文案从下方进入\nlabel.Text = \"Published\";"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:effects=\"clr-namespace:Arc.Avalonia.Effects.Controls;assembly=Arc.Avalonia.Effects\">\n  <effects:ArcTextMorph x:Name=\"Label\"\n                        Text=\"Publish\"\n                        Level=\"H3\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Effects.Controls.ArcTextMorph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "当前标签；改值即触发变形，标签不换行",
+      "Level": "类型层级，决定字号与语义标签，默认 Span"
+    }
+  }
+}

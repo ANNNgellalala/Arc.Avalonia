@@ -28,6 +28,11 @@ public sealed class ProductDetailPage : ArcItemPage
 {
     public override string ItemSlug => "product-detail";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-gallery", "variant-finish-size", "variant-details-accordion", "variant-reviews-summary"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

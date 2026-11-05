@@ -23,6 +23,11 @@ public sealed class SiteHeaderPage : ArcItemPage
 {
     public override string ItemSlug => "site-header";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-transparent", "state-solid", "state-narrow"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -181,10 +186,61 @@ public sealed class SiteHeaderPage : ArcItemPage
         var narrow = new ArcSwitch { Label = "Narrow container", Checked = false };
         narrow.CheckedChanged += (_, _) => menu.ForceNarrow = narrow.Checked;
 
+        // Static specimens for the two states the switches demonstrate interactively: the documentation
+        // preview shows transparent, solid and narrow without a click.
+        var solidSpecimen = new Border
+        {
+            Background = Mk.Brush(ArcTokens.Surface),
+            BorderBrush = Mk.Brush(ArcTokens.BorderSubtle),
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Padding = new Thickness(6, 4, 6, 4),
+            Child = CompactMenu(narrow: false)
+        };
+
+        var narrowSpecimen = new Border
+        {
+            Background = Mk.Brush(ArcTokens.Surface),
+            BorderBrush = Mk.Brush(ArcTokens.BorderSubtle),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(14),
+            Padding = new Thickness(6, 4, 6, 4),
+            Child = CompactMenu(narrow: true)
+        };
+
         return Mk.Stack(14,
             Mk.Row(20, scrolled, narrow),
-            Mk.Frame("acme.com", stage));
+            Mk.Frame("acme.com", stage),
+            Mk.Caption("Solid: scrolled past the threshold"),
+            solidSpecimen,
+            Mk.Caption("Narrow container: sections fold into the sheet"),
+            narrowSpecimen);
     }
+
+    private static ArcMegaMenu CompactMenu(bool narrow) => new()
+    {
+        Brand = "Acme",
+        BrandIcon = "layers",
+        Label = "Main",
+        Current = "product",
+        ForceNarrow = narrow,
+        Sections = new List<ArcMegaMenuSection>
+        {
+            new()
+            {
+                Value = "product",
+                Label = "Product",
+                Footer = "Platform, solutions and pricing."
+            },
+            new() { Value = "solutions", Label = "Solutions" },
+            new() { Value = "docs", Label = "Docs" },
+            new() { Value = "pricing", Label = "Pricing" }
+        },
+        Actions = new List<ArcMegaMenuAction>
+        {
+            new() { Label = "Sign in", Variant = ArcMegaMenuActionVariant.Quiet },
+            new() { Label = "Start free", Variant = ArcMegaMenuActionVariant.Primary }
+        }
+    };
 
     private static ArcMegaMenuLink Link(string label, string description, string icon, string? badge = null) => new()
     {

@@ -21,6 +21,11 @@ public sealed class SettingsPage : ArcItemPage
 {
     public override string ItemSlug => "settings-page";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-unsaved", "variant-section-nav", "variant-profile-form", "variant-density-segmented"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

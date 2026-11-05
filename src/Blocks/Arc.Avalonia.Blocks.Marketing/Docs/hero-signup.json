@@ -1,0 +1,49 @@
+{
+  "slug": "hero-signup",
+  "nameZh": "候补名单首屏",
+  "summary": "整屏候补名单首屏：柔和漂移的网底上只有一个邮箱字段，按钮按有效地址启用，提交后长出排位确认。",
+  "purpose": [
+    "当产品还没开放、首屏唯一目标是留下邮箱时用它：一个徽标、一句大标题、一句说明，加一个邮箱字段与一个按钮。",
+    "输入时校验：地址不完整就显示错误文案并禁用按钮，地址为空时按钮保持可用以便聚焦；提交成功后表单原地换成确认信息，写明排位与已等待人数。",
+    "组成依赖：邮箱字段用 input，Join the waitlist 用 button，Waitlist open 徽标用 badge，确认里的等待者头像用 avatar-group。"
+  ],
+  "whenToUse": [
+    "发布前的候补名单页，邮箱是唯一行动。",
+    "产品尚未开放、想用真实排位制造紧迫感时。",
+    "活动页只需要一个字段与一条信任文案时。"
+  ],
+  "whenNotToUse": [
+    "产品已经可以试用、需要展示产品本身时，改用 hero-section。",
+    "需要收集姓名、公司等更多字段时，用 contact-section。",
+    "订阅是页面收尾的次要行动时，用 newsletter-signup。"
+  ],
+  "variants": [
+    { "key": "variant-form", "label": "Form", "note": "邮箱字段与 Join the waitlist 按钮" },
+    { "key": "state-confirmation", "label": "Confirmation", "note": "提交后显示排位、收件说明与已等待人数" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "邮箱字段用 ArcInput，错误文案落在字段内" },
+    { "type": "uses", "target": "button", "note": "Join the waitlist 是 ArcButton，地址无效时禁用" },
+    { "type": "uses", "target": "badge", "note": "Waitlist open 徽标用 ArcBadge" },
+    { "type": "uses", "target": "avatar-group", "note": "确认里「已有一千多人排队」用 avatar group 呈现" },
+    { "type": "alternative", "target": "hero-section", "note": "首屏要展示产品时改用 hero section" }
+  ],
+  "contrasts": [
+    {
+      "target": "hero-section",
+      "title": "Hero signup 与 Hero section",
+      "rows": [
+        { "dimension": "目标", "self": "留下邮箱、进入候补名单", "other": "解释产品并引导进入" },
+        { "dimension": "内容", "self": "标题、一个字段与一个按钮", "other": "标题、两个行动与一块产品证据" },
+        { "dimension": "背景", "self": "柔和漂移的网底即主角", "other": "网底上叠产品截图或大字" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "候补名单表单",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:i=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <StackPanel Spacing=\"18\" Margin=\"32,34,32,0\" HorizontalAlignment=\"Center\">\n    <c:ArcBadge Content=\"Waitlist open\" Tone=\"Accent\" Dot=\"True\" HorizontalAlignment=\"Center\" />\n    <TextBlock Text=\"Be first when the doors open.\"\n               Classes=\"arc-title-sm\" TextAlignment=\"Center\" />\n    <TextBlock Text=\"Arc opens in small groups through the spring.\"\n               Classes=\"arc-body-sm arc-secondary\"\n               TextAlignment=\"Center\" MaxWidth=\"460\" TextWrapping=\"Wrap\" />\n    <StackPanel Orientation=\"Horizontal\" Spacing=\"8\" HorizontalAlignment=\"Center\">\n      <i:ArcInput Width=\"300\" Placeholder=\"you@company.com\" LeadingIcon=\"mail\" />\n      <c:ArcButton Content=\"Join the waitlist\" Size=\"Lg\" />\n    </StackPanel>\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

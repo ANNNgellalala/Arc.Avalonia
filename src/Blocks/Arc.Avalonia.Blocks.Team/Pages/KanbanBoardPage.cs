@@ -36,6 +36,11 @@ public sealed class KanbanBoardPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-swimlanes", "variant-wip-columns", "state-wip-warning", "variant-empty-cell"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "A team board where cards move between statuses and ordering within a stage matters.",

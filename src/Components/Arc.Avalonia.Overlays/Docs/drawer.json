@@ -1,0 +1,80 @@
+{
+  "slug": "drawer",
+  "nameZh": "抽屉",
+  "summary": "从侧边滑入的模态面板：保留页面大部分内容，用与对话框相同的遮罩、Escape 与焦点规则承载较长的表单或详情。",
+  "purpose": [
+    "当内容比一个对话框能承载的更多、而你还想对照背后的页面时，抽屉从左侧或右侧边缘滑入，只压暗不遮盖。",
+    "它复用对话框的模态规则：36% 的遮罩、Escape 与遮罩点击关闭、打开后把焦点锁在面板内、关闭后还给触发它的控件。",
+    "结构固定为标题、描述、正文、底栏四段；Side 决定贴哪条边，默认右侧；左侧适合返回上一层的入口或活动流。"
+  ],
+  "whenToUse": [
+    "筛选条件、设置详情、评论或较长的表单，需要在开着的同时看到背后的列表。",
+    "从列表某一行打开的详情，关掉后应当回到那一行。",
+    "正文需要滚动、而动作区要固定在底部时。"
+  ],
+  "whenNotToUse": [
+    "只需要一个确认或一个短决定时，改用 dialog，居中的面板更能让人停下来。",
+    "手机上从底部升起更顺手时，改用 bottom-sheet。",
+    "只是补充一条短提示、不需要遮住页面时，改用 popover 或 tooltip。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "遮罩压暗页面，面板从边缘滑入" },
+    { "key": "side-right", "label": "右侧", "note": "默认方向，适合筛选与详情" },
+    { "key": "side-left", "label": "左侧", "note": "用于返回入口或活动流" },
+    { "key": "layout-footer", "label": "底栏动作", "note": "动作固定在底部，正文滚动" },
+    { "key": "layout-no-footer", "label": "无底栏", "note": "纯内容面板，用 Escape 或遮罩收起" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dialog", "note": "只需要一个决定时，用居中的 dialog 更能让人停下来" },
+    { "type": "alternative", "target": "bottom-sheet", "note": "触屏与窄屏上从底部升起的 bottom sheet 更顺手" },
+    { "type": "complement", "target": "button", "note": "底栏动作复用 button，一主一次右对齐" }
+  ],
+  "contrasts": [
+    {
+      "target": "dialog",
+      "title": "Drawer 与 Dialog",
+      "rows": [
+        { "dimension": "出现方向", "self": "从左侧或右侧边缘滑入", "other": "在面板中央浮出" },
+        { "dimension": "页面上下文", "self": "保留页面大部分可见，可随时对照", "other": "完全遮住背景，要求先处理眼前的问题" },
+        { "dimension": "适合内容", "self": "较长的表单、筛选条件或详情", "other": "一个决定、一到两个动作" },
+        { "dimension": "关闭方式", "self": "Escape、遮罩或右上角关闭按钮", "other": "Escape、遮罩或底栏动作" }
+      ]
+    },
+    {
+      "target": "bottom-sheet",
+      "title": "Drawer 与 Bottom sheet",
+      "rows": [
+        { "dimension": "方向", "self": "从左右边缘滑入，占满高度", "other": "从底部升起，占满宽度" },
+        { "dimension": "适用设备", "self": "桌面与宽屏", "other": "手机、触屏与窄窗口" },
+        { "dimension": "高度", "self": "铺满整个面板高度", "other": "按 detents 停在不同高度" },
+        { "dimension": "手势", "self": "关闭按钮、Escape 或遮罩", "other": "下拖、Escape 或遮罩" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一个筛选抽屉",
+      "language": "xaml",
+      "code": "<Window xmlns:overlays=\"clr-namespace:Arc.Avalonia.Overlays.Controls;assembly=Arc.Avalonia.Overlays\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia\">\n  <overlays:ArcDrawer Title=\"Filters\"\n                      Description=\"Narrow the list without leaving the page.\"\n                      Side=\"Right\"\n                      IsOpen=\"{Binding IsFiltersOpen}\">\n    <StackPanel Spacing=\"10\">\n      <TextBlock Text=\"Status · Active\" />\n      <TextBlock Text=\"Owner · Maya Chen\" />\n    </StackPanel>\n    <overlays:ArcDrawer.Footer>\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n        <arc:ArcButton Content=\"Reset\" Variant=\"Ghost\" />\n        <arc:ArcButton Content=\"Apply filters\" Variant=\"Primary\" />\n      </StackPanel>\n    </overlays:ArcDrawer.Footer>\n  </overlays:ArcDrawer>\n</Window>"
+    },
+    {
+      "title": "用代码打开并从左侧滑入",
+      "language": "csharp",
+      "code": "var drawer = new ArcDrawer\n{\n    Title = \"Activity\",\n    Description = \"The same sheet from the left edge.\",\n    Side = ArcDrawerSide.Left,\n    Content = new TextBlock { Text = \"Maya merged the checkout branch.\" }\n};\n\ndrawer.Closed += (_, _) => statusText.Text = \"抽屉已关闭\";\ndrawer.IsOpen = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Overlays.Controls.ArcDrawer",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "IsOpen": "是否显示；由页面或 ViewModel 赋值，置为 false 即关闭",
+      "Title": "标题，使用 arc-heading 样式",
+      "Description": "标题下的一行说明，可为空",
+      "Content": "正文区，任意控件；内容多时在面板内滚动",
+      "Footer": "底栏动作区，右对齐，通常放两个按钮",
+      "Side": "贴边方向：Right（默认）或 Left",
+      "CloseOnBackdropPress": "点击遮罩是否关闭，默认 true",
+      "Closed": "关闭后触发，无论关闭来自 Escape、遮罩还是代码"
+    }
+  }
+}

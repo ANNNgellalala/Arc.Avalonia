@@ -1,0 +1,74 @@
+{
+  "slug": "photo-grid",
+  "nameZh": "照片网格",
+  "summary": "可缩放列数的相册网格：6 / 4 / 3 列之间切换，收藏项带心形角标，点开照片从格子长成带胶片条的查看器。",
+  "purpose": [
+    "把一整个相册铺成网格：顶部是相册标题与「12 photos · zoom level 1 of 3」，右上角是减号、列数、加号组成的缩放药丸，网格在 6 / 4 / 3 列之间切换，切换时围绕当前焦点重排。",
+    "收藏是网格状态的一部分：已收藏的照片左上角有一枚心形角标，在查看器里按 F 可以切换，返回网格时角标随之更新。查看器从被点的格子长出来，底部是一条胶片条，可以左右切照片。",
+    "桌面没有双指捏合，所以控件用 Ctrl + 滚轮与加号减号来实现缩放，并在底部提示里写清；真实触屏设备上把这两个入口换成缩放手势即可，网格本身的布局与焦点模型不变。"
+  ],
+  "whenToUse": [
+    "相册或照片库需要在一屏里浏览很多照片，并允许在密度与细节之间切换时。",
+    "需要收藏（或标记）若干照片，并在同一个查看器里逐张确认时。",
+    "照片比例接近、更适合等宽方块而不是瀑布流的集合。"
+  ],
+  "whenNotToUse": [
+    "竖图横图混排、要保留各自比例时，改用 lightbox-gallery。",
+    "只有少量图、想做轮播或整块可拖动的展示时，改用 carousel。",
+    "需要在查看器里逐张放大到细节并做缩放时，改用 lightbox-gallery 的查看器路径。"
+  ],
+  "variants": [
+    { "key": "state-grid", "label": "Grid", "note": "默认 6 列网格，标题与张数统计在顶部" },
+    { "key": "variant-zoom-pill", "label": "Zoom pill", "note": "减号 / 列数 / 加号组成的缩放药丸" },
+    { "key": "variant-favorite", "label": "Favourite", "note": "已收藏照片左上角的心形角标" },
+    { "key": "variant-caption", "label": "Caption", "note": "相册标题与「12 photos · zoom level 1 of 3」" },
+    { "key": "variant-hint", "label": "Hint", "note": "底部操作提示：点击打开、Ctrl+滚轮缩放" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "lightbox-gallery", "note": "竖横混排、保持比例时用 lightbox gallery" },
+    { "type": "alternative", "target": "cover-flow", "note": "精选少量照片、一次专注一张时用 cover flow" },
+    { "type": "complement", "target": "filter-toolbar", "note": "照片多时在上方加一条筛选工具栏，网格只负责呈现结果" }
+  ],
+  "contrasts": [
+    {
+      "target": "lightbox-gallery",
+      "title": "Photo grid 与 Lightbox gallery",
+      "rows": [
+        { "dimension": "排版", "self": "等宽方块网格，列数可切换", "other": "瀑布流，照片保持各自比例" },
+        { "dimension": "密度控制", "self": "缩放药丸与 Ctrl+滚轮切换 6 / 4 / 3 列", "other": "固定按宽度自动分列，不提供列数控制" },
+        { "dimension": "标记", "self": "心形角标表示已收藏，可在查看器里按 F 切换", "other": "没有收藏概念，只有浏览与缩放" }
+      ]
+    },
+    {
+      "target": "cover-flow",
+      "title": "Photo grid 与 Cover flow",
+      "rows": [
+        { "dimension": "浏览目标", "self": "在一个相册里快速扫过大量照片", "other": "在少量精选里一次专注一张" },
+        { "dimension": "视觉密度", "self": "高密度小格子", "other": "一张前景大图加两侧退后的卡片" },
+        { "dimension": "操作模型", "self": "移动焦点、切换列数、打开查看器", "other": "拖动或甩动整条轨道" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放进相册页",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcPhotoGrid Width=\"940\" Height=\"450\"\n                       HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘与缩放入口",
+      "language": "csharp",
+      "code": "// 收起态：方向键移动焦点，加上/减号改变列数（等价于捏合），\n// Enter / Space 打开查看器；查看器里 Left / Right 换照片，F 收藏，Escape 关闭。\nvar grid = new ArcPhotoGrid\n{\n    Width = 940,\n    Height = 450,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcPhotoGrid",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "网格宽度；列宽按宽度与当前列数计算",
+      "Height": "网格可见高度，网格在容器内裁剪滚动",
+      "IsEnabled": "禁用后不再打开查看器或响应缩放",
+      "IsVisible": "隐藏后停止查看器动画"
+    }
+  }
+}

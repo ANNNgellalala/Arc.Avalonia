@@ -1,0 +1,67 @@
+{
+  "slug": "speculative-decoding",
+  "nameZh": "推测解码插画",
+  "summary": "解释推测解码的插画：快速草稿模型先猜几个 token，目标模型一次扫描全部校验，命中的猜测并入答案，第一处未命中由目标模型改写。",
+  "purpose": [
+    "把「用小模型起草、大模型批量校验」讲清楚：上方 Draft model 行逐字冒出草稿 token，下方 Target model 行用一次扫描把它们全部校验，命中的打勾、第一处未命中打叉并由目标模型给出正确 token。",
+    "底部 Answer 行按来源着色（草稿为 Series 2、目标模型为强调色），右侧统计 Speedup、Accepted 与 Tokens per pass；Draft length 2/4/6/8 与 Compare 开关可以现场改参数，对比条会同时画出「目标模型每轮只写一个 token」的进度。",
+    "开启减弱动效时停在第 2 轮校验的代表帧（相位 0.62）：草稿卡与校验格都已判定，Answer 行已写着两轮产出的 token。预览展示这一帧，声明的变体都是帧内同时可见的元素。"
+  ],
+  "whenToUse": [
+    "推理服务或模型产品的页面需要解释为什么能更快出 token。",
+    "文档页介绍草稿模型、验收率与吞吐提升等概念时，需要一张对照图。",
+    "需要向读图者说明「猜测并不影响答案正确性」。"
+  ],
+  "whenNotToUse": [
+    "需要展示真实的逐 token 生成动画时，改用 typewriter-terminal 或 text-reveal。",
+    "需要展示延迟或吞吐的时间序列时，改用 sparkline 或 line-chart。",
+    "需要解释模型怎样路由到专家时，改用 mixture-of-experts。"
+  ],
+  "variants": [
+    { "key": "state-verifying", "label": "Verifying", "note": "默认帧：第 2 轮校验（pass 2 of 3），校验标记已出" },
+    { "key": "variant-draft", "label": "Draft lane", "note": "Draft model 行与草稿 token 卡，含被丢弃的猜测" },
+    { "key": "variant-target", "label": "Target lane", "note": "Target model 行与一次扫描填满的校验格" },
+    { "key": "variant-answer", "label": "Answer", "note": "Answer 行：按来源着色的 token 与已写出数量" },
+    { "key": "variant-compare", "label": "Compare", "note": "Target only 对比条与 Compare 开关（每轮只写一个 token）" },
+    { "key": "variant-draft-length", "label": "Draft length", "note": "2 / 4 / 6 / 8 草稿长度选择器" },
+    { "key": "variant-stats", "label": "Stats", "note": "Speedup、Accepted 与 Tokens per pass 三项统计" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "mixture-of-experts", "note": "同为推理加速解释：需要讲稀疏路由时改用 mixture of experts" },
+    { "type": "complement", "target": "prompt-cache", "note": "两种降本提速手段，常在同一篇性能文档里对照出现" },
+    { "type": "complement", "target": "sparkline", "note": "插画解释机制，真实吞吐曲线用 sparkline 展示" }
+  ],
+  "contrasts": [
+    {
+      "target": "mixture-of-experts",
+      "title": "Speculative decoding 与 Mixture of experts",
+      "rows": [
+        { "dimension": "加速手段", "self": "小模型起草，大模型一次校验", "other": "每个 token 只激活部分专家" },
+        { "dimension": "可调参数", "self": "Draft length 与 Compare 开关", "other": "Top 1 / Top 2 路由宽度" },
+        { "dimension": "阅读焦点", "self": "草稿是否命中、答案如何写出", "other": "路由分数、专家负载与合并" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcSpeculativeDecoding Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "暂停在讲解点",
+      "language": "csharp",
+      "code": "var speculative = new ArcSpeculativeDecoding { Height = 400 };\n\n// 讲到「校验」这一步时暂停，讲完再继续。\nspeculative.SetPaused(true);\n// ...\nspeculative.SetPaused(false);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcSpeculativeDecoding",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；暂停后画面停在当前帧",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

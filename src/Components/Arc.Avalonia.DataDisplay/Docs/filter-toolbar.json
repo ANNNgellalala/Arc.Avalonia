@@ -1,0 +1,74 @@
+{
+  "slug": "filter-toolbar",
+  "nameZh": "筛选工具栏",
+  "summary": "表格与列表上方的一行工具栏：搜索、可移除的筛选 chip、Add filter 菜单、Sort 菜单与结果计数；空间不够时自动换行，筛选状态始终一览无余。",
+  "purpose": [
+    "当列表需要一组可组合的筛选条件时用它：搜索词 + 若干 chip + 排序 + 结果数。它把筛选状态摊在明面上，用户随时能移除单个条件或一键清空。",
+    "Fields 描述 Add filter 菜单里可选的字段与值，Filters 是已应用的条件；SearchText、SortKey 与 ResultCount 都是受控属性，变化通过 SearchChanged、FilterAdded、FilterRemoved、ClearAllRequested、SortChanged 交回代码。",
+    "所有内容先排在一行，放不下才换行；ShowSearch=false 可以省掉搜索框，ResultCount 省略时计数自动隐藏。"
+  ],
+  "whenToUse": [
+    "表格或列表上方需要一个可组合、可清除的筛选区时。",
+    "筛选条件数量不固定、希望用户能看到当前生效的每个条件时。",
+    "需要把搜索、筛选与排序放在同一行、并跟随容器宽度换行时。"
+  ],
+  "whenNotToUse": [
+    "只有一个固定搜索框时用 search-field，不需要 chip 与排序菜单。",
+    "筛选条件由用户在别处（例如侧栏）管理、工具栏只做展示时，直接用一行文本与 chip 更轻。",
+    "需要日期、数值区间等复杂条件输入时，优先用 date-range-picker 或专门的表单，而不是塞进 chip。"
+  ],
+  "variants": [
+    { "key": "variant-filters", "label": "Filters applied", "note": "搜索词 + 两个 chip + 排序 + 结果计数" },
+    { "key": "variant-empty", "label": "No filters", "note": "没有 chip 与计数，只有入口的初始态" },
+    { "key": "state-no-search", "label": "No search", "note": "ShowSearch=false，搜索框收起" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "button", "note": "Add filter 与 Sort 都是 ArcButton" },
+    { "type": "alternative", "target": "search-field", "note": "单个搜索框用 search field，组合筛选用工具栏" }
+  ],
+  "contrasts": [
+    {
+      "target": "search-field",
+      "title": "Filter toolbar 与 Search field",
+      "rows": [
+        { "dimension": "职责", "self": "组合搜索、筛选、排序与计数", "other": "只负责一个搜索输入" },
+        { "dimension": "状态展示", "self": "每个筛选条件以 chip 常驻可见", "other": "只有输入框里的关键字" },
+        { "dimension": "清空", "self": "可以逐项移除，也可以一键 Clear all", "other": "清空按钮清掉关键字" },
+        { "dimension": "适用", "self": "表格与列表上方的筛选区", "other": "页头、列表顶部的单个搜索" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明工具栏",
+      "language": "xaml",
+      "code": "<arc:ArcFilterToolbar xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n                    Label=\"Project filters\"\n                    SearchPlaceholder=\"Search projects\"\n                    ResultLabel=\"projects\"\n                    SearchText=\"design\" />"
+    },
+    {
+      "title": "筛选、排序与事件",
+      "language": "csharp",
+      "code": "var toolbar = new ArcFilterToolbar\n{\n    Label = \"Project filters\",\n    SearchText = string.Empty,\n    SearchPlaceholder = \"Search projects\",\n    ResultCount = 128,\n    ResultLabel = \"projects\",\n    SortKey = \"updated\",\n    Filters = new[]\n    {\n        new ArcFilterChip { Id = \"status\", Label = \"Status\", Value = \"Open\" },\n        new ArcFilterChip { Id = \"owner\", Label = \"Owner\", Value = \"Maya\" }\n    },\n    Fields = new[]\n    {\n        new ArcFilterField\n        {\n            Id = \"status\",\n            Label = \"Status\",\n            Options = new List<ArcFilterOption>\n            {\n                new() { Value = \"Open\" },\n                new() { Value = \"Closed\" },\n                new() { Value = \"Blocked\" }\n            }\n        }\n    },\n    SortOptions = new[]\n    {\n        new ArcSortOption { Key = \"updated\", Label = \"Last updated\" },\n        new ArcSortOption { Key = \"name\", Label = \"Name\" }\n    }\n};\n\ntoolbar.SearchChanged += (_, text) => Reload(query: text);\ntoolbar.FilterAdded += (_, chip) => AddFilter(chip.Id, chip.Value);\ntoolbar.FilterRemoved += (_, id) => RemoveFilter(id);\ntoolbar.ClearAllRequested += (_, _) => ResetFilters();\ntoolbar.SortChanged += (_, key) => SortBy(key);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcFilterToolbar",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Filters": "已应用的筛选条件，显示为可移除的 chip",
+      "Fields": "Add filter 菜单里可选的字段与值",
+      "SortOptions": "Sort 菜单里可选的排序项",
+      "SortKey": "当前排序键，与 SortOptions 对应",
+      "SearchText": "搜索框内容，每次变化触发 SearchChanged",
+      "ShowSearch": "显示搜索框，默认 true",
+      "SearchPlaceholder": "搜索框占位文案，默认 Search",
+      "ResultCount": "结果数量；省略时隐藏计数",
+      "ResultLabel": "计数的名词，默认 results",
+      "Label": "工具栏的无障碍名称，默认 Filters",
+      "FilterRemoved": "移除某个 chip 时触发，参数是 chip 的 Id",
+      "FilterAdded": "从菜单添加筛选条件时触发",
+      "ClearAllRequested": "点击 Clear all 时触发",
+      "SearchChanged": "搜索词变化时触发",
+      "SortChanged": "排序项变化时触发，参数是新的排序键"
+    }
+  }
+}

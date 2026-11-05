@@ -1,0 +1,52 @@
+{
+  "slug": "page-header",
+  "nameZh": "页面页头",
+  "summary": "项目详情的页头：面包屑、状态、成员、进度与带计数的标签条，滚动后折叠成紧凑的一行。",
+  "purpose": [
+    "放在项目、仓库或记录详情页顶部：一层面包屑说明位置，大标题旁是状态徽标与操作，下一行是成员头像组与进度，再下面是带计数的标签条。",
+    "滚动越过阈值后，面包屑、大标题与元信息收起，只留一行紧凑标题与标签条；折叠时阅读顺序不变，只是不再显示次要信息。",
+    "组成依赖：状态与计数用 badge，成员用 avatar-group，进度用 progress，标签条用 segmented-control，操作按钮用 button。"
+  ],
+  "whenToUse": [
+    "项目、仓库或记录详情页的顶部，需要状态、成员与标签。",
+    "内容很长、页头应该在滚动后折叠并保持上下文时。",
+    "需要先把几个主操作放在标题旁、其余收进溢出菜单时。"
+  ],
+  "whenNotToUse": [
+    "营销站的整站导航用 site-header，那里需要分区浮层而不是页面标签。",
+    "只需要一个标题与一条说明时，用普通标题排版即可。",
+    "只有导航、没有页面级状态与行动时，用 tabs 或 breadcrumb 单独组合。"
+  ],
+  "variants": [
+    { "key": "variant-expanded", "label": "Expanded", "note": "面包屑、大标题、状态与元信息完整展开" },
+    { "key": "variant-tabs", "label": "Tabs", "note": "带计数的标签条，计数会滚动到新值" },
+    { "key": "variant-members", "label": "Members", "note": "成员头像组与项目进度并排" },
+    { "key": "state-folded", "label": "Folded", "note": "滚动后收起成一行紧凑标题" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "avatar-group", "note": "成员用 avatar group 叠放展示" },
+    { "type": "uses", "target": "badge", "note": "状态与标签计数用 ArcBadge 呈现" },
+    { "type": "uses", "target": "progress", "note": "项目进度条用 ArcProgress" },
+    { "type": "uses", "target": "segmented-control", "note": "带计数的标签条用 segmented control 的计数附件" },
+    { "type": "uses", "target": "button", "note": "Follow、Share 与溢出菜单都是 ArcButton" },
+    { "type": "alternative", "target": "tabs", "note": "只需要标签条本身时直接用 tabs 组件" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Page header 与 Tabs",
+      "rows": [
+        { "dimension": "职责", "self": "页面级标题、状态、成员与进度", "other": "只负责视图切换的标签条" },
+        { "dimension": "滚动行为", "self": "越过阈值折叠为紧凑一行", "other": "通常保持原位" },
+        { "dimension": "内容", "self": "包含面包屑、操作与元信息", "other": "只有标签与计数" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页头的两层结构",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:f=\"clr-namespace:Arc.Avalonia.Feedback.Controls;assembly=Arc.Avalonia.Feedback\">\n  <StackPanel Spacing=\"14\" Margin=\"26,22,26,20\">\n    <StackPanel Spacing=\"10\">\n      <TextBlock Text=\"Acme / Projects / Atlas design system\" Classes=\"arc-caption\" />\n      <Grid ColumnDefinitions=\"Auto,Auto,*,Auto\">\n        <TextBlock Text=\"Atlas design system\" Classes=\"arc-title-sm\" />\n        <c:ArcBadge Grid.Column=\"1\" Content=\"In progress\" Tone=\"Warning\" Dot=\"True\" Margin=\"12,0,0,0\" />\n        <c:ArcButton Grid.Column=\"3\" Content=\"Follow\" Variant=\"Secondary\" Size=\"Sm\" />\n      </Grid>\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"8\" VerticalAlignment=\"Center\">\n        <TextBlock Text=\"Members\" Classes=\"arc-caption\" />\n        <f:ArcAvatarGroup Max=\"5\" Size=\"Xs\" Label=\"Project members\" />\n        <c:ArcProgress Width=\"150\" Value=\"62\" Max=\"100\" ShowValue=\"True\" Size=\"Sm\" />\n      </StackPanel>\n    </StackPanel>\n    <c:ArcSegmentedControl Label=\"Project sections\" />\n  </StackPanel>\n</Window>"
+    }
+  ]
+}

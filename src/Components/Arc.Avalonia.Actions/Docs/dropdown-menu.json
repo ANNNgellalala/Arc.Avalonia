@@ -1,0 +1,74 @@
+{
+  "slug": "dropdown-menu",
+  "nameZh": "下拉菜单",
+  "summary": "挂在按钮上的动作列表：点击或按 Down 打开，高亮在行间滑行，快捷键提示靠右，破坏性动作以分隔线收在末尾。",
+  "purpose": [
+    "一个触发器加一列动作，适合放在工具栏、卡片角落或表头。面板由页面承载而不是独立弹窗，所以它天然出现在布局流里，截图与并排比对都不会丢；箭头随开合旋转，触发按钮的宽度随标签弹性变化。",
+    "每行可以带 Lucide 图标、快捷键提示与破坏性标记：IsDestructive 让行读作危险色并默认放在末尾，SeparatorBefore 在行上方画分隔线分组。",
+    "打开后焦点进入菜单，方向键移动、Escape 或外部点击关闭并把焦点还给触发器。IsOpen 支持由页面直接驱动，因此可以在文档或测试里静态展示打开态。"
+  ],
+  "whenToUse": [
+    "一个对象上的 3–7 个次级动作，触发器本身只需要显示「操作」或一个图标。",
+    "动作带有键盘快捷键，需要把提示展示在行右侧。",
+    "表面空间紧张，希望把低频操作收进一个按钮。"
+  ],
+  "whenNotToUse": [
+    "动作绑定在某个对象的位置上（右键或长按出现）时，改用 context-menu。",
+    "菜单内容是账号身份、主题与退出登录时，改用 user-menu。",
+    "只有两三个始终可见的动作时，直接用 button-group，不需要先展开一层。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "面板在触发器下方展开，高亮停在首行" },
+    { "key": "state-closed", "label": "Closed", "note": "只有触发器，箭头朝下" },
+    { "key": "variant-icon", "label": "Icon trigger", "note": "触发器带前置 Lucide 图标" },
+    { "key": "variant-shortcuts", "label": "Shortcut hints", "note": "行尾显示键盘快捷键" },
+    { "key": "variant-destructive", "label": "Destructive last", "note": "危险动作以分隔线分组、收在末尾" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "context-menu", "note": "动作跟着对象位置出现时改用 context menu" },
+    { "type": "alternative", "target": "user-menu", "note": "账号级菜单（身份、主题、退出）改用 user menu" },
+    { "type": "complement", "target": "button", "note": "触发器就是一个 button，菜单只是它的展开层" }
+  ],
+  "contrasts": [
+    {
+      "target": "context-menu",
+      "title": "Dropdown menu 与 Context menu",
+      "rows": [
+        { "dimension": "入口", "self": "显式的触发按钮，位置固定", "other": "右键、长按或 Shift+F10，位置跟随指针或目标" },
+        { "dimension": "绑定关系", "self": "属于页面或工具栏，不绑定具体对象", "other": "包裹一个对象，动作只作用于它" },
+        { "dimension": "可发现性", "self": "一直可见的按钮，容易被发现", "other": "藏在次级手势后，需要用户知道可以右键" }
+      ]
+    },
+    {
+      "target": "user-menu",
+      "title": "Dropdown menu 与 User menu",
+      "rows": [
+        { "dimension": "内容", "self": "一组通用动作", "other": "身份头部、账号目的地、主题偏好与退出登录" },
+        { "dimension": "结构", "self": "只有列表，可以用分隔线与勾选态分组", "other": "固定三段结构，内联主题开关与带 spinner 的退出行" },
+        { "dimension": "放置位置", "self": "任何需要动作的地方", "other": "顶栏右上角的固定入口" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "带快捷键与破坏性动作",
+      "language": "csharp",
+      "code": "var menu = new ArcDropdownMenu\n{\n    Label = \"Actions\",\n    Icon = \"more-horizontal\",\n    Items = new List<ArcMenuItem>\n    {\n        new() { Label = \"Rename\", Icon = \"pencil\", Shortcut = \"⌘R\" },\n        new() { Label = \"Duplicate\", Icon = \"copy\", Shortcut = \"⌘D\" },\n        new() { Label = \"Pin to sidebar\", Icon = \"pin\" },\n        new() { Label = \"Delete project\", Icon = \"trash-2\", IsDestructive = true, SeparatorBefore = true }\n    }\n};\n\nmenu.IsOpen = true;"
+    },
+    {
+      "title": "在 XAML 中声明",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:actions=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\"\n        xmlns:internal=\"clr-namespace:Arc.Avalonia.Internal;assembly=Arc.Avalonia.Internal\">\n  <actions:ArcDropdownMenu Label=\"Sort\" Icon=\"arrow-down-up\">\n    <actions:ArcDropdownMenu.Items>\n      <internal:ArcMenuItem Label=\"Newest first\" Icon=\"arrow-down\" />\n      <internal:ArcMenuItem Label=\"Oldest first\" Icon=\"arrow-up\" />\n    </actions:ArcDropdownMenu.Items>\n  </actions:ArcDropdownMenu>\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcDropdownMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "触发按钮的文案，例如 \"Actions\"",
+      "Icon": "触发按钮的前置 Lucide 图标名",
+      "Items": "菜单项；破坏性项放在最后并把它前面的 SeparatorBefore 设为 true",
+      "IsOpen": "菜单是否打开，可由页面驱动以展示静态打开态"
+    }
+  }
+}

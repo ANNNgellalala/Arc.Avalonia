@@ -1,0 +1,77 @@
+{
+  "slug": "segmented-control",
+  "nameZh": "分段控件",
+  "summary": "2–5 个互斥视图的紧凑切换：一块共享的高亮 pill 用弹簧在段之间滑动，选中段独自成为 Tab 停靠点。",
+  "purpose": [
+    "用于切换同一区域里的几种视图（Day / Week / Month、Compact / Standard / Comfortable）：整组只占一行，比一行一个单选省下大量纵向空间。",
+    "高亮只由一块共享的 pill 表达，它在段之间滑动而不是每段各自换底色，所以切换时视线能跟上，也避免了「两个同时亮」的错觉。",
+    "每段可以带一个尾部小计数（Accessory），用来显示该视图下有多少条结果；计数用弱化色，不参与选中态。",
+    "键盘语义接近单选组：方向键即时切换到相邻段，Home / End 跳到首尾，Tab 只停在当前选中段上。"
+  ],
+  "whenToUse": [
+    "2–5 个互斥视图的切换，选项短到能一行排下。",
+    "切换后同一块内容区域整体替换，而不是跳转到另一个页面。",
+    "希望键盘用方向键连续比较几种视图，而不是按 Tab 逐个穿过。"
+  ],
+  "whenNotToUse": [
+    "选项会改变整个页面的路由或内容结构时，改用 tabs，它有明确的页面级语义。",
+    "每个选项都需要一句说明或需要纵向排列时，改用 radio-group。",
+    "切换的是业务周期、并且要展示折扣徽标时，改用 billing-toggle。"
+  ],
+  "variants": [
+    { "key": "variant-selected", "label": "Selected", "note": "高亮 pill 停在选中段" },
+    { "key": "variant-two", "label": "Two segments", "note": "最小形态：两段" },
+    { "key": "variant-three", "label": "Three segments", "note": "最常见的三段视图" },
+    { "key": "variant-accessory", "label": "With accessory", "note": "段尾的小计数，弱化色" },
+    { "key": "state-unselected", "label": "Unselected", "note": "没有值时不显示高亮 pill" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tabs", "note": "切换会改变页面级内容结构时改用 tabs" },
+    { "type": "alternative", "target": "radio-group", "note": "选项需要说明或需要纵向排列时改用 radio group" },
+    { "type": "alternative", "target": "billing-toggle", "note": "周期切换且需要节省徽标时改用 billing toggle" },
+    { "type": "alternative", "target": "chip-group", "note": "需要同时启用多个筛选时改用 chip group" }
+  ],
+  "contrasts": [
+    {
+      "target": "tabs",
+      "title": "Segmented control 与 Tabs",
+      "rows": [
+        { "dimension": "语义", "self": "同一区域内的视图切换", "other": "页面级的内容分区与路由" },
+        { "dimension": "视觉重量", "self": "紧凑胶囊，弱化背景", "other": "下划线或胶囊页签，强调当前分区" },
+        { "dimension": "选项数量", "self": "2–5 个短标签", "other": "可更多，允许滚动与溢出菜单" }
+      ]
+    },
+    {
+      "target": "radio-group",
+      "title": "Segmented control 与 Radio group",
+      "rows": [
+        { "dimension": "占用高度", "self": "整组一行", "other": "每个选项一行" },
+        { "dimension": "选项说明", "self": "只有标签与尾部计数", "other": "每行可带一句说明" },
+        { "dimension": "视觉", "self": "一块高亮 pill 滑动", "other": "行式单选，选中行点亮圆点" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcSegmentedControl Label=\"Range\"\n                           Options=\"{Binding Ranges}\"\n                           Value=\"{Binding Range, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "段尾计数与值变化",
+      "language": "csharp",
+      "code": "var inbox = new ArcSegmentedControl\n{\n    Label = \"Inbox\",\n    Width = 320,\n    Value = \"open\",\n    Options = new[]\n    {\n        new ArcSegmentOption(\"open\", \"Open\", \"12\"),\n        new ArcSegmentOption(\"snoozed\", \"Snoozed\", \"3\"),\n        new ArcSegmentOption(\"done\", \"Done\")\n    }\n};\n\ninbox.ValueChanged += (_, _) => Load(inbox.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcSegmentedControl",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "段集合，元素是 ArcSegmentOption（Value / Label / Accessory）",
+      "Value": "当前选中段的 Value，未选择时为 null",
+      "Label": "组的无障碍名称",
+      "ValueChanged": "切换到另一段后触发，此时 Value 已更新",
+      "OptionIntent": "指针进入或焦点落到某段时触发，参数指出即将被选中的值"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "slug": "exploded-view",
+  "nameZh": "分解视图",
+  "summary": "把一台手机的五层结构沿深度分开：显示、玻璃、界面、内容与机身各占一层，分离滑块控制层间距，右侧说明所选图层。",
+  "purpose": [
+    "当要解释一件产品由哪些层组成时，用 exploded view：五层沿纵深错开，标签跟着各自的层，右侧面板说明当前选中层。",
+    "分离滑块（当前停在 0.55）直接驱动层间距，0 时合成一台完整的手机，1 时完全展开；每层还可单独隐藏，用来强调某一层或去掉干扰。",
+    "图层开关以筹码形式排成一排，隐藏的层在芯片上变暗并从堆叠中消失；这是「解释结构」的区块，不是可交互的产品配置器。"
+  ],
+  "whenToUse": [
+    "产品页需要解释硬件或软件的层次结构时。",
+    "需要让读者自己拖动分离程度时。",
+    "要逐层点亮并阅读说明时。"
+  ],
+  "whenNotToUse": [
+    "需要展示产品的卖点与购买入口时，用 product-detail。",
+    "图片浏览与放大的场景，用 product-gallery。",
+    "只需要一层剖面图时，用静态图片即可。"
+  ],
+  "variants": [
+    { "key": "layout-exploded", "label": "整体布局", "note": "分解舞台、分离滑块、图层开关与说明面板并置" },
+    { "key": "variant-layers", "label": "Layers", "note": "五层沿纵深错开的堆叠" },
+    { "key": "variant-labels", "label": "Labels", "note": "跟随各层的名称标签" },
+    { "key": "variant-separation", "label": "Separation", "note": "分离滑块，当前停在 0.55" },
+    { "key": "variant-detail-panel", "label": "Detail", "note": "所选图层的说明与显示 / 隐藏操作" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "slider", "note": "层分离程度由滑块直接驱动" },
+    { "type": "uses", "target": "badge", "note": "图层序号与状态用徽章标出" },
+    { "type": "uses", "target": "button", "note": "显示 / 隐藏图层与图层切换用按钮" },
+    { "type": "uses", "target": "card", "note": "舞台与说明面板由卡片承载" },
+    { "type": "alternative", "target": "product-detail", "note": "产品详情与购买入口用 product detail" }
+  ],
+  "contrasts": [
+    {
+      "target": "product-detail",
+      "title": "Exploded view 与 Product detail",
+      "rows": [
+        { "dimension": "目的", "self": "解释内部结构与层次", "other": "展示卖点并完成购买" },
+        { "dimension": "交互", "self": "拖动分离、逐层选择与隐藏", "other": "变体、数量、加入购物袋" },
+        { "dimension": "信息", "self": "每层的材料与功能说明", "other": "价格、评价、参数与物流" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,300\">\n  <charts:ArcExplodedLayers Height=\"300\" />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"16\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：层与分离",
+      "language": "csharp",
+      "code": "var layers = new List<ExplodedLayer>\n{\n    new(\"Display\", \"6.7 inch OLED, 120 Hz\", 0),\n    new(\"Cover glass\", \"Ceramic shield\", 1),\n    new(\"Interface\", \"Navigation and the live sheet\", 2),\n    new(\"Content\", \"The screen being explained\", 3),\n    new(\"Chassis\", \"Titanium frame and USB-C\", 1)\n};\n\nvar stage = new ArcExplodedLayers(layers, separation: 0.55) { Height = 300 };"
+    }
+  ]
+}

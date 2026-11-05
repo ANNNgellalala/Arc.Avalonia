@@ -22,6 +22,11 @@ public sealed class LoginSplitPage : ArcItemPage
 {
     public override string ItemSlug => "login-split";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "state-email-step", "variant-brand-panel", "variant-split-layout", "variant-providers"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

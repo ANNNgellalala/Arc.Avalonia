@@ -38,6 +38,11 @@ public sealed class ApiKeysPage : ArcItemPage
 
     public override bool DemoOnCanvas => false;
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-key-list", "state-revealed-secret", "state-masked-secret", "variant-environment-badge"
+    };
+
     public override IReadOnlyList<string>? WhenToUse => new[]
     {
         "The developer settings page of an API product.",

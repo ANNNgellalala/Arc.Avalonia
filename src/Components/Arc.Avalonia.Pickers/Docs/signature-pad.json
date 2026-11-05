@@ -1,0 +1,83 @@
+{
+  "slug": "signature-pad",
+  "nameZh": "签名板",
+  "summary": "手写签名板：墨迹随笔速变细、支持撤销与重做、可清空重签，并把签名导出为透明 PNG。",
+  "purpose": [
+    "在合同、审批、验收这类需要“亲手确认”的流程里，签名比勾选框更有分量。签名板把指针轨迹采集成笔画，按速度调整笔尖粗细，看起来像真实钢笔。",
+    "笔画保存在 600 × 260 的坐标空间里，随控件缩放与主题重绘；StrokesChanged 输出可持久化的笔画列表，下次用 LoadStrokes 原样回放。",
+    "工具栏提供三种墨色与三档笔宽，撤销、重做、清空都在原地完成；键盘上 Control Z、Control Shift Z 与 Delete 走同一套历史。",
+    "SavePng 用三倍分辨率渲染透明背景的 PNG，DefaultExportPath 给文件命名一个默认值；Signer 与 Hint 负责已签与待签两种文字状态。"
+  ],
+  "whenToUse": [
+    "合同、审批、验收签字等需要手写确认的流程。",
+    "需要把签名作为图片或笔画数据保存下来，供之后回放或打印时。",
+    "要让签署人选择墨色与笔宽、并在签错时撤销或重来时。",
+    "桌面端需要键盘可达的签名输入（无法使用触屏手写）时。"
+  ],
+  "whenNotToUse": [
+    "只是让用户确认姓名或首字母时，用 textarea 或 inline-edit 键入更简单、也更易校验。",
+    "需要上传一份已签好的扫描件时改用 file-dropzone。",
+    "需要收集头像或照片时改用 avatar-upload。",
+    "签名要作为图像与其他截图对比时，导出 PNG 后改用 image-compare 展示差异。"
+  ],
+  "variants": [
+    { "key": "variant-signed", "label": "已签（紫色）", "note": "紫色墨迹 + 签名人姓名，Medium 笔宽" },
+    { "key": "variant-blue-ink", "label": "蓝色墨迹", "note": "InkColor=Blue，同一份笔画换色" },
+    { "key": "variant-black-ink", "label": "黑色墨迹", "note": "InkColor=Black，最接近纸质签字" },
+    { "key": "state-empty", "label": "待签", "note": "没有笔画时显示基线、Hint 与工具栏" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "textarea", "note": "只需要键入姓名确认时，textarea 更轻也更好校验" },
+    { "type": "complement", "target": "file-dropzone", "note": "签名 PNG 常与合同附件一起上传" },
+    { "type": "complement", "target": "image-compare", "note": "需要对比新旧签名图时，导出后可放进 image compare" }
+  ],
+  "contrasts": [
+    {
+      "target": "textarea",
+      "title": "Signature pad 与 Textarea",
+      "rows": [
+        { "dimension": "输入方式", "self": "手写轨迹，按速度变粗细", "other": "键盘键入字符" },
+        { "dimension": "产物", "self": "笔画数据与透明 PNG", "other": "纯文本字符串" },
+        { "dimension": "校验", "self": "只能检查是否有墨迹", "other": "可以做格式、长度与内容校验" },
+        { "dimension": "适用场景", "self": "签合同、验收确认", "other": "留言、备注、短文本" }
+      ]
+    },
+    {
+      "target": "file-dropzone",
+      "title": "Signature pad 与 File dropzone",
+      "rows": [
+        { "dimension": "来源", "self": "在控件内现场手写", "other": "选择或拖入已有文件" },
+        { "dimension": "输出", "self": "笔画列表或导出的 PNG", "other": "原始文件本身" },
+        { "dimension": "可编辑性", "self": "可撤销、清空、重新签名", "other": "只能移除后重新选择" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "声明一个可签名的板子",
+      "language": "csharp",
+      "code": "var pad = new ArcSignaturePad\n{\n    Width = 600,\n    Signer = \"Ada Lovelace\",\n    InkColor = ArcInkColor.Violet,\n    InkWidth = ArcInkWidth.Medium,\n    FileName = \"ada-signature\"\n};\n\npad.StrokesChanged += (_, strokes) => Persist(strokes);\npad.PngSaved += (_, path) => Console.WriteLine($\"Saved to {path}\");"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcSignaturePad x:Name=\"Signature\"\n                           Width=\"600\"\n                           Signer=\"Ada Lovelace\"\n                           InkColor=\"Violet\"\n                           InkWidth=\"Medium\"\n                           FileName=\"ada-signature\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcSignaturePad",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Signer": "打印在基线下的签署人姓名",
+      "Hint": "尚未落笔时显示在基线上的提示，默认 Sign here",
+      "InkColor": "新笔画的墨色：Black / Blue / Violet",
+      "InkWidth": "新笔画的笔尖宽度：Fine / Medium / Bold",
+      "FileName": "导出 PNG 时的默认文件名，默认 signature",
+      "Label": "无障碍名称，默认 Signature pad",
+      "Strokes": "当前笔画列表；未撤销时即最新一笔之后的状态",
+      "HasInk": "是否已有任何笔画",
+      "StrokesChanged": "笔画增加、撤销、重做或清空后触发，输出可持久化的笔画",
+      "PngSaved": "导出透明 PNG 成功后触发，参数是写入路径"
+    }
+  }
+}

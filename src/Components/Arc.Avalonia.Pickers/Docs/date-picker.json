@@ -1,0 +1,145 @@
+{
+  "slug": "date-picker",
+  "nameZh": "日期选择器",
+  "summary": "表单里的日期字段：点击或按 Enter 展开月历，选中的日期就地显示，已选时可一键清除，MinDate、MaxDate 与 DisabledDates 控制可选范围。",
+  "purpose": [
+    "日期选择器把一个日历收进一个有标签的字段，让你在表单、筛选条件与设置面板里输入日期，而不用一直占着一块月历：关闭时它只占一行，打开时在字段下方浮出面板。",
+    "关闭态由标签、日期值（或占位提示）和日历图标组成；已选日期时右侧出现清除按钮，触发器的可访问名称会念出当前日期。",
+    "打开后方向键在日历里逐日移动、PageUp 与 PageDown 按月翻页、Home 与 End 跳到周首尾；Escape 关闭面板并把焦点还给字段，点击面板外即收起。",
+    "MinDate、MaxDate、DisabledDates 与 ShowToday 会原样传给面板里的月历，所以范围限制与“跳到今天”在打开前后表现一致。"
+  ],
+  "whenToUse": [
+    "你的表单需要输入一个日期，而页面上不需要一直看到月历时。",
+    "可选项受范围限制，例如不能选过去、不能选周末或只能在若干天内选择。",
+    "需要把日期输入与标签、占位提示和辅助说明排成标准字段时。"
+  ],
+  "whenNotToUse": [
+    "日期需要始终可见、与你正在浏览的内容并排时，改用 calendar 内联月历。",
+    "要选一段起止日期时，改用 date-range-picker。",
+    "只选时间而不是日期时，改用 time-picker。"
+  ],
+  "variants": [
+    {
+      "key": "state-empty",
+      "label": "Empty",
+      "note": "显示占位提示，没有清除按钮"
+    },
+    {
+      "key": "state-filled",
+      "label": "Selected",
+      "note": "显示格式化日期，右侧出现清除按钮"
+    },
+    {
+      "key": "state-open",
+      "label": "Open",
+      "note": "字段下方浮出月历，方向键直接落在可选日期上"
+    },
+    {
+      "key": "state-constrained",
+      "label": "Constrained",
+      "note": "MinDate、MaxDate 与禁用日一起生效"
+    }
+  ],
+  "relations": [
+    {
+      "type": "alternative",
+      "target": "calendar",
+      "note": "日期需要始终可见、与内容并排浏览时，直接用内联 calendar"
+    },
+    {
+      "type": "alternative",
+      "target": "date-range-picker",
+      "note": "要选起止区间而不是单日时改用 date-range-picker"
+    },
+    {
+      "type": "complement",
+      "target": "time-picker",
+      "note": "同一张表单里日期与时间常常并排出现，两者的字段样式一致"
+    }
+  ],
+  "contrasts": [
+    {
+      "target": "calendar",
+      "title": "Date picker 与 Calendar",
+      "rows": [
+        {
+          "dimension": "可见性",
+          "self": "默认收起，点击字段才展开面板",
+          "other": "月历始终可见，占一整块区域"
+        },
+        {
+          "dimension": "页面占用",
+          "self": "收起时只占一行字段的高度",
+          "other": "常驻时至少占一张月历的宽高"
+        },
+        {
+          "dimension": "适用场景",
+          "self": "表单、筛选条件、设置面板",
+          "other": "日程页、预约页等以日期为主体的页面"
+        },
+        {
+          "dimension": "选择反馈",
+          "self": "选中后收起面板，把焦点还给字段",
+          "other": "选中后就地保留月历，方便连续浏览"
+        }
+      ]
+    },
+    {
+      "target": "date-range-picker",
+      "title": "Date picker 与 Date range picker",
+      "rows": [
+        {
+          "dimension": "选择粒度",
+          "self": "一天",
+          "other": "一个起止区间"
+        },
+        {
+          "dimension": "面板结构",
+          "self": "单月月历",
+          "other": "预设栏加一到两个月"
+        },
+        {
+          "dimension": "确认方式",
+          "self": "点中日期立刻生效",
+          "other": "先选草稿，按 Apply 才提交"
+        },
+        {
+          "dimension": "字段显示",
+          "self": "格式化日期或占位提示",
+          "other": "起止两端的日期摘要"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放进表单",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcDatePicker Label=\"开始日期\"\n                         Placeholder=\"选择日期\"\n                         Width=\"280\"\n                         SelectedDate=\"{Binding StartDate}\"\n                         MinDate=\"{Binding Today}\"\n                         ShowToday=\"True\"\n                         Description=\"订阅从这一天开始。\" />\n</Window>"
+    },
+    {
+      "title": "限制范围并处理选择变化",
+      "language": "csharp",
+      "code": "var picker = new ArcDatePicker\n{\n    Label = \"预约日期\",\n    Width = 280,\n    Placeholder = \"只能选工作日\",\n    MinDate = DateTime.Today,\n    MaxDate = DateTime.Today.AddDays(45),\n    DisabledDates = day => day.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,\n    ShowToday = true\n};\n\npicker.SelectedDateChanged += (_, date) =>\n    statusText.Text = date is null ? \"尚未选择日期\" : date.Value.ToString(\"yyyy-MM-dd\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcDatePicker",
+    "exclude": [
+      "TemplatedParent"
+    ],
+    "descriptions": {
+      "SelectedDate": "选中的日期；null 表示空字段并显示占位提示",
+      "MinDate": "可选范围的下界，更早的日期不可选",
+      "MaxDate": "可选范围的上界，更晚的日期不可选",
+      "DisabledDates": "返回 true 的日期被禁用，用来排除周末或固定日期",
+      "ShowToday": "在月历头部显示 Today 快捷动作，默认 false",
+      "Format": "字段显示日期时使用的 .NET 格式，默认 \"MMM d, yyyy\"",
+      "SelectedDateChanged": "选中日期或被清除时触发，清除时参数为 null",
+      "IsDropDownOpen": "面板是否展开；Escape 或选中后关闭并把焦点还给字段",
+      "Label": "字段上方的标签，同时进入触发器的可访问名称",
+      "Placeholder": "未选日期时字段里的提示文字",
+      "Description": "字段下方的辅助说明，可为空"
+    }
+  }
+}

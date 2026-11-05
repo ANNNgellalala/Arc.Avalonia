@@ -1,0 +1,75 @@
+{
+  "slug": "expandable-text",
+  "nameZh": "可展开文本",
+  "summary": "把长文本压到几行并加一层柔和渐隐：Read more 展开到完整高度，Show less 收回；只有真的溢出时才出现开关。",
+  "purpose": [
+    "评论、描述、任务说明这类默认只需要读前几行的文本，用固定的行数上限保持列表整齐。行数由 Lines 控制（默认 3），底部渐隐取控件 Background 的颜色，所以放在任何表面上都不会出现一块异色。",
+    "是否溢出在测量之后决定：没溢出的短文本既不显示开关也不加渐隐，避免给一行文本无端加一条链接。宽度变化会重新测量，响应式布局里行数始终按当前宽度算。",
+    "IsExpanded 可以由外部控制，ExpandedChanged 报告变化。展开时裁剪高度与渐隐都走弹簧过渡，文本不会突然跳一屏；Show less 收到的字数与展开前一致。"
+  ],
+  "whenToUse": [
+    "评论、issue 描述、变更说明这类默认只读前几行的长文本。",
+    "列表卡片里每条摘要长度不同，希望统一成固定行高。",
+    "需要「展开 / 收起」是一个明确的、可聚焦的按钮，而不是点击整段文字。"
+  ],
+  "whenNotToUse": [
+    "内容是一组问答、需要逐条开合时，改用 accordion。",
+    "展开后要显示图片、表单等不只是文本的内容时，改用 expandable-card。",
+    "文本永远不会超过目标行数时不必加开关，直接渲染 TextBlock。"
+  ],
+  "variants": [
+    { "key": "state-collapsed", "label": "Collapsed", "note": "只显示前几行，底部柔和渐隐，开关读作 Read more" },
+    { "key": "state-expanded", "label": "Expanded", "note": "完整高度，无渐隐，开关读作 Show less" },
+    { "key": "state-fitted", "label": "Fitted", "note": "短文本不溢出：没有开关，也没有渐隐" },
+    { "key": "variant-two-lines", "label": "Two lines", "note": "Lines=2，窄卡片里的更紧凑的裁剪" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "accordion", "note": "一组问答逐条开合时用 accordion" },
+    { "type": "alternative", "target": "expandable-card", "note": "展开的内容不止文本时用 expandable card" },
+    { "type": "complement", "target": "comment-thread", "note": "评论正文常以折叠文本呈现，展开后再读全文" }
+  ],
+  "contrasts": [
+    {
+      "target": "accordion",
+      "title": "Expandable text 与 Accordion",
+      "rows": [
+        { "dimension": "结构", "self": "一段连续文本，只有一个开关", "other": "多行标题，每行独立开合" },
+        { "dimension": "折叠依据", "self": "按行数裁剪，溢出才出现开关", "other": "按行索引展开其中一行，未展开的答案完全不占位" },
+        { "dimension": "典型场景", "self": "评论、描述、变更说明", "other": "FAQ、设置项分组" }
+      ]
+    },
+    {
+      "target": "expandable-card",
+      "title": "Expandable text 与 Expandable card",
+      "rows": [
+        { "dimension": "内容类型", "self": "纯文本", "other": "任意控件：明细、列表、表单" },
+        { "dimension": "开关形态", "self": "文本末尾的 Read more / Show less", "other": "整块卡片头部都是开关，带箭头" },
+        { "dimension": "收起尺寸", "self": "固定行数，高度随宽度重算", "other": "固定宽度上限，展开时还能变宽" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "三行折叠与展开",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:actions=\"clr-namespace:Arc.Avalonia.Actions.Controls;assembly=Arc.Avalonia.Actions\">\n  <actions:ArcExpandableText Lines=\"3\"\n                             MaxWidth=\"560\"\n                             Background=\"{DynamicResource ArcBackground}\"\n                             Text=\"{Binding ReviewText}\" />\n</Window>"
+    },
+    {
+      "title": "受控展开并监听变化",
+      "language": "csharp",
+      "code": "var text = new ArcExpandableText\n{\n    Lines = 3,\n    MaxWidth = 560,\n    Text = review,\n    MoreLabel = \"Read more\",\n    LessLabel = \"Show less\"\n};\n\ntext.ExpandedChanged += (_, expanded) =>\n{\n    // 用于埋点或在窄屏上滚动到卡片的顶部。\n    if (expanded)\n    {\n        text.BringIntoView();\n    }\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Actions.Controls.ArcExpandableText",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Text": "要显示的正文",
+      "Lines": "收起时显示的行数，默认 3",
+      "IsExpanded": "是否已展开；可由外部控制",
+      "MoreLabel": "收起时开关的文案，默认 \"Read more\"",
+      "LessLabel": "展开时开关的文案，默认 \"Show less\"",
+      "ExpandedChanged": "展开状态变化时触发，参数为新的布尔值"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "slug": "carousel",
+  "nameZh": "轮播",
+  "summary": "一排可拖拽、可按键切换的幻灯片：两侧留出相邻卡片的边缘，底部圆点指示位置，也支持自动轮播。",
+  "purpose": [
+    "当内容天然是一组平级卡片（房源、模板、案例、推荐）时，轮播让一组内容共用一块版面，读者横向滑动、拖拽或按方向键逐张查看。",
+    "它不把页面切成整屏大图，而是让相邻幻灯片露出边缘：读者一眼知道“还有更多”，也让滑动方向自解释。",
+    "DefaultIndex 决定初始位置，Index 用于受控切换，SlideSize 控制单张宽度（窄容器会自动收缩），Interval 与 Autoplay 控制自动轮播节奏。",
+    "底部圆点既是位置指示也是跳转入口；每张幻灯片由 ArcCarouselItem 的标题、描述与自定义内容组成，可以放图片、卡片或任意控件。"
+  ],
+  "whenToUse": [
+    "展示一组平级、可横向浏览的内容，例如房源、模板、案例或推荐。",
+    "版面只够放一张卡片、但需要让用户知道还有更多时。",
+    "希望相邻幻灯片露出边缘、暗示可滑动时。",
+    "需要自动轮播（例如营销位）但也要保留手动控制时。"
+  ],
+  "whenNotToUse": [
+    "需要逐张做取舍决策（保留/跳过）时改用 card-stack。",
+    "只是对比两张图的差异时改用 image-compare。",
+    "内容需要同时并排比较、不宜隐藏时用普通网格或列表。",
+    "要播放视频或音频时改用 media-player。"
+  ],
+  "variants": [
+    { "key": "variant-four-slides", "label": "四张幻灯片", "note": "默认从第二张开始，SlideSize=300" },
+    { "key": "variant-compact", "label": "紧凑尺寸", "note": "SlideSize=200，同屏露出更多相邻卡片" },
+    { "key": "state-first-slide", "label": "第一张", "note": "DefaultIndex=0，左边缘对齐" },
+    { "key": "state-last-slide", "label": "最后一张", "note": "DefaultIndex=3，右边缘对齐" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "card-stack", "note": "需要逐张取舍、带撤销时用 card stack" },
+    { "type": "alternative", "target": "image-compare", "note": "只对比两张图时用 image compare" }
+  ],
+  "contrasts": [
+    {
+      "target": "card-stack",
+      "title": "Carousel 与 Card stack",
+      "rows": [
+        { "dimension": "互动目的", "self": "浏览一组内容", "other": "对每张卡片做取舍" },
+        { "dimension": "导航", "self": "拖拽、方向键、圆点跳转", "other": "左右抛出或按钮决策，可撤销" },
+        { "dimension": "内容保留", "self": "所有幻灯片始终保留", "other": "做过的决定会被移出牌堆" }
+      ]
+    },
+    {
+      "target": "image-compare",
+      "title": "Carousel 与 Image compare",
+      "rows": [
+        { "dimension": "图片数量", "self": "一组多张，逐张切换", "other": "恰好两张，叠放对比" },
+        { "dimension": "比较方式", "self": "切换视角，不要求对齐", "other": "同一画框内对齐后拖动分隔线" },
+        { "dimension": "适用问题", "self": "还有哪些", "other": "改了什么" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "四张房源幻灯片",
+      "language": "csharp",
+      "code": "var carousel = new ArcCarousel\n{\n    Label = \"Harbour suites\",\n    DefaultIndex = 1,\n    SlideSize = 300,\n    Interval = 5000,\n    Items = new List<ArcCarouselItem>\n    {\n        new(\"Sea view suite\", \"Floor to ceiling glass and a private terrace.\"),\n        new(\"Garden suite\", \"Quiet rooms around a planted courtyard.\"),\n        new(\"Loft suite\", \"A double height studio under the roof.\"),\n        new(\"Harbour suite\", \"Corner windows over the water.\")\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcCarousel x:Name=\"Suites\"\n                     Width=\"760\"\n                     DefaultIndex=\"1\"\n                     SlideSize=\"300\"\n                     Interval=\"5000\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Media.Controls.ArcCarousel",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "轮播的无障碍名称，默认 Carousel",
+      "Items": "每张幻灯片一项：标题、描述与可选内容",
+      "Index": "受控的当前幻灯片；null 时由控件自己管理",
+      "DefaultIndex": "非受控时的初始幻灯片，默认 0",
+      "SlideSize": "单张幻灯片宽度（px），默认 340；窄容器会自动收缩",
+      "Interval": "自动轮播的间隔毫秒数，0 表示关闭",
+      "Autoplay": "进入视觉树后自动轮播，仍保留可见的播放/暂停按钮",
+      "CurrentIndex": "当前幻灯片下标（只读）",
+      "IndexChanged": "活动幻灯片变化后触发，参数是新下标"
+    }
+  }
+}

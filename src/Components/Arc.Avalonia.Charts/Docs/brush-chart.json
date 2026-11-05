@@ -1,0 +1,83 @@
+{
+  "slug": "brush-chart",
+  "nameZh": "刷选图",
+  "summary": "带概览条的时间序列：主图显示选中的时间窗，概览条显示整段历史，拖动窗口可平移、拖边缘可缩放，并在时间上标注发布与事故。",
+  "purpose": [
+    "当数据有一年甚至更长的每日读数时，一张普通折线会挤成噪声。刷选图把「全貌」和「细节」放在同一张图里：上方主图只画选中窗口，下方概览条保留整段历史。",
+    "窗口可以整体拖动来平移，拖左右把手来缩放，也可以在空白轨道上直接框出新窗口；键盘上方向键平移、Shift + 方向键缩放、Home 或 End 恢复全段。",
+    "事件通过 ChartEvent 标在主图与概览条上，用不同语义色区分发布、变更与事故，让「读数为什么变了」出现在同一时间轴上。",
+    "窗口范围以 0–1 的比例表示（WindowStart / WindowEnd），方便你把选择状态保存下来或与外部筛选联动。"
+  ],
+  "whenToUse": [
+    "有 6 个月以上的每日或每小时读数，需要同时看全貌与任意局部。",
+    "要在时间轴上标出发布、事故等关键事件，并说明它们与读数的关系时。",
+    "用户需要反复放大某个时间段做比对，而不是只看最后一个点。",
+    "数据密度高、普通 line-chart 在整段显示时会丢失细节时。"
+  ],
+  "whenNotToUse": [
+    "数据只有几十个点、一屏就能看清时改用 line-chart，概览条是多余的。",
+    "只需要最近一段滚动读数、并不需要回看历史时改用 realtime-stream。",
+    "不需要精确时间定位、只要看到某种趋势时改用 sparkline。",
+    "每个时间点要被逐条读取或编辑时改用 data-grid。"
+  ],
+  "variants": [
+    { "key": "variant-window", "label": "选中窗口", "note": "WindowStart=0.55、WindowEnd=1，只看最近一段" },
+    { "key": "variant-full-range", "label": "全段范围", "note": "WindowStart=0、WindowEnd=1，主图显示整段历史" },
+    { "key": "state-no-events", "label": "无事件标记", "note": "不传 Events 时主图与概览条都不画事件" },
+    { "key": "state-empty", "label": "空数据", "note": "Series 为空时画出 No data yet" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "line-chart", "note": "数据量小、一屏能放下时用 line chart 就够" },
+    { "type": "alternative", "target": "realtime-stream", "note": "只关心最新读数、不回看历史时用 realtime stream" },
+    { "type": "alternative", "target": "sparkline", "note": "只要一个概览趋势、不需要窗口交互时用 sparkline" },
+    { "type": "complement", "target": "activity-heatmap", "note": "热力图给密度、刷选图给窗口内的精确走势" }
+  ],
+  "contrasts": [
+    {
+      "target": "line-chart",
+      "title": "Brush chart 与 Line chart",
+      "rows": [
+        { "dimension": "数据量", "self": "为几百到上千个点设计", "other": "几十个点最舒服" },
+        { "dimension": "时间范围", "self": "主图窗口 + 概览条全段，可平移缩放", "other": "一次显示全部数据" },
+        { "dimension": "事件标注", "self": "主图与概览条都支持 ChartEvent", "other": "没有事件层" },
+        { "dimension": "交互", "self": "拖窗口、拖把手、框选、键盘平移缩放", "other": "十字准线读点" }
+      ]
+    },
+    {
+      "target": "sparkline",
+      "title": "Brush chart 与 Sparkline",
+      "rows": [
+        { "dimension": "定位", "self": "可交互的时间探索工具", "other": "指标旁的趋势点缀" },
+        { "dimension": "坐标轴", "self": "有时间轴、值轴与概览条", "other": "没有坐标轴与图例" },
+        { "dimension": "状态保存", "self": "WindowStart / WindowEnd 可保存与联动", "other": "无选择状态" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "八个月的每日活跃用户",
+      "language": "csharp",
+      "code": "var chart = new ArcBrushChart\n{\n    Series = dailyUsers,\n    Start = new DateTime(2025, 10, 1),\n    WindowStart = 0.55,\n    WindowEnd = 1.0,\n    ValueSuffix = \" users\",\n    Events = new[]\n    {\n        new ChartEvent(146, \"v2 launch\", ChartTone.Accent, \"Offline mode and shared spaces\"),\n        new ChartEvent(213, \"Incident\", ChartTone.Danger, \"Queue backlog, 41 minutes\")\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:charts=\"clr-namespace:Arc.Avalonia.Charts.Controls;assembly=Arc.Avalonia.Charts\">\n  <charts:ArcBrushChart x:Name=\"DailyUsers\"\n                        Height=\"320\"\n                        WindowStart=\"0.55\"\n                        WindowEnd=\"1\"\n                        ValueSuffix=\" users\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Charts.Controls.ArcBrushChart",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Series": "按时间顺序排列的读数，越密越能体现概览条的价值",
+      "Labels": "可选的时间标签，每个点对应一个；不传则用 Start 加一天推算",
+      "Start": "序列的起始日期，用于时间轴与提示",
+      "Events": "画在主图与概览条上的事件，用色调区分发布、变更与事故",
+      "WindowStart": "选中窗口左边缘占整段序列的比例，0 到 1",
+      "WindowEnd": "选中窗口右边缘占整段序列的比例，0 到 1",
+      "ShowGrid": "绘制安静的水平网格线，默认 true",
+      "ValueSuffix": "追加在提示数值后的单位",
+      "ValueFormat": "自定义提示数值格式"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "slug": "dot-grid",
+  "nameZh": "点阵",
+  "summary": "一层会呼吸的点阵背景：圆点被指针附近的「镜头」推开并轻微染色，点击还会向外送出涟漪；降级动效时保留一个固定的镜头静帧。",
+  "purpose": [
+    "作为背景装饰，它不承载信息，只负责让空页面「活着」：22px 间隔的点阵铺满表面，指针附近 150px 半径内的圆点被推开约 17px，并按距离混入强调色，形成一枚柔软的镜头鼓起。",
+    "圆点各自挂在一根阻尼弹簧上，所以移动指针时是整片场域跟随、轻微回弹，而不是瞬时重排。点击会从指针处送出涟漪（620px/s、最多六道同时存在），涟漪经过时额外推开圆点并加深染色。",
+    "降级动效时不会动画：镜头停在画面 60% / 44% 的固定位置，只做静态推开与染色，点击也不再产生涟漪。它只暴露一个焦点停靠，方向键移动镜头（Shift 走四倍距离），Space / Enter 从镜头处送涟漪，读屏名称与帮助文案说明这只是一个装饰场。"
+  ],
+  "whenToUse": [
+    "落地页 hero 区需要一点生命力，但不想引入视频或 WebGL 时。",
+    "空状态、登录面板或倒计时页面的背景，希望邀请用户随意戳一下时。",
+    "需要与页面的强调色联动、又足够低调的装饰背景。"
+  ],
+  "whenNotToUse": [
+    "正文或数据密集的界面后面不要放它，移动的点会与阅读抢注意力。",
+    "已经有第二个会动的背景时不要再叠加。",
+    "需要承载交互或信息时，改用真正的网格组件（photo-grid 等）。"
+  ],
+  "variants": [
+    { "key": "state-lens", "label": "Lens", "note": "镜头停在固定点：附近圆点被推开并混入强调色" },
+    { "key": "variant-field", "label": "Field", "note": "22px 间隔的等距点阵铺满表面" },
+    { "key": "variant-falloff", "label": "Falloff", "note": "推开幅度在镜头边缘渐变到零，没有硬边" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "gravity-well", "note": "都要指针驱动形变：点阵是背景场，引力井是内容墙" },
+    { "type": "complement", "target": "empty-state", "note": "空状态里常用点阵作为不抢主体信息的背景" },
+    { "type": "complement", "target": "hero-section", "note": "落地页 hero 可以把点阵铺在文案与主行动后面" }
+  ],
+  "contrasts": [
+    {
+      "target": "gravity-well",
+      "title": "Dot grid 与 Gravity well",
+      "rows": [
+        { "dimension": "内容", "self": "纯装饰的圆点，不承载任何信息", "other": "图片瓦片组成的墙，本身是内容" },
+        { "dimension": "形变对象", "self": "点阵的位移与染色", "other": "瓦片被拉向井、缩小并变暗" },
+        { "dimension": "适合位置", "self": "页面背景", "other": "页面中的一块陈列区域" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "把点阵放在 hero 背景",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <Panel>\n    <special:ArcDotGrid Width=\"960\" Height=\"400\" />\n    <!-- 文案与主行动叠在点阵之上 -->\n  </Panel>\n</Window>"
+    },
+    {
+      "title": "键盘驱动的镜头",
+      "language": "csharp",
+      "code": "// 方向键移动镜头（Shift 走 48px），Space / Enter 从镜头处送出一道涟漪。\n// 读屏名称固定为 \"Dot grid\"，帮助文案说明它只是装饰。\nvar field = new ArcDotGrid\n{\n    Width = 960,\n    Height = 400,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcDotGrid",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "场宽；点阵列数按宽度与 22px 间隔计算",
+      "Height": "场高；点阵行数按高度计算",
+      "IsEnabled": "禁用后不再移动镜头或产生涟漪",
+      "IsVisible": "隐藏后停止帧时钟"
+    }
+  }
+}

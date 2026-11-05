@@ -1,0 +1,85 @@
+{
+  "slug": "multi-select",
+  "nameZh": "多选字段",
+  "summary": "从固定列表里选出多个值：已选项以小标签常驻触发器，超出折叠为 +N，菜单行带复选框且顺序稳定。",
+  "purpose": [
+    "把「多个值」收进一个和 input 等高的字段里：触发器横向排布已选标签，超过 MaxVisible 后其余折叠成 +N，所以选了六项也不会把表单撑开。",
+    "菜单行是带勾选框的列表项，点一行切换一个值；值的顺序始终跟随 Options 而不是点击顺序，回写后再次打开菜单不会跳行。",
+    "它复用字段外壳的 Label、Description、Error 与三档尺寸，因此和 select、input 在同一张表单里共享对齐、错误态与间距。"
+  ],
+  "whenToUse": [
+    "给工单打多个标签、给文档设多个协作者、给数据行挑多个分类。",
+    "候选值固定可枚举，且一次选择通常只有 2–5 项。",
+    "需要在字段里直接看到「选了哪几个」，而不是只显示一个计数。"
+  ],
+  "whenNotToUse": [
+    "只能选一个值时改用 select，多选字段的标签会白白占掉两行高度。",
+    "值需要用户自由输入、并非来自固定列表时，改用 tag-input。",
+    "筛选项应当全部常驻可见、一眼可切换时，改用 chip-group。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px，紧凑表单" },
+    { "key": "size-md", "label": "Medium", "note": "默认 44 px" },
+    { "key": "size-lg", "label": "Large", "note": "50 px，强调型单一字段" },
+    { "key": "state-empty", "label": "Empty", "note": "没有已选值时显示 placeholder" },
+    { "key": "state-selected", "label": "Selected", "note": "已选值以标签常驻触发器" },
+    { "key": "state-overflow", "label": "Overflow", "note": "超过 MaxVisible 的标签折叠为 +N" },
+    { "key": "state-error", "label": "Error", "note": "危险色边框与错误文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "不可展开，也不响应键盘" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "select", "note": "只能选一个值时改用 select" },
+    { "type": "alternative", "target": "combobox", "note": "候选很长、需要输入过滤时改用 combobox" },
+    { "type": "alternative", "target": "chip-group", "note": "筛选项需要全部常驻可见时改用 chip group" },
+    { "type": "alternative", "target": "tag-input", "note": "值由用户自由输入时改用 tag input" }
+  ],
+  "contrasts": [
+    {
+      "target": "select",
+      "title": "Multi-select 与 Select",
+      "rows": [
+        { "dimension": "选择数量", "self": "一次多个值", "other": "一次一个值" },
+        { "dimension": "触发器呈现", "self": "多枚标签，超出折叠为 +N", "other": "显示单个标签" },
+        { "dimension": "Value 类型", "self": "字符串集合", "other": "string" }
+      ]
+    },
+    {
+      "target": "chip-group",
+      "title": "Multi-select 与 Chip group",
+      "rows": [
+        { "dimension": "选项可见性", "self": "选项收在菜单里，触发器只显示已选", "other": "所有 chip 常驻在页面上" },
+        { "dimension": "空间占用", "self": "恒定一行，选多少都不变高", "other": "随选项数量换行变高" },
+        { "dimension": "典型场景", "self": "表单里的多值字段", "other": "列表上方的筛选条" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcMultiSelect Label=\"标签\"\n                      Placeholder=\"选择标签\"\n                      MaxVisible=\"2\"\n                      Options=\"{Binding Labels}\"\n                      Value=\"{Binding SelectedLabels, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "已选值与折叠数量",
+      "language": "csharp",
+      "code": "var labels = new ArcMultiSelect\n{\n    Label = \"标签\",\n    MaxVisible = 2,\n    Value = new[] { \"bug\", \"feature\", \"docs\" },\n    Options = new[]\n    {\n        new ArcSelectOption(\"bug\", \"Bug\"),\n        new ArcSelectOption(\"feature\", \"Feature\"),\n        new ArcSelectOption(\"docs\", \"Docs\"),\n        new ArcSelectOption(\"design\", \"Design\")\n    },\n    Description = \"其余折叠为 +N。\"\n};\n\nlabels.ValueChanged += (_, _) => Save(labels.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcMultiSelect",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Options": "候选项集合，元素是 ArcSelectOption（Value / Label / Disabled），与 select 共用",
+      "Value": "已选值的集合，按 Options 顺序稳定排列",
+      "Placeholder": "没有已选值时显示的占位文案，默认 Select options",
+      "MaxVisible": "触发器中最多常驻几枚标签，其余折叠为 +N，默认 2",
+      "IsOpen": "菜单是否展开",
+      "Label": "可见标签，同时参与无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时触发器边框取危险色",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm 36 / Md 44 / Lg 50，默认 Md",
+      "ValueChanged": "切换任一值后触发，此时 Value 已按 Options 顺序重排"
+    }
+  }
+}

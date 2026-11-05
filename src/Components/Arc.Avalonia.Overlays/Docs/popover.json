@@ -1,0 +1,74 @@
+{
+  "slug": "popover",
+  "nameZh": "浮层",
+  "summary": "从触发器旁浮出的小型非模态内容面板：点击打开、点击外部或按 Escape 关闭，页面其余部分始终可用。",
+  "purpose": [
+    "当一小块上下文内容需要贴着某个按钮出现时——分享设置、行内操作、简短表单——popover 从触发器下方浮出，而不是把页面盖住。",
+    "它是非模态的：打开时页面其他位置仍然可以点击，浮层随点击外部或 Escape 关闭，并把焦点还给触发器。",
+    "浮层承载的是可交互内容（按钮、菜单、表单），这也是它与 tooltip、hover card 的分界：后两者只读。"
+  ],
+  "whenToUse": [
+    "需要在一块锚定的小面板里放几个可交互控件时。",
+    "内容与某个具体触发器强相关，离开它就没有意义时。",
+    "页面其余部分需要保持可读、可点的场景。"
+  ],
+  "whenNotToUse": [
+    "需要打断页面、要求用户先做一个决定时，改用 dialog。",
+    "只有一行说明、且不需要点按时，改用 tooltip。",
+    "只需要展示一个只读的人员或链接预览时，改用 hover-card。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "打开", "note": "面板锚定在触发器下方" },
+    { "key": "variant-rich", "label": "富内容", "note": "标题、说明与一个动作按钮" },
+    { "key": "variant-menu", "label": "菜单列表", "note": "三行可点的行内操作" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dialog", "note": "需要打断页面并要求一个决定时，用模态的 dialog" },
+    { "type": "alternative", "target": "tooltip", "note": "只有一行说明、不需要交互时，用更轻的 tooltip" },
+    { "type": "alternative", "target": "hover-card", "note": "只读预览一个人的资料时，用 hover-card 悬停即可出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "tooltip",
+      "title": "Popover 与 Tooltip",
+      "rows": [
+        { "dimension": "内容", "self": "可交互的控件、菜单或表单", "other": "一行只读文字" },
+        { "dimension": "打开方式", "self": "点击触发器", "other": "悬停或键盘聚焦" },
+        { "dimension": "关闭方式", "self": "点击外部、Escape 或再次点击触发器", "other": "移开指针、失焦或 Escape" },
+        { "dimension": "可访问性", "self": "面板本身可聚焦，内容可依次到达", "other": "作为说明挂到触发器上，不进入焦点顺序" }
+      ]
+    },
+    {
+      "target": "dialog",
+      "title": "Popover 与 Dialog",
+      "rows": [
+        { "dimension": "模态性", "self": "非模态，页面其余部分仍可操作", "other": "模态，遮罩阻隔背后的页面" },
+        { "dimension": "位置", "self": "贴着触发器浮出", "other": "在面板中央浮出" },
+        { "dimension": "适合内容", "self": "一小块上下文操作", "other": "需要打断的决定" },
+        { "dimension": "焦点", "self": "打开时移入面板，关闭还给触发器", "other": "焦点锁在对话框内循环" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中声明一个分享浮层",
+      "language": "xaml",
+      "code": "<Window xmlns:overlays=\"clr-namespace:Arc.Avalonia.Overlays.Controls;assembly=Arc.Avalonia.Overlays\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Controls;assembly=Arc.Avalonia\">\n  <overlays:ArcPopover Label=\"Share settings\" IsOpen=\"{Binding IsShareOpen}\">\n    <overlays:ArcPopover.Trigger>\n      <arc:ArcButton Content=\"Share\" Variant=\"Secondary\" />\n    </overlays:ArcPopover.Trigger>\n    <StackPanel Spacing=\"10\" Width=\"260\">\n      <TextBlock Text=\"Share with the team\" Classes=\"arc-label\" />\n      <TextBlock Text=\"Anyone with the link can view this board.\" Classes=\"arc-caption\" TextWrapping=\"Wrap\" />\n      <arc:ArcButton Content=\"Copy link\" Variant=\"Secondary\" HorizontalAlignment=\"Left\" />\n    </StackPanel>\n  </overlays:ArcPopover>\n</Window>"
+    },
+    {
+      "title": "用代码打开并处理关闭",
+      "language": "csharp",
+      "code": "var popover = new ArcPopover\n{\n    Label = \"Row actions\",\n    Trigger = new ArcButton { Content = \"More\", Variant = ArcButtonVariant.Ghost },\n    Content = new StackPanel\n    {\n        Spacing = 2,\n        Children =\n        {\n            new ArcButton { Content = \"Duplicate\", Variant = ArcButtonVariant.Ghost, HorizontalAlignment = HorizontalAlignment.Stretch },\n            new ArcButton { Content = \"Archive\", Variant = ArcButtonVariant.Ghost, HorizontalAlignment = HorizontalAlignment.Stretch }\n        }\n    }\n};\n\npopover.IsOpen = true;"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Overlays.Controls.ArcPopover",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Trigger": "锚点内容；点击它切换浮层的开合",
+      "IsOpen": "浮层是否显示；可赋值以便静态展示打开态",
+      "Label": "浮层的可访问名称",
+      "Content": "浮层里的内容，通常是几个可交互控件"
+    }
+  }
+}

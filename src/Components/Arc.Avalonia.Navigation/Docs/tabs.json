@@ -1,0 +1,107 @@
+{
+  "slug": "tabs",
+  "nameZh": "标签页",
+  "summary": "在同一视图里切换几组平级内容的标签条：选中胶囊滑到当前标签，面板就地更换并带方向感的淡入。",
+  "purpose": [
+    "当同一个对象有几组平级视图（概览、活动、设置）时，标签条把它们并排摆出来，让你一眼看到有哪些内容，并就地切换而不离开页面。",
+    "选中胶囊用弹簧过渡滑到新标签，面板以 8px 的方向性位移加淡入换内容：向右切换时内容从右侧进来，向左切换时从左侧进来。",
+    "每个标签本身就是一个可聚焦按钮：方向键在标签之间移动，Home 与 End 跳到首尾；读屏会把整个标签条念成一组可访问名称取自 Label 的标签。"
+  ],
+  "whenToUse": [
+    "你有三到七个平级视图，用户需要在它们之间频繁来回切换。",
+    "切换视图时，页面其余部分（标题、工具栏、筛选条件）应当保持不变。",
+    "标签文案足够短，能在一行里放下，且用户不需要同时看到多组内容。"
+  ],
+  "whenNotToUse": [
+    "内容需要顺序阅读、每组内容都较长时，改用 accordion 在页面里纵向展开。",
+    "你需要在层级之间跳转而不是平级切换时，改用 breadcrumb 表达当前位置。",
+    "标签超过七个、一行放不下时，用侧边导航或 mega menu 收纳，而不是把标签条挤成两行。"
+  ],
+  "variants": [
+    {
+      "key": "state-selected",
+      "label": "Selected",
+      "note": "胶囊滑到当前标签，文字转为高对比"
+    },
+    {
+      "key": "state-unselected",
+      "label": "Unselected",
+      "note": "次要文字色，悬停时提亮"
+    },
+    {
+      "key": "state-disabled",
+      "label": "Disabled",
+      "note": "保留位置但不可聚焦、不可点击"
+    },
+    {
+      "key": "state-icon",
+      "label": "Icon label",
+      "note": "图标与文字并排，图标跟随选中状态变色"
+    }
+  ],
+  "relations": [
+    {
+      "type": "alternative",
+      "target": "accordion",
+      "note": "内容长、需要顺序阅读时，accordion 纵向展开比横向切换更合适"
+    },
+    {
+      "type": "complement",
+      "target": "breadcrumb",
+      "note": "breadcrumb 说明页面在层级里的位置，tabs 负责同一层内的视图切换"
+    }
+  ],
+  "contrasts": [
+    {
+      "target": "accordion",
+      "title": "Tabs 与 Accordion",
+      "rows": [
+        {
+          "dimension": "排列方向",
+          "self": "横向标签条，视图并列摆放",
+          "other": "纵向行，内容在行下面展开"
+        },
+        {
+          "dimension": "同时可见",
+          "self": "一次只显示一个面板，其余视图不可见",
+          "other": "所有行标题始终可见，一次展开一行内容"
+        },
+        {
+          "dimension": "适用内容",
+          "self": "短标签、频繁切换的平级视图",
+          "other": "问答、说明等较长的分段内容"
+        },
+        {
+          "dimension": "切换表现",
+          "self": "面板淡入并从切换方向滑入 8px",
+          "other": "高度与透明度一起过渡"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中绑定标签数据",
+      "language": "xaml",
+      "code": "<Window xmlns:nav=\"clr-namespace:Arc.Avalonia.Navigation.Controls;assembly=Arc.Avalonia.Navigation\">\n  <nav:ArcTabs Label=\"项目分区\"\n               Items=\"{Binding Sections}\"\n               SelectedValue=\"{Binding Section}\" />\n</Window>"
+    },
+    {
+      "title": "用代码定义标签与图标",
+      "language": "csharp",
+      "code": "var tabs = new ArcTabs\n{\n    Label = \"项目分区\",\n    SelectedIndex = 1,\n    Items = new[]\n    {\n        new ArcTabItem(\"overview\", \"概览\", overviewPanel),\n        new ArcTabItem(\"activity\", \"活动\", activityPanel) { Icon = \"users\" },\n        new ArcTabItem\n        {\n            Value = \"settings\",\n            Header = \"设置\",\n            Icon = \"settings\",\n            Content = settingsPanel,\n            IsDisabled = true\n        }\n    }\n};\n\ntabs.SelectionChanged += (_, item) => statusText.Text = $\"当前分区：{item.Header}\";"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Navigation.Controls.ArcTabs",
+    "exclude": [
+      "TemplatedParent"
+    ],
+    "descriptions": {
+      "Items": "标签定义列表，每项包含 Value、Header、Icon、Content 与 IsDisabled",
+      "SelectedIndex": "当前标签的下标；改变时选中胶囊滑到对应位置",
+      "SelectedValue": "当前标签的 Value，与 SelectedIndex 保持同步，适合双向绑定",
+      "Label": "标签条的可访问名称，会写入 AutomationProperties.Name",
+      "SelectionChanged": "选中标签变化时触发，参数是当前的 ArcTabItem"
+    }
+  }
+}

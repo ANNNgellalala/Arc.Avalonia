@@ -1,0 +1,86 @@
+{
+  "slug": "file-dropzone",
+  "nameZh": "文件拖放区",
+  "summary": "一个慷慨的文件投放目标：支持拖拽或点选、多文件、类型与大小上限，并逐行显示就绪、上传中与失败。",
+  "purpose": [
+    "把「选择文件」变成一块显眼的投放区域：整块区域都是点击目标，也接受从系统拖入的文件，桌面端最自然的入口就在这里。",
+    "每一行都带状态：Ready 显示文件名与大小，Uploading 显示百分比进度，Failed 显示原因并提供重试；Accept、MaxFiles 与 MaxSize 在放入时逐项校验，不合规的文件直接标成失败。",
+    "IsDragOver 由控件在拖入时自动维护，也可以手动设成 true 用来展示投放态；Note 与 DropLabel 负责补充说明与拖拽文案。",
+    "Items 与 DefaultItems 让你展示已有的附件并保持受控；FilesChanged 交出下层文件，ItemsChanged 交出带状态的列表，二者配合可以完成真实上传流程。"
+  ],
+  "whenToUse": [
+    "需要上传一到多个文件，且希望同时支持点选与拖拽时。",
+    "上传过程需要逐文件展示进度、失败原因与重试时。",
+    "要限制文件类型、数量或大小，并让用户在放入前就知道规则时。",
+    "表单里需要一块明确的附件区域，而不是一个小小的“选择文件”按钮时。"
+  ],
+  "whenNotToUse": [
+    "上传目标是单个头像图片、还需要就地裁剪时改用 avatar-upload。",
+    "只需要一个上传进度、不涉及文件列表时直接用 progress。",
+    "文件是正文内容的一部分（例如插入图片到文章）时，应把入口放进 rich-text-editor。",
+    "只是展示已有附件列表、不需要再添加时用普通列表或 data-grid。"
+  ],
+  "variants": [
+    { "key": "variant-empty", "label": "空投放区", "note": "只有标题、说明和类型/大小提示" },
+    { "key": "variant-files", "label": "带文件列表", "note": "同时显示就绪、上传中与失败三种行" },
+    { "key": "state-drag-over", "label": "拖拽悬停", "note": "IsDragOver=true，虚线变成强调色" },
+    { "key": "variant-single", "label": "单文件", "note": "Multiple=false、MaxFiles=1" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "avatar-upload", "note": "只上传头像图片并需要裁剪时，avatar upload 更专用" },
+    { "type": "complement", "target": "progress", "note": "整批上传的总体进度可以交给 progress 展示" },
+    { "type": "complement", "target": "rich-text-editor", "note": "正文与附件一起提交时，两者常出现在同一张表单里" }
+  ],
+  "contrasts": [
+    {
+      "target": "avatar-upload",
+      "title": "File dropzone 与 Avatar upload",
+      "rows": [
+        { "dimension": "上传对象", "self": "任意类型的一个或多个文件", "other": "只处理一张头像图片" },
+        { "dimension": "后续处理", "self": "逐行进度、失败与重试", "other": "就地裁剪、缩放后上传" },
+        { "dimension": "校验", "self": "按类型、数量、大小逐项校验", "other": "只校验图片格式与大小" },
+        { "dimension": "视觉形态", "self": "整块投放区 + 文件行", "other": "头像圆形/方形剪影" }
+      ]
+    },
+    {
+      "target": "progress",
+      "title": "File dropzone 与 Progress",
+      "rows": [
+        { "dimension": "粒度", "self": "每个文件一行独立状态", "other": "一条整体进度" },
+        { "dimension": "输入", "self": "接收拖拽与点选的文件", "other": "只展示进度值" },
+        { "dimension": "失败处理", "self": "行内显示原因与重试", "other": "通常只显示百分比" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "限制类型与大小",
+      "language": "csharp",
+      "code": "var zone = new ArcFileDropzone\n{\n    Width = 380,\n    Label = \"Add attachments\",\n    Accept = \".pdf,image/*\",\n    MaxFiles = 5,\n    MaxSize = 10 * 1024 * 1024,\n    Note = \"PDF and images, up to 10 MB each\",\n    DefaultItems = new[]\n    {\n        new ArcFileDropzoneItem { Id = \"guide\", Name = \"brand-guide.pdf\", Size = 2_411_724 },\n        new ArcFileDropzoneItem\n        {\n            Id = \"hero\", Name = \"hero-shot.png\", Size = 1_204_224,\n            Status = ArcFileDropzoneStatus.Uploading, Progress = 62\n        }\n    }\n};"
+    },
+    {
+      "title": "在 XAML 中声明外观",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcFileDropzone x:Name=\"Attachments\"\n                           Width=\"380\"\n                           Label=\"Add attachments\"\n                           Accept=\".pdf,image/*\"\n                           MaxFiles=\"5\"\n                           MaxSize=\"10485760\" />\n</Window>"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcFileDropzone",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Accept": "接受的文件类型，例如 \".pdf,image/*\"",
+      "Multiple": "是否允许一次放入多个文件，默认 true",
+      "MaxFiles": "允许的最大文件数，默认 5",
+      "Label": "投放区标题，默认 Add files",
+      "Description": "标题下的说明文字",
+      "Note": "类型与大小规则等补充说明",
+      "DropLabel": "拖拽悬停时替换标题的文案",
+      "MaxSize": "单文件最大字节数；超出会标成失败",
+      "DefaultItems": "初始文件行，用于展示已有附件",
+      "IsDragOver": "拖拽悬停态；控件自动维护，也可以手动设置",
+      "Items": "当前文件行列表（只读快照）",
+      "FilesChanged": "文件集合变化后触发，参数是底层存储文件",
+      "ItemsChanged": "文件行变化后触发，参数是带状态的列表"
+    }
+  }
+}

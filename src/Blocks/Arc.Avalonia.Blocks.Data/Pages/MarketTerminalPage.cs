@@ -23,6 +23,12 @@ public sealed class MarketTerminalPage : ArcItemPage
 {
     public override string ItemSlug => "market-terminal";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "layout-terminal", "variant-candles", "variant-watchlist",
+        "variant-order-ticket", "variant-limit-order"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

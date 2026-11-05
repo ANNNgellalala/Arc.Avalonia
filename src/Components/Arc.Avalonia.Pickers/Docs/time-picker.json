@@ -1,0 +1,68 @@
+{
+  "slug": "time-picker",
+  "nameZh": "时间选择器",
+  "summary": "字段式时间选择器：点击字段或按 Enter 展开按固定分钟步长滚动的列表，值始终按 24 小时保存，字段可按 12 或 24 小时显示。",
+  "purpose": [
+    "当表单需要一个具体时刻（预约、提醒、营业时间）时，time picker 把一列固定步长的时间收进字段，展开时列表自动滚到当前值。",
+    "值内部始终按 24 小时保存；Format 只影响显示——12 小时制带 AM/PM，24 小时制显示 HH:mm，切换显示不会改变值。",
+    "方向键在列表里上下移动并循环，Enter 或点击选定并关闭，Escape 关闭并把焦点还给字段；分钟步长最小 1、最大 60。"
+  ],
+  "whenToUse": [
+    "只需要选择一天里的某个时刻时。",
+    "可选项应当按固定步长（5、15、30 分钟）给出时。",
+    "与 date-picker 并排出现在同一张表单里时。"
+  ],
+  "whenNotToUse": [
+    "要选日期而不是时间时，改用 date-picker。",
+    "要选一段起止日期时，改用 date-range-picker。",
+    "需要自由输入任意时刻（秒级或不在步长上）时，改成普通 input 加校验。"
+  ],
+  "variants": [
+    { "key": "state-empty", "label": "空字段", "note": "显示占位提示，没有选中值" },
+    { "key": "state-filled", "label": "12 小时", "note": "字段显示带 AM/PM 的时刻" },
+    { "key": "state-24h", "label": "24 小时", "note": "Format=TwentyFourHour，显示 HH:mm" },
+    { "key": "state-open", "label": "打开列表", "note": "面板锚定在字段下方，列表滚到当前值" }
+  ],
+  "relations": [
+    { "type": "complement", "target": "date-picker", "note": "日期与时间常在同一张表单里并排出现，字段样式一致" },
+    { "type": "complement", "target": "date-range-picker", "note": "按整天筛选之后，时间范围用来进一步收窄条件" }
+  ],
+  "contrasts": [
+    {
+      "target": "date-picker",
+      "title": "Time picker 与 Date picker",
+      "rows": [
+        { "dimension": "选的值", "self": "一天里的某个时刻", "other": "日历里的一天" },
+        { "dimension": "面板内容", "self": "按固定步长排列的时间列表", "other": "一个月的日期网格" },
+        { "dimension": "值的表示", "self": "24 小时 TimeSpan，显示格式可切换", "other": "DateTime，按 Format 显示" },
+        { "dimension": "键盘", "self": "上下移动并循环，Enter 选定", "other": "方向键在网格里移动，PageUp/PageDown 翻月" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 中放一个开始时间",
+      "language": "xaml",
+      "code": "<Window xmlns:pickers=\"clr-namespace:Arc.Avalonia.Pickers.Controls;assembly=Arc.Avalonia.Pickers\">\n  <pickers:ArcTimePicker Label=\"Start time\"\n                         Width=\"240\"\n                         Value=\"{Binding StartTime}\"\n                         MinuteStep=\"15\"\n                         Format=\"TwelveHour\" />\n</Window>"
+    },
+    {
+      "title": "用代码设置 24 小时显示",
+      "language": "csharp",
+      "code": "var picker = new ArcTimePicker\n{\n    Label = \"Reminder (24 h)\",\n    Width = 240,\n    Value = new TimeSpan(8, 45, 0),\n    Format = ArcTimeFormat.TwentyFourHour,\n    MinuteStep = 5\n};\n\npicker.TimeChanged += (_, time) => statusText.Text = picker.Display(time);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Pickers.Controls.ArcTimePicker",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "选中的时间，按 TimeSpan 保存；null 表示空字段",
+      "MinuteStep": "两个选项之间的分钟数，默认 15；会被夹到 1–60",
+      "Format": "显示格式：TwelveHour 或 TwentyFourHour，默认 12 小时",
+      "TimeChanged": "列表选中新时间时触发",
+      "IsDropDownOpen": "面板是否展开；Enter 或选中后关闭并把焦点还给字段",
+      "Label": "字段上方的标签",
+      "Placeholder": "未选时间时字段里的提示文字",
+      "Description": "字段下方的辅助说明"
+    }
+  }
+}

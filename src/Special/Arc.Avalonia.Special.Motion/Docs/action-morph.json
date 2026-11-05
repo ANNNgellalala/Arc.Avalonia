@@ -1,0 +1,75 @@
+{
+  "slug": "action-morph",
+  "nameZh": "变形行动按钮",
+  "summary": "常驻页面角落的创建按钮，一整块表面在按钮、快捷动作菜单与就地输入之间弹簧变形；提交后原地打勾再折回按钮。",
+  "purpose": [
+    "当快速捕获（新建任务、写一条笔记、发一条评论）需要一个常驻入口，又不值得为它打开对话框时，用 action morph：按钮长成菜单，菜单再长成就地的一小块表单。",
+    "整块表面只有一个矩形在变：宽度、高度与圆角都走 morph 弹簧，面孔交叉淡入淡出，菜单行错峰进入；不需要第二层浮层，也不打断页面的阅读节奏。",
+    "默认贴在容器右下角，CornerStart 可改为从左下角生长；按钮、菜单与输入面共用同一个焦点停靠点，读屏会把当前面孔与可用快捷键一起讲出来。"
+  ],
+  "whenToUse": [
+    "需要随时创建一条任务、笔记或评论，且输入只有一行到两行时。",
+    "页面已经拥挤、再放一个对话框会显得太重时。",
+    "希望创建入口常驻在角落、并带一层轻量动作菜单时。"
+  ],
+  "whenNotToUse": [
+    "表单字段较多、需要专注填写时，改用 dialog 或 bottom-sheet。",
+    "动作按下即执行、不需要任何输入时，改用 dropdown-menu 或 floating-button-group。",
+    "创建动作本身就是页面主任务、值得占据版心时，改用常规表单。"
+  ],
+  "variants": [
+    { "key": "state-button", "label": "Button", "note": "收起的 56px 圆形按钮，只露加号" },
+    { "key": "state-menu", "label": "Menu", "note": "动作菜单：New task / New note 两行加行尾快捷键" },
+    { "key": "state-composer", "label": "Composer", "note": "就地输入面：标题、输入框、日期选项与提交" },
+    { "key": "variant-corner-start", "label": "Corner start", "note": "从容器左下角生长，而不是右下角" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "floating-button-group", "note": "多个常驻行动应改用浮动工具栏，而不是把全部塞进一个按钮" },
+    { "type": "alternative", "target": "dropdown-menu", "note": "动作按下即执行、不需要输入时用菜单更直接" },
+    { "type": "complement", "target": "dialog", "note": "字段更多、需要专注的长表单放进对话框" }
+  ],
+  "contrasts": [
+    {
+      "target": "floating-button-group",
+      "title": "Action morph 与 Floating button group",
+      "rows": [
+        { "dimension": "展开形态", "self": "一块表面从按钮长成菜单再长成输入面", "other": "固定的一排软按钮，托盘不变形" },
+        { "dimension": "输入", "self": "带就地输入面，可写一行文字", "other": "只有行动，没有输入" },
+        { "dimension": "位置", "self": "常驻容器角落，随创建动作出现", "other": "浮在画布或选区上方，跟随内容" }
+      ]
+    },
+    {
+      "target": "dropdown-menu",
+      "title": "Action morph 与 Dropdown menu",
+      "rows": [
+        { "dimension": "触发面", "self": "按钮自身长成菜单，位置不变", "other": "文字或图标触发器旁弹出列表" },
+        { "dimension": "后续输入", "self": "选中后继续长成输入面", "other": "选中即执行并关闭" },
+        { "dimension": "适用动作", "self": "创建型动作：任务、笔记、评论", "other": "通用命令清单" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法：常驻创建按钮",
+      "language": "xaml",
+      "code": "<arc:ArcActionMorph xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                    Label=\"Create\"\n                    Face=\"Menu\"\n                    HorizontalAlignment=\"Right\"\n                    VerticalAlignment=\"Bottom\" />"
+    },
+    {
+      "title": "代码构建：打开输入面与确认",
+      "language": "csharp",
+      "code": "var morph = new ArcActionMorph\n{\n    Label = \"Create\",\n    Face = ArcActionMorphFace.Button,\n    CornerStart = false,\n    HorizontalAlignment = HorizontalAlignment.Right,\n    VerticalAlignment = VerticalAlignment.Bottom\n};\n\nmorph.OpenComposer(\"task\"); // 直接进入就地输入面\nmorph.ShowSuccess();        // 打勾后自动折回按钮"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcActionMorph",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Label": "按钮与菜单的可访问名称，默认 Create",
+      "Face": "当前面孔：Button / Menu / Composer / Success",
+      "CornerStart": "true 时从容器左下角生长，而不是右下角",
+      "OpenMenu": "把面孔切到快捷动作菜单",
+      "OpenComposer": "按动作 Id 打开就地输入面",
+      "ShowSuccess": "切到成功面孔，随后自动折回按钮"
+    }
+  }
+}

@@ -22,6 +22,11 @@ public sealed class PricingCalculatorPage : ArcItemPage
 {
     public override string ItemSlug => "pricing-calculator";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-cards", "variant-seat-slider", "variant-billing-toggle", "state-recommended"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]

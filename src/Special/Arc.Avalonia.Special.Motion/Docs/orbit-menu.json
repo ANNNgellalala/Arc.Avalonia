@@ -1,0 +1,70 @@
+{
+  "slug": "orbit-menu",
+  "nameZh": "环形动作菜单",
+  "summary": "按住圆形按钮、动作沿弧线旋出：按住拖到某个动作再松手即触发，也可以点一下让弧保持展开后再点选。",
+  "purpose": [
+    "当一张便签、一张照片或一行内容上只有三到六个快速动作时，用 orbit menu：动作不是列表，而是从触发点沿弧线旋出的一圈圆形按钮。",
+    "它更像馅饼菜单：目标判定按角度而不是按矩形，触发点周围有一圈死区；按下、拖到目标、松手是一次手势，也可以在展开后单独点击某个动作。",
+    "触发点本身也是一枚状态指示：展开时它是关闭的叉，触发某个动作后变成成功勾，并弹出过去式的标签（Pinned、Copied），一秒多之后复位。"
+  ],
+  "whenToUse": [
+    "触屏优先的场景，希望用一次按压加拖拽完成选择。",
+    "一张卡片或一条记录上只有三到六个动作时。",
+    "想用圆形触发点把动作收成一块、不占正文位置时。"
+  ],
+  "whenNotToUse": [
+    "动作较多或文字较长，用 dropdown-menu 或 context-menu。",
+    "工具需要保持选中态，用 dock。",
+    "只有一个动作，用 action-button。"
+  ],
+  "variants": [
+    { "key": "state-open", "label": "Open", "note": "默认展开：四个动作沿弧线旋出，触发点变成关闭叉" },
+    { "key": "variant-actions", "label": "Actions", "note": "Pin / Share / Copy 三个常规动作的圆形按钮" },
+    { "key": "variant-danger", "label": "Danger", "note": "Delete 用危险色绘制图标，命中后同样反相" },
+    { "key": "variant-trigger", "label": "Trigger", "note": "强调色圆钮：展开时为叉、收起时为省略号、完成后为勾" },
+    { "key": "variant-label", "label": "Label", "note": "触发点下方的标签药丸，展开时显示「Actions」" },
+    { "key": "variant-note", "label": "Context", "note": "菜单上方的便签卡，提供动作对象" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "context-menu", "note": "右键或长按唤起的列表动作改用 context menu" },
+    { "type": "alternative", "target": "dropdown-menu", "note": "动作更多、需要文字与快捷键时用 dropdown menu" },
+    { "type": "alternative", "target": "action-button", "note": "只有一个动作时不需要环形菜单" }
+  ],
+  "contrasts": [
+    {
+      "target": "context-menu",
+      "title": "Orbit menu 与 Context menu",
+      "rows": [
+        { "dimension": "唤起方式", "self": "按住圆形按钮并拖动，或在展开后点选", "other": "右键或长按对象" },
+        { "dimension": "布局", "self": "动作沿弧线围绕触发点", "other": "自上而下的命令列表" },
+        { "dimension": "适用动作", "self": "三到六个触屏快速动作，可带危险色", "other": "较长的命令清单，可分组" }
+      ]
+    },
+    {
+      "target": "dropdown-menu",
+      "title": "Orbit menu 与 Dropdown menu",
+      "rows": [
+        { "dimension": "动作数量", "self": "三到六个，动作数固定且互斥", "other": "可以更长，按组排列" },
+        { "dimension": "选择方式", "self": "按角度瞄准，松手即触发", "other": "逐行点击或键盘上下移动" },
+        { "dimension": "触发器", "self": "圆形浮动触发点", "other": "文字或图标触发器旁弹出" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "XAML 用法",
+      "language": "xaml",
+      "code": "<arc:ArcOrbitMenu xmlns:arc=\"using:Arc.Avalonia.Special.Motion.Controls\"\n                  HorizontalAlignment=\"Center\"\n                  VerticalAlignment=\"Bottom\" />"
+    },
+    {
+      "title": "代码给触发器命名",
+      "language": "csharp",
+      "code": "var menu = new ArcOrbitMenu();\nAutomationProperties.SetName(menu, \"Note actions\");\n// 按住拖动到动作松手触发，或点开后再点选；Escape 收起。"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Motion.Controls.ArcOrbitMenu",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {}
+  }
+}

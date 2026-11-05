@@ -1,0 +1,58 @@
+{
+  "slug": "market-terminal",
+  "nameZh": "行情终端",
+  "summary": "交易终端的一屏：K 线与均线、成交量、十字线 OHLC 读数、带迷你走势的自选列表，以及买入侧的限价单票据。",
+  "purpose": [
+    "当投研或交易界面需要在一屏内同时看行情与下单时，用 market terminal：左侧 K 线画价格与成交量，右侧自选列表切标的，下方订单票据填写数量与价格。",
+    "十字线在图上移动时读出当前 K 线的开高低收（OHLC）与涨跌；五条与二十条均线以虚线叠加，涨跌用两种序列色区分，不依赖红绿。",
+    "票据当前是买入侧的限价单：数量、限价与预估金额都可改，提交只在本地报告一条状态——它是演示，不连任何交易系统。"
+  ],
+  "whenToUse": [
+    "交易或投研界面的行情与下单同屏场景。",
+    "需要 K 线、成交量与均线一起呈现时。",
+    "自选列表与订单票据共处一屏时。"
+  ],
+  "whenNotToUse": [
+    "只需要一条价格趋势时，用 line-chart。",
+    "需要实时到达的行情流时，用 realtime-stream。",
+    "需要带排序与筛选的行情表格时，用 sortable-data-table。"
+  ],
+  "variants": [
+    { "key": "layout-terminal", "label": "整体布局", "note": "K 线、自选列表与订单票据并置" },
+    { "key": "variant-candles", "label": "Candles", "note": "15 分钟 K 线、5 / 20 期均线与成交量" },
+    { "key": "variant-watchlist", "label": "Watchlist", "note": "自选列表与每行的迷你走势" },
+    { "key": "variant-order-ticket", "label": "Ticket", "note": "数量、限价与预估金额的下单票据" },
+    { "key": "variant-limit-order", "label": "Limit", "note": "限价单与买入侧为当前选择" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "数量与限价都是文本输入" },
+    { "type": "uses", "target": "button", "note": "买入、卖出与跳转都由按钮承担" },
+    { "type": "uses", "target": "badge", "note": "Market open 与涨跌状态用徽章标出" },
+    { "type": "uses", "target": "sparkline", "note": "自选列表每行带一条迷你走势" },
+    { "type": "uses", "target": "segmented-control", "note": "标的与周期切换用分段控件" },
+    { "type": "alternative", "target": "realtime-stream", "note": "需要持续到达的行情流时，改用 realtime stream" }
+  ],
+  "contrasts": [
+    {
+      "target": "realtime-stream",
+      "title": "Market terminal 与 Realtime stream",
+      "rows": [
+        { "dimension": "数据", "self": "固定的样本 K 线与自选列表", "other": "持续到达的实时数据流" },
+        { "dimension": "交互", "self": "切标的、移动十字线、填写下单票据", "other": "滚动视图，暂停或恢复" },
+        { "dimension": "目的", "self": "行情观察与下单模拟", "other": "监控与流式观测" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "页面骨架",
+      "language": "xaml",
+      "code": "<Grid ColumnDefinitions=\"*,12,320\" RowDefinitions=\"*,12,Auto\">\n  <charts:ArcCandleChart Height=\"280\" />\n  <arc:ArcCard Grid.Column=\"2\" Padding=\"14\" />\n  <arc:ArcInput Grid.Row=\"2\" Label=\"Quantity\" Value=\"25\" />\n</Grid>"
+    },
+    {
+      "title": "代码构建：标的与票据",
+      "language": "csharp",
+      "code": "var symbolKey = \"acme\";\nvar side = \"buy\";\nvar orderType = \"limit\";\nvar quantity = 25;\nvar limitPrice = candles[symbolKey][^1].Close;\n\nvar chart = new ArcCandleChart(candles[symbolKey]) { Height = 280 };\nchart.Inspected += (_, candle) => readout.Text = Ohlc(candle);"
+    }
+  ]
+}

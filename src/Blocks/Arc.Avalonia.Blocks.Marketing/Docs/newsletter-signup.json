@@ -1,0 +1,49 @@
+{
+  "slug": "newsletter-signup",
+  "nameZh": "订阅区",
+  "summary": "用往期内容框住订阅表单的区块：订阅成功后，一期写着你邮箱的新刊会落到往期堆叠的最前面。",
+  "purpose": [
+    "左边是标题、说明与订阅表单，右边是一列往期内容卡。这比单独一个输入框更有说服力：用户能看到订阅后定期收到什么。",
+    "订阅在本地校验邮箱；成功后把一张写着收件邮箱、带 For you 徽标的新刊卡插到堆叠最前面，并把说明文案换成「Issue 12 将在周四送达」。",
+    "组成依赖：邮箱字段用 input，Subscribe 用 button，For you 与期号徽标用 badge；失败时错误落在字段内，而不是弹 toast。"
+  ],
+  "whenToUse": [
+    "博客、更新日志或周刊，有稳定往期内容可以展示时。",
+    "页面收尾需要低承诺行动、但不想只放一个裸输入框时。",
+    "希望用「你会收到什么」来降低订阅顾虑时。"
+  ],
+  "whenNotToUse": [
+    "订阅只是首屏的次要行动、没有往期内容时，用 hero-signup 或 cta-section。",
+    "需要收集姓名、公司等多字段时，用 contact-section。",
+    "内容是按期更新的产品公告、需要历史列表时，用 announcement-bar 加页面内的列表。"
+  ],
+  "variants": [
+    { "key": "variant-form", "label": "Form", "note": "邮箱字段、Subscribe 与说明文案" },
+    { "key": "variant-archive", "label": "Archive stack", "note": "右侧往期内容卡堆叠，最近一期在最上" },
+    { "key": "state-confirmed", "label": "Confirmed", "note": "订阅后新刊卡落到最前，并写明收件邮箱" }
+  ],
+  "relations": [
+    { "type": "uses", "target": "input", "note": "邮箱字段用 ArcInput，错误文案落在字段内" },
+    { "type": "uses", "target": "button", "note": "Subscribe 与 Read the archive 都是 ArcButton" },
+    { "type": "uses", "target": "badge", "note": "For you 与期号状态用 ArcBadge 标出" },
+    { "type": "alternative", "target": "hero-signup", "note": "订阅是首屏唯一行动时改用 hero signup" }
+  ],
+  "contrasts": [
+    {
+      "target": "hero-signup",
+      "title": "Newsletter signup 与 Hero signup",
+      "rows": [
+        { "dimension": "位置", "self": "页面中段或收尾的一块订阅区", "other": "整屏首屏，行动只有一个" },
+        { "dimension": "说服方式", "self": "用往期内容展示订阅价值", "other": "用候补名单与排位制造紧迫感" },
+        { "dimension": "成功后", "self": "新刊卡落到往期最前并写明邮箱", "other": "按钮长成确认，显示排位与已等待人数" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "表单与往期并排",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:c=\"using:Arc.Avalonia.Controls\"\n        xmlns:i=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <Grid ColumnDefinitions=\"1*,1*\" Margin=\"26,26,26,24\">\n    <StackPanel Spacing=\"14\">\n      <TextBlock Text=\"The weekly build log\" Classes=\"arc-heading\" />\n      <TextBlock Text=\"One considered issue about planning, shipping and the tools in between.\"\n                 Classes=\"arc-body-sm arc-secondary\" TextWrapping=\"Wrap\" MaxWidth=\"380\" />\n      <StackPanel Orientation=\"Horizontal\" Spacing=\"8\">\n        <i:ArcInput Width=\"240\" Placeholder=\"you@company.com\" LeadingIcon=\"mail\" />\n        <c:ArcButton Content=\"Subscribe\" />\n      </StackPanel>\n      <c:ArcButton Content=\"Read the archive\" Variant=\"Ghost\" Size=\"Sm\" HorizontalAlignment=\"Left\" />\n    </StackPanel>\n    <StackPanel Grid.Column=\"1\" Spacing=\"8\" Margin=\"28,0,0,0\">\n      <c:ArcCard Padding=\"14,12,14,12\">\n        <StackPanel Spacing=\"4\">\n          <c:ArcBadge Content=\"For you\" Tone=\"Accent\" />\n          <TextBlock Text=\"Issue 12 · The next issue, written for you\" Classes=\"arc-body-sm arc-medium\" />\n        </StackPanel>\n      </c:ArcCard>\n    </StackPanel>\n  </Grid>\n</Window>"
+    }
+  ]
+}

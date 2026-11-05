@@ -23,6 +23,15 @@ public sealed class AiChatPage : ArcItemPage
 {
     public override string ItemSlug => "ai-chat";
 
+    public override IReadOnlyList<string> ImplementedStates => new[]
+    {
+        "variant-thread",
+        "variant-reasoning-row",
+        "variant-tool-chip",
+        "variant-sources",
+        "variant-message-actions"
+    };
+
     public override bool DemoOnCanvas => false;
 
     public override IReadOnlyList<string>? WhenToUse => new[]
@@ -249,7 +258,8 @@ public sealed class AiChatPage : ArcItemPage
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         header.Children.Add(K.Row(6,
             K.Text("Checkout latency spike", "arc-label"),
-            K.Caption("Sarah Chen · 12 turns")));
+            K.Caption("Sarah Chen · 12 turns"),
+            K.Pill("Simulated", ArcBadgeTone.Neutral)));
         var headerRight = K.Row(4,
             modelChip.Button,
             K.IconBtn("plus", "New chat"),

@@ -1,0 +1,94 @@
+{
+  "slug": "textarea",
+  "nameZh": "多行文本域",
+  "summary": "多行文本字段：按行数或内容自动增高，可显示实时字数计数，帮助与错误文案沿用同一套字段外壳。",
+  "purpose": [
+    "把备注、描述、发布说明这类会跨行、长度不可预估的文本收进表单。内部仍是原生 TextBox 并开启 AcceptsReturn，换行、撤销、输入法组合与粘贴都保持系统原生行为。",
+    "高度有两套策略：固定 Rows 行、超出后内部滚动，或用 AutoGrow 随内容长高。两者都只影响输入区，标签、帮助文案与计数行仍按同一条基线排布。",
+    "它是 input 的多行版本：字段外壳、尺寸与状态色来自同一套 ArcFieldBase，所以和 input 并排时左右边缘与上下间距天然对齐。"
+  ],
+  "whenToUse": [
+    "需要多行或长度不可预估的文本：备注、简介、发布说明、工单描述。",
+    "希望在输入时就给出剩余字数（ShowCounter 配 MaxLength）而不是提交后报错。",
+    "描述区需要随内容长高、避免出现内部滚动条时，用 AutoGrow。"
+  ],
+  "whenNotToUse": [
+    "姓名、邮箱、URL 等单行值改用 input，单行字段更紧凑且清除按钮位置稳定。",
+    "需要加粗、列表、链接等格式时改用 rich-text-editor。",
+    "只读长文本、默认折叠展开阅读时改用 expandable-text，而不是把可编辑文本域设成只读。",
+    "密码、验证码等敏感文本改用 password-field。"
+  ],
+  "variants": [
+    { "key": "size-sm", "label": "Small", "note": "36 px 基线，紧凑面板" },
+    { "key": "size-md", "label": "Medium", "note": "默认尺寸" },
+    { "key": "size-lg", "label": "Large", "note": "50 px 基线，强调型字段" },
+    { "key": "state-default", "label": "Default", "note": "空值、占位文案与帮助文案" },
+    { "key": "state-filled", "label": "Filled", "note": "有值并保留多行换行" },
+    { "key": "state-counter", "label": "Counter", "note": "ShowCounter + MaxLength 显示 12 / 280" },
+    { "key": "state-autogrow", "label": "Auto grow", "note": "随内容长高，不出现内部滚动条" },
+    { "key": "state-error", "label": "Error", "note": "危险色边框，错误文案替换帮助文案" },
+    { "key": "state-disabled", "label": "Disabled", "note": "只读展示，降低不透明度" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "input", "note": "单行值改用 input，字段更紧凑" },
+    { "type": "alternative", "target": "rich-text-editor", "note": "需要格式化与富文本时改用 rich text editor" },
+    { "type": "alternative", "target": "expandable-text", "note": "只读长文本的展开阅读改用 expandable text" },
+    { "type": "complement", "target": "button", "note": "文本域通常与提交/取消按钮成组出现" }
+  ],
+  "contrasts": [
+    {
+      "target": "input",
+      "title": "Textarea 与 Input",
+      "rows": [
+        { "dimension": "行数", "self": "多行；按 Rows 固定或用 AutoGrow 随内容增长", "other": "单行；高度由 Sm/Md/Lg 三档固定" },
+        { "dimension": "换行", "self": "AcceptReturn 开启，回车插入换行", "other": "回车不换行，通常用于提交或失焦" },
+        { "dimension": "计数", "self": "可配 ShowCounter 与 MaxLength 显示字数", "other": "没有内置字数计数" }
+      ]
+    },
+    {
+      "target": "rich-text-editor",
+      "title": "Textarea 与 Rich text editor",
+      "rows": [
+        { "dimension": "文本格式", "self": "纯文本，只有换行", "other": "粗体、斜体、列表、链接等富文本" },
+        { "dimension": "数据形态", "self": "Value 是纯字符串", "other": "文档模型或标记文本" },
+        { "dimension": "适用场景", "self": "备注、简介、工单描述", "other": "文章、邮件正文、带格式的说明" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcTextarea Label=\"备注\"\n                   Placeholder=\"补充说明，例如复现步骤。\"\n                   Rows=\"4\"\n                   Description=\"仅内部可见。\"\n                   Value=\"{Binding Note, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "字数上限与自动增高",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcTextarea Label=\"发布说明\"\n                   Rows=\"3\"\n                   AutoGrow=\"True\"\n                   ShowCounter=\"True\"\n                   MaxLength=\"280\"\n                   Value=\"{Binding ReleaseNotes, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "监听输入变化",
+      "language": "csharp",
+      "code": "var notes = new ArcTextarea\n{\n    Label = \"工单描述\",\n    Rows = 4,\n    AutoGrow = true,\n    ShowCounter = true,\n    MaxLength = 500\n};\n\nnotes.ValueChanged += (_, _) => UpdateDraft(notes.Value);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcTextarea",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Value": "当前文本，含换行符；双向绑定到内部 TextBox",
+      "Placeholder": "空值时显示的占位文案",
+      "Label": "可见标签，同时作为内部输入框的无障碍名称",
+      "Description": "帮助文案；与 Error 同时存在时被 Error 覆盖显示",
+      "Error": "错误文案；有值时字段进入错误态",
+      "HasError": "只读，Error 是否非空",
+      "Size": "尺寸：Sm / Md / Lg，默认 Md",
+      "Rows": "最少可见行数，默认 4；只在 AutoGrow 关闭时决定高度基准",
+      "AutoGrow": "随内容长高而不是在 Rows 之后内部滚动，默认 false",
+      "ShowCounter": "在帮助行显示字数，默认 false",
+      "MaxLength": "原生最大长度，同时作为计数分母；null 表示不限",
+      "IsInputFocused": "只读，内部 TextBox 是否持有焦点",
+      "ValueChanged": "用户每次编辑后触发，此时 Value 已更新"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "slug": "gravity-well",
+  "nameZh": "引力井",
+  "summary": "一整面图片瓦片组成的墙：指针像引力源一样把附近的瓦片吸过去，越近越缩小、变暗并压到邻居下面，点击还会送出穿过墙体的冲击波。",
+  "purpose": [
+    "用一面密集的图片墙表达「广度」：9 列 4 行的瓦片铺满表面，指针所在的位置成为一口引力井，附近约 205px 半径内的瓦片被拉向井心，越近拉力越强，瓦片按比例缩小、降低不透明度，并被排在邻居下层。",
+    "每块瓦片挂一根欠阻尼弹簧，所以快速划过会留下果冻般的尾迹；瓦片只通过位移与缩放移动，网格槽位与读屏顺序都不变。点击会从指针处送出 900px/s 的冲击波，环扫过时瓦片被额外推开一下。",
+    "Avalonia 没有逐帧 z-index 合成器，所以绘制顺序按「被吸引的深度」排序，让近井的瓦片压在邻居上面；降级动效时墙面停在一个固定的、作者指定的弯折上，并在井底留一圈强调色光晕，保证静帧也读得出引力效果。"
+  ],
+  "whenToUse": [
+    "团队、客户或情绪板墙面，希望用「一墙内容」表现广度时。",
+    "落地页区块需要在不动用轮播的情况下展示大量 logos、头像或照片时。",
+    "希望有一个既密集又能被指针拨动的趣味表面时。"
+  ],
+  "whenNotToUse": [
+    "需要精确点击或扫描的网格（文件选择器、大型图库）不要用，形变会干扰定位。",
+    "只想要静态排布的图片墙时，直接用等宽网格即可，不必承担逐帧计算。",
+    "需要表达层级或流程关系时，改用真正的关系型可视化，而不是形变。"
+  ],
+  "variants": [
+    { "key": "state-bend", "label": "Bend", "note": "静止弯折：墙面朝固定的井心倾斜，降级动效下的确定静帧" },
+    { "key": "variant-wall", "label": "Wall", "note": "9 × 4 的图片瓦片墙，保持网格槽位" },
+    { "key": "variant-halo", "label": "Halo", "note": "井底的强调色光晕，让弯折在静帧里也可见" },
+    { "key": "variant-depth", "label": "Depth", "note": "近井瓦片缩小、变暗并被相邻瓦片遮住" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "dot-grid", "note": "都要指针驱动形变：点阵是背景场，引力井是内容墙" },
+    { "type": "alternative", "target": "sticker-peel", "note": "同为玩味表面：贴纸让人摆放，引力井让人拨动" },
+    { "type": "complement", "target": "team-members", "note": "团队页里可以用引力井墙展示成员头像，用成员列表承载姓名与角色" }
+  ],
+  "contrasts": [
+    {
+      "target": "dot-grid",
+      "title": "Gravity well 与 Dot grid",
+      "rows": [
+        { "dimension": "内容", "self": "图片瓦片本身是内容", "other": "纯装饰圆点，不承载信息" },
+        { "dimension": "形变", "self": "瓦片被拉向井、缩小并变暗", "other": "点被推开并染上强调色" },
+        { "dimension": "适合位置", "self": "页面中的一块陈列区域", "other": "页面背景" }
+      ]
+    },
+    {
+      "target": "sticker-peel",
+      "title": "Gravity well 与 Sticker peel",
+      "rows": [
+        { "dimension": "排列", "self": "严格的 9 × 4 网格", "other": "按比例散落的贴纸" },
+        { "dimension": "交互结果", "self": "整面墙随指针弯折，位置不持久", "other": "单个贴纸被拿起并贴到新位置" },
+        { "dimension": "目的", "self": "表现内容的广度与体量", "other": "让人玩、留下个人化的摆放" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "把引力井放进团队页",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:special=\"clr-namespace:Arc.Avalonia.Special.Media.Controls;assembly=Arc.Avalonia.Special.Media\">\n  <special:ArcGravityWell Width=\"930\" Height=\"430\"\n                         HorizontalAlignment=\"Left\" />\n</Window>"
+    },
+    {
+      "title": "键盘驱动井心",
+      "language": "csharp",
+      "code": "// 方向键在瓦片间移动井心，Home / End 跳到首尾，\n// Space / Enter 从井心送出冲击波；瓦片的读屏顺序不随形变改变。\nvar wall = new ArcGravityWell\n{\n    Width = 930,\n    Height = 430,\n    HorizontalAlignment = HorizontalAlignment.Left\n};"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.Media.Controls.ArcGravityWell",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Width": "墙宽；列数固定为 9，瓦片宽度按它计算",
+      "Height": "墙高；行数固定为 4",
+      "IsEnabled": "禁用后不再移动井心或送出冲击波",
+      "IsVisible": "隐藏后停止弹簧与冲击波动画"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "slug": "reasoning-tree",
+  "nameZh": "推理树插画",
+  "summary": "解释树搜索的插画：问题先提出三个候选方案，按分数剪掉弱分支，保留的想法再展开一层，最后把从问题到答案的最佳路径画出来。",
+  "purpose": [
+    "把「思考可以是一棵树」讲清楚：左侧是问题卡（Which release plan ships by Friday?），向右三层是候选想法，每个节点带分数与分数条；被剪掉的节点整体淡出，留下的进入下一层。",
+    "顶部标出每层的 Depth 与保留数量，右侧 Answer 卡给出最终答案、分数、思考深度与当前 beam；底部 Beam width 1/2/3 选择器可以在现场切换保留宽度，路径与淡出状态随之重算。",
+    "画面不依赖时间轴：路径与剪枝由 beam 搜索当场算出。预览展示的是默认 beam 2 下的已求解帧（最佳路径已高亮到 Answer），声明的变体都是这一帧里同时可见的元素。"
+  ],
+  "whenToUse": [
+    "AI 研究或产品页需要解释 tree-of-thoughts、beam search 或推理路径。",
+    "文档页介绍候选生成、打分与剪枝时，需要一张有层次的示意图。",
+    "需要向用户说明「答案是从多个候选里挑出来的」。"
+  ],
+  "whenNotToUse": [
+    "需要展示可展开的数据树（文件树、组织结构）时，改用 tree-view。",
+    "需要展示可排序的层级表格时，改用 tree-table。",
+    "只需要手风琴式分段内容时，改用 accordion。"
+  ],
+  "variants": [
+    { "key": "state-solved", "label": "Solved", "note": "默认帧：最佳路径已从问题连到答案，剪枝分支淡出" },
+    { "key": "variant-question", "label": "Question", "note": "左侧问题卡与图标" },
+    { "key": "variant-candidates", "label": "Candidates", "note": "三层候选想法：标题、分数与分数条、Depth 保留数" },
+    { "key": "variant-pruned", "label": "Pruned", "note": "未入选分支以低透明度显示，连线变淡" },
+    { "key": "variant-path", "label": "Path", "note": "高亮的思考路径与 Answer 卡（分数、深度、beam）" },
+    { "key": "variant-beam-pills", "label": "Beam pills", "note": "Beam width 1/2/3 选择器与 Illustrative scores 说明" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tree-view", "note": "需要可展开可勾选的真实树时改用 tree view" },
+    { "type": "complement", "target": "agent-loop", "note": "同属 AI explainers：一个讲分支搜索，一个讲循环执行" },
+    { "type": "complement", "target": "tree-table", "note": "需要在表格里呈现层级数据时用 tree table 补充" }
+  ],
+  "contrasts": [
+    {
+      "target": "tree-view",
+      "title": "Reasoning tree 与 Tree view",
+      "rows": [
+        { "dimension": "角色", "self": "解释推理过程的插画", "other": "真实可展开、可选择的树控件" },
+        { "dimension": "数据", "self": "固定示例想法与分数", "other": "调用方提供的节点模型" },
+        { "dimension": "交互", "self": "Beam width 药丸与数字键切换保留数", "other": "展开/收起、选择与键盘导航" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Special.AIExplainers.Controls;assembly=Arc.Avalonia.Special.AIExplainers\">\n  <arc:ArcReasoningTree Height=\"400\" />\n</Window>"
+    },
+    {
+      "title": "配合「剪枝」讲解",
+      "language": "csharp",
+      "code": "var tree = new ArcReasoningTree { Height = 400 };\n\n// 画面本来就是已求解帧，暂停可避免讲解时被其他动画干扰。\ntree.SetPaused(true);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Special.AIExplainers.Controls.ArcReasoningTree",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Height": "插画高度；默认 400，宽度随容器拉伸",
+      "HorizontalAlignment": "横向对齐；铺满内容列时用 Stretch",
+      "SetPaused": "暂停或继续故事时钟；本插画的路径与剪枝按 beam 当场计算",
+      "TogglePlay": "切换播放状态，等价于按一次 Space"
+    }
+  }
+}

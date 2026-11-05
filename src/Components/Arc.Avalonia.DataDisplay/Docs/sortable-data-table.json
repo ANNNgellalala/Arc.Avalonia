@@ -1,0 +1,71 @@
+{
+  "slug": "sortable-data-table",
+  "nameZh": "可排序数据表",
+  "summary": "结构化记录的只读表格：表头点击排序、数字列右对齐并使用等宽数字、可选行选择与斑马纹，行数据可以是普通对象或字典，空态与页脚计数也一并覆盖。",
+  "purpose": [
+    "当记录只需要被阅读和排序、不需要就地编辑时用它：项目清单、价格表、后台列表。列用 ArcTableColumn 描述，行可以是任意对象或 Dictionary，列按 Key 读取字段。",
+    "表头点击在升序 → 降序 → 关闭之间循环，数字列右对齐并使用等宽数字；Selectable 打开后出现复选框列，选中集合与 SelectedKeys 双向同步，Shift 点击可以连续选择。",
+    "EmptyMessage 负责空态文案，ItemName 决定页脚里「project / projects」的单复数；它保持轻量，所以宽表会在自己的框内横向滚动。"
+  ],
+  "whenToUse": [
+    "记录以阅读为主，最多需要按列排序与勾选做批量操作时。",
+    "表格上方要放 filter-toolbar，由工具栏缩小数据集、表格负责展示时。",
+    "字段数量在桌面宽度内放得下、或可以接受横向滚动时。"
+  ],
+  "whenNotToUse": [
+    "需要单元格内联编辑、列宽拖拽、列显隐与页脚合计时用 data-grid，它是本表的进阶版本。",
+    "行有父子层级、需要展开折叠时用 tree-table。",
+    "只有三两条记录时用 card 或定义列表，表格反而更重。"
+  ],
+  "variants": [
+    { "key": "variant-basic", "label": "Basic", "note": "列定义 + 行数据，表头可排序" },
+    { "key": "variant-selected", "label": "Selected rows", "note": "SelectedKeys 预设选中行，页脚显示计数" },
+    { "key": "state-no-selection", "label": "No selector", "note": "Selectable=false，去掉复选框列" },
+    { "key": "state-empty", "label": "Empty", "note": "Rows 为空时显示 EmptyMessage" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "tree-table", "note": "平表用 sortable data table，行需要层级与展开折叠时用 tree table" },
+    { "type": "complement", "target": "filter-toolbar", "note": "筛选栏常放在表格上方，负责缩小数据集" }
+  ],
+  "contrasts": [
+    {
+      "target": "tree-table",
+      "title": "Sortable data table 与 Tree table",
+      "rows": [
+        { "dimension": "行结构", "self": "平表，行之间没有父子关系", "other": "嵌套行，按层级缩进并展开折叠" },
+        { "dimension": "排序", "self": "整表按列排序", "other": "每一层内部排序，保留父子结构" },
+        { "dimension": "选择", "self": "复选框列 + Shift 连续区间", "other": "三态选择，父节点选中即子节点全选" },
+        { "dimension": "数据模型", "self": "普通对象或 Dictionary + 轻量列定义", "other": "ArcTreeTableRow.Values + 层级 Children" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "在 XAML 里声明外壳",
+      "language": "xaml",
+      "code": "<arc:ArcSortableDataTable xmlns:arc=\"clr-namespace:Arc.Avalonia.DataDisplay.Controls;assembly=Arc.Avalonia.DataDisplay\"\n                          Caption=\"Projects\"\n                          Selectable=\"True\"\n                          EmptyMessage=\"No projects yet\" />"
+    },
+    {
+      "title": "列、行与预选",
+      "language": "csharp",
+      "code": "var table = new ArcSortableDataTable\n{\n    Caption = \"Projects\",\n    Selectable = true,\n    SelectedKeys = new[] { \"p2\" },\n    DefaultSort = new ArcTableSort { Key = \"name\", Direction = ArcSortDirection.Asc },\n    ItemName = new ArcTableItemName { One = \"project\", Other = \"projects\" },\n    Columns = new[]\n    {\n        new ArcTableColumn { Key = \"name\", Label = \"Project\" },\n        new ArcTableColumn { Key = \"owner\", Label = \"Owner\", Width = 150, Sortable = false },\n        new ArcTableColumn { Key = \"budget\", Label = \"Budget\", Width = 130, Numeric = true }\n    },\n    Rows = new[]\n    {\n        new Dictionary<string, object?>\n        {\n            [\"id\"] = \"p1\", [\"name\"] = \"Harbour\", [\"owner\"] = \"Maya Chen\", [\"budget\"] = 42000\n        }\n    }\n};\n\ntable.SortChanged += (_, sort) => Reload(sort.Key, sort.Direction);"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.DataDisplay.Controls.ArcSortableDataTable",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Rows": "行集合；每列按 Key 读取对象的属性或字典键",
+      "Columns": "列定义，顺序即显示顺序",
+      "RowKey": "稳定的行键；默认读 id 成员，否则用行索引",
+      "Caption": "表格标题与无障碍名称，默认 Data table",
+      "EmptyMessage": "没有行时显示的空态文案",
+      "DefaultSort": "初始排序；null 表示不排序",
+      "Selectable": "显示复选框列与页脚计数，默认 false",
+      "SelectedKeys": "已选行的键，可预设，也会随选择同步更新",
+      "ItemName": "页脚计数的名词单复数，例如 project / projects",
+      "SortChanged": "排序变化后触发；参数为当前排序",
+      "SelectionChanged": "选择变化后触发，参数为选中的键列表"
+    }
+  }
+}

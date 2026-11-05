@@ -1,0 +1,79 @@
+{
+  "slug": "switch",
+  "nameZh": "开关",
+  "summary": "立即生效的二值开关：拇指在弹簧上滑动，开启时轨道取强调色，整行都是点击区域。",
+  "purpose": [
+    "表达「翻转即生效」的布尔设置：点一下状态立刻提交，没有二次确认。",
+    "轨道 46×28、拇指 22，开启时拇指平移 18 px，颜色走 BrushTransition；整个控件至少 44 px 高，所以标签与轨道一起构成点击区。",
+    "开关自身不保存后端状态：Checked 是唯一的数据源，CheckedChanged 只告诉你用户改了，写回与失败回滚由你决定。"
+  ],
+  "whenToUse": [
+    "通知、隐私、自动保存这类翻转即生效的设置项。",
+    "设置列表里每行一个偏好，需要一眼看出开/关。",
+    "需要键盘用户用 Space / Enter 立即切换，且标签同时作为读屏名称的场景。"
+  ],
+  "whenNotToUse": [
+    "选择要等表单提交才生效时，改用 checkbox。",
+    "在 2–5 个具名选项之间切换（Day / Week / Month）时，改用 segmented-control。",
+    "明暗外观切换改用 theme-switch；按月/按年这种带价格与节省徽标的业务开关改用 billing-toggle。"
+  ],
+  "variants": [
+    { "key": "variant-off", "label": "Off", "note": "轨道为控制轨道色，拇指在左" },
+    { "key": "variant-on", "label": "On", "note": "轨道取强调色，拇指右移 18 px" },
+    { "key": "variant-label", "label": "With label", "note": "标签同时是读屏名称" },
+    { "key": "variant-bare", "label": "Bare", "note": "只有轨道，需要自备无障碍名称" },
+    { "key": "state-disabled", "label": "Disabled", "note": "保留开关状态，降低不透明度" }
+  ],
+  "relations": [
+    { "type": "alternative", "target": "checkbox", "note": "需要提交才生效的二值选择改用 checkbox" },
+    { "type": "alternative", "target": "segmented-control", "note": "在具名选项间切换改用 segmented control" },
+    { "type": "alternative", "target": "theme-switch", "note": "明暗外观切换改用 theme switcher" },
+    { "type": "alternative", "target": "billing-toggle", "note": "按月/按年这类带价格与徽标的业务开关改用 billing toggle" }
+  ],
+  "contrasts": [
+    {
+      "target": "checkbox",
+      "title": "Switch 与 Checkbox",
+      "rows": [
+        { "dimension": "生效时机", "self": "翻转立即生效", "other": "等表单提交才生效" },
+        { "dimension": "外观", "self": "轨道加滑动拇指", "other": "方框加勾选标记" },
+        { "dimension": "典型场景", "self": "通知、隐私等设置列表", "other": "同意条款、批量选择" }
+      ]
+    },
+    {
+      "target": "billing-toggle",
+      "title": "Switch 与 Billing toggle",
+      "rows": [
+        { "dimension": "语义", "self": "通用布尔开关", "other": "专用于计费周期（月/年）" },
+        { "dimension": "附加信息", "self": "只有开与关", "other": "节省徽标，价格随周期滚动" },
+        { "dimension": "数据", "self": "Checked 是 bool", "other": "Value 是选项字符串（monthly / yearly）" }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "title": "基础用法",
+      "language": "xaml",
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:arc=\"clr-namespace:Arc.Avalonia.Inputs.Controls;assembly=Arc.Avalonia.Inputs\">\n  <arc:ArcSwitch Label=\"邮件通知\"\n                 Checked=\"{Binding EmailNotifications, Mode=TwoWay}\" />\n</Window>"
+    },
+    {
+      "title": "写回失败时回滚",
+      "language": "csharp",
+      "code": "var toggle = new ArcSwitch { Label = \"自动保存\", Checked = true };\n\ntoggle.CheckedChanged += async (_, _) =>\n{\n    if (!await SaveAsync(toggle.Checked))\n    {\n        toggle.Checked = !toggle.Checked;\n    }\n};"
+    },
+    {
+      "title": "无标签时补上无障碍名称",
+      "language": "csharp",
+      "code": "using Avalonia.Automation;\n\nvar mute = new ArcSwitch { Checked = true };\nAutomationProperties.SetName(mute, \"静音\");"
+    }
+  ],
+  "api": {
+    "type": "Arc.Avalonia.Inputs.Controls.ArcSwitch",
+    "exclude": ["TemplatedParent"],
+    "descriptions": {
+      "Checked": "当前是否开启；开关唯一的数据源，翻转后由主题的 checked 类驱动外观",
+      "Label": "轨道左侧的可见标签，同时作为读屏名称",
+      "CheckedChanged": "用户点击或按 Space / Enter 切换后触发；编程赋值不会触发"
+    }
+  }
+}

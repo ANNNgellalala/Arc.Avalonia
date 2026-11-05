@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\*.json" />
+  </ItemGroup>
 </Project>
