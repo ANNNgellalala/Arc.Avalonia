@@ -64,7 +64,8 @@ $components = @(
     'Arc.Avalonia.Feedback', 'Arc.Avalonia.DataDisplay', 'Arc.Avalonia.Charts', 'Arc.Avalonia.Pickers',
     'Arc.Avalonia.Effects', 'Arc.Avalonia.Content', 'Arc.Avalonia.Media'
 )
-$agents = @('Arc.Avalonia.AgentUI', 'Arc.Avalonia.LifeToday')
+# L4 agent layer (top composition) + the two leaf agent surface packages.
+$agents = @('Arc.Avalonia.Agent', 'Arc.Avalonia.AgentUI', 'Arc.Avalonia.LifeToday')
 $specials = @(
     'Arc.Avalonia.Special.Glass', 'Arc.Avalonia.Special.Motion', 'Arc.Avalonia.Special.Media',
     'Arc.Avalonia.Special.AIWidgets', 'Arc.Avalonia.Special.AIExplainers'

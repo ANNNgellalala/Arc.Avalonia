@@ -6,8 +6,15 @@ namespace Arc.Avalonia.Icons;
 /// <summary>Stroke path data for the Lucide icon set (24x24 grid, stroke 1.75, round caps and joins).</summary>
 public static class ArcIconData
 {
-    /// <summary>Icon name in kebab-case, for example "chevron-down".</summary>
-    public static readonly IReadOnlyDictionary<string, string> Paths = new Dictionary<string, string>(StringComparer.Ordinal)
+    /// <summary>
+    /// Icon name in kebab-case, for example "chevron-down". Read-only and stable: runtime additions go
+    /// through <see cref="ArcIcon.Register(string, string)"/> / <see cref="ArcIconRegistry"/> and never
+    /// mutate this table (M2-G3g keeps the built-in data immutable so consumers can rely on it).
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> Paths = MergeHighFrequency();
+
+    /// <summary>The original Arc icon set, before the M2 high-frequency additions.</summary>
+    private static IReadOnlyDictionary<string, string> CreateBuiltIns() => new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["check"] = "M20 6 9 17l-5-5",
         ["check-check"] = "M18 6 7 17l-5-5 m22 10-7.5 7.5L13 16",
@@ -171,6 +178,30 @@ public static class ArcIconData
         ["dot"] = "M11.1 12.1a1 1 0 1 0 2 0a1 1 0 1 0 -2 0",
         ["circle-small"] = "M6 12a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"
     };
+
+    /// <summary>
+    /// Built-ins plus the M2 high-frequency Lucide additions (<see cref="ArcIconDataHighFrequency"/>).
+    /// A name defined in both tables keeps the built-in path, so M2 additions can never silently change
+    /// an existing icon.
+    /// </summary>
+    private static IReadOnlyDictionary<string, string> MergeHighFrequency()
+    {
+        var builtIns = CreateBuiltIns();
+        var merged = new Dictionary<string, string>(
+            builtIns.Count + ArcIconDataHighFrequency.Paths.Count, StringComparer.Ordinal);
+
+        foreach (var pair in ArcIconDataHighFrequency.Paths)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        foreach (var pair in builtIns)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        return merged;
+    }
 }
 
 

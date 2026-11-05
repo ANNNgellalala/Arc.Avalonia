@@ -56,6 +56,7 @@
     <!-- Agent surfaces -->
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
     <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.Agent\Arc.Avalonia.Agent.csproj" />
     <!-- Special components -->
     <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIExplainers\Arc.Avalonia.Special.AIExplainers.csproj" />
     <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIWidgets\Arc.Avalonia.Special.AIWidgets.csproj" />

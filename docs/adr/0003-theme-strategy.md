@@ -186,3 +186,42 @@ AvaloniaXamlLoader.Load(this);           // ArcBaseStyles + 11 个组件主题
 `ArcFluentOverrides.Build`）并由 `ArcThemeManager.Apply` 合并，而不是写死在主题 XAML 里 —— 因为 Arc token 由
 OKLCH 计算产生，写进 XAML 会违反 R6（token-only，禁止字面色值）。这与 §2/§8 的"XAML 内容顺序"等价：
 装配顺序仍是 Fluent → token 字典 → Fluent 键覆盖 → 组件主题，只是后两步在运行时注入。
+
+## 10. M2 增量：ThemeOptions 与自定义 accent（G3h，2026-11-06）
+
+M1 的 `ArcTheme` 只解决"一行装配"；M2-G3h 把主题扩展为一次请求描述，让自定义品牌色同时驱动 Arc token
+与 Fluent `SystemAccentColor`（Foundation 仍不引用 Fluent）。
+### 10.1 API
+```csharp
+public enum ArcDensity { Compact, Default, Comfortable }
+public sealed record ArcThemeOptions
+{
+    public ArcColorScheme Scheme { get; init; } = ArcColorScheme.Light;
+    public ArcAccent Accent { get; init; } = ArcAccent.Neutral;   // 设置 AccentColor 后忽略
+    public Color? AccentColor { get; init; }                       // 自定义品牌种子
+    public ArcDensity Density { get; init; } = ArcDensity.Default;
+    public double CornerRadiusScale { get; init; } = 1.0;          // clamp 0.5–2.0；pill 不缩放
+}
+ArcThemeManager.Apply(app, options);                               // 新重载
+ArcThemeManager.Apply(app, scheme, accent);                        // 旧 3 参重载保留（兼容）
+ArcThemeManager.SetAccent(app, Color accentColor);                 // 自定义品牌色入口
+// event Action<Application, ArcColorScheme, ArcThemeOptions> Applied（升级为传完整请求）
+```
+`Applied` 带上 `ArcThemeOptions` 后，`src/Theme/Arc.Avalonia.Theme` 订阅同一请求重建 `FluentTheme.Palettes`
+与 Fluent 键覆盖，Foundation 因此不需要依赖 Fluent。
+### 10.2 派生算法（`ArcPalette.AccentFromSeed`，OKLCH）
+种子 → `ArcColor.ToOklch` 保 hue、chroma 夹 **0–0.30**；Light accent `l∈[0.36,0.72]`，Dark 用
+`clamp(l+0.28,0.62,0.92)`（chroma×0.90）；strong 再偏一档（Light `l−0.16`、Dark `l+0.40`）；前景/字形按
+WCAG `≥4.5` 选白或近黑，黑/白/高饱和种子都不抛异常。Density 缩放 height（×0.88/×1.14）与 space（×0.80/×1.20），
+Fluent 输入内边距/下拉/选项卡高度同步取 density 值；`CornerRadiusScale` 缩放 `RadiusControl/Panel/Surface`，pill 不缩放。
+### 10.3 证据（`Arc.Avalonia.Gallery.dll --theme-report`，exit 0）
+| 断言 | 实测 |
+|---|---|
+| Fluent 键解析 | Light **47/47**、Dark **47/47** |
+| 预设 accent → `SystemAccentColor` | Neutral/Violet/Rose 精确匹配 |
+| 自定义 seed → `SystemAccentColor == ArcAccent` | 4 个种子（含极端明暗）全部匹配（派生色而非裸 seed） |
+| 极值种子对比度 | **7.90**（近白）– **10.86**（近黑），均 ≥4.5 |
+| density `ControlHeightMd` | default **44** / compact **39** / comfortable **50**（live compact=39） |
+### 10.4 遗留
+* TextBox/ComboBox 的**字号**仍不受 `ControlContentThemeFontSize` 影响，需局部 `ControlTheme`（ADR 0004 §3.1/3.2）；
+* 组件内部仍有硬编码尺寸（图标 size、部分 padding），未全部随 `Density` 缩放；8 accent × density 截图矩阵未补。

@@ -21,7 +21,7 @@
     "L2f": ["L1", "L2"],
     "L2.5": ["L1", "L2"],
     "L3": ["L1", "L2"],
-    "L4": ["L1", "L2", "L3"],
+    "L4": ["L1", "L2", "L3", "L4"],
     "app": ["L0", "L1", "L2", "L2f", "L2.5", "L3", "L4", "app"]
   },
   "allowedEdges": [
@@ -46,6 +46,7 @@
     "L2.5（Arc.Avalonia.Theme）按 docs/13 §2.3 是对 L2 的聚合例外；其允许目标仍是 L1/L2，若出现其它边需在 allowedEdges 里逐条登记。",
     "leafProjects 的引用由 R2 判定；M1-T1 出库后 R2 已清零（GREEN），新增 leaf 引用会直接 RED。",
     "apps/tests 允许任意层（app 是宿主/叶子）。",
-    "allowedEdges 的一侧可用 from/to（AssemblyName 或 csproj 文件名）或 fromProject/toProject（仓库相对路径）匹配；改名时应同时核对两组字段。"
+    "allowedEdges 的一侧可用 from/to（AssemblyName 或 csproj 文件名）或 fromProject/toProject（仓库相对路径）匹配；改名时应同时核对两组字段。",
+    "M2-G4: L4 允许引用 L4。Arc.Avalonia.Agent 是 Agent 顶层的组合根，Arc.Avalonia.AgentUI 是同一 L4 的叶子控件包（transcript / run bar / approval sheet / ask card / background dock / attention inbox）；组合根必须复用叶子控件而不是复制它们，故登记为同层兄弟边（docs/13 D8、docs/analysis/13-review-c-agent-gates §6.3）。其它 L4→L4 边仍按本表判定，新增需评审。"
   ]
 }

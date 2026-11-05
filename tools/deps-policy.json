@@ -64,6 +64,12 @@
     ],
     "note": "仅构建/SDK 级依赖；出现新的 Microsoft.*/System.* 时评审需确认它不属于 UI 运行时库。"
   },
+  "buildOnlyPackages": {
+    "packages": [
+      "Microsoft.CodeAnalysis.BannedApiAnalyzers"
+    ],
+    "note": "编译期 analyzer/tooling（PrivateAssets=all）：允许出现在 assets 的 build 闭包里，但不得进入任何发布包的 NuGet 依赖闭包；check-deps 单独归类并从发布闭包统计中剔除，pack 产物由 R5 复核。"
+  },
   "denied": {
     "exact": [
       "ShimSkiaSharp"

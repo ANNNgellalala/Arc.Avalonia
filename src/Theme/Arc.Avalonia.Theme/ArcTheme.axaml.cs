@@ -44,7 +44,7 @@ public partial class ArcTheme : Styles
         // rebuilds the same dictionaries (they are tracked, so nothing accumulates).
         if (Application.Current is { } application)
         {
-            ArcThemeManager.Apply(application, ArcThemeManager.Scheme, ArcThemeManager.Accent);
+            ArcThemeManager.Apply(application, ArcThemeManager.Options);
         }
     }
 
@@ -59,17 +59,17 @@ public partial class ArcTheme : Styles
         public object? GetService(Type serviceType) => null;
     }
 
-    private void OnThemeApplied(Application application, ArcColorScheme scheme, ArcAccent accent)
+    private void OnThemeApplied(Application application, ArcColorScheme scheme, ArcThemeOptions options)
     {
-        // 8 accents map onto Fluent's public palette API instead of a bare SystemAccentColor override.
-        ArcThemePalettes.Apply(_fluentTheme, accent);
+        // Preset and custom accents both map onto Fluent's palette API instead of a bare SystemAccentColor.
+        ArcThemePalettes.Apply(_fluentTheme, options);
 
         if (_fluentOverrides is not null)
         {
             application.Resources.MergedDictionaries.Remove(_fluentOverrides);
         }
 
-        _fluentOverrides = ArcFluentOverrides.Build(accent);
+        _fluentOverrides = ArcFluentOverrides.Build(options);
         application.Resources.MergedDictionaries.Add(_fluentOverrides);
     }
 }

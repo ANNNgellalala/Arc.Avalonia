@@ -58,13 +58,13 @@
   field System.Object ProvideTargetObject
   field System.Object ProvideTargetProperty
   field TTarget RootObject
-  method Avalonia.Controls.ResourceDictionary Build[Arc.Avalonia.Theme.ArcAccent accent]
+  method Avalonia.Controls.ResourceDictionary Build[Arc.Avalonia.Theme.ArcThemeOptions options]
   method System.Object get_Current[]
   method System.Object GetService[System.Type ]
   method System.Object TryLoad[System.IServiceProvider , System.String ]
   method System.Object TryLoad[System.String ]
   method System.Uri get_BaseUri[]
-  method System.Void Apply[Avalonia.Themes.Fluent.FluentTheme theme, Arc.Avalonia.Theme.ArcAccent accent]
+  method System.Void Apply[Avalonia.Themes.Fluent.FluentTheme theme, Arc.Avalonia.Theme.ArcThemeOptions options]
   method System.Void PopParent[]
   method System.Void PushParent[System.Object ]
   method System.Void set_BaseUri[System.Uri ]

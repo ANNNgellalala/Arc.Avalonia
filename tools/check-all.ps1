@@ -1,8 +1,8 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    M0 一键门禁：依次运行 R3 依赖、R1/R2 架构、R4 主题、R6 token-only、R8 无渲染层自研，
-    输出红/绿/known-red 三态汇总表。只有“新增违规”才 exit 1；基线内 known-red（R2/R5）不阻塞。
+    一键门禁：依次运行 R3 依赖、R1/R2 架构、R4 主题、R6 token-only、R8 无渲染层自研、R9 Agent 边界，
+    以及 R5 打包产物检查，输出红/绿/known-red 三态汇总表。只有“新增违规”才 exit 1。
 
 .DESCRIPTION
     各子门禁先写 .recon/gates/<name>-latest.json，再由本脚本汇总；子门禁的 exit code 只用于兜底。
@@ -10,7 +10,9 @@
       GREEN      无违规（可有已登记豁免，如 R6 的 28 条存量 token 例外）
       KNOWN-RED  仅基线内已知红（tools/gates-baseline.json；M1 目标）
       RED        新增违规（或子门禁自身 ERROR）
-    R5（dotnet pack 产物）M0-3 不实现，按基线登记为 KNOWN-RED；BannedApi 不在 M0-3 范围。
+    R5（dotnet pack 产物）由 check-package.ps1 实现（artifacts/ 未生成时为 RED，先 dotnet pack）。
+    R9（Agent 边界）主门禁是 BannedApiAnalyzers（RS0030 → error），check-agent-boundary.ps1 是离线兜底；
+    其报告是简化 schema（gate/status/issues），本脚本单独兼容，不进入 gates-baseline 的 known-red。
 
 .PARAMETER KnownRed
     严格模式：把 KNOWN-RED 也视为失败（exit 1）。默认 known-red 不阻塞（docs/14 §9 的 M0 预期状态）。
@@ -20,7 +22,7 @@
     自检失败同样 exit 1。
 
 .PARAMETER Gate
-    只跑指定门禁：R1 / R2 / R3 / R4 / R6 / R8 / selftest（大小写不敏感，前缀匹配）。
+    只跑指定门禁：R1 / R2 / R3 / R4 / R5 / R6 / R8 / R9 / selftest（大小写不敏感，前缀匹配）。
 
 .PARAMETER Quiet
     不打印汇总表（仅用于脚本化调用；仍写报告）。
@@ -60,7 +62,8 @@ $gateDefs = @(
     [pscustomobject]@{ Rule = 'R1/R2'; Name = 'architecture'; Script = 'check-architecture.ps1'; Args = @() },
     [pscustomobject]@{ Rule = 'R4'; Name = 'theme'; Script = 'check-theme.ps1'; Args = @() },
     [pscustomobject]@{ Rule = 'R6'; Name = 'token-only'; Script = 'check-token-only.ps1'; Args = @() },
-    [pscustomobject]@{ Rule = 'R8'; Name = 'no-render'; Script = 'check-no-render.ps1'; Args = @() }
+    [pscustomobject]@{ Rule = 'R8'; Name = 'no-render'; Script = 'check-no-render.ps1'; Args = @() },
+    [pscustomobject]@{ Rule = 'R9'; Name = 'agent-boundary'; Script = 'check-agent-boundary.ps1'; Args = @() }
 )
 if ($SelfTest) {
     $gateDefs += [pscustomobject]@{ Rule = 'R3-ST'; Name = 'deps-selftest'; Script = 'check-deps.ps1'; Args = @('-SelfTest') }
@@ -104,16 +107,39 @@ foreach ($def in $gateDefs) {
         $rows.Add([pscustomobject]@{ Rule = $def.Rule; Status = 'ERROR'; New = 0; KnownRed = 0; Exempt = 0; Checked = 0; Report = '' })
         continue
     }
-    foreach ($ruleResult in @($childReport.rules)) {
+    $ruleResults = @()
+    if ($null -ne $childReport.PSObject.Properties['rules']) { $ruleResults = @($childReport.rules) }
+    if ($ruleResults.Count -gt 0) {
+        foreach ($ruleResult in $ruleResults) {
+            $rows.Add([pscustomobject]@{
+                    Rule     = [string]$ruleResult.id
+                    Status   = [string]$ruleResult.status
+                    New      = [int]$ruleResult.newViolations
+                    KnownRed = [int]$ruleResult.knownRed
+                    Exempt   = [int]$ruleResult.exemptions
+                    Checked  = [int]$ruleResult.checked
+                    Report   = ConvertTo-GatesRelPath -Path $latestPath -Base $root
+                })
+        }
+    }
+    elseif ($null -ne $childReport.PSObject.Properties['status']) {
+        # 兼容 check-agent-boundary.ps1 的简化 schema（gate/status/issues，无 rules 数组）。
+        $fallbackStatus = [string]$childReport.status
+        if ($fallbackStatus -ne 'GREEN' -and $fallbackStatus -ne 'KNOWN-RED') { $fallbackStatus = 'RED' }
+        $issueCount = if ($null -ne $childReport.PSObject.Properties['issues']) { @($childReport.issues).Count } else { 0 }
         $rows.Add([pscustomobject]@{
-                Rule     = [string]$ruleResult.id
-                Status   = [string]$ruleResult.status
-                New      = [int]$ruleResult.newViolations
-                KnownRed = [int]$ruleResult.knownRed
-                Exempt   = [int]$ruleResult.exemptions
-                Checked  = [int]$ruleResult.checked
+                Rule     = [string]$def.Rule
+                Status   = $fallbackStatus
+                New      = $issueCount
+                KnownRed = 0
+                Exempt   = 0
+                Checked  = 0
                 Report   = ConvertTo-GatesRelPath -Path $latestPath -Base $root
             })
+    }
+    else {
+        $errors.Add("$($def.Name): 报告格式不可识别（既无 rules 也无 status）")
+        $rows.Add([pscustomobject]@{ Rule = $def.Rule; Status = 'ERROR'; New = 0; KnownRed = 0; Exempt = 0; Checked = 0; Report = '' })
     }
 }
 
@@ -222,7 +248,7 @@ if (-not $Quiet) {
     }
     $greenCount = @($rows | Where-Object { $_.Status -eq 'GREEN' }).Count
     Write-Output ''
-    Write-Output "GATES: green=$greenCount knownRed=$($knownRows.Count) red=$($redRows.Count) errors=$($errors.Count) => $overall"
+    Write-Output "GATES: green=$greenCount/$($rows.Count) knownRed=$($knownRows.Count) red=$($redRows.Count) errors=$($errors.Count) => $overall"
     if ($knownRows.Count -gt 0) {
         Write-Output 'KNOWN-RED（M1 目标，不阻塞 M0）:'
         foreach ($row in $knownRows) {

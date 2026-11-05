@@ -82,7 +82,12 @@ function Get-DepsPolicyVerdict {
     if (Test-GatesAnyGlob -Name $PackageId -Patterns @($policy.denied.patterns)) {
         return [pscustomobject]@{ allowed = $false; category = 'denied'; kind = 'denied-package'; reason = '匹配 deps-policy.denied.patterns' }
     }
-    # 2) 直接官方包
+    # 2) build-only analyzer/tooling：允许存在于编译期 assets，但不计入发布依赖闭包。
+    if ($null -ne $policy.PSObject.Properties['buildOnlyPackages'] -and
+        (Test-PolicyExactId -Id $PackageId -Ids @($policy.buildOnlyPackages.packages))) {
+        return [pscustomobject]@{ allowed = $true; category = 'build-only'; kind = ''; reason = 'build-only analyzer/tooling，不进发布包依赖闭包' }
+    }
+    # 3) 直接官方包
     foreach ($entry in $policy.allowedDirect) {
         if (-not [string]::Equals($PackageId, [string]$entry.id, [System.StringComparison]::OrdinalIgnoreCase)) { continue }
         switch ([string]$entry.scope) {
@@ -146,6 +151,7 @@ function New-DepsScanResult {
         DirectCount    = 0
         TransitiveCount = 0
         Violations     = [System.Collections.Generic.List[object]]::new()
+        BuildOnlyIds   = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
         UnknownNodes   = [System.Collections.Generic.List[string]]::new()
         Errors         = [System.Collections.Generic.List[string]]::new()
         Categories     = @{}
@@ -391,11 +397,16 @@ function Invoke-DepsClosureScan {
                     if ($nodeCmps.ContainsKey($_)) { $nodeCmps[$_].Id } else { $_ }
                 })
             if ($node.Type -eq 'project') { [void]$projectRefIds.Add($canonicalId); continue }
-            [void]$packageIds.Add($canonicalId)
-            if ($depths[$id] -le 1) { [void]$directIds.Add($canonicalId) } else { [void]$transitiveIds.Add($canonicalId) }
             $verdict = Get-DepsPolicyVerdict -PackageId $canonicalId -IsApp $IsApp -IsFeature $IsFeature
             if (-not $categories.ContainsKey($verdict.category)) { $categories[$verdict.category] = 0 }
             $categories[$verdict.category]++
+            if ($verdict.category -eq 'build-only') {
+                # 编译期 analyzer/tooling：不算发布闭包（PrivateAssets=all 不会出现在 nuspec 依赖里）。
+                [void]$result.BuildOnlyIds.Add($canonicalId)
+                continue
+            }
+            [void]$packageIds.Add($canonicalId)
+            if ($depths[$id] -le 1) { [void]$directIds.Add($canonicalId) } else { [void]$transitiveIds.Add($canonicalId) }
             if (-not $verdict.allowed) {
                 $violationKey = "$($ProjectLabel)|$($canonicalId.ToLowerInvariant())"
                 if ($seenViolationKeys.Add($violationKey)) {
@@ -572,6 +583,7 @@ $totalDirect = 0
 $totalTransitive = 0
 $totalProjectRefs = 0
 $violationCount = 0
+$buildOnlySeen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 $skipped = [System.Collections.Generic.List[string]]::new()
 
 foreach ($project in $projects) {
@@ -612,6 +624,7 @@ foreach ($project in $projects) {
     $totalDirect += $scan.DirectCount
     $totalTransitive += $scan.TransitiveCount
     $totalProjectRefs += $scan.ProjectRefCount
+    foreach ($buildOnlyId in @($scan.BuildOnlyIds)) { [void]$buildOnlySeen.Add($buildOnlyId) }
     foreach ($v in $scan.Violations) {
         $violationCount++
         Add-GatesItem -Rule $rule -Severity 'new' -Kind $v.Kind -Project $project.Rel `
@@ -620,7 +633,10 @@ foreach ($project in $projects) {
 }
 
 $rule.checked = $projects.Count
-$rule.notes.Add("扫描项目数: $($projects.Count)；包节点合计: $totalPackages（直接 $totalDirect / 传递 $totalTransitive）；项目引用节点: $totalProjectRefs")
+$rule.notes.Add("扫描项目数: $($projects.Count)；发布闭包包节点: $totalPackages（直接 $totalDirect / 传递 $totalTransitive）；项目引用节点: $totalProjectRefs")
+if ($buildOnlySeen.Count -gt 0) {
+    $rule.notes.Add("build-only 已从发布闭包剔除 $($buildOnlySeen.Count) 个: $(@($buildOnlySeen) -join ', ')（编译期 analyzer/tooling，见 deps-policy.buildOnlyPackages）")
+}
 $rule.notes.Add('节点键 = csproj PackageId（缺省 AssemblyName，再缺省工程名）；libraries[].path 按 NuGet 语义相对工程目录解析。')
 $rule.notes.Add("R3 当前无 known-red 基线：任何命中都是新增违规，必须修。")
 $report.notes.Add('Apps 与发布库共用同一策略；Avalonia.Desktop 只在 -IncludeApps 扫描 src/Apps 时判定为应用专用合法。')

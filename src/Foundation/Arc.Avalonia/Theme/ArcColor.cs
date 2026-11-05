@@ -52,9 +52,30 @@ public static class ArcColor
         return Color.FromArgb(AlphaByte(alpha), ToByte(r), ToByte(g), ToByte(bl));
     }
 
-    /// <summary>Returns OKLCH coordinates for an sRGB colour (lightness 0..1, hue in degrees).</summary>
-    public static (double Lightness, double Chroma, double Hue) ToOklch(Color color)
+    /// <summary>
+    /// WCAG 2.1 contrast ratio between two colours (1.0 = identical, 21.0 = black on white). Used by the
+    /// custom-accent derivation to pick a readable foreground instead of guessing.
+    /// </summary>
+    public static double ContrastRatio(Color a, Color b)
     {
+        static double Channel(byte value)
+        {
+            var normalized = value / 255.0;
+            return normalized <= 0.03928 ? normalized / 12.92 : Math.Pow((normalized + 0.055) / 1.055, 2.4);
+        }
+
+        static double Luminance(Color color) =>
+            0.2126 * Channel(color.R) + 0.7152 * Channel(color.G) + 0.0722 * Channel(color.B);
+
+        var first = Luminance(a);
+        var second = Luminance(b);
+        var lighter = Math.Max(first, second);
+        var darker = Math.Min(first, second);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    /// <summary>Returns OKLCH coordinates for an sRGB colour (lightness 0..1, hue in degrees).</summary>
+    public static (double Lightness, double Chroma, double Hue) ToOklch(Color color)    {
         var (l, a, b) = SrgbToOklab(color);
         var chroma = Math.Sqrt(a * a + b * b);
         var hue = Math.Atan2(b, a) * 180.0 / Math.PI;

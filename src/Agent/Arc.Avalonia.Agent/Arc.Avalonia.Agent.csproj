@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    M2-G4: Agent top-layer MVP (L4). The presentation runtime: pure event reducer, workspace/session
+    projection, approval/attention/artifact queues, Dispatcher-batched streaming, item view registry and
+    the composite AgentSurface controls. No I/O, no timers, no persistence - the host implements
+    IArcAgentTransport and pushes events. Same layer as Arc.Avalonia.AgentUI (the leaf controls it
+    composes), hence the L4 -> L4 exception registered in tools/architecture-allow.json.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Agent</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Agent</AssemblyName>
+    <PackageId>Arc.Avalonia.Agent</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Agent top layer for Arc for Avalonia: a pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues, item view registry) plus the AgentSurface composition controls. Hosts implement IArcAgentTransport and push events; the layer never performs I/O, timers or model calls.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <!--
+      M2-G4 boundary CI: Microsoft's official banned-symbol analyzer, build-only. The banned list lives in
+      tools/BannedSymbols.txt and is wired as an AdditionalFiles item below; RS0030 is promoted to an error
+      so an accidental HttpClient/File/Timer in this assembly fails the build. The offline fallback is
+      tools/check-agent-boundary.ps1.
+    -->
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"
+                      PrivateAssets="all"
+                      IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\..\..\tools\BannedSymbols.txt" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <WarningsAsErrors>$(WarningsAsErrors);RS0030</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
+
+
+

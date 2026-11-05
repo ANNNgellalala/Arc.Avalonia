@@ -62,6 +62,37 @@ public class ArcIcon : Control
 
     protected override Size MeasureOverride(Size availableSize) => new(Size, Size);
 
+    /// <summary>
+    /// Registers or overrides a single icon path at runtime (M2-G3g). Thread-safe; the parsed-geometry
+    /// cache for that name is dropped so the next render picks up the new data. <see cref="Icons.ArcIconData.Paths"/>
+    /// itself stays read-only.
+    /// </summary>
+    public static void Register(string name, string pathData)
+    {
+        ArcIconRegistry.Register(name, pathData);
+        Cache.TryRemove(name, out _);
+    }
+
+    /// <summary>Unregisters a runtime override; the built-in icon (if any) takes over again.</summary>
+    public static bool Unregister(string name)
+    {
+        Cache.TryRemove(name, out _);
+        return ArcIconRegistry.Unregister(name);
+    }
+
+    /// <summary>
+    /// Registers an <see cref="IArcIconProvider"/>: consulted after runtime registrations and before the
+    /// built-in table, so a host can plug in a whole icon set without patching Arc.
+    /// </summary>
+    public static void Register(IArcIconProvider provider)
+    {
+        ArcIconRegistry.Register(provider);
+        Cache.Clear();
+    }
+
+    /// <summary>Resolves an icon name through the runtime registry (registrations → providers → built-ins).</summary>
+    public static bool TryGetPath(string name, out string? pathData) => ArcIconRegistry.TryGetPath(name, out pathData);
+
     public override void Render(DrawingContext context)
     {
         var name = Icon;
@@ -72,7 +103,7 @@ public class ArcIcon : Control
 
         var geometry = Cache.GetOrAdd(name, static key =>
         {
-            if (!ArcIconData.Paths.TryGetValue(key, out var data) || string.IsNullOrWhiteSpace(data))
+            if (!ArcIconRegistry.TryGetPath(key, out var data) || string.IsNullOrWhiteSpace(data))
             {
                 return null;
             }

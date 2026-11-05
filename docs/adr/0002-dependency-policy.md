@@ -47,7 +47,10 @@ docs/14 §3.4 的验收要求：当前树 0 违规；人为加黑名单包必须
 3. BFS 求完整闭包并记录最短引入路径；**project 节点继续下钻**（其它库间接带来的包也会被看到）；
 4. 只对 `package` 节点做策略判定，记录 `root → … → 违规包` 的引入路径与 tfm；
 5. assets 缺失时只对**单个 csproj** 串行 `dotnet restore`；文件锁/解析失败 sleep 10s 重试一次，
-   仍失败记为 ERROR（exit 2），不静默放过。
+   仍失败记为 ERROR（exit 2），不静默放过；
+6. **build-only 排除**：`deps-policy.buildOnlyPackages`（当前 `Microsoft.CodeAnalysis.BannedApiAnalyzers`）是
+   编译期 analyzer/tooling（`PrivateAssets=all`），会出现在 assets 的 build 节点但**不应进入发布包依赖闭包**；
+   check-deps 把它归为 `build-only` 并从发布闭包统计中剔除（报告 notes 会列出被剔除项），发布物侧由 R5 复核。
 
 ### 节点 id 与工程名解耦（M1-T2a 修正，2026-11-05）
 
@@ -74,6 +77,20 @@ NuGet 的 targets 节点键是 **PackageId**，MSBuild 的默认 PackageId = Ass
   （`.recon/` 已 gitignore；docs/14 原写 `artifacts/gates/`，M0 统一到 `.recon/gates/`）；
 - 退出码：`0` 无违规 / `1` 违规 / `2` 无法完成检查。
 
+## 门禁清单（check-all 8 行）
+
+| 规则 | 脚本 | 说明 |
+|---|---|---|
+| R1/R2 | `check-architecture.ps1` | 分层方向 + 发布库不引用 Demo/Docs（ADR 0001） |
+| R3 | `check-deps.ps1` | 外部依赖白/黑名单 + 传递闭包（本 ADR） |
+| R4 | `check-theme.ps1` | 主题来源只允许 Arc/官方 Avalonia 主题 |
+| R5 | `check-package.ps1` | `dotnet pack` 产物：无 Pages/Docs、依赖闭包、许可/XML |
+| R6 | `check-token-only.ps1` | 禁 hex/rgb/FromArgb（存量豁免在 `token-allow.json`） |
+| R8 | `check-no-render.ps1` | 禁自研帧时钟/绘制缓存/主题失效协议 |
+| **R9 边界** | `check-agent-boundary.ps1` | Agent 程序集禁止 `HttpClient/HttpRequestMessage/File/Directory/FileStream/Process/Timer/DispatcherTimer/TrayIcon/IStorageProvider/IStorageFile`；主门禁是 **BannedApiAnalyzers（RS0030 → error）**，脚本是离线兜底（报告为简化 schema：`gate/status/issues`，由 `check-all` 兼容），不设 known-red。 |
+
+`check-all.ps1` 现输出 8 行（R1/R2 拆行、R5/R9 各自提供），**全部 GREEN 才通过**；R5 在 `artifacts/` 未生成/过期时 RED。`-KnownRed` 严格模式仍只作用于 known-red 行（当前为 0）。
+
 ## `-SelfTest`：证明门禁不是"永远绿"
 
 `tools/fixtures/self-test/**` 用**伪造的 `project.assets.json`**（不编译、不联网）覆盖四类断言：
@@ -87,7 +104,7 @@ NuGet 的 targets 节点键是 **PackageId**，MSBuild 的默认 PackageId = Ass
 
 任一断言失败 → `check-deps.ps1 -SelfTest` exit 1。
 
-## 验证结果（2026-11-05，M1-T1/T2a 集成后）
+## 验证结果（2026-11-05 M1 / 2026-11-06 M2）
 
 命令与输出（本机 pwsh 7.6.7 / dotnet 10.0.114 / Avalonia 12.1.4）：
 
@@ -122,6 +139,9 @@ GATES: green=6 knownRed=1 red=0 errors=0 => KNOWN-RED
 扫描 29 个项目（26 发布库 + Gallery + Docs 叶子工程）仍为 GREEN；三个负例 fixture 的检出内容与修复前一致，
 证明节点解析改动没有削弱黑名单检测。
 
+> 以上为 M1 历史快照。2026-11-06 起 R5 已可执行、R9 已接入、known-red 为空：`check-all -KnownRed` 为 exit 0，
+> 见下方「M2 增量复验」。
+
 ### 本次修复对照（门禁自身误报）
 
 | 现象 | 根因 | 修复 |
@@ -131,25 +151,52 @@ GATES: green=6 knownRed=1 red=0 errors=0 => KNOWN-RED
 | R6 RED 2：`src/Docs/.../Pickers/Pages/ColorPickerPage.cs` | Pages 迁入 Docs 工程，旧路径豁免失效 | `token-allow.json` 两条 Page 豁免迁移到新路径并清理旧条目（当前豁免 28 条、零命中 0 条） |
 | R2 KNOWN-RED 48 | M1-T1 前发布库仍引 Demo / 嵌 Docs | 已被 M1-T1 清零：`gates-baseline.json` R2 counts=0、permittedProjects=[]、expected=false |
 
+### M2 增量复验（2026-11-06，8 行门禁）
+
+R9 接入后 check-all 由 7 行变 8 行，全部 GREEN（本机；artifacts 已按当前 csproj 重新 pack）：
+
+```text
+M0 GATES - 2026-11-06 02:33:15
+Rule     Status        New  KnownRed  Exempt  Checked  Report
+R3       GREEN           0         0       0       31  .recon/gates/deps-latest.json
+R1       GREEN           0         0       0      190  .recon/gates/architecture-latest.json
+R2       GREEN           0         0       0       29  .recon/gates/architecture-latest.json
+R4       GREEN           0         0       0      118  .recon/gates/theme-latest.json
+R6       GREEN           0         0      28      800  .recon/gates/token-only-latest.json
+R8       GREEN           0         0       0      800  .recon/gates/no-render-latest.json
+R9       GREEN           0         0       0        0  .recon/gates/agent-boundary-latest.json
+R5       GREEN           0         0       0       31  .recon/gates/package-latest.json
+GATES: green=8 knownRed=0 red=0 errors=0 => GREEN   # 8/8，exit 0
+```
+
+- `check-deps.ps1`：GREEN checked=31（发布库含 M2 新增 `src/Meta` 等），发布闭包 159 个包节点；build-only 剔除
+  `Microsoft.CodeAnalysis.BannedApiAnalyzers`（1 个），0 违规、0 scan-error；
+- `check-agent-boundary.ps1`：GREEN issues=0；禁止符号与主/兜底关系见「门禁清单」R9；其报告是简化 schema
+  （`gate/status/issues`），`check-all` 单独兼容成一行 R9，不进入 known-red；
+- 复验注意：R5 曾因 `src/Meta/Arc.Avalonia.Meta` 新增 Agent 依赖但 `artifacts/` 仍是旧包而短暂 RED；重新 pack 后 GREEN —
+  这是产物同步问题，不是门禁误报（check-package 的 fail-closed 行为正确）。
+
 ## 偏离与遗留
 
 1. 报告目录用 `.recon/gates/`（与 docs/14 §3.3 的 `artifacts/gates/` 不同），原因是本工作树 `.gitignore`
    已忽略 `.recon/`，避免误提交门禁产物；如 M1 需要归档报告，再改目录并同步 docs/14。
-2. R5（`dotnet pack` 产物内容）不在 M0-3 交付范围，`check-all` 按 `gates-baseline.json` 显示 KNOWN-RED；
-   BannedApiAnalyzers 同理（M1 配置、M2 生效），未纳入 check-all。
+2. R5（`dotnet pack` 产物内容）已由 `tools/check-package.ps1` 实现并接入 check-all（`artifacts/` 缺失/过期时 RED，
+   需先 `dotnet pack`）；BannedApiAnalyzers 已作为 **R9 Agent 边界**接入（主门禁 analyzer，脚本离线兜底）。
 3. R6/R8 的存量例外是**已登记豁免**而非 known-red：`token-allow.json` 按 `file+rule+max 行数` 记录
    （当前 28 条、全部有 reason，Pages 两条已随 M1-T1 迁到 `src/Docs/...`），`render-allow.json` 当前为空；
    新增命中一律 fail-closed。
 4. L3→L1 的直连属 ADR 0001 的例外 E2，不在 R3 依赖策略里（R3 只管外部 NuGet 包）。
 5. M1-T1 出库后 `src/Docs` 是 app 叶子工程：`deps-policy.json` 的 `appsRoots` 已列入，默认扫描不包含，
-   `-IncludeApps` 时按应用规则检查（29 个项目）；发布库仍只算 26 个。
-6. R2 的 known-red 已清零（M1-T1），当前唯一 known-red 是未实现的 R5；R2 从 `knownred` 转 GREEN 后，
-   新增 leaf 引用会直接 RED，不再被基线吞掉。
+   `-IncludeApps` 时按应用规则检查；发布库扫描包含 M2 新增的 `src/Meta`、`src/Theme`、`src/Service` 等（见 policy）。
+6. R2 的 known-red 已清零（M1-T1）；R5 已转为可执行门禁，当前 `gates-baseline.json` 无 known-red 条目。
+7. **build-only 不变量**：`Microsoft.CodeAnalysis.BannedApiAnalyzers` 只在编译期生效（`PrivateAssets=all`），
+   不出现在任何 `*.nupkg` 的依赖组里；R3 把它从发布闭包剔除，R5 复核 nuspec 依赖，两者互补。
 
 ## 维护
 
 - 改白/黑名单：改 `tools/deps-policy.json`，在本 ADR 记一行理由（评审 diff 可见）；
-- 改 known-red 基线：改 `tools/gates-baseline.json`；R2 已于 M1-T1 清零，R5 属 M1-T4/T5；
+- 改 known-red 基线：改 `tools/gates-baseline.json`；R2 已于 M1-T1 清零，R5 已转为可执行门禁（无 known-red）；
+- 新增 build-only analyzer/tooling：加入 `deps-policy.buildOnlyPackages` 并在本 ADR §3 记录（R3 自动剔除、R5 复核产物）；
 - 新增自绘 alpha 例外：改 `tools/token-allow.json`（见 R6）；新增历史渲染信号：改 `tools/render-allow.json`（见 R8）；
 - **改 AssemblyName/PackageId 或移动 csproj**：targets 节点键会随之变化。R3 已改为读 `PackageId`（缺省
   AssemblyName）并缓存路径映射，一般无需改脚本；但 `architecture-allow.json` 的例外与

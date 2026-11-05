@@ -1,0 +1,19 @@
+# M2-G4 Agent boundary: symbols the Arc.Avalonia.Agent presentation layer must never use directly.
+# Consumed by Microsoft.CodeAnalysis.BannedApiAnalyzers (RS0030 -> error) via an AdditionalFiles item in
+# src/Agent/Arc.Avalonia.Agent/Arc.Avalonia.Agent.csproj. The host owns I/O, timers, system capabilities
+# and model calls; the top layer only projects events and composes UI.
+#
+# Format: symbol;message (BannedApiAnalyzers). Keep this list small and intent-clear.
+
+T:System.Net.Http.HttpClient;Agent UI must not call the network. Route model/tool requests through IArcAgentTransport.
+T:System.Net.Http.HttpRequestMessage;Agent UI must not call the network. Route model/tool requests through IArcAgentTransport.
+T:System.IO.File;Agent UI must not read or write files. The host pushes display models and reads/writes storage.
+T:System.IO.Directory;Agent UI must not touch the file system. The host owns storage.
+T:System.IO.FileStream;Agent UI must not touch the file system. The host owns storage.
+T:System.Diagnostics.Process;Agent UI must not start processes. The host owns tools and execution.
+T:System.Threading.Timer;Agent UI must not own timers. Use Dispatcher batching; the host owns cadence.
+T:System.Timers.Timer;Agent UI must not own timers. Use Dispatcher batching; the host owns cadence.
+T:Avalonia.Threading.DispatcherTimer;No control-level timers. Use Dispatcher batching / host-driven ticks.
+T:Avalonia.Controls.TrayIcon;System tray capability belongs to the host application.
+T:Avalonia.Platform.Storage.IStorageProvider;File pickers belong to the host application (IArcAgentServices).
+T:Avalonia.Platform.Storage.IStorageFile;File access belongs to the host application (IArcAgentServices).

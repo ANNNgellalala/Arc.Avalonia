@@ -19,29 +19,56 @@ namespace Arc.Avalonia.Theme;
 /// </remarks>
 public static class ArcFluentOverrides
 {
-    /// <summary>Input vertical padding used by the Arc field family (spacing tokens 10 + horizontal 16).</summary>
-    private static readonly Thickness InputPadding = new(16, 10, 16, 10);
-
-    /// <summary>ComboBox keeps a slightly narrower trailing edge for the drop-down glyph.</summary>
-    private static readonly Thickness ComboBoxInputPadding = new(16, 10, 12, 10);
-
     /// <summary>Arc's tab strip uses trailing space instead of symmetric padding.</summary>
     private static readonly Thickness TabHeaderPadding = new(0, 0, 16, 0);
 
     private static readonly Thickness NoMargin = new(0);
 
-    public static ResourceDictionary Build(ArcAccent accent) => new()
+    /// <summary>Builds the Light/Dark override pair for a full theme request (accent, density, radii).</summary>
+    public static ResourceDictionary Build(ArcThemeOptions options) => new()
     {
         ThemeDictionaries =
         {
-            [ThemeVariant.Light] = ForScheme(ArcColorScheme.Light, accent),
-            [ThemeVariant.Dark] = ForScheme(ArcColorScheme.Dark, accent)
+            [ThemeVariant.Light] = ForScheme(ArcColorScheme.Light, options),
+            [ThemeVariant.Dark] = ForScheme(ArcColorScheme.Dark, options)
         }
     };
 
-    private static ResourceDictionary ForScheme(ArcColorScheme scheme, ArcAccent accent)
+    /// <summary>Field padding follows the density preset so bare Fluent inputs match Arc controls.</summary>
+    private static Thickness InputPadding(ArcThemeOptions options) => options.Density switch
     {
-        var palette = ArcPalette.Build(scheme, accent);
+        ArcDensity.Compact => new Thickness(14, 8, 14, 8),
+        ArcDensity.Comfortable => new Thickness(18, 12, 18, 12),
+        _ => new Thickness(16, 10, 16, 10)
+    };
+
+    /// <summary>ComboBox keeps a slightly narrower trailing edge for the drop-down glyph.</summary>
+    private static Thickness ComboBoxInputPadding(ArcThemeOptions options) => options.Density switch
+    {
+        ArcDensity.Compact => new Thickness(14, 8, 10, 8),
+        ArcDensity.Comfortable => new Thickness(18, 12, 14, 12),
+        _ => new Thickness(16, 10, 12, 10)
+    };
+
+    /// <summary>Minimum combo width follows the density preset (bare Fluent default is 64).</summary>
+    private static double ComboMinWidth(ArcThemeOptions options) => options.Density switch
+    {
+        ArcDensity.Compact => 128d,
+        ArcDensity.Comfortable => 152d,
+        _ => 140d
+    };
+
+    /// <summary>Tab header height follows the density preset (bare Fluent default is 48).</summary>
+    private static double TabMinHeight(ArcThemeOptions options) => options.Density switch
+    {
+        ArcDensity.Compact => 36d,
+        ArcDensity.Comfortable => 46d,
+        _ => 40d
+    };
+
+    private static ResourceDictionary ForScheme(ArcColorScheme scheme, ArcThemeOptions options)
+    {
+        var palette = ArcPalette.Build(scheme, options);
         var dictionary = new ResourceDictionary();
 
         IBrush Brush(string token) => palette[token] as IBrush ?? Brushes.Transparent;
@@ -65,7 +92,7 @@ public static class ArcFluentOverrides
         dictionary[ArcFluentKeys.TextControlSelectionHighlightColor] =
             ArcColor.WithAlpha(Colour(ArcTokens.Accent), 0.35);
         dictionary[ArcFluentKeys.TextControlThemeMinHeight] = Number(ArcTokens.ControlHeightMd);
-        dictionary[ArcFluentKeys.TextControlThemePadding] = InputPadding;
+        dictionary[ArcFluentKeys.TextControlThemePadding] = InputPadding(options);
 
         // ---- ComboBox ----
         dictionary[ArcFluentKeys.ComboBoxBackground] = Brush(ArcTokens.Surface);
@@ -81,15 +108,15 @@ public static class ArcFluentOverrides
         dictionary[ArcFluentKeys.ComboBoxItemBackgroundSelected] = Brush(ArcTokens.SurfaceMuted);
         dictionary[ArcFluentKeys.ComboBoxItemForeground] = Brush(ArcTokens.Foreground);
         dictionary[ArcFluentKeys.ComboBoxItemForegroundSelected] = Brush(ArcTokens.Foreground);
-        dictionary[ArcFluentKeys.ComboBoxPadding] = ComboBoxInputPadding;
-        dictionary[ArcFluentKeys.ComboBoxThemeMinWidth] = 140d;
+        dictionary[ArcFluentKeys.ComboBoxPadding] = ComboBoxInputPadding(options);
+        dictionary[ArcFluentKeys.ComboBoxThemeMinWidth] = ComboMinWidth(options);
         dictionary[ArcFluentKeys.ComboBoxMinHeight] = Number(ArcTokens.ControlHeightMd);
 
         // ---- TabControl / TabItem ----
         dictionary[ArcFluentKeys.TabItemHeaderFontSize] = Number(ArcTokens.TextSm);
         dictionary[ArcFluentKeys.TabItemMargin] = NoMargin;
         dictionary[ArcFluentKeys.TabItemHeaderMargin] = TabHeaderPadding;
-        dictionary[ArcFluentKeys.TabItemMinHeight] = 40d;
+        dictionary[ArcFluentKeys.TabItemMinHeight] = TabMinHeight(options);
         dictionary[ArcFluentKeys.TabItemHeaderBackgroundUnselected] = Brushes.Transparent;
         dictionary[ArcFluentKeys.TabItemHeaderBackgroundSelected] = Brushes.Transparent;
         dictionary[ArcFluentKeys.TabItemHeaderBackgroundUnselectedPointerOver] = Brush(ArcTokens.SurfaceMuted);

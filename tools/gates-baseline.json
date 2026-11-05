@@ -1,8 +1,8 @@
 {
-  "$comment": "门禁已知红基线。check-all 用它把“当前已知红（后续 milestone 目标）”与“新增违规”区分开：只有新增违规才 exit 1。M1-T1 出库完成后 R2 已清零（GREEN）；当前唯一 known-red 是未实现的 R5。",
+  "$comment": "门禁已知红基线。check-all 用它把“当前已知红（后续 milestone 目标）”与“新增违规”区分开：只有新增违规才 exit 1。M1-T1 出库后 R2 已清零；R5 已由 check-package 实现；R9 已接入 check-all，当前无任何 known-red。",
   "version": 2,
   "generatedAt": "2026-11-05",
-  "updatedAt": "2026-11-05 (M1-T1 出库后 R2 清零)",
+  "updatedAt": "2026-11-06 (R9 接入 check-all；R5 已实现；known-red 为空)",
   "knownRed": {
     "R2": {
       "expected": false,
@@ -23,11 +23,11 @@
     }
   },
   "notImplemented": {
-    "BannedApi": "docs/14 §4 的 BannedApiAnalyzers（M1 配好、M2 生效）不在 M0-3 交付范围，未纳入 check-all。"
+    "R9": "已实现：主门禁为 Microsoft.CodeAnalysis.BannedApiAnalyzers（RS0030 -> error，见 src/Agent/Arc.Avalonia.Agent + tools/BannedSymbols.txt），tools/check-agent-boundary.ps1 是离线兜底并已接入 check-all 第 8 行；不设 known-red。"
   },
   "notes": [
-    "R1/R2/R3/R4/R6/R8 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。",
-    "known-red 只在“数量不超过基线 + 项目在 permittedProjects 内”时成立；R2 清零后 permittedProjects 为空、counts 为 0，任何命中都是新增违规。",
-    "R5 仍为 known-red，属 M1-T4/T5 目标；check-all 默认不阻塞，-KnownRed 严格模式会失败。"
+    "R1/R2/R3/R4/R6/R8/R9 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。",
+    "known-red 只在“数量不超过基线 + 项目在 permittedProjects 内”时成立；当前无 known-red 条目，-KnownRed 严格模式不会额外失败。",
+    "R5 由 check-package 实现，缺失/过期 artifacts 时直接 RED（fail-closed，不属 known-red）；R9 的 build-only analyzer 不进入发布包依赖闭包（见 ADR 0002 §3）。"
   ]
 }

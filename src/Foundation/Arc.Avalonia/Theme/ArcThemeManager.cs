@@ -14,31 +14,45 @@ public static class ArcThemeManager
 {
     private static ResourceDictionary? _current;
 
-    public static ArcColorScheme Scheme { get; private set; } = ArcColorScheme.Light;
+    public static ArcColorScheme Scheme => Options.Scheme;
 
-    public static ArcAccent Accent { get; private set; } = ArcAccent.Neutral;
+    /// <summary>The preset accent of the active theme (a custom brand colour is reflected in <see cref="Options"/>).</summary>
+    public static ArcAccent Accent => Options.Accent;
+
+    /// <summary>The full theme request applied most recently (scheme, accent/seed, density, radius scale).</summary>
+    public static ArcThemeOptions Options { get; private set; } = new();
 
     /// <summary>When true components skip travel animation, matching Arc's reduced-motion branch.</summary>
     public static bool ReducedMotion { get; set; }
 
     /// <summary>
-    /// Raised after <see cref="Apply"/> swapped the palette (arguments: application, scheme, accent).
-    /// The aggregated theme (src/Theme/Arc.Avalonia.Theme) subscribes to keep Fluent's
-    /// <c>FluentTheme.Palettes</c> and the Fluent resource-key overrides in sync, so the Foundation
-    /// layer does not need a dependency on Avalonia.Themes.Fluent.
+    /// Raised after <see cref="Apply(Application, ArcThemeOptions)"/> swapped the palette (arguments:
+    /// application, scheme, options). The aggregated theme (src/Theme/Arc.Avalonia.Theme) subscribes to
+    /// keep Fluent's <c>FluentTheme.Palettes</c> and the Fluent resource-key overrides in sync, so the
+    /// Foundation layer does not need a dependency on Avalonia.Themes.Fluent.
     /// </summary>
-    public static event Action<Application, ArcColorScheme, ArcAccent>? Applied;
+    public static event Action<Application, ArcColorScheme, ArcThemeOptions>? Applied;
 
-    public static void Apply(Application app, ArcColorScheme scheme, ArcAccent accent)
+    /// <summary>Compatibility overload: applies a preset scheme + accent with the default density/radii.</summary>
+    public static void Apply(Application app, ArcColorScheme scheme, ArcAccent accent) =>
+        Apply(app, new ArcThemeOptions { Scheme = scheme, Accent = accent });
+
+    /// <summary>
+    /// Applies a full theme request: preset or custom brand accent, density preset and radius scale.
+    /// </summary>
+    public static void Apply(Application app, ArcThemeOptions options)
     {
-        Scheme = scheme;
-        Accent = accent;
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(options);
 
-        app.RequestedThemeVariant = scheme == ArcColorScheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
+        Options = options;
+
+        app.RequestedThemeVariant = options.Scheme == ArcColorScheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 
         // Tokens live in ThemeDictionaries (Light + Dark), so a bare variant switch restyles the whole tree
-        // and only an accent change needs a rebuild (ADR 0003 §4.2).
-        var palette = ArcPalette.BuildThemeDictionaries(accent);
+        // and only an accent/density change needs a rebuild (ADR 0003 §4.2). A custom brand colour is
+        // derived in OKLCH inside ArcPalette - no literal colour ever enters the theme.
+        var palette = ArcPalette.BuildThemeDictionaries(options);
         if (_current is not null)
         {
             app.Resources.MergedDictionaries.Remove(_current);
@@ -46,15 +60,21 @@ public static class ArcThemeManager
 
         app.Resources.MergedDictionaries.Add(_current = palette);
 
-        Applied?.Invoke(app, scheme, accent);
+        Applied?.Invoke(app, options.Scheme, options);
     }
 
-    public static void SetScheme(Application app, ArcColorScheme scheme) => Apply(app, scheme, Accent);
+    public static void SetScheme(Application app, ArcColorScheme scheme) => Apply(app, Options with { Scheme = scheme });
 
     public static void ToggleScheme(Application app) =>
-        Apply(app, Scheme == ArcColorScheme.Light ? ArcColorScheme.Dark : ArcColorScheme.Light, Accent);
+        Apply(app, Options with { Scheme = Options.Scheme == ArcColorScheme.Light ? ArcColorScheme.Dark : ArcColorScheme.Light });
 
-    public static void SetAccent(Application app, ArcAccent accent) => Apply(app, Scheme, accent);
+    /// <summary>Switches to a preset accent (clears any custom brand seed).</summary>
+    public static void SetAccent(Application app, ArcAccent accent) =>
+        Apply(app, Options with { Accent = accent, AccentColor = null });
+
+    /// <summary>Switches to a custom brand accent, derived from the seed colour in OKLCH.</summary>
+    public static void SetAccent(Application app, Color accentColor) =>
+        Apply(app, Options with { AccentColor = accentColor });
 }
 
 /// <summary>Typed lookups for components that need token values from code (charts, custom drawing).</summary>

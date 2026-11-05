@@ -20,7 +20,7 @@ public sealed class IconsPage : ArcPage
     public override string Group => "Overview";
 
     public override string? Description =>
-        "161 Lucide icons drawn on the 24 unit grid at stroke 1.75 with round caps. Use ArcIcon with the kebab-case name; the geometry scales to the requested size.";
+        $"{ArcIconData.Paths.Count} Lucide icons drawn on the 24 unit grid at stroke 1.75 with round caps. Use ArcIcon with the kebab-case name; the geometry scales to the requested size. Runtime additions go through ArcIcon.Register / IArcIconProvider.";
 
     public override int Order => 2;
 

@@ -47,15 +47,47 @@ public static class ArcPalette
         }
     };
 
+    /// <summary>Theme-aware token dictionary for a full <see cref="ArcThemeOptions"/> request (M2-G3h).</summary>
+    public static ResourceDictionary BuildThemeDictionaries(ArcThemeOptions options) => new()
+    {
+        ThemeDictionaries =
+        {
+            [ThemeVariant.Light] = Build(ArcColorScheme.Light, options),
+            [ThemeVariant.Dark] = Build(ArcColorScheme.Dark, options)
+        }
+    };
+
     /// <summary>Accent colour used when mapping an Arc accent onto Fluent's <c>ColorPaletteResources</c>.</summary>
     public static Color AccentColor(ArcColorScheme scheme, ArcAccent accent) =>
         Build(scheme, accent)[ArcTokens.Accent] is ISolidColorBrush brush ? brush.Color : Colors.Gray;
 
-    public static ResourceDictionary Build(ArcColorScheme scheme, ArcAccent accent)
+    /// <summary>
+    /// Accent colour for a full options request: the derived brand colour when
+    /// <see cref="ArcThemeOptions.AccentColor"/> is set, otherwise the preset's colour. Keeping this in
+    /// sync with the token dictionary is what makes <c>SystemAccentColor</c> match the Arc accent.
+    /// </summary>
+    public static Color AccentColor(ArcColorScheme scheme, ArcThemeOptions options) =>
+        Build(scheme, options)[ArcTokens.Accent] is ISolidColorBrush brush ? brush.Color : Colors.Gray;
+
+    public static ResourceDictionary Build(ArcColorScheme scheme, ArcAccent accent) =>
+        BuildCore(scheme, AccentFor(accent, scheme == ArcColorScheme.Dark));
+
+    /// <summary>
+    /// Full theme request: custom brand seed (derived in OKLCH), density presets and radius scaling.
+    /// </summary>
+    public static ResourceDictionary Build(ArcColorScheme scheme, ArcThemeOptions options)
+    {
+        var dark = scheme == ArcColorScheme.Dark;
+        var accent = options.AccentColor is { } seed ? AccentFromSeed(seed, dark) : AccentFor(options.Accent, dark);
+        var dictionary = BuildCore(scheme, accent);
+        ApplyErgonomics(dictionary, options);
+        return dictionary;
+    }
+
+    private static ResourceDictionary BuildCore(ArcColorScheme scheme, AccentSet a)
     {
         var dark = scheme == ArcColorScheme.Dark;
         var dictionary = new ResourceDictionary();
-        var a = AccentFor(accent, dark);
 
         // Page, surfaces, text, lines. Light inherits the neutral ramp; dark uses its own steps.
         var background = dark ? ArcColor.Oklch(0.19, 0, 0) : ArcColor.Oklch(1.0, 0, 0);
@@ -266,6 +298,105 @@ public static class ArcPalette
         dictionary[ArcTokens.DurationConsidered] = TimeSpan.FromMilliseconds(480);
 
         return dictionary;
+    }
+
+    /// <summary>
+    /// Derives a full accent set from one brand seed colour, in OKLCH: hue is preserved, lightness is
+    /// clamped per scheme so the tone stays readable, a darker/lighter "strong" step is derived for
+    /// pressed states, and the foreground is picked by WCAG contrast rather than a hard-coded black/white.
+    /// Inputs may be any colour (black, white, high-chroma) — nothing throws and the result stays legible.
+    /// </summary>
+    private static AccentSet AccentFromSeed(Color seed, bool dark)
+    {
+        var (lightness, chroma, hue) = ArcColor.ToOklch(seed);
+        // Neutral seeds stay neutral (no invented hue); chroma is only bounded for gamut safety.
+        var safeChroma = Math.Clamp(chroma, 0, 0.30);
+        var onAccentIsWhite = ArcColor.ContrastRatio(
+            ArcColor.Oklch(Math.Clamp(lightness, 0.36, 0.72), safeChroma, hue), Colors.White) >= 4.5;
+
+        if (dark)
+        {
+            var accent = ArcColor.Oklch(Math.Clamp(lightness + 0.28, 0.62, 0.92), safeChroma * 0.90, hue);
+            var strong = ArcColor.Oklch(Math.Clamp(lightness + 0.40, 0.74, 0.97), safeChroma * 0.75, hue);
+            var glyph = ArcColor.Oklch(0.19, 0, 0);
+            return new AccentSet(
+                accent, strong, 0.20, glyph,
+                accent, glyph, Colors.White,
+                accent, glyph, Colors.White,
+                accent);
+        }
+
+        var lightAccent = ArcColor.Oklch(Math.Clamp(lightness, 0.36, 0.72), safeChroma, hue);
+        var lightStrong = ArcColor.Oklch(Math.Clamp(lightness - 0.16, 0.24, 0.58), safeChroma, hue);
+        var lightGlyph = onAccentIsWhite ? Colors.White : ArcColor.Oklch(0.15, 0, 0);
+        var lightForeground = ArcColor.ContrastRatio(lightAccent, Colors.White) >= 4.5
+            ? Colors.White
+            : ArcColor.Oklch(0.15, 0, 0);
+        return new AccentSet(
+            lightAccent, lightStrong, 0.10, lightForeground,
+            lightAccent, lightGlyph, Colors.White,
+            ArcColor.Oklch(0.93, 0, 0), lightGlyph, Colors.White,
+            null);
+    }
+
+    /// <summary>Applies the density preset and the radius scale on top of a generated palette.</summary>
+    private static void ApplyErgonomics(ResourceDictionary dictionary, ArcThemeOptions options)
+    {
+        var (heightScale, spaceScale) = options.Density switch
+        {
+            ArcDensity.Compact => (0.88, 0.80),
+            ArcDensity.Comfortable => (1.14, 1.20),
+            _ => (1.0, 1.0)
+        };
+        var radiusScale = Math.Clamp(options.CornerRadiusScale, 0.5, 2.0);
+
+        if (heightScale != 1.0)
+        {
+            ScaleNumber(dictionary, ArcTokens.ControlHeightSm, heightScale);
+            ScaleNumber(dictionary, ArcTokens.ControlHeightMd, heightScale);
+            ScaleNumber(dictionary, ArcTokens.ControlHeightLg, heightScale);
+        }
+
+        if (spaceScale != 1.0)
+        {
+            foreach (var key in new[]
+                     {
+                         ArcTokens.Space1, ArcTokens.Space2, ArcTokens.Space3, ArcTokens.Space4,
+                         ArcTokens.Space5, ArcTokens.Space6, ArcTokens.Space8, ArcTokens.Space10,
+                         ArcTokens.Space12, ArcTokens.Space16, ArcTokens.Space20, ArcTokens.Space24
+                     })
+            {
+                ScaleNumber(dictionary, key, spaceScale);
+            }
+        }
+
+        if (radiusScale != 1.0)
+        {
+            // RadiusPill is intentionally excluded: 9999 * scale would be a no-op or overflow the look.
+            ScaleRadius(dictionary, ArcTokens.RadiusControl, radiusScale);
+            ScaleRadius(dictionary, ArcTokens.RadiusPanel, radiusScale);
+            ScaleRadius(dictionary, ArcTokens.RadiusSurface, radiusScale);
+        }
+    }
+
+    private static void ScaleNumber(ResourceDictionary dictionary, string key, double scale)
+    {
+        if (dictionary.TryGetValue(key, out var value) && value is double number)
+        {
+            dictionary[key] = Math.Round(number * scale);
+        }
+    }
+
+    private static void ScaleRadius(ResourceDictionary dictionary, string key, double scale)
+    {
+        if (dictionary.TryGetValue(key, out var value) && value is CornerRadius radius)
+        {
+            dictionary[key] = new CornerRadius(
+                Math.Round(radius.TopLeft * scale),
+                Math.Round(radius.TopRight * scale),
+                Math.Round(radius.BottomRight * scale),
+                Math.Round(radius.BottomLeft * scale));
+        }
     }
 
     private static void Set(ResourceDictionary dictionary, string key, Color color) =>

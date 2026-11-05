@@ -68,4 +68,4 @@ Grid (Auto,*)
 2. `ArcWindow` Custom 标题栏未做 Win32 交互点验（拖动区/系统菜单/高 DPI）。
 3. 服务 UI 复用既有组件主题，未新增 Services 主题入口（无需）。
 4. 树窗口化的行高为常量 44（与现有 `ArcTreeTable` 一致）；可变行高不在本波范围。
-5. BannedApi（Agent 边界）仍在 M2 后续 Agent 波次接入。
+5. BannedApi（Agent 边界）~~仍在 M2 后续 Agent 波次接入~~ → **已在第二波交付**：`tools/BannedSymbols.txt` + `BannedApiAnalyzers`（RS0030→error）+ `tools/check-agent-boundary.ps1`（R9），见 [`docs/17`](17-m2-wave2-agent-and-theme-api.zh.md)。

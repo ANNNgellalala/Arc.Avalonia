@@ -130,9 +130,13 @@
   method System.Object TryLoad[System.IServiceProvider , System.String ]
   method System.Object TryLoad[System.String ]
   method System.Uri get_BaseUri[]
+  method System.Void Append[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
+  method System.Void AppendOrUpdate[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
+  method System.Void AppendRange[System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> events]
   method System.Void PopParent[]
   method System.Void Populate:/Themes/ArcAgentUITheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void PushParent[System.Object ]
+  method System.Void ResetIncremental[]
   method System.Void set_BaseUri[System.Uri ]
   property Arc.Avalonia.AgentUI.Controls.ArcAgentAskState State {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Kind {get;set}
@@ -162,6 +166,12 @@
   property System.Double ElapsedSeconds {get;set}
   property System.Double ExpiresInSeconds {get;set}
   property System.Double Progress {get;set}
+  property System.Int32 DroppedRowCount {get}
+  property System.Int32 FullRebuildCount {get}
+  property System.Int32 MaxRenderedRows {get;set}
+  property System.Int32 RenderedRowCount {get}
+  property System.Int32 TotalEventCount {get}
+  property System.Int32 ViewportRows {get;set}
   property System.Object Current {get}
   property System.String ActionLabel {get;set}
   property System.String Age {get;set}

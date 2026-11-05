@@ -82,6 +82,52 @@ public static class ThemeReport
             }
         }
 
+        // G3h: a custom brand seed must derive the whole accent ramp and still drive SystemAccentColor,
+        // density must move the control-height tokens, and extreme seeds must stay readable.
+        foreach (var seed in new[] { Color.FromRgb(0x6C, 0x4B, 0xF4), Color.FromRgb(0x0A, 0x0A, 0x0A), Color.FromRgb(0xFB, 0xFB, 0xFB), Color.FromRgb(0x0F, 0xF0, 0xA0) })
+        {
+            var options = new ArcThemeOptions { Scheme = ArcColorScheme.Light, AccentColor = seed };
+            ArcThemeManager.Apply(app, options);
+            var expected = ArcPalette.AccentColor(ArcColorScheme.Light, options);
+            Color? actual = null;
+            if (app.TryGetResource("SystemAccentColor", app.ActualThemeVariant, out var seedValue) && seedValue is Color seedColor)
+            {
+                actual = seedColor;
+            }
+
+            var accentBrush = ArcResources.Brush(ArcTokens.Accent);
+            var foreground = ArcResources.Color(ArcTokens.AccentForeground);
+            var contrast = ArcColor.ContrastRatio(accentBrush is ISolidColorBrush accentSolid ? accentSolid.Color : Colors.Gray, foreground);
+            Console.WriteLine($"THEME REPORT customAccent seed={seed} SystemAccentColor={actual?.ToString() ?? "<missing>"} " +
+                              $"ArcAccent={Describe(accentBrush)} contrast={contrast:0.00}");
+            if (actual != expected)
+            {
+                failures.Add($"custom accent {seed}: SystemAccentColor {actual?.ToString() ?? "<missing>"} != {expected}");
+            }
+
+            if (contrast < 4.5)
+            {
+                failures.Add($"custom accent {seed}: accent/foreground contrast {contrast:0.00} < 4.5");
+            }
+        }
+
+        var defaultHeight = ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions())[ArcTokens.ControlHeightMd];
+        var compactHeight = ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { Density = ArcDensity.Compact })[ArcTokens.ControlHeightMd];
+        var comfortableHeight = ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { Density = ArcDensity.Comfortable })[ArcTokens.ControlHeightMd];
+        ArcThemeManager.Apply(app, new ArcThemeOptions { Scheme = ArcColorScheme.Light, Density = ArcDensity.Compact });
+        var liveHeight = ArcResources.Double(ArcTokens.ControlHeightMd);
+        Console.WriteLine($"THEME REPORT density default={defaultHeight} compact={compactHeight} comfortable={comfortableHeight} live(compact)={liveHeight}");
+        if (!(compactHeight is double compact && defaultHeight is double normal && comfortableHeight is double comfortable
+              && compact < normal && normal < comfortable))
+        {
+            failures.Add("density did not change ControlHeightMd as expected");
+        }
+
+        if (!(liveHeight is double live && compactHeight is double compactLive && Math.Abs(live - compactLive) < 0.01))
+        {
+            failures.Add($"live compact ControlHeightMd {liveHeight} != built compact {compactHeight}");
+        }
+
         ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral);
 
         if (failures.Count == 0)

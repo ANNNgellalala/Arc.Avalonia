@@ -24,6 +24,7 @@
   </Folder>
   <Folder Name="/Agent/">
     <Project Path="src/Agent/Arc.Avalonia.AgentUI/Arc.Avalonia.AgentUI.csproj" />
+    <Project Path="src/Agent/Arc.Avalonia.Agent/Arc.Avalonia.Agent.csproj" />
     <Project Path="src/Agent/Arc.Avalonia.LifeToday/Arc.Avalonia.LifeToday.csproj" />
   </Folder>
   <Folder Name="/Special/">

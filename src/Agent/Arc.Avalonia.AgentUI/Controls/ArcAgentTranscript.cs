@@ -144,8 +144,23 @@ public class ArcAgentTranscript : Panel
 
     private readonly HashSet<string> _expanded = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ArcButton> _rowButtons = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Control> _rowContainers = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ArcAgentEvent> _rowEvents = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TextBlock> _rowTitles = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ArcAgentEventStatus> _rowStatuses = new(StringComparer.Ordinal);
     private bool _seedExpanded = true;
     private string? _pendingFocus;
+    private StackPanel? _rowHost;
+    private ScrollViewer? _scroll;
+    private TextBlock? _summary;
+    private Control? _emptyState;
+    private int _incrementalTotal;
+    private int _dropped;
+    private int _fullRebuildCount;
+    private int _viewportRows = 40;
+    private int _maxRenderedRows = 80;
+    private bool _autoScroll = true;
+    private bool _scrollScheduled;
 
     static ArcAgentTranscript()
     {
@@ -196,8 +211,202 @@ public class ArcAgentTranscript : Panel
     /// <summary>Raised when a failed event's Retry action is pressed; the host decides whether to re-run it.</summary>
     public event EventHandler<ArcAgentEvent>? RetryRequested;
 
+    /// <summary>
+    /// M2-G4 incremental streaming: rows appended through <see cref="Append"/> are added at the tail without
+    /// rebuilding the tree. The rendered window is bounded by <see cref="MaxRenderedRows"/> so a 10,000-event
+    /// run never realizes a 10,000-control visual tree; older rows are dropped from the live tree (their count
+    /// is still reported by <see cref="TotalEventCount"/>). Full scrollback virtualization remains a later
+    /// milestone; existing pages that assign <see cref="Events"/> keep the original rebuild path.
+    /// </summary>
+    public int FullRebuildCount => _fullRebuildCount;
+
+    /// <summary>Number of row controls currently realized in the body.</summary>
+    public int RenderedRowCount => _rowHost?.Children.Count ?? 0;
+
+    /// <summary>Number of events accepted through the incremental path.</summary>
+    public int TotalEventCount => _incrementalTotal;
+
+    /// <summary>Number of rows dropped from the front because the rendered window was full.</summary>
+    public int DroppedRowCount => _dropped;
+
+    /// <summary>Rows assumed visible in the viewport; the default window is twice this.</summary>
+    public int ViewportRows
+    {
+        get => _viewportRows;
+        set
+        {
+            _viewportRows = Math.Max(1, value);
+            MaxRenderedRows = Math.Max(_viewportRows, _viewportRows * 2);
+        }
+    }
+
+    /// <summary>Maximum number of realized rows in incremental mode (defaults to 2 × <see cref="ViewportRows"/>).</summary>
+    public int MaxRenderedRows
+    {
+        get => _maxRenderedRows;
+        set
+        {
+            _maxRenderedRows = Math.Max(1, value);
+            TrimWindow();
+        }
+    }
+
+    /// <summary>Appends one event at the tail (O(1) in the number of previously rendered rows) and updates the
+    /// row in place when its id already exists (streaming deltas).</summary>
+    public void Append(ArcAgentEvent evt)
+    {
+        AppendOrUpdate(evt);
+    }
+
+    /// <summary>Appends a batch and scrolls once.</summary>
+    public void AppendRange(IEnumerable<ArcAgentEvent> events)
+    {
+        foreach (var evt in events)
+        {
+            AppendOrUpdate(evt);
+        }
+
+        ScheduleAutoScroll();
+    }
+
+    /// <summary>Appends a row, or replaces the existing row with the same id without rebuilding the tree.</summary>
+    public void AppendOrUpdate(ArcAgentEvent evt)
+    {
+        if (_rowHost is null)
+        {
+            Rebuild();
+        }
+
+        if (_rowHost is null)
+        {
+            return;
+        }
+
+        if (_rowEvents.TryGetValue(evt.Id, out _) && _rowContainers.TryGetValue(evt.Id, out var existing))
+        {
+            if (_rowStatuses.TryGetValue(evt.Id, out var previousStatus) &&
+                previousStatus == evt.Status &&
+                _rowTitles.TryGetValue(evt.Id, out var titleBlock))
+            {
+                // Streaming deltas only change the text: mutate the existing TextBlock instead of rebuilding.
+                titleBlock.Text = string.IsNullOrWhiteSpace(evt.Title) ? "(no title)" : evt.Title;
+                _rowEvents[evt.Id] = evt;
+                _incrementalTotal++;
+                UpdateHeader();
+                AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
+                return;
+            }
+
+            var index = _rowHost.Children.IndexOf(existing);
+            if (index >= 0)
+            {
+                var replacement = BuildRow(evt);
+                _rowHost.Children[index] = replacement;
+                _rowContainers[evt.Id] = replacement;
+                _rowEvents[evt.Id] = evt;
+                _rowStatuses[evt.Id] = evt.Status;
+                _incrementalTotal++;
+                UpdateHeader();
+                AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
+                return;
+            }
+        }
+
+        var row = BuildRow(evt);
+        if (_emptyState is not null && _rowHost.Children.Contains(_emptyState))
+        {
+            _rowHost.Children.Remove(_emptyState);
+            _emptyState = null;
+        }
+
+        _rowHost.Children.Add(row);
+        _rowContainers[evt.Id] = row;
+        _rowEvents[evt.Id] = evt;
+        _rowStatuses[evt.Id] = evt.Status;
+        _incrementalTotal++;
+        TrimWindow();
+        UpdateHeader();
+        AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
+        ScheduleAutoScroll();
+    }
+
+    /// <summary>Clears rows accumulated through the incremental path.</summary>
+    public void ResetIncremental()
+    {
+        _incrementalTotal = 0;
+        _dropped = 0;
+        _rowEvents.Clear();
+        _rowContainers.Clear();
+        _rowTitles.Clear();
+        _rowStatuses.Clear();
+        _rowButtons.Clear();
+        _rowHost?.Children.Clear();
+        if (_rowHost is not null)
+        {
+            _emptyState = BuildEmptyState();
+            _rowHost.Children.Add(_emptyState);
+        }
+
+        UpdateHeader();
+    }
+
+    private void TrimWindow()
+    {
+        if (_rowHost is null)
+        {
+            return;
+        }
+
+        while (_rowHost.Children.Count > MaxRenderedRows)
+        {
+            var oldest = _rowHost.Children[0];
+            _rowHost.Children.RemoveAt(0);
+            foreach (var pair in _rowContainers.ToArray())
+            {
+                if (ReferenceEquals(pair.Value, oldest))
+                {
+                    _rowContainers.Remove(pair.Key);
+                    _rowEvents.Remove(pair.Key);
+                    _rowTitles.Remove(pair.Key);
+                    _rowStatuses.Remove(pair.Key);
+                    _rowButtons.Remove(pair.Key);
+                    break;
+                }
+            }
+
+            _dropped++;
+        }
+    }
+
+    private void UpdateHeader()
+    {
+        if (_summary is not null)
+        {
+            _summary.Text = Summary(_incrementalTotal);
+        }
+    }
+
+    private void ScheduleAutoScroll()
+    {
+        if (!_autoScroll || _scroll is null || _scrollScheduled)
+        {
+            return;
+        }
+
+        _scrollScheduled = true;
+        var scroll = _scroll;
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                _scrollScheduled = false;
+                scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height));
+            },
+            DispatcherPriority.Loaded);
+    }
+
     private void Rebuild()
     {
+        _fullRebuildCount++;
         var events = (Events ?? Array.Empty<ArcAgentEvent>()).ToList();
 
         if (_seedExpanded)
@@ -216,6 +425,15 @@ public class ArcAgentTranscript : Panel
 
         Children.Clear();
         _rowButtons.Clear();
+        _rowContainers.Clear();
+        _rowEvents.Clear();
+        _rowTitles.Clear();
+        _rowStatuses.Clear();
+        _rowHost = null;
+        _scroll = null;
+        _summary = null;
+        _incrementalTotal = events.Count;
+        _dropped = 0;
 
         var root = new Grid
         {
@@ -229,29 +447,34 @@ public class ArcAgentTranscript : Panel
         Grid.SetRow(divider, 1);
         root.Children.Add(divider);
 
-        var body = new Control();
+        var list = new StackPanel { Spacing = 2 };
+        _rowHost = list;
+        _scroll = new ScrollViewer
+        {
+            Content = list,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+        };
+
         if (events.Count == 0)
         {
-            body = BuildEmptyState();
+            _emptyState = BuildEmptyState();
+            list.Children.Add(_emptyState);
         }
         else
         {
-            var list = new StackPanel { Spacing = 2 };
+            _emptyState = null;
             foreach (var evt in events)
             {
-                list.Children.Add(BuildRow(evt));
+                var row = BuildRow(evt);
+                list.Children.Add(row);
+                _rowContainers[evt.Id] = row;
+                _rowEvents[evt.Id] = evt;
             }
-
-            body = new ScrollViewer
-            {
-                Content = list,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-            };
         }
 
-        Grid.SetRow(body, 2);
-        root.Children.Add(body);
+        Grid.SetRow(_scroll, 2);
+        root.Children.Add(_scroll);
 
         var live = new TextBlock { Opacity = 0, Height = 1, IsHitTestVisible = false };
         AutomationProperties.SetLiveSetting(live, AutomationLiveSetting.Polite);
@@ -295,7 +518,8 @@ public class ArcAgentTranscript : Panel
 
         var titles = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
         titles.Children.Add(ArcUi.Label("Transcript"));
-        titles.Children.Add(ArcUi.Caption(Summary(count)));
+        _summary = ArcUi.Caption(Summary(count));
+        titles.Children.Add(_summary);
         header.Children.Add(titles);
 
         var state = ArcUi.HStack(6);
@@ -338,6 +562,7 @@ public class ArcAgentTranscript : Panel
         headerContent.Children.Add(KindIcon(evt.Kind));
 
         var title = ArcUi.Text(evt.Title, "arc-body-sm");
+        _rowTitles[evt.Id] = title;
         title.VerticalAlignment = VerticalAlignment.Center;
         if (evt.Status is ArcAgentEventStatus.Done or ArcAgentEventStatus.Skipped)
         {
@@ -599,3 +824,4 @@ public class ArcAgentTranscript : Panel
         };
     }
 }
+

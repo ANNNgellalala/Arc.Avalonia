@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Avalonia;
 using Avalonia.Animation.Easings;
@@ -7,12 +8,16 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Arc.Avalonia.Controls;
 using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feature.DataGrid;
+using Arc.Avalonia.Icons;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
+using Agent = Arc.Avalonia.Agent;
+using AgentUi = Arc.Avalonia.AgentUI.Controls;
 
 namespace Arc.Avalonia.Verify;
 
@@ -32,7 +37,10 @@ public static class Program
         MotionChecks();
         CatalogChecks();
         ThemeChecks();
+        IconChecks();
+        ThemeOptionChecks();
         ListChecks();
+        AgentChecks();
 
         Console.WriteLine($"VERIFY: checks={_checks} failures={Failures.Count}");
         foreach (var failure in Failures)
@@ -179,7 +187,7 @@ public static class Program
 
         Check("Fluent key table has 47 entries", ArcFluentKeys.All.Count == 47);
 
-        var overrides = ArcFluentOverrides.Build(ArcAccent.Neutral);
+        var overrides = ArcFluentOverrides.Build(new ArcThemeOptions { Accent = ArcAccent.Neutral });
         Check("Fluent overrides have Light and Dark",
             overrides.ThemeDictionaries.ContainsKey(ThemeVariant.Light) &&
             overrides.ThemeDictionaries.ContainsKey(ThemeVariant.Dark));
@@ -198,7 +206,7 @@ public static class Program
             expectedRadius is CornerRadius expected &&
             corner == expected);
 
-        var violetOverrides = Variant(ArcFluentOverrides.Build(ArcAccent.Violet), ThemeVariant.Light);
+        var violetOverrides = Variant(ArcFluentOverrides.Build(new ArcThemeOptions { Accent = ArcAccent.Violet }), ThemeVariant.Light);
         Check("accent reaches the Fluent overrides",
             ColorOf(lightOverrides[ArcFluentKeys.TextControlSelectionHighlightColor]) !=
             ColorOf(violetOverrides[ArcFluentKeys.TextControlSelectionHighlightColor]));
@@ -206,6 +214,204 @@ public static class Program
         Check("accent colours differ between schemes",
             ArcPalette.AccentColor(ArcColorScheme.Light, ArcAccent.Neutral) !=
             ArcPalette.AccentColor(ArcColorScheme.Dark, ArcAccent.Neutral));
+    }
+
+    /// <summary>
+    /// M2-G3g: the icon table carries the high-frequency additions, every path is a valid geometry, and the
+    /// runtime registry (registration / override / provider / unknown fallback) behaves as documented.
+    /// </summary>
+    private static void IconChecks()
+    {
+        // 161 original Arc icons + 103 high-frequency Lucide additions fetched from lucide-static 0.545.0.
+        Check("icon table has the high-frequency additions", ArcIconData.Paths.Count >= 264);
+        Check("every icon path parses", AllIconPathsParse());
+
+        var builtInCheck = ArcIconData.Paths["check"];
+        ArcIcon.Register("test-spark", "M12 2v20");
+        Check("runtime icon registration",
+            ArcIcon.TryGetPath("test-spark", out var spark) && spark == "M12 2v20");
+        Check("ArcIconData.Paths stays read-only for runtime additions", !ArcIconData.Paths.ContainsKey("test-spark"));
+
+        ArcIcon.Register("check", "M4 4 20 20");
+        Check("runtime registration overrides a built-in",
+            ArcIcon.TryGetPath("check", out var overridden) && overridden == "M4 4 20 20");
+        ArcIcon.Unregister("check");
+        Check("unregister restores the built-in",
+            ArcIcon.TryGetPath("check", out var restored) && restored == builtInCheck);
+        ArcIcon.Unregister("test-spark");
+
+        Check("unknown icon falls back to nothing", !ArcIcon.TryGetPath("no-such-icon", out _));
+
+        var provider = new FakeIconProvider();
+        ArcIcon.Register(provider);
+        try
+        {
+            Check("provider supplies new icons",
+                ArcIcon.TryGetPath("provider-icon", out var providerPath) && providerPath == "M2 2h20v20");
+            Check("provider does not shadow a built-in",
+                ArcIcon.TryGetPath("check", out var providerCheck) && providerCheck == builtInCheck);
+            ArcIcon.Register("check", "M1 1 2 2");
+            Check("registration wins over provider and built-in",
+                ArcIcon.TryGetPath("check", out var registered) && registered == "M1 1 2 2");
+        }
+        finally
+        {
+            ArcIcon.Unregister("check");
+            ArcIconRegistry.Unregister(provider);
+            ArcIconRegistry.ClearProviders();
+        }
+
+        var rejected = false;
+        try
+        {
+            ArcIcon.Register("  ", "M0 0");
+        }
+        catch (ArgumentException)
+        {
+            rejected = true;
+        }
+
+        Check("blank icon names are rejected", rejected);
+    }
+
+    private static bool AllIconPathsParse()
+    {
+        // The console harness has no Avalonia platform, so Geometry.Parse (which needs
+        // IPlatformRenderInterface) is unavailable here; validate the path grammar structurally instead.
+        // The Gallery icons page renders the same table on the UI thread (screenshot in
+        // .recon/theme-shots/), which is the real "does it parse and draw" check.
+        foreach (var (name, data) in ArcIconData.Paths)
+        {
+            if (!IconPathLooksValid(data))
+            {
+                Console.WriteLine($"  ICON PATH INVALID: {name}: '{data}'");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Structural check for Lucide-style path data: move command first, known commands only.</summary>
+    private static bool IconPathLooksValid(string? data)
+    {
+        if (string.IsNullOrWhiteSpace(data))
+        {
+            return false;
+        }
+
+        var trimmed = data.TrimStart();
+        if (trimmed[0] is not ('M' or 'm'))
+        {
+            return false;
+        }
+
+        const string commands = "MmZzLlHhVvCcSsQqTtAa";
+        foreach (var character in trimmed)
+        {
+            if (commands.IndexOf(character) >= 0 || char.IsDigit(character) ||
+                character is ' ' or ',' or '.' or '-' or '+')
+            {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// M2-G3h: custom brand accents are derived in OKLCH (hue kept, foreground chosen by contrast),
+    /// density reorders height/spacing tokens, and the radius scale leaves the pill radius alone.
+    /// </summary>
+    private static void ThemeOptionChecks()
+    {
+        var seeds = new[]
+        {
+            Color.FromRgb(0x6C, 0x4B, 0xF4), Colors.Black, Colors.White, Color.FromRgb(0x00, 0xFF, 0x88)
+        };
+
+        foreach (var scheme in new[] { ArcColorScheme.Light, ArcColorScheme.Dark })
+        {
+            foreach (var seed in seeds)
+            {
+                var options = new ArcThemeOptions { Scheme = scheme, AccentColor = seed };
+                var palette = ArcPalette.Build(scheme, options);
+                var accent = BrushColor(palette, ArcTokens.Accent);
+                var foreground = BrushColor(palette, ArcTokens.AccentForeground);
+                Check($"custom accent resolves {scheme}/{seed}", accent is not null && foreground is not null);
+                if (accent is Color accentColour && foreground is Color foregroundColour)
+                {
+                    Check($"custom accent contrast {scheme}/{seed} >= 4.5",
+                        ArcColor.ContrastRatio(accentColour, foregroundColour) >= 4.5);
+                }
+
+                // The value that drives Fluent's SystemAccentColor must be the same colour as the token.
+                Check($"custom accent drives the palette accent {scheme}/{seed}",
+                    ArcPalette.AccentColor(scheme, options) == accent);
+            }
+        }
+
+        var brand = Color.FromRgb(0x6C, 0x4B, 0xF4);
+        var derived = BrushColor(ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { AccentColor = brand }), ArcTokens.Accent);
+        if (derived is Color derivedColour)
+        {
+            var (_, seedChroma, seedHue) = ArcColor.ToOklch(brand);
+            var (_, derivedChroma, derivedHue) = ArcColor.ToOklch(derivedColour);
+            var hueDelta = Math.Abs(seedHue - derivedHue);
+            hueDelta = Math.Min(hueDelta, 360 - hueDelta);
+            Check("custom accent keeps the seed hue",
+                seedChroma > 0.05 && derivedChroma > 0.02 && hueDelta < 30);
+        }
+
+        double HeightOf(ArcDensity density) =>
+            ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { Density = density })[ArcTokens.ControlHeightMd] is double value ? value : 0;
+        double SpaceOf(ArcDensity density) =>
+            ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { Density = density })[ArcTokens.Space4] is double value ? value : 0;
+
+        Check("density orders control heights",
+            HeightOf(ArcDensity.Compact) < HeightOf(ArcDensity.Default) &&
+            HeightOf(ArcDensity.Default) < HeightOf(ArcDensity.Comfortable));
+        Check("density orders spacing",
+            SpaceOf(ArcDensity.Compact) < SpaceOf(ArcDensity.Default) &&
+            SpaceOf(ArcDensity.Default) < SpaceOf(ArcDensity.Comfortable));
+
+        var scaled = ArcPalette.Build(ArcColorScheme.Light, new ArcThemeOptions { CornerRadiusScale = 1.5 });
+        var baseRadius = ArcPalette.Build(ArcColorScheme.Light, ArcAccent.Neutral)[ArcTokens.RadiusControl];
+        Check("corner radius scale multiplies RadiusControl",
+            baseRadius is CornerRadius baseCorner &&
+            scaled[ArcTokens.RadiusControl] is CornerRadius scaledCorner &&
+            Math.Abs(scaledCorner.TopLeft - Math.Round(baseCorner.TopLeft * 1.5)) < 0.01);
+        Check("corner radius scale leaves the pill radius alone",
+            scaled[ArcTokens.RadiusPill] is CornerRadius pill && pill.TopLeft > 1000);
+
+        Check("theme option dictionaries cover every token",
+            CoversAllKeys(
+                ArcPalette.BuildThemeDictionaries(new ArcThemeOptions
+                {
+                    AccentColor = brand, Density = ArcDensity.Compact, CornerRadiusScale = 1.2
+                }),
+                TokenKeys()));
+
+        Check("legacy preset overload still matches the options path",
+            ArcPalette.AccentColor(ArcColorScheme.Light, ArcAccent.Violet) ==
+            ArcPalette.AccentColor(ArcColorScheme.Light, new ArcThemeOptions { Accent = ArcAccent.Violet }));
+    }
+
+    private sealed class FakeIconProvider : IArcIconProvider
+    {
+        public bool TryGetPath(string name, out string? pathData)
+        {
+            if (name == "provider-icon")
+            {
+                pathData = "M2 2h20v20";
+                return true;
+            }
+
+            pathData = null;
+            return false;
+        }
     }
 
     private static IReadOnlyList<string> TokenKeys() => typeof(ArcTokens)
@@ -541,6 +747,214 @@ public static class Program
         }
     }
 
+    /// <summary>
+    /// M2-G4: the Agent top layer must be a deterministic pure reducer with explicit sequence handling,
+    /// cross-run queues and an incremental transcript that never rebuilds while streaming.
+    /// </summary>
+    private static void AgentChecks()
+    {
+        var at = DateTimeOffset.UtcNow;
+        static Agent.ArcAgentEvent[] BuildStream(string runId, string sessionId)
+        {
+            var now = DateTimeOffset.UtcNow;
+            Agent.ArcEventStamp Stamp(long seq) => Agent.ArcEventStamp.Create(runId, seq, $"{runId}:{seq}");
+            var run = new Agent.ArcAgentRunRef(runId, sessionId);
+            return new Agent.ArcAgentEvent[]
+            {
+                new Agent.ArcRunStartedEvent(Stamp(1), now, run),
+                new Agent.ArcStepStartedEvent(Stamp(2), now, "step-1", "Plan"),
+                new Agent.ArcStepFinishedEvent(Stamp(3), now, "step-1", Agent.ArcStepStatus.Done),
+                new Agent.ArcMessageStartedEvent(Stamp(4), now, "msg-1", Agent.ArcAgentRole.Assistant),
+                new Agent.ArcMessageDeltaEvent(Stamp(5), now, "msg-1", "hello "),
+                new Agent.ArcMessageDeltaEvent(Stamp(6), now, "msg-1", "world"),
+                new Agent.ArcMessageEndedEvent(Stamp(7), now, "msg-1"),
+                new Agent.ArcToolCallStartedEvent(Stamp(8), now, "call-1", "repo.search", "find", Agent.ArcRiskLevel.Low),
+                new Agent.ArcToolArgsDeltaEvent(Stamp(9), now, "call-1", "{\"q\":\"x\"}"),
+                new Agent.ArcToolCallEndedEvent(Stamp(10), now, "call-1", Agent.ArcToolCallStatus.Succeeded, "1 match"),
+                new Agent.ArcApprovalRequestedEvent(Stamp(11), now, new Agent.ArcApprovalRequest
+                {
+                    RequestId = "approval-1",
+                    RunId = runId,
+                    CallId = "call-1",
+                    ToolName = "shell.exec",
+                    Risk = Agent.ArcRiskLevel.High
+                }),
+                new Agent.ArcAttentionRaisedEvent(Stamp(12), now, new Agent.ArcAttentionEntry
+                {
+                    EntryId = "attention-1",
+                    RunId = runId,
+                    Kind = Agent.ArcAttentionKind.Approval,
+                    Title = "Approve",
+                    Level = Agent.ArcAttentionLevel.Blocking,
+                    State = Agent.ArcAttentionState.New,
+                    CreatedAt = now
+                }),
+                new Agent.ArcArtifactPublishedEvent(Stamp(13), now, new Agent.ArcArtifact
+                {
+                    ArtifactId = "artifact-1",
+                    Kind = Agent.ArcArtifactKind.Diff,
+                    Title = "diff",
+                    At = now
+                }),
+                new Agent.ArcRunPhaseChangedEvent(Stamp(14), now, Agent.ArcRunPhase.AwaitingApproval)
+            };
+        }
+
+        // Replay determinism + idempotency.
+        var first = new Agent.ArcAgentWorkspace();
+        var results = BuildStream("run-a", "sess-a").Select(first.Apply).ToArray();
+        Check("agent reducer accepts a contiguous stream", results.All(result => result == Agent.ArcApplyResult.Accepted));
+        var duplicate = first.Apply(BuildStream("run-a", "sess-a")[4]);
+        Check("agent reducer is idempotent by event id", duplicate == Agent.ArcApplyResult.Duplicate);
+
+        var second = new Agent.ArcAgentWorkspace();
+        foreach (var @event in BuildStream("run-a", "sess-a"))
+        {
+            second.Apply(@event);
+        }
+
+        var left = first.GetSession("run-a");
+        var right = second.GetSession("run-a");
+        Check("agent replay is deterministic",
+            left is not null && right is not null &&
+            left.Messages.Count == right.Messages.Count &&
+            left.Messages[0].Text == right.Messages[0].Text &&
+            left.ToolCalls.Count == right.ToolCalls.Count &&
+            left.Run.Phase == right.Run.Phase);
+
+        // Out-of-order gating and gap fill.
+        var gapped = new Agent.ArcAgentWorkspace();
+        var runRef = new Agent.ArcAgentRunRef("run-o", "sess-o");
+        Check("agent runner seeds a run", gapped.Apply(new Agent.ArcRunStartedEvent(Agent.ArcEventStamp.Create("run-o", 1), at, runRef)) == Agent.ArcApplyResult.Accepted);
+        Check("agent runner accepts seq 2", gapped.Apply(new Agent.ArcMessageStartedEvent(Agent.ArcEventStamp.Create("run-o", 2), at, "m", Agent.ArcAgentRole.Assistant)) == Agent.ArcApplyResult.Accepted);
+        Check("agent runner buffers a gap", gapped.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-o", 4), at, "m", "d4")) == Agent.ArcApplyResult.OutOfOrder);
+        Check("agent runner fills the gap and drains the buffer", gapped.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-o", 3), at, "m", "d3")) == Agent.ArcApplyResult.Accepted);
+        Check("agent runner applied both deltas in order", gapped.GetSession("run-o")!.Messages[0].Text == "d3d4");
+
+        // Unknown-run buffering (a host may push session events before RunStarted).
+        var orphaned = new Agent.ArcAgentWorkspace();
+        Check("agent runner buffers unknown-run events", orphaned.Apply(new Agent.ArcMessageStartedEvent(Agent.ArcEventStamp.Create("run-x", 2), at, "m", Agent.ArcAgentRole.Assistant)) == Agent.ArcApplyResult.UnknownRun);
+        orphaned.Apply(new Agent.ArcRunStartedEvent(Agent.ArcEventStamp.Create("run-x", 1), at, new Agent.ArcAgentRunRef("run-x", "sess-x")));
+        orphaned.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-x", 3), at, "m", "orphan"));
+        Check("agent runner drains orphan events when the run starts", orphaned.GetSession("run-x")!.Messages.Count == 1 && orphaned.GetSession("run-x")!.Messages[0].Text == "orphan");
+
+        // Multi-run routing and background dock data.
+        var multi = new Agent.ArcAgentWorkspace();
+        multi.Apply(new Agent.ArcRunStartedEvent(Agent.ArcEventStamp.Create("run-fg", 1), at, new Agent.ArcAgentRunRef("run-fg", "sess-fg")));
+        multi.Apply(new Agent.ArcRunStartedEvent(Agent.ArcEventStamp.Create("run-bg", 1), at, new Agent.ArcAgentRunRef("run-bg", "sess-bg", Agent.ArcAgentRunKind.Background, Label: "bg")));
+        Check("agent workspace routes two runs", multi.Runs.Count == 2 && multi.GetSession("run-bg")?.SessionId == "sess-bg");
+        Check("agent workspace exposes background runs", multi.BackgroundRuns.Count == 1 && multi.BackgroundRuns[0].RunId == "run-bg");
+        Check("agent workspace activates a session", multi.Activate("sess-fg") && multi.Active?.SessionId == "sess-fg");
+
+        // Approval queue serialises and de-duplicates.
+        var approvals = new Agent.ArcApprovalQueue();
+        Check("approval queue enqueues", approvals.Enqueue(new Agent.ArcApprovalRequest { RequestId = "a", RunId = "r", CallId = "c", ToolName = "t" }));
+        Check("approval queue rejects duplicate ids", !approvals.Enqueue(new Agent.ArcApprovalRequest { RequestId = "a", RunId = "r", CallId = "c", ToolName = "t" }));
+        Check("approval queue enqueues second", approvals.Enqueue(new Agent.ArcApprovalRequest { RequestId = "b", RunId = "r", CallId = "c", ToolName = "t" }));
+        Check("approval queue is serial (current is first)", approvals.Current?.RequestId == "a" && approvals.Count == 2);
+        Check("approval queue advances after resolve", approvals.Resolve("a") && approvals.Current?.RequestId == "b");
+
+        // Attention queue de-duplicates and sorts blocking first.
+        var attention = new Agent.ArcAttentionQueue();
+        attention.Upsert(new Agent.ArcAttentionEntry { EntryId = "i", RunId = "r", Kind = Agent.ArcAttentionKind.Suggestion, Title = "info", Level = Agent.ArcAttentionLevel.Info, CreatedAt = at });
+        attention.Upsert(new Agent.ArcAttentionEntry { EntryId = "b", RunId = "r", Kind = Agent.ArcAttentionKind.Approval, Title = "block", Level = Agent.ArcAttentionLevel.Blocking, CreatedAt = at });
+        attention.Upsert(new Agent.ArcAttentionEntry { EntryId = "i", RunId = "r", Kind = Agent.ArcAttentionKind.Suggestion, Title = "info2", Level = Agent.ArcAttentionLevel.Info, CreatedAt = at.AddSeconds(1) });
+        Check("attention queue de-duplicates", attention.Entries.Count == 2);
+        Check("attention queue sorts blocking first", attention.Entries[0].EntryId == "b" && attention.BlockingCount == 1);
+
+        // Artifact index identity.
+        var artifacts = new Agent.ArcArtifactIndex();
+        Check("artifact index adds", artifacts.Add(new Agent.ArcArtifact { ArtifactId = "x", Kind = Agent.ArcArtifactKind.File, Title = "x", At = at }));
+        Check("artifact index de-duplicates", !artifacts.Add(new Agent.ArcArtifact { ArtifactId = "x", Kind = Agent.ArcArtifactKind.File, Title = "x", At = at }));
+
+        // Dispatcher batching: N enqueues collapse to one flush.
+        var dispatcher = new Agent.QueuedUiDispatcher();
+        var coalescer = new Agent.ArcDeltaCoalescer(dispatcher);
+        var flushes = 0;
+        var batched = 0;
+        coalescer.Flush += (_, batch) =>
+        {
+            flushes++;
+            batched += batch.Events.Count;
+        };
+        for (var index = 0; index < 5; index++)
+        {
+            coalescer.Enqueue(new Agent.ArcCustomEvent(Agent.ArcEventStamp.Create("run-c", index + 1), at, "test", "x"));
+        }
+
+        Check("coalescer batches until the dispatcher runs", flushes == 0 && coalescer.PendingCount == 5);
+        dispatcher.RunPending();
+        Check("coalescer flushes a batch once", flushes == 1 && batched == 5 && coalescer.FlushCount == 1);
+
+        // Incremental transcript: 10k appends, no full rebuild, bounded realized window.
+        var transcript = new AgentUi.ArcAgentTranscript();
+        transcript.ResetIncremental();
+        var rebuildsBefore = transcript.FullRebuildCount;
+        var allocationsBefore = GC.GetAllocatedBytesForCurrentThread();
+        var stopwatch = Stopwatch.StartNew();
+        for (var index = 0; index < 10_000; index++)
+        {
+            // 200 live messages, each receiving 50 streaming deltas: realistic high-frequency updates.
+            transcript.Append(new AgentUi.ArcAgentEvent
+            {
+                Id = $"message-{index / 50}",
+                Kind = AgentUi.ArcAgentEventKind.Message,
+                Title = $"streamed delta {index}",
+                Status = AgentUi.ArcAgentEventStatus.Running,
+                Timestamp = at
+            });
+        }
+
+        stopwatch.Stop();
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - allocationsBefore;
+        Check("agent transcript never rebuilds while appending", transcript.FullRebuildCount == rebuildsBefore);
+        Check("agent transcript bounds realized rows to the viewport window",
+            transcript.RenderedRowCount <= transcript.MaxRenderedRows &&
+            transcript.RenderedRowCount <= transcript.ViewportRows * 2);
+        Check("agent transcript counts all events", transcript.TotalEventCount == 10_000);
+        Check("agent transcript drops old rows", transcript.DroppedRowCount > 0);
+        Check("agent transcript allocation stays bounded", allocated < 256L * 1024 * 1024);
+        Check("agent transcript append is fast enough for a headless guard", stopwatch.Elapsed < TimeSpan.FromSeconds(30));
+
+        var rowsBeforeUpdate = transcript.RenderedRowCount;
+        var totalBeforeUpdate = transcript.TotalEventCount;
+        var update = new AgentUi.ArcAgentEvent
+        {
+            Id = "message-199",
+            Kind = AgentUi.ArcAgentEventKind.Message,
+            Title = "updated",
+            Status = AgentUi.ArcAgentEventStatus.Done,
+            Timestamp = at
+        };
+        for (var updateIndex = 0; updateIndex < 5; updateIndex++)
+        {
+            transcript.Append(update);
+        }
+
+        Check("agent transcript updates a streaming row in place",
+            transcript.TotalEventCount == totalBeforeUpdate + 5 &&
+            transcript.RenderedRowCount == rowsBeforeUpdate &&
+            transcript.FullRebuildCount == rebuildsBefore);
+
+        // View registry defaults + override.
+        var registry = new Agent.ArcAgentItemViewRegistry();
+        Check("view registry resolves a message view",
+            registry.Resolve(new Agent.ArcAgentMessage { Id = "m", Role = Agent.ArcAgentRole.Assistant }) is Control);
+        Check("view registry resolves a tool view",
+            registry.Resolve(new Agent.ArcToolCall { Id = "c", ToolName = "t" }) is Control);
+        Check("view registry resolves an approval view",
+            registry.Resolve(new Agent.ArcApprovalRequest { RequestId = "a", RunId = "r", CallId = "c", ToolName = "t" }) is Control);
+        Check("view registry resolves an artifact view",
+            registry.Resolve(new Agent.ArcArtifact { ArtifactId = "a", Kind = Agent.ArcArtifactKind.File, Title = "f" }) is Control);
+        Check("view registry creates a template", registry.CreateTemplate() is not null);
+
+        // Sample workspace is host-free and deterministic.
+        var sample = Agent.ArcAgentWorkspace.CreateSample();
+        Check("sample workspace has foreground + background runs", sample.Sessions.Count == 2 && sample.BackgroundRuns.Count == 1);
+        Check("sample workspace has a pending approval and attention entry",
+            sample.PendingApprovals.Count == 1 && sample.Attention.Entries.Count == 1 && sample.Artifacts.Items.Count == 1);
+    }
+
     private static void Check(string name, bool passed)
     {
         _checks++;
@@ -550,3 +964,5 @@ public static class Program
         }
     }
 }
+
+

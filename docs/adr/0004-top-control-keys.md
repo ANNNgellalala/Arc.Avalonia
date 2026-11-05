@@ -160,3 +160,38 @@ dotnet poc\TopControlSkinPoc\bin\Debug\net10.0\TopControlSkinPoc.dll --probe    
 |---|---|
 | `skin-before-after-light.png` | Light：左 Fluent 默认 / 右 Arc token 键覆盖（TextBox、ComboBox、TabControl、ScrollBar V+H） |
 | `skin-before-after-dark.png` | Dark：同上 |
+
+## 9. M2 增量：图标扩展点（G3g，2026-11-06）
+
+M2 把图标从"编译期只读表"扩展为"内置表 + 运行时注册 + 宿主导入"，同时保持内置数据不可变、查找线程安全。
+
+### 9.1 API 与查找顺序
+
+```csharp
+ArcIcon.Register(name, pathData);             // 运行时注册，可覆盖内置
+ArcIcon.Unregister(name);
+ArcIcon.Register(IArcIconProvider provider);  // 宿主/设计工具整包注入
+ArcIcon.TryGetPath(name, out pathData);
+// ArcIconData.Paths 仍为 IReadOnlyDictionary（内置+高频合并，只读）
+```
+
+| 顺序 | 来源 | 备注 |
+|---:|---|---|
+| 1 | 运行时 `Register(name,pathData)` | 可覆盖内置；provider **不能**覆盖它（先查） |
+| 2 | `IArcIconProvider`（按注册顺序） | 在内置之前查找，因此也不能覆盖内置 |
+| 3 | `ArcIconData.Paths`（内置） | 只读；内置+高频合并时**内置优先**（同名不改变既有图标） |
+
+`ArcIcon` 自带 `ConcurrentDictionary<string, Geometry?>` 几何缓存：`Register(name,…)`/`Unregister(name)` 精准
+移除该 name 条目，`Register(provider)` 清空全部缓存（provider 可能影响任意 name）；注册/查找均线程安全。
+
+### 9.2 内置集合 161 → 264
+
+| 项 | 数量 | 说明 |
+|---|---:|---|
+| 原内置 | 161 | M1 前的 Arc 图标 |
+| M2 高频新增 | +103 | Lucide **0.545.0**（ISC），`ArcIconDataHighFrequency` |
+| 合计 | **264** | 无重名（两表交集 0；若同名，`MergeHighFrequency` 保留内置） |
+
+多元素图标压平成单个 path 字符串；`circle/rect/line` 已转成等价 arc/line path 命令，`ArcIcon` 用单一
+geometry 渲染（24 网格、stroke 1.75、round caps/joins）。path data 是**几何数据不是颜色**，R6 token-only
+（禁止 hex/rgb/FromArgb）不适用；图标颜色仍走 `Foreground` / `ArcTokens.TextSecondary`。

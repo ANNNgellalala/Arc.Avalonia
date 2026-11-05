@@ -82,11 +82,12 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 
 | Package | Contents | Install when |
 | --- | --- | --- |
-| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 11 component families + `AgentUI` + `LifeToday` | normal application |
+| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 11 component families + `Arc.Avalonia.Agent` + `AgentUI` + `LifeToday` | normal application |
 | `Arc.Avalonia.All` | `Arc.Avalonia` + 5 Special + 6 Blocks packages | you want every surface |
 | `Arc.Avalonia.Theme` | L2.5 aggregate theme (Fluent baseline, tokens, component themes) | you already reference individual component packages |
 | `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
 | `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media}` | L2 component families | you prefer component-level dependencies |
+| `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` | building an agent UI on your own runtime |
 | `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent and life surfaces (UI contracts only) | agent / daily-planning UI |
 | `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
 
@@ -149,14 +150,15 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 
 | Project | Contents |
 | --- | --- |
-| `src/Foundation/Arc.Avalonia` | Foundation (assembly/package `Arc.Avalonia.Foundation`): OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, `ArcUi` |
+| `src/Foundation/Arc.Avalonia` | Foundation (assembly/package `Arc.Avalonia.Foundation`): OKLCH colour engine, palette/theme manager, typography, motion, 264 Lucide icons (extensible via `ArcIcon.Register`), `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, `ArcUi` |
 | `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 11 component theme families behind one `<arc:ArcTheme/>` element |
 | `src/Docs/Arc.Avalonia.Docs` | Documentation leaf project (`Arc.Avalonia.Docs`): 320 pages, 294 embedded `Docs/<slug>.json` documents and the demo portraits, discovered by reflection |
 | `src/Docs/Arc.Avalonia.Docs.Abstractions` | Contract assembly (`Arc.Avalonia.Docs.Abstractions`, namespace `Arc.Avalonia.Demo`): `ArcPage`/`ArcItemPage`, the `ArcDoc` model, doc store and validator, `DemoUi` layout helpers, `ArcCatalog`, reflection discovery |
-| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 11 component families and the two Agent packages |
+| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 11 component families, the agent top layer and the two agent surface packages |
 | `src/Meta/Arc.Avalonia.All` | Aggregate package `Arc.Avalonia.All`: `Arc.Avalonia` plus the Special and Blocks packages |
 | `src/Apps/Arc.Avalonia.Gallery` | The documentation platform: three-column shell, search, outline, coverage report, API-table generator, `--audit`/`--smoke`/`--shot` harnesses |
-| `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
+| `src/Agent/Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, approval/attention/artifact queues, Dispatcher-batched delta coalescer, item view registry) plus `ArcAgentSurface` and its composer/card controls. Hosts implement `IArcAgentTransport`; the layer never does I/O, timers or model calls |
+| `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript (incremental append API), run control bar, tool approval sheet, question card, background dock, attention inbox |
 | `src/Agent/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
 | `src/Components/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
 | `src/Components/Arc.Avalonia.Actions` | Buttons, menus, disclosure, messages, plus action button, floating/expanding button groups, icon morph, user menu |
@@ -212,7 +214,7 @@ Every token from Arc's `foundation.css` is defined in OKLCH in
 * Motion presets: `SpringSmooth` (0.40 s, no overshoot), `SpringSnappy` (0.26 s), `SpringMorph` (0.42 s),
   plus 120/160/240/480 ms tweens — `ArcSpringEasing` samples a damped oscillator, `ArcThemeManager.ReducedMotion`
   removes travel for reduced-motion branches.
-* Lucide icons at stroke 1.75 on the 24 unit grid, embedded in `ArcIconData` (161 names).
+* Lucide icons at stroke 1.75 on the 24 unit grid, embedded in `ArcIconData` (264 names, extensible at runtime through `ArcIcon.Register` / `IArcIconProvider`).
 
 Theming at runtime:
 
