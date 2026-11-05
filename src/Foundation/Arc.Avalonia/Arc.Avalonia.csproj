@@ -5,10 +5,14 @@
          so the 15+ ProjectReference paths and every C# namespace remain untouched. avares URIs must
          use avares://Arc.Avalonia.Foundation/ (see Theme/ArcTheme.axaml and Gallery/App.axaml). -->
     <AssemblyName>Arc.Avalonia.Foundation</AssemblyName>
+    <PackageId>Arc.Avalonia.Foundation</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Arc for Avalonia design-system core: 82 design tokens, the OKLCH palette engine, ArcThemeManager, motion presets, 161 Lucide icons and the atomic controls (button, card, badge, icon, spinner).</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
   </ItemGroup>
 </Project>

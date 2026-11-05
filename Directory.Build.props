@@ -11,5 +11,31 @@
     <NoWarn>$(NoWarn);NU1900;NU1901;NU1902;NU1903;NU1904;CS1591</NoWarn>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <InvariantGlobalization>false</InvariantGlobalization>
+
+    <!--
+      M1-T4 release identity. Every Arc package ships the same lockstep version; override on the
+      command line with -p:Version=0.9.0-beta.2. VersionPrefix/VersionSuffix compose the default
+      0.9.0-alpha (docs/15 §5).
+    -->
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.9.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">alpha</VersionSuffix>
+
+    <!-- Common NuGet metadata. A project may override any of these in its own PropertyGroup. -->
+    <Authors Condition="'$(Authors)' == ''">Arc for Avalonia contributors</Authors>
+    <Company Condition="'$(Company)' == ''">Arc for Avalonia</Company>
+    <Copyright Condition="'$(Copyright)' == ''">Copyright (c) 2026 Arc for Avalonia contributors</Copyright>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/arc-avalonia/arc.avalonia</PackageProjectUrl>
+    <!-- TODO(M1-T4): replace with the real remote before the first public push. -->
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/arc-avalonia/arc.avalonia</RepositoryUrl>
+    <RepositoryType Condition="'$(RepositoryType)' == ''">git</RepositoryType>
+    <PackageTags Condition="'$(PackageTags)' == ''">avalonia;ui;design-system;controls;arc</PackageTags>
+    <PackageLicenseFile Condition="'$(PackageLicenseFile)' == ''">LICENSE</PackageLicenseFile>
+    <PackageReadmeFile Condition="'$(PackageReadmeFile)' == ''">README.md</PackageReadmeFile>
+
+    <!--
+      Publishing is opt-in (docs/15 §5): only the L1/L2/L2.5/L3/L4 libraries and the two meta packages
+      set IsPackable=true. Docs, Gallery, samples, POCs and tests inherit this false.
+    -->
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>
 </Project>

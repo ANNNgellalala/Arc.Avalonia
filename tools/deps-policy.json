@@ -9,6 +9,7 @@
       "src/Special",
       "src/Blocks",
       "src/Theme",
+    "src/Meta",
       "src/Feature",
       "src/Patterns"
     ],

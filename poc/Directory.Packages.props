@@ -1,0 +1,7 @@
+<Project>
+  <!-- The M0 POCs keep explicit, pinned package versions for their experiments; opt them out of the
+       repository-wide central package management in the root Directory.Packages.props. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

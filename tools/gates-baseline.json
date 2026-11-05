@@ -16,9 +16,9 @@
       "history": "M0 起点基线为 24 个发布库 Demo 引用 + 24 个 EmbeddedResource Docs（仓库口径 25/26 含 Gallery/tests，属 app 不参与 R2）；该 48 项随 M1-T1 出库全部消失。"
     },
     "R5": {
-      "expected": true,
-      "implemented": false,
-      "reason": "R5（dotnet pack 产物不含 Pages/Docs/demo PNG）依赖打包改造，属 M1-T4/T5；M0 只登记为已知红，check-all 显示 KNOWN-RED 不跑检查。",
+      "expected": false,
+      "implemented": true,
+      "reason": "R5 已由 M1-T4/T5 实现：check-all 调用 tools/check-package.ps1（artifacts/*.nupkg 断言无 Pages/Docs/demo、依赖白名单、xml/许可、lockstep 版本）；缺失 artifacts 直接 RED（fail-closed）。",
       "counts": {}
     }
   },

@@ -11,6 +11,7 @@
     { "prefix": "src/Blocks/", "layer": "L3" },
     { "prefix": "src/Agent/", "layer": "L4" },
     { "prefix": "src/Docs/", "layer": "app" },
+    { "prefix": "src/Meta/", "layer": "app" },
     { "prefix": "src/Apps/", "layer": "app" },
     { "prefix": "tests/", "layer": "app" }
   ],

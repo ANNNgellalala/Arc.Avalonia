@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- M1-T4 sample: ProjectReference-based (offline buildable), not in ArcUI.slnx and not packed. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Arc.Avalonia.Sample.Settings</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Sample.Settings</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Theme pulls in Foundation and all 11 component families through ProjectReference. -->
+    <ProjectReference Include="..\..\src\Theme\Arc.Avalonia.Theme\Arc.Avalonia.Theme.csproj" />
+  </ItemGroup>
+</Project>

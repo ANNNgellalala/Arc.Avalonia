@@ -67,10 +67,10 @@ public sealed class ArcUserMenuItem
 public sealed class ArcUserMenu : TemplatedControl
 {
     public static readonly StyledProperty<string> UserNameProperty =
-        AvaloniaProperty.Register<ArcUserMenu, string>(nameof(UserName), "Maya Chen");
+        AvaloniaProperty.Register<ArcUserMenu, string>(nameof(UserName), "Your account");
 
     public static readonly StyledProperty<string> EmailProperty =
-        AvaloniaProperty.Register<ArcUserMenu, string>(nameof(Email), "maya@acme.com");
+        AvaloniaProperty.Register<ArcUserMenu, string>(nameof(Email), string.Empty);
 
     public static readonly StyledProperty<string?> PlanProperty =
         AvaloniaProperty.Register<ArcUserMenu, string?>(nameof(Plan));
@@ -175,12 +175,14 @@ public sealed class ArcUserMenu : TemplatedControl
     /// <summary>Raised with the chosen appearance; applying it to the page is up to the app.</summary>
     public event EventHandler<ArcUserMenuTheme>? ThemeChanged;
 
+    /// <summary>Display name in the identity header and the optional trigger label (neutral default "Your account").</summary>
     public string UserName
     {
         get => GetValue(UserNameProperty);
         set => SetValue(UserNameProperty, value);
     }
 
+    /// <summary>Secondary identity line in the panel; empty by default so no demo persona ships in the package.</summary>
     public string Email
     {
         get => GetValue(EmailProperty);

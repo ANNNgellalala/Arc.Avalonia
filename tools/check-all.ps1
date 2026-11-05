@@ -117,18 +117,37 @@ foreach ($def in $gateDefs) {
     }
 }
 
-# R5（未实现，按基线登记为 known-red）只在被 Gate 过滤命中时展示。
+# R5：dotnet pack 产物检查（M1-T4/T5 实现）。check-package.ps1 产出 gates 兼容的 package-latest.json。
 if (Test-GateFilter -Rule 'R5' -Name 'pack') {
-    $r5 = $baseline.knownRed.R5
-    $rows.Add([pscustomobject]@{
-            Rule     = 'R5'
-            Status   = if ($r5.expected) { 'KNOWN-RED' } else { 'GREEN' }
-            New      = 0
-            KnownRed = if ($r5.expected) { 1 } else { 0 }
-            Exempt   = 0
-            Checked  = 0
-            Report   = '(M0 不实现，见 gates-baseline.json)'
-        })
+    $packageScript = Join-Path $PSScriptRoot 'check-package.ps1'
+    $packageJson = Join-Path $OutDir 'package-latest.json'
+    if (Test-Path $packageScript) {
+        & $packageScript -Quiet *> $null
+    }
+    if (Test-Path $packageJson) {
+        $packageResult = Read-GatesJson $packageJson
+        $r5 = @($packageResult.rules | Where-Object { $_.id -eq 'R5' }) | Select-Object -First 1
+        $rows.Add([pscustomobject]@{
+                Rule     = 'R5'
+                Status   = if ($r5 -and $r5.status -eq 'GREEN') { 'GREEN' } else { 'RED' }
+                New      = if ($r5) { [int]$r5.newViolations } else { 1 }
+                KnownRed = 0
+                Exempt   = 0
+                Checked  = if ($r5) { [int]$r5.checked } else { 0 }
+                Report   = ConvertTo-GatesRelPath -Path $packageJson -Base $root
+            })
+    }
+    else {
+        $rows.Add([pscustomobject]@{
+                Rule     = 'R5'
+                Status   = 'RED'
+                New      = 1
+                KnownRed = 0
+                Exempt   = 0
+                Checked  = 0
+                Report   = '(artifacts/ 未生成：先 dotnet pack ArcUI.slnx -c Release -o artifacts -m:1 -nodeReuse:false)'
+            })
+    }
 }
 
 $redRows = @($rows | Where-Object { $_.Status -eq 'RED' -or $_.Status -eq 'ERROR' })
@@ -143,7 +162,7 @@ $md = [System.Text.StringBuilder]::new()
 [void]$md.AppendLine('')
 [void]$md.AppendLine("- 生成时间: $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz'))")
 [void]$md.AppendLine("- 总体状态: **$overall**")
-[void]$md.AppendLine('- 基线: tools/gates-baseline.json（R2/R5 为 M1 已知红）')
+[void]$md.AppendLine('- 基线: tools/gates-baseline.json（R2 已清零；R5 已由 check-package 实现）')
 [void]$md.AppendLine('')
 [void]$md.AppendLine('| 规则 | 状态 | 新增 | known-red | 已登记豁免 | 检查数 | 报告 |')
 [void]$md.AppendLine('|---|---|---:|---:|---:|---:|---|')
@@ -160,7 +179,7 @@ if ($knownRows.Count -gt 0) {
             [void]$md.AppendLine("  - 基线计数: demo 引用 $($baseline.knownRed.R2.counts.'r2-demo-ref')、EmbeddedResource Docs $($baseline.knownRed.R2.counts.'r2-embedded-docs')")
         }
         elseif ($row.Rule -eq 'R5') {
-            [void]$md.AppendLine("- **R5**: $($baseline.knownRed.R5.reason)")
+            [void]$md.AppendLine("- **R5**: 见 $($row.Report)")
         }
         else {
             [void]$md.AppendLine("- **$($row.Rule)**: 见 $($row.Report)")
@@ -211,7 +230,7 @@ if (-not $Quiet) {
                 Write-Output "  - R2: 发布库仍引用 Demo（$($baseline.knownRed.R2.counts.'r2-demo-ref')）+ EmbeddedResource Docs（$($baseline.knownRed.R2.counts.'r2-embedded-docs')）；M1-T1 出库后清零"
             }
             elseif ($row.Rule -eq 'R5') {
-                Write-Output '  - R5: dotnet pack 产物检查不在 M0-3 范围（M1-T4/T5 实现）'
+                Write-Output '  - R5: 见 check-package 报告（artifacts/ 未生成时会 RED，先 dotnet pack）'
             }
             else {
                 Write-Output "  - $($row.Rule): 见 $($row.Report)"

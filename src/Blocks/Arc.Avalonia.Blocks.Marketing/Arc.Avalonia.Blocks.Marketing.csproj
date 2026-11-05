@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Blocks.Marketing</RootNamespace>
     <AssemblyName>Arc.Avalonia.Blocks.Marketing</AssemblyName>
+    <PackageId>Arc.Avalonia.Blocks.Marketing</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Marketing page blocks: hero, pricing, FAQ, testimonials, logo marquee and footer for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />

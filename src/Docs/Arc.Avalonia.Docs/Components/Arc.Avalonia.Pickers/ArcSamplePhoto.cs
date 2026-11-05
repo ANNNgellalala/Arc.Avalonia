@@ -7,7 +7,8 @@ using Arc.Avalonia.Theme;
 namespace Arc.Avalonia.Pickers.Controls;
 
 /// <summary>
-/// A generated stand-in photo for the demos, so the avatar states render without touching the file system.
+/// A generated stand-in photo for the documentation demos, so the avatar states render without touching
+/// the file system. Lives in the documentation leaf project so the public Pickers package ships no demo helper.
 /// It is a stylised portrait painted from theme tokens (a gradient wash, a head and shoulders silhouette),
 /// not a bitmap asset; the real pick and drop paths replace it with the visitor's own image.
 /// </summary>

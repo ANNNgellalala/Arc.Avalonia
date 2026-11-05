@@ -56,6 +56,55 @@ Read the analysis first:
   purity + Internal dissolution, theme adaptation + `ArcTheme`, release engineering, gates/regression) with write scopes,
   DoD and the 82 person-day parallel plan.
 
+## Install
+
+Arc ships as a set of lockstep `0.9.0-alpha` NuGet packages. Start with the meta package and one line
+of XAML:
+
+```powershell
+dotnet add package Arc.Avalonia --version 0.9.0-alpha
+```
+
+```xml
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:arc="using:Arc.Avalonia.Theme">
+  <Application.Styles>
+    <arc:ArcTheme />   <!-- Fluent baseline + Arc tokens + the 11 component themes -->
+  </Application.Styles>
+</Application>
+```
+
+Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` once in
+`OnFrameworkInitializationCompleted` (all three `samples/` apps do exactly this).
+
+| Package | Contents | Install when |
+| --- | --- | --- |
+| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 11 component families + `AgentUI` + `LifeToday` | normal application |
+| `Arc.Avalonia.All` | `Arc.Avalonia` + 5 Special + 6 Blocks packages | you want every surface |
+| `Arc.Avalonia.Theme` | L2.5 aggregate theme (Fluent baseline, tokens, component themes) | you already reference individual component packages |
+| `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
+| `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media}` | L2 component families | you prefer component-level dependencies |
+| `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent and life surfaces (UI contracts only) | agent / daily-planning UI |
+| `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
+
+Every package depends only on Avalonia's official packages (`Avalonia`, `Avalonia.Themes.Fluent`,
+`Avalonia.Fonts.Inter`). `tools/check-package.ps1` unpacks each nupkg and fails the release when any
+other dependency or any page/doc/demo asset is found.
+
+### Build the packages locally
+
+```powershell
+# offline; single-node MSBuild is required on this machine
+dotnet pack ArcUI.slnx -c Release -o artifacts -m:1 -nodeReuse:false
+
+pwsh -NoProfile tools/check-package.ps1       # R5: ids, deps, xml, license, demo-free
+pwsh -NoProfile tools/check-public-api.ps1    # public API diff against tools/api-baselines
+```
+
+The version is defined once (`VersionPrefix`/`VersionSuffix` in `Directory.Build.props`, default
+`0.9.0-alpha`) and can be overridden with `-p:Version=...`; package versions are managed centrally in
+`Directory.Packages.props`.
+
 ## Gallery
 
 The gallery is a three-column documentation site: navigation on the left, the document in the middle and a
@@ -97,9 +146,12 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 
 | Project | Contents |
 | --- | --- |
-| `src/Foundation/Arc.Avalonia` | Foundation: OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList` |
-| `src/Foundation/Arc.Avalonia.Internal` | Shared internal primitives: menu surface and glide, icon button, feedback composition helpers and tweens |
-| `src/Apps/Arc.Avalonia.Demo` | Documentation contract: `ArcPage`/`ArcItemPage`, the `ArcDoc` model, the embedded `Docs/*.json` loader and validator, `DemoUi` layout helpers, reflection page discovery |
+| `src/Foundation/Arc.Avalonia` | Foundation (assembly/package `Arc.Avalonia.Foundation`): OKLCH colour engine, palette/theme manager, typography, motion, 161 Lucide icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, `ArcUi` |
+| `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 11 component theme families behind one `<arc:ArcTheme/>` element |
+| `src/Docs/Arc.Avalonia.Docs` | Documentation leaf project (`Arc.Avalonia.Docs`): 320 pages, 294 embedded `Docs/<slug>.json` documents and the demo portraits, discovered by reflection |
+| `src/Docs/Arc.Avalonia.Docs.Abstractions` | Contract assembly (`Arc.Avalonia.Docs.Abstractions`, namespace `Arc.Avalonia.Demo`): `ArcPage`/`ArcItemPage`, the `ArcDoc` model, doc store and validator, `DemoUi` layout helpers, `ArcCatalog`, reflection discovery |
+| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 11 component families and the two Agent packages |
+| `src/Meta/Arc.Avalonia.All` | Aggregate package `Arc.Avalonia.All`: `Arc.Avalonia` plus the Special and Blocks packages |
 | `src/Apps/Arc.Avalonia.Gallery` | The documentation platform: three-column shell, search, outline, coverage report, API-table generator, `--audit`/`--smoke`/`--shot` harnesses |
 | `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript, run control bar, tool approval sheet, question card, background dock, attention inbox |
 | `src/Agent/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
@@ -116,9 +168,11 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | `src/Components/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
 | `src/Special/Arc.Avalonia.Special.*` | 55 Special components in five projects: glass and surfaces, motion and interaction, media and input, AI widgets, AI explainers |
 | `src/Blocks/Arc.Avalonia.Blocks.*` | 111 page-level blocks in six projects: marketing, commerce, app shell, team and collaboration, data and charts, AI |
+| `samples/` | Three ProjectReference-based apps (login, settings, data) that show the one-line `<arc:ArcTheme/>` setup end to end |
+| `tools/` | Build wrapper, screenshot harness, dependency/architecture/theme/token/render gates, package gate and public-API baseline |
 
-Each component project ships the docs for its own entries as embedded `Docs/<slug>.json`; pages are
-discovered by reflection, so adding a component never needs a central registry edit.
+Documentation and pages live in the `src/Docs` leaf project and are discovered by reflection: the
+publishable libraries ship no pages, no documents and no demo assets.
 
 ## Documentation model
 
@@ -134,7 +188,7 @@ discovered by reflection, so adding a component never needs a central registry e
 * **API tables are generated**: public properties, events, types and default values are read from the
   control type by reflection; only the Chinese descriptions are hand-written.
 * **Documentation is data**: the prose lives in `Docs/<slug>.json`; only the preview lives in code. The
-  validator in `Arc.Avalonia.Demo` checks required sections, dangling relations, contrast targets, declared
+  validator in `Arc.Avalonia.Docs.Abstractions` (namespace `Arc.Avalonia.Demo`) checks required sections, dangling relations, contrast targets, declared
   versus implemented preview states and CJK coverage.
 
 Search covers titles, Chinese names, summaries, body text and relation notes. The status page lists all 294
@@ -272,6 +326,25 @@ No commercial or third-party UI/component library is used. The only NuGet packag
 control, chart and surface in this repository is our own XAML/C#. Pro components are implemented independently
 from Arc's public documentation and visual descriptions, without using or copying Pro source code.
 
+Package versions are centralised in `Directory.Packages.props` (NuGet central package management); the
+dependency policy and its gates live in [`tools/deps-policy.json`](tools/deps-policy.json),
+[`tools/check-deps.ps1`](tools/check-deps.ps1) and [`tools/check-package.ps1`](tools/check-package.ps1).
+Third-party licences and attribution are listed in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
+## API compatibility
+
+Public API baselines live in [`tools/api-baselines/`](tools/api-baselines) — one text file per package,
+generated by reflection. `pwsh -NoProfile tools/check-public-api.ps1` fails on any unbaselined change;
+`-Update` rewrites the baselines and must be reviewed like source. This is a deliberate M1 substitute for
+`Microsoft.CodeAnalysis.PublicApiAnalyzers`, which is not available in the offline package cache; the
+baseline covers public types and member signatures but not parameter defaults, nullable annotations or
+attributes yet (planned for M2 when the analyzer package can be restored).
+
+## License
+
+Arc for Avalonia is released under the MIT License — see [`LICENSE`](LICENSE). The same file is packed at
+the root of every NuGet package.
+
 ## Attribution
 
 * Design system, tokens, component behaviour and copy are derived from **Arc UI** (https://uiarc.dev),
@@ -279,3 +352,5 @@ from Arc's public documentation and visual descriptions, without using or copyin
   Pro components are re-implemented from public documentation without using Pro source code.
 * Icons are from **Lucide** (https://lucide.dev), ISC licensed, embedded as path data on the 24 unit grid.
 * Fonts: **Inter** (SIL Open Font License) via `Avalonia.Fonts.Inter`.
+* The full third-party list (runtime packages, SkiaSharp/HarfBuzzSharp, fonts, icons, Arc UI, and the
+  AG-UI semantic-only reference) is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).

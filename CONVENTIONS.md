@@ -9,9 +9,12 @@ type, colour, motion intent) matters more than API-name parity.
 
 | Path | Owner | Contents |
 | --- | --- | --- |
-| `src/Foundation/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles |
-| `src/Foundation/Arc.Avalonia.Internal` | Lead | shared internal primitives: menu surface/glide, icon button, feedback composition helpers, action models; `InternalsVisibleTo` the consuming projects |
-| `src/Apps/Arc.Avalonia.Demo` | Lead | `ArcPage` contract, `DemoUi` layout helpers, page discovery |
+| `src/Foundation/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles; assembly/package `Arc.Avalonia.Foundation` |
+| `src/Theme/Arc.Avalonia.Theme` | Lead | L2.5 aggregate theme: `<arc:ArcTheme/>` = Fluent baseline + tokens + 47 key overrides + the 11 component theme families |
+| `src/Docs/Arc.Avalonia.Docs` | Lead | documentation leaf project: 320 pages, 294 `Docs/<slug>.json`, demo portraits; never published |
+| `src/Docs/Arc.Avalonia.Docs.Abstractions` | Lead | `ArcPage` contract, `DemoUi` layout helpers, `ArcDoc` model/store/validator, `ArcCatalog`, page discovery (namespace stays `Arc.Avalonia.Demo`); never published |
+| `src/Meta/Arc.Avalonia.Meta` | Lead | meta package `Arc.Avalonia` (no lib; dependency-only) |
+| `src/Meta/Arc.Avalonia.All` | Lead | aggregate package `Arc.Avalonia.All` (meta + Special + Blocks) |
 | `src/Agent/Arc.Avalonia.AgentUI` | agent-ui agent | P0 agent transcript / run bar / approval sheet / question card / background dock / attention inbox |
 | `src/Agent/Arc.Avalonia.LifeToday` | life-today agent | P0 reminder row/center, daily brief, day agenda, medication schedule, quick capture, routine editor |
 | `src/Apps/Arc.Avalonia.Gallery` | Lead | shell window, shot harness, foundations page |
@@ -28,9 +31,10 @@ type, colour, motion intent) matters more than API-name parity.
 | `src/Components/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
 
 **Never edit files outside your project** (except adding your `ResourceInclude` lines inside your own
-project theme file). In particular do not touch `Directory.Build.*`, `ArcUI.slnx`, `src/Foundation/Arc.Avalonia/**`,
-`src/Apps/Arc.Avalonia.Demo/**`, `src/Apps/Arc.Avalonia.Gallery/**`, `tools/**` or `docs/**`. If a change to the
-foundation is genuinely needed, message the Lead with the exact file and reason.
+project theme file). In particular do not touch `Directory.Build.*`, `Directory.Packages.props`, `ArcUI.slnx`,
+`src/Foundation/Arc.Avalonia/**`, `src/Theme/**`, `src/Docs/**`, `src/Meta/**`, `src/Apps/Arc.Avalonia.Gallery/**`,
+`tools/**` or `docs/**`. If a change to the foundation is genuinely needed, message the Lead with the exact file
+and reason.
 
 ## 2. Build and verify
 
@@ -50,6 +54,11 @@ pwsh -NoProfile tools/shots.ps1
 pwsh -NoProfile tools/shots.ps1 -Page input -Theme both
 # shell screenshot (the whole gallery window)
 pwsh -NoProfile tools/shots.ps1 -Shell
+
+# release pipeline (M1-T4): pack + package gate + public API baseline
+dotnet pack ArcUI.slnx -c Release -o artifacts -m:1 -nodeReuse:false
+pwsh -NoProfile tools/check-package.ps1
+pwsh -NoProfile tools/check-public-api.ps1
 ```
 
 Screenshots land in `shots/light/<order>-<slug>.png` and `shots/dark/...`. Read them with the image
@@ -77,7 +86,9 @@ components are not recreated.
    </ResourceDictionary.MergedDictionaries>
    ```
 
-4. `src/<project>/Pages/XxxPage.cs`: a public sealed `ArcPage` subclass. The gallery discovers pages by
+4. `src/Docs/Arc.Avalonia.Docs/<Group>/<Project>/Pages/XxxPage.cs`: a public sealed `ArcPage` subclass
+   (the project folder mirrors the library it documents; namespaces stay `Arc.Avalonia.<X>.Pages`). Pages
+   live in the documentation leaf project, never in the publishable library. The gallery discovers pages by
    reflection, so **no registration is needed**. One page per project area (not per component) is enough;
    use `DemoUi.Section` for each component with a one-line "when to use" description.
 
@@ -223,7 +234,8 @@ Page orders for this round (spread across the existing projects, one writer per 
 ## 9. Round 4: catalog parity (Special components and Blocks)
 
 The gallery navigation is now **catalog-driven** and mirrors https://uiarc.dev/docs/introduction:
-`ArcCatalog` (in `Arc.Avalonia.Demo`) loads `Catalog/arc-catalog.json` (generated from the public
+`ArcCatalog` (in `Arc.Avalonia.Docs.Abstractions`, namespace `Arc.Avalonia.Demo`) loads
+`Catalog/arc-catalog.json` (generated from the public
 llms-small.txt + the introduction sidebar by `tools/build-catalog.ps1`) and the sidebar renders
 Components (23 categories, 128 items), Blocks (6 implementation groups, 111 items) and Special components
 (5 groups, 55 items), with an All/Free/Pro tier filter and search.
@@ -269,16 +281,49 @@ Catalog data is generated from public docs only:
 
 ```powershell
 pwsh -NoProfile -File tools/build-catalog.ps1     # writes docs/arc-catalog.json and validates 55 specials / 111 blocks
-Copy-Item docs/arc-catalog.json src/Apps/Arc.Avalonia.Demo/Catalog/arc-catalog.json -Force
+Copy-Item docs/arc-catalog.json src/Docs/Arc.Avalonia.Docs.Abstractions/Catalog/arc-catalog.json -Force
 ```
 
-The Demo project embeds that JSON (`ArcCatalog`), the gallery sidebar renders it, and
+The catalog leaf project embeds that JSON (`ArcCatalog` in `Arc.Avalonia.Docs.Abstractions`), the gallery
+sidebar renders it, and
 `dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit` must report
 `missing=0 pageFailures=0`. When adding a page, give it the exact catalog `ItemSlug`; when a component is
 demonstrated on a shared page without its own heading, add it to `ArcCatalogAliases` in
-`src/Apps/Arc.Avalonia.Demo/ArcCatalogAliases.cs` so the sidebar still reaches it.
+`src/Docs/Arc.Avalonia.Docs.Abstractions/ArcCatalogAliases.cs` so the sidebar still reaches it.
 
 Note: `tools/shots.ps1` builds the gallery with `-p:BuildProjectReferences=false`, so a freshly built
 component DLL is not copied into the gallery output. Run a normal `tools/build.ps1` / `dotnet build
 ArcUI.slnx` first, or copy the project DLL into `src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/`, before
 shooting; otherwise screenshots render the previous assembly.
+
+## 10. Release conventions (M1-T4)
+
+These rules keep `dotnet pack` reproducible and R5-clean; `tools/check-package.ps1` enforces them.
+
+* **Opt in to packing explicitly.** A library csproj must set `<IsPackable>true</IsPackable>` plus
+  `<PackageId>`, `<Description>` and `<GenerateDocumentationFile>true</GenerateDocumentationFile>`.
+  Everything else (Docs, Gallery, samples, POCs, tests) inherits `IsPackable=false` from
+  `Directory.Build.props` and must never be packed.
+* **Lockstep version.** `VersionPrefix`/`VersionSuffix` in `Directory.Build.props` produce `0.9.0-alpha`;
+  override with `-p:Version=...` only for a deliberate release. Never hard-code a version in a csproj.
+* **Central package management.** Package versions live in `Directory.Packages.props`; csproj files use
+  `<PackageReference Include="..." />` with no `Version`. The only allowed non-Arc packages are
+  `Avalonia`, `Avalonia.Desktop` (apps only), `Avalonia.Themes.Fluent` and `Avalonia.Fonts.Inter`.
+  `poc/Directory.Packages.props` opts the POCs out; do not add other nested overrides.
+* **No demo residue in packages.** Pages, documents, demo portraits, sample personas and demo-only
+  helpers stay in `src/Docs`. Publishable libraries must not reference `Arc.Avalonia.Docs*`, carry
+  `EmbeddedResource Docs`, or default public properties to demo personas; convert to neutral defaults
+  (for example `ArcUserMenu` defaults to "Your account" with an empty email).
+* **Packages carry licence + notices + XML docs.** `Directory.Build.targets` packs the root `LICENSE`,
+  `README.md` and `THIRD-PARTY-NOTICES.md` into every package and turns on XML documentation for packable
+  projects. Update `THIRD-PARTY-NOTICES.md` whenever a dependency, font, icon set or design source changes.
+* **API changes are baselined.** `tools/api-baselines/<PackageId>.txt` records the public API (reflection
+  export). After an intentional API change run `pwsh tools/check-public-api.ps1 -Update` and review the
+  baseline diff in the same commit.
+* **Meta packages are dependency-only.** `src/Meta/Arc.Avalonia.Meta` (PackageId `Arc.Avalonia`) and
+  `src/Meta/Arc.Avalonia.All` (PackageId `Arc.Avalonia.All`) use `IncludeBuildOutput=false`; their
+  ProjectReferences are the dependency tree. File paths and `AssemblyName` use the `Arc.Avalonia.Meta`/
+  `Arc.Avalonia.All` names so the PackageId does not collide with an assembly identity.
+* **Local release verification** (offline): `dotnet pack ArcUI.slnx -c Release -o artifacts -m:1
+  -nodeReuse:false` then `pwsh tools/check-package.ps1` (exit 0 = 28 packages, clean dependency closure,
+  xml + license + readme present, no Pages/Docs/demo entries).

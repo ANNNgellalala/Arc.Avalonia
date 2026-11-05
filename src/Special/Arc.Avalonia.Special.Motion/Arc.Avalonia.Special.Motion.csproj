@@ -2,11 +2,15 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Special.Motion</RootNamespace>
     <AssemblyName>Arc.Avalonia.Special.Motion</AssemblyName>
+    <PackageId>Arc.Avalonia.Special.Motion</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Motion-led special components: morph navigation, dock, orbit menu, liquid tab bar and text effects for Arc for Avalonia.</Description>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
   </ItemGroup>
 

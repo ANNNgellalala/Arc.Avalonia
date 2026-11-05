@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Effects</RootNamespace>
     <AssemblyName>Arc.Avalonia.Effects</AssemblyName>
+    <PackageId>Arc.Avalonia.Effects</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Text reveal, morph and shimmer, announcement bar, cookie consent, hover card, bottom sheet and expandable card for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
   </ItemGroup>
 

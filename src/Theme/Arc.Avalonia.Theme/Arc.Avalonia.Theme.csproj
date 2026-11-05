@@ -7,13 +7,16 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Theme</RootNamespace>
     <AssemblyName>Arc.Avalonia.Theme</AssemblyName>
+    <PackageId>Arc.Avalonia.Theme</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Arc Avalonia aggregate theme: Fluent baseline, Arc tokens and the 11 component theme families behind a single &lt;arc:ArcTheme/&gt; element.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
   </ItemGroup>
 
   <ItemGroup>

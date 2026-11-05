@@ -1,0 +1,11 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:arc="using:Arc.Avalonia.Theme"
+             x:Class="Arc.Avalonia.Sample.Login.App"
+             RequestedThemeVariant="Light">
+
+  <!-- One line is all the setup the Arc design system needs. -->
+  <Application.Styles>
+    <arc:ArcTheme />
+  </Application.Styles>
+</Application>

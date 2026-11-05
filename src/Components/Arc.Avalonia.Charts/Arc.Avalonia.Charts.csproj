@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Charts</RootNamespace>
     <AssemblyName>Arc.Avalonia.Charts</AssemblyName>
+    <PackageId>Arc.Avalonia.Charts</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Data-visualisation controls (line, bar, donut, gauge, sankey, treemap, realtime stream and more) for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
   </ItemGroup>
 

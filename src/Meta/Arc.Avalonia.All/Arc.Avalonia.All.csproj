@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    M1-T4 aggregate package: `Arc.Avalonia.All` = the Arc.Avalonia meta package plus the L3 composition
+    layer (55 special components in 5 packages, 111 blocks in 6 packages). Special/Blocks stay opt-in
+    for consumers who only need the component library.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.All</RootNamespace>
+    <AssemblyName>Arc.Avalonia.All</AssemblyName>
+    <PackageId>Arc.Avalonia.All</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>Arc for Avalonia complete bundle: the Arc.Avalonia meta package plus the special-component and block packages. Everything shipped by the repository in one install.</Description>
+    <PackageTags>avalonia;ui;design-system;controls;blocks;meta</PackageTags>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Arc.Avalonia.Meta\Arc.Avalonia.Meta.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Glass\Arc.Avalonia.Special.Glass.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Motion\Arc.Avalonia.Special.Motion.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Media\Arc.Avalonia.Special.Media.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIWidgets\Arc.Avalonia.Special.AIWidgets.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIExplainers\Arc.Avalonia.Special.AIExplainers.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Marketing\Arc.Avalonia.Blocks.Marketing.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Commerce\Arc.Avalonia.Blocks.Commerce.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.App\Arc.Avalonia.Blocks.App.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Team\Arc.Avalonia.Blocks.Team.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Data\Arc.Avalonia.Blocks.Data.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.AI\Arc.Avalonia.Blocks.AI.csproj" />
+  </ItemGroup>
+</Project>

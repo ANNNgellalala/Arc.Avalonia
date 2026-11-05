@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Blocks.Team</RootNamespace>
     <AssemblyName>Arc.Avalonia.Blocks.Team</AssemblyName>
+    <PackageId>Arc.Avalonia.Blocks.Team</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Team and collaboration blocks: directory, permissions, kanban, calendar, webhooks and API keys for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />

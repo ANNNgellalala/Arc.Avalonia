@@ -282,3 +282,21 @@ dotnet pack ArcUI.slnx -c Release -o artifacts
 **M1-T3 已知偏差（ADR 0003 §9 已记录）**：FluentTheme 用 C# 创建（R4 禁止库内 axaml 出现 FluentTheme 元素，且注释文本也算命中）；token 与 47 键由 C# 生成（满足 R6 token-only）；TextBox/ComboBox 字号需局部 ControlTheme；ScrollBar 自动收缩未覆盖（ADR 0004 已记）。
 
 **剩余 M1**：M1-T4 发布工程（24 人日）、M1-T5 门禁回归（11 人日，R5 转绿 + 发布验证）。
+
+### 9.5 第三波执行记录（2026-11-06：M1-T4 + M1-T5）—— M1 完成
+
+| 卡 | 结果 |
+|---|---|
+| **M1-T4 发布工程** | ✅ `dotnet pack ArcUI.slnx -c Release -o artifacts -m:1 -nodeReuse:false` → **28 包 / 1.76 MB / 0.9.0-alpha**；`Directory.Build.props`（lockstep 版本/元数据/包许可/README）、`Directory.Packages.props`（CPM，POC opt-out）、28 个 csproj 元数据；`src/Meta`：`Arc.Avalonia`（→Theme+11 组件+2 Agent）与 `Arc.Avalonia.All`（→元包+5 Special+6 Blocks）；3 个可编译 samples（登录/设置/数据，各一行 `<arc:ArcTheme/>`）；`LICENSE`（MIT）+`THIRD-PARTY-NOTICES.md`；API 基线（自建 `check-public-api.ps1`，28/28 MATCH）；demo 清理（ArcUserMenu 中性默认值、ArcSamplePhoto 移入 Docs） |
+| **M1-T5 门禁回归** | ✅ R5 接入 `check-all`（调用 `check-package.ps1`，artifacts 缺失即 RED）；R1 认识 `src/Meta`（app 层）；R3 扫描 meta 包依赖；`.gitignore` 加 `artifacts/`；**check-all 7/7 GREEN（0 red / 0 known-red）**；`check-public-api` 28/28；button 页明暗截图抽检通过（ArcTheme 下 ArcButton 各变体/尺寸/加载/禁用正确） |
+
+**M1 退出标准核对**：
+- [x] `dotnet pack` 产物合规（28 包，无 Pages/Docs/demo；依赖仅官方包+lockstep Arc 包；dll+xml+README+LICENSE）
+- [x] 一行 `<arc:ArcTheme/>` 接入（Gallery + samples 均验证）
+- [x] 617 文件出库；audit 294/294；smoke 315 页；明暗截图抽检通过
+- [x] `Arc.Avalonia.Internal` 解散；`AssemblyName=Arc.Avalonia.Foundation`；主题聚合 L2.5
+- [x] `check-all.ps1` 全绿（R1–R8）
+- [x] `0.9.0-alpha` 离线消费者安装验证（临时工程 source=artifacts，restore+build 0 error）
+- [x] README（Install/打包/API/License）、CONVENTIONS §10 发布约定
+
+**M1 完成。** 已知遗留（M2 处理）：Docs 页面经 24 个 IVT 使用各库 internal kit（T2b 可选迁出）；TextBox/ComboBox 字号需局部 ControlTheme；ScrollBar 自动收缩未覆盖；`RepositoryUrl` 为占位；BannedApi 在 M2 生效；`TeamData` 等 internal demo 数据随 kit 迁 Docs。

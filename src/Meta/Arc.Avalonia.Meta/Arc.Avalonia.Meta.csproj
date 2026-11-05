@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    M1-T4 meta package: `Arc.Avalonia` is the recommended one-install entry point (docs/13 §2.3).
+    It has no lib content of its own; the ProjectReferences below become NuGet dependencies, pulling in
+    the L2.5 theme aggregate (which itself brings L1 Foundation and the 11 L2 component families) plus
+    the two Agent surface packages.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Meta</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Meta</AssemblyName>
+    <PackageId>Arc.Avalonia</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>Arc for Avalonia all-in-one meta package: install this to get the Arc theme, all 11 component families and the agent surface packages. One line of XAML - &lt;arc:ArcTheme/&gt; - is all the setup the design system needs.</Description>
+    <PackageTags>avalonia;ui;design-system;controls;meta</PackageTags>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Theme\Arc.Avalonia.Theme\Arc.Avalonia.Theme.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />
+  </ItemGroup>
+</Project>

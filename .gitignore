@@ -7,3 +7,4 @@ TestResults/
 .recon/
 *.user
 .vs/
+artifacts/

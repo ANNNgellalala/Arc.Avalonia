@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.AgentUI</RootNamespace>
     <AssemblyName>Arc.Avalonia.AgentUI</AssemblyName>
+    <PackageId>Arc.Avalonia.AgentUI</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Agent transcript, run bar, tool approval sheet, question card, background dock and attention inbox UI contracts for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
   </ItemGroup>
 

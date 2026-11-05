@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Feedback</RootNamespace>
     <AssemblyName>Arc.Avalonia.Feedback</AssemblyName>
+    <PackageId>Arc.Avalonia.Feedback</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Progress, avatars, presence, activity and feedback states for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
   </ItemGroup>

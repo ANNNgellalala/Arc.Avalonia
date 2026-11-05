@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
   </ItemGroup>
 

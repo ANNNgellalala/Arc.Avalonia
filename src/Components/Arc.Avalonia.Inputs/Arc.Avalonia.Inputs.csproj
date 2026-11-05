@@ -2,10 +2,14 @@
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Inputs</RootNamespace>
     <AssemblyName>Arc.Avalonia.Inputs</AssemblyName>
+    <PackageId>Arc.Avalonia.Inputs</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Text, number, password and search fields, selects, toggles, sliders, chip and segmented controls, and the advanced input family for Arc for Avalonia.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
   </ItemGroup>
 
