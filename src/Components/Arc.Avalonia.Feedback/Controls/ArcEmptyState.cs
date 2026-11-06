@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -14,6 +15,7 @@ namespace Arc.Avalonia.Feedback.Controls;
 /// A useful next step when there is nothing to show: a quiet illustration slot, a title, one or
 /// two sentences of explanation, and at most two actions.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcEmptyState : TemplatedControl
 {
     public static readonly StyledProperty<string> TitleProperty =

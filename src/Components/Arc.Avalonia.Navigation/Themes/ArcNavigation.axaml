@@ -16,13 +16,13 @@
                   CornerRadius="{DynamicResource ArcRadiusControl}"
                   Padding="3">
             <Panel>
-              <Panel x:Name="GlideLayer" IsHitTestVisible="False">
-                <i:ArcGlide x:Name="Glide" CornerRadius="16" />
+              <Panel x:Name="PART_GlideLayer" IsHitTestVisible="False">
+                <i:ArcGlide x:Name="PART_Glide" CornerRadius="16" />
               </Panel>
-              <StackPanel x:Name="Triggers" Orientation="Horizontal" Spacing="2" />
+              <StackPanel x:Name="PART_Triggers" Orientation="Horizontal" Spacing="2" />
             </Panel>
           </Border>
-          <ContentControl x:Name="PanelHost" HorizontalContentAlignment="Left" />
+          <ContentControl x:Name="PART_PanelHost" HorizontalContentAlignment="Left" />
         </StackPanel>
       </ControlTemplate>
     </Setter>
@@ -33,7 +33,7 @@
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
-        <WrapPanel x:Name="Crumbs" Orientation="Horizontal" VerticalAlignment="Center" />
+        <WrapPanel x:Name="PART_Crumbs" Orientation="Horizontal" VerticalAlignment="Center" />
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -43,7 +43,7 @@
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
-        <StackPanel x:Name="Buttons" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left" />
+        <StackPanel x:Name="PART_Buttons" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left" />
       </ControlTemplate>
     </Setter>
   </ControlTheme>

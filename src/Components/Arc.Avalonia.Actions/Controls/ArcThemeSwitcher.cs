@@ -6,6 +6,8 @@ using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
+using Avalonia.Interactivity;
+
 namespace Arc.Avalonia.Actions.Controls;
 
 /// <summary>
@@ -39,6 +41,16 @@ public sealed class ArcThemeSwitcher : ArcButton
 
     /// <summary>Raised with the scheme that should be applied next.</summary>
     public event EventHandler<ArcColorScheme>? ThemeChanged;
+    /// <summary>Bubbled copy of <see cref="ThemeChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcThemeSwitcherThemeChangedEventArgs> ThemeChangedEvent =
+        RoutedEvent.Register<ArcThemeSwitcher, ArcThemeSwitcherThemeChangedEventArgs>("ThemeChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ThemeChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcThemeSwitcherThemeChangedEventArgs>? ThemeChangedRouted
+    {
+        add => AddHandler(ThemeChangedEvent, value);
+        remove => RemoveHandler(ThemeChangedEvent, value);
+    }
 
     /// <summary>The theme the control reports; drives the icon and the pressed state.</summary>
     public ArcColorScheme Scheme
@@ -59,7 +71,9 @@ public sealed class ArcThemeSwitcher : ArcButton
         base.OnClick();
         var next = Scheme == ArcColorScheme.Dark ? ArcColorScheme.Light : ArcColorScheme.Dark;
         SetCurrentValue(SchemeProperty, next);
+                var themeChangedArgs = new ArcThemeSwitcherThemeChangedEventArgs(ThemeChangedEvent) { Scheme = next };
         ThemeChanged?.Invoke(this, next);
+        RaiseEvent(themeChangedArgs);
 
         if (Application.Current is { } app)
         {

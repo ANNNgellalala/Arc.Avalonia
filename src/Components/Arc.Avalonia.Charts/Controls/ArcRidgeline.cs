@@ -151,7 +151,7 @@ public class ArcRidgeline : ArcChartBase
                 "No distributions",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -212,14 +212,14 @@ public class ArcRidgeline : ArcChartBase
             ChartFormat.Compact(domain.Min),
             _plot.Left,
             _plot.Bottom + 11,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted);
         ChartText.Draw(
             context,
             ChartFormat.Compact(domain.Max),
             _plot.Right,
             _plot.Bottom + 11,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Right);
     }
@@ -244,7 +244,7 @@ public class ArcRidgeline : ArcChartBase
 
         var baseline = _baselines[index] - (active ? 4 : 0);
         context.DrawLine(
-            new Pen(ChartPalette.BorderSubtle, 1),
+            new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
             new Point(_plot.Left, Crisp(baseline)),
             new Point(_plot.Right, Crisp(baseline)));
 
@@ -281,7 +281,7 @@ public class ArcRidgeline : ArcChartBase
             series.Name,
             56,
             baseline - 3,
-            12,
+            ChartMetrics.LabelFontSize,
             active || index == HighlightIndex ? ChartPalette.Foreground : ChartPalette.Secondary,
             active || index == HighlightIndex ? FontWeight.Medium : FontWeight.Normal,
             TextAlignment.Right,

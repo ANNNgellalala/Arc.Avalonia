@@ -2,6 +2,8 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -18,6 +20,16 @@ namespace Arc.Avalonia.Media.Controls;
 /// morphs the label, the icon and the tone to the done state. Space and Enter hold it too, and tabbing
 /// away cancels the hold so it can never fire by accident.
 /// </summary>
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_Fill", typeof(Border))]
+[TemplatePart("PART_Clip", typeof(Border))]
+[TemplatePart("PART_FillRow", typeof(Grid))]
+[TemplatePart("PART_BaseRow", typeof(StackPanel))]
+[TemplatePart("PART_LabelBase", typeof(TextBlock))]
+[TemplatePart("PART_LabelFill", typeof(TextBlock))]
+[TemplatePart("PART_IconBase", typeof(ArcIcon))]
+[TemplatePart("PART_IconFill", typeof(ArcIcon))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcHoldToConfirm : Button
 {
     public static readonly StyledProperty<string> LabelProperty =
@@ -131,21 +143,31 @@ public class ArcHoldToConfirm : Button
     public event EventHandler? HoldEnded;
 
     /// <summary>Raised once when the hold completes.</summary>
+    public static readonly RoutedEvent<ArcHoldConfirmedRoutedEventArgs> ConfirmedEvent =
+        RoutedEvent.Register<ArcHoldToConfirm, ArcHoldConfirmedRoutedEventArgs>("Confirmed", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="Confirmed"/>.</summary>
+    public event EventHandler<ArcHoldConfirmedRoutedEventArgs>? ConfirmedRouted
+    {
+        add => AddHandler(ConfirmedEvent, value);
+        remove => RemoveHandler(ConfirmedEvent, value);
+    }
+
     public event EventHandler? Confirmed;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _root = e.NameScope.Find<Border>("Root");
-        _fill = e.NameScope.Find<Border>("Fill");
-        _clip = e.NameScope.Find<Border>("Clip");
-        _fillRow = e.NameScope.Find<Grid>("FillRow");
-        _baseRow = e.NameScope.Find<StackPanel>("BaseRow");
-        _labelBase = e.NameScope.Find<TextBlock>("LabelBase");
-        _labelFill = e.NameScope.Find<TextBlock>("LabelFill");
-        _iconBase = e.NameScope.Find<ArcIcon>("IconBase");
-        _iconFill = e.NameScope.Find<ArcIcon>("IconFill");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _root = e.NameScope.Find<Border>("PART_Root");
+        _fill = e.NameScope.Find<Border>("PART_Fill");
+        _clip = e.NameScope.Find<Border>("PART_Clip");
+        _fillRow = e.NameScope.Find<Grid>("PART_FillRow");
+        _baseRow = e.NameScope.Find<StackPanel>("PART_BaseRow");
+        _labelBase = e.NameScope.Find<TextBlock>("PART_LabelBase");
+        _labelFill = e.NameScope.Find<TextBlock>("PART_LabelFill");
+        _iconBase = e.NameScope.Find<ArcIcon>("PART_IconBase");
+        _iconFill = e.NameScope.Find<ArcIcon>("PART_IconFill");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
         _measuredWidth = -1;
         UpdateVisualState();
         ApplyFraction(_fraction);
@@ -333,6 +355,7 @@ public class ArcHoldToConfirm : Button
         UpdateVisualState();
         HoldEnded?.Invoke(this, EventArgs.Empty);
         Confirmed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcHoldConfirmedRoutedEventArgs(ConfirmedEvent));
     }
 
     private void ApplyFraction(double fraction)
@@ -484,6 +507,9 @@ public class ArcHoldToConfirm : Button
         _pointerHold = false;
     }
 }
+
+
+
 
 
 

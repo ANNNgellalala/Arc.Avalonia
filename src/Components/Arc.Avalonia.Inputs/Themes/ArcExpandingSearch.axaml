@@ -11,8 +11,8 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel x:Name="Host" ClipToBounds="False" MinHeight="40">
-          <Border x:Name="Field"
+        <Panel x:Name="PART_Host" ClipToBounds="False" MinHeight="40">
+          <Border x:Name="PART_Field"
                   Width="40"
                   Height="40"
                   HorizontalAlignment="Right"
@@ -30,7 +30,7 @@
               </Transitions>
             </Border.Transitions>
             <Grid ColumnDefinitions="Auto,*,Auto">
-              <arc:ArcIcon x:Name="Icon"
+              <arc:ArcIcon x:Name="PART_Icon"
                            Icon="search"
                            Size="18"
                            Margin="11,0,0,0"
@@ -53,7 +53,7 @@
                        VerticalAlignment="Center"
                        VerticalContentAlignment="Center"
                        IsVisible="False" />
-              <Button x:Name="ClearButton"
+              <Button x:Name="PART_ClearButton"
                       Grid.Column="2"
                       Theme="{DynamicResource ArcAdvancedIconButton}"
                       Width="24"
@@ -67,7 +67,7 @@
             </Grid>
           </Border>
 
-          <Border x:Name="Panel"
+          <Border x:Name="PART_Panel"
                   IsVisible="False"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Right"
@@ -85,7 +85,7 @@
             <ScrollViewer MaxHeight="300"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
-              <StackPanel x:Name="Rows" Spacing="1" />
+              <StackPanel x:Name="PART_Rows" Spacing="1" />
             </ScrollViewer>
           </Border>
         </Panel>

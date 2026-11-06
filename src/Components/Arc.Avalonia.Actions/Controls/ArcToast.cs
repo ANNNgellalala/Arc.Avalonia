@@ -3,6 +3,8 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
@@ -14,6 +16,11 @@ namespace Arc.Avalonia.Actions.Controls;
 /// close button. It leaves on its own after a few seconds; hover does not pause the timer, so keep the
 /// copy short.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_Action", typeof(ArcButton))]
+[TemplatePart("PART_Close", typeof(ArcButton))]
 public sealed class ArcToast : TemplatedControl
 {
     public static readonly StyledProperty<string?> TitleProperty =
@@ -55,6 +62,16 @@ public sealed class ArcToast : TemplatedControl
 
     /// <summary>Raised when the toast closes, by timeout, the close button or the action.</summary>
     public event EventHandler? Closed;
+    /// <summary>Bubbled copy of <see cref="Closed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcToastClosedEventArgs> ClosedEvent =
+        RoutedEvent.Register<ArcToast, ArcToastClosedEventArgs>("Closed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Closed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcToastClosedEventArgs>? ClosedRouted
+    {
+        add => AddHandler(ClosedEvent, value);
+        remove => RemoveHandler(ClosedEvent, value);
+    }
 
     /// <summary>Runs when the action button is pressed.</summary>
     public Action? Action { get; set; }
@@ -101,11 +118,11 @@ public sealed class ArcToast : TemplatedControl
 
     private void _scene(TemplateAppliedEventArgs e)
     {
-        _surface = e.NameScope.Find<Border>("Surface");
-        _title = e.NameScope.Find<TextBlock>("Title");
-        _description = e.NameScope.Find<TextBlock>("Description");
-        _action = e.NameScope.Find<ArcButton>("Action");
-        _close = e.NameScope.Find<ArcButton>("Close");
+        _surface = e.NameScope.Find<Border>("PART_Surface");
+        _title = e.NameScope.Find<TextBlock>("PART_Title");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
+        _action = e.NameScope.Find<ArcButton>("PART_Action");
+        _close = e.NameScope.Find<ArcButton>("PART_Close");
 
         if (_close is not null)
         {
@@ -168,7 +185,9 @@ public sealed class ArcToast : TemplatedControl
 
             IsVisible = false;
             _timer.Stop();
-            Closed?.Invoke(this, EventArgs.Empty);
+                    var closedArgs = new ArcToastClosedEventArgs(ClosedEvent);
+        Closed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(closedArgs);
         }
     }
 

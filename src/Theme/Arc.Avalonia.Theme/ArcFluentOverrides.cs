@@ -15,7 +15,8 @@ namespace Arc.Avalonia.Theme;
 /// 46/47 of these keys are pure overrides verified by M0 POC-B. The one gap is the TextBox/ComboBox font
 /// size: Fluent hard-codes the template size, so those two controls still need a local ControlTheme
 /// (tracked in the M1-T3 report). Filled in by <see cref="ArcTheme"/> on every
-/// <see cref="ArcThemeManager.Apply"/> so accent changes reach the Fluent surface too.
+/// <see cref="ArcThemeManager.Apply(Application, ArcThemeOptions)"/> call so accent changes reach the Fluent
+/// surface too.
 /// </remarks>
 public static class ArcFluentOverrides
 {

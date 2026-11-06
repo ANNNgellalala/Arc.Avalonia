@@ -24,7 +24,7 @@
                     BorderBrush="{DynamicResource ArcFocusOutline}"
                     IsVisible="False"
                     IsHitTestVisible="False" />
-            <Border x:Name="Trigger"
+            <Border x:Name="PART_Trigger"
                     MinHeight="{DynamicResource ArcControlHeightMd}"
                     Padding="16,0"
                     Background="{DynamicResource ArcSurface}"
@@ -39,10 +39,10 @@
                 </Transitions>
               </Border.Transitions>
               <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                <TextBlock x:Name="ValueText"
+                <TextBlock x:Name="PART_ValueText"
                            VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis" />
-                <arc:ArcIcon x:Name="Chevron"
+                <arc:ArcIcon x:Name="PART_Chevron"
                              Grid.Column="1"
                              Icon="chevron-down"
                              Size="16"
@@ -64,13 +64,13 @@
               </Grid>
             </Border>
           </Panel>
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />
 
-          <Popup x:Name="MenuPopup" IsLightDismissEnabled="True" Focusable="False">
-            <Border x:Name="MenuSurface"
+          <Popup x:Name="PART_MenuPopup" IsLightDismissEnabled="True" Focusable="False">
+            <Border x:Name="PART_MenuSurface"
                     Background="{DynamicResource ArcSurfaceRaised}"
                     BorderBrush="{DynamicResource ArcBorder}"
                     BorderThickness="1"
@@ -78,7 +78,7 @@
                     Padding="6"
                     BoxShadow="{DynamicResource ArcShadowFloating}">
               <Panel>
-                <Border x:Name="Highlight"
+                <Border x:Name="PART_Highlight"
                         Background="{DynamicResource ArcAccentSubtle}"
                         CornerRadius="12"
                         HorizontalAlignment="Stretch"
@@ -104,7 +104,7 @@
                     </TranslateTransform>
                   </Border.RenderTransform>
                 </Border>
-                <ListBox x:Name="Menu"
+                <ListBox x:Name="PART_Menu"
                          Theme="{DynamicResource ArcMenuListTheme}"
                          MaxHeight="300"
                          Focusable="True" />
@@ -161,7 +161,7 @@
           <TextBlock Text="{TemplateBinding Label}"
                      Classes="arc-label"
                      IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
-          <Border x:Name="Trigger"
+          <Border x:Name="PART_Trigger"
                   MinHeight="{DynamicResource ArcControlHeightMd}"
                   Padding="12,0"
                   Background="{DynamicResource ArcSurface}"
@@ -194,7 +194,7 @@
                        VerticalContentAlignment="Center"
                        AcceptsReturn="False"
                        TextWrapping="NoWrap" />
-              <Button x:Name="ClearAction"
+              <Button x:Name="PART_ClearAction"
                       Grid.Column="2"
                       Theme="{DynamicResource ArcIconButtonTheme}"
                       Margin="4,0,0,0"
@@ -215,13 +215,13 @@
                            Foreground="{DynamicResource ArcTextMuted}" />
             </Grid>
           </Border>
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />
 
-          <Popup x:Name="MenuPopup" IsLightDismissEnabled="True" Focusable="False">
-            <Border x:Name="MenuSurface"
+          <Popup x:Name="PART_MenuPopup" IsLightDismissEnabled="True" Focusable="False">
+            <Border x:Name="PART_MenuSurface"
                     Background="{DynamicResource ArcSurfaceRaised}"
                     BorderBrush="{DynamicResource ArcBorder}"
                     BorderThickness="1"
@@ -229,11 +229,11 @@
                     Padding="6"
                     BoxShadow="{DynamicResource ArcShadowFloating}">
               <Panel>
-                <ListBox x:Name="Menu"
+                <ListBox x:Name="PART_Menu"
                          Theme="{DynamicResource ArcMenuListTheme}"
                          MaxHeight="300"
                          Focusable="False" />
-                <TextBlock x:Name="EmptyText"
+                <TextBlock x:Name="PART_EmptyText"
                            Classes="arc-caption"
                            Margin="10,12"
                            IsVisible="False" />
@@ -285,14 +285,14 @@
                      Classes="arc-label"
                      IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
           <Panel>
-            <Border x:Name="Ring"
+            <Border x:Name="PART_Ring"
                     Margin="-4"
                     CornerRadius="{DynamicResource ArcRadiusControl}"
                     BorderThickness="2"
                     BorderBrush="{DynamicResource ArcFocusOutline}"
                     IsVisible="False"
                     IsHitTestVisible="False" />
-            <Border x:Name="Trigger"
+            <Border x:Name="PART_Trigger"
                     MinHeight="{DynamicResource ArcControlHeightMd}"
                     Padding="12,0,14,0"
                     Background="{DynamicResource ArcSurface}"
@@ -307,18 +307,18 @@
               </Border.Transitions>
               <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
                 <Panel Grid.Column="0" ClipToBounds="True">
-                  <TextBlock x:Name="PlaceholderText"
+                  <TextBlock x:Name="PART_PlaceholderText"
                              VerticalAlignment="Center"
                              Foreground="{DynamicResource ArcTextMuted}" />
-                  <StackPanel x:Name="ChipPanel" Orientation="Horizontal" VerticalAlignment="Center" />
+                  <StackPanel x:Name="PART_ChipPanel" Orientation="Horizontal" VerticalAlignment="Center" />
                 </Panel>
-                <TextBlock x:Name="Overflow"
+                <TextBlock x:Name="PART_Overflow"
                            Grid.Column="1"
                            Classes="arc-caption"
                            Margin="2,0,0,0"
                            VerticalAlignment="Center"
                            IsVisible="False" />
-                <arc:ArcIcon x:Name="Chevron"
+                <arc:ArcIcon x:Name="PART_Chevron"
                              Grid.Column="2"
                              Icon="chevron-down"
                              Size="16"
@@ -340,20 +340,20 @@
               </Grid>
             </Border>
           </Panel>
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />
 
-          <Popup x:Name="MenuPopup" IsLightDismissEnabled="True" Focusable="False">
-            <Border x:Name="MenuSurface"
+          <Popup x:Name="PART_MenuPopup" IsLightDismissEnabled="True" Focusable="False">
+            <Border x:Name="PART_MenuSurface"
                     Background="{DynamicResource ArcSurfaceRaised}"
                     BorderBrush="{DynamicResource ArcBorder}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource ArcRadiusPanel}"
                     Padding="6"
                     BoxShadow="{DynamicResource ArcShadowFloating}">
-              <ListBox x:Name="Menu"
+              <ListBox x:Name="PART_Menu"
                        Theme="{DynamicResource ArcMenuListTheme}"
                        MaxHeight="320"
                        Focusable="False" />

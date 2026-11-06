@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 
@@ -14,6 +15,7 @@ namespace Arc.Avalonia.Navigation.Controls;
 /// A path of links where the last item is the current page. Chevron separators are decorative; the
 /// current page is never a link.
 /// </summary>
+[TemplatePart("PART_Crumbs", typeof(WrapPanel))]
 public sealed class ArcBreadcrumb : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcBreadcrumbItem>?> ItemsProperty =
@@ -52,7 +54,7 @@ public sealed class ArcBreadcrumb : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _crumbs = e.NameScope.Find<WrapPanel>("Crumbs");
+        _crumbs = e.NameScope.Find<WrapPanel>("PART_Crumbs");
         AutomationProperties.SetName(this, Label ?? "Breadcrumb");
         Build();
     }

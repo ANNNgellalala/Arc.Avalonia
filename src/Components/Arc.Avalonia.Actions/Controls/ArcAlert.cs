@@ -4,6 +4,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
@@ -22,6 +24,11 @@ public enum ArcAlertTone
 /// A persistent message inside the page flow: a tone icon, a short title, optional details and one
 /// action. It stays until it is dismissed, unlike a toast.
 /// </summary>
+[TemplatePart("PART_Icon", typeof(ArcIcon))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Details", typeof(ContentPresenter))]
+[TemplatePart("PART_Action", typeof(ArcButton))]
+[TemplatePart("PART_Close", typeof(ArcButton))]
 public sealed class ArcAlert : ContentControl
 {
     public static readonly StyledProperty<string?> TitleProperty =
@@ -59,6 +66,16 @@ public sealed class ArcAlert : ContentControl
     public Action? Action { get; set; }
 
     public event EventHandler? Dismissed;
+    /// <summary>Bubbled copy of <see cref="Dismissed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAlertDismissedEventArgs> DismissedEvent =
+        RoutedEvent.Register<ArcAlert, ArcAlertDismissedEventArgs>("Dismissed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Dismissed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAlertDismissedEventArgs>? DismissedRouted
+    {
+        add => AddHandler(DismissedEvent, value);
+        remove => RemoveHandler(DismissedEvent, value);
+    }
 
     public string? Title
     {
@@ -95,11 +112,11 @@ public sealed class ArcAlert : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _icon = e.NameScope.Find<ArcIcon>("Icon");
-        _title = e.NameScope.Find<TextBlock>("Title");
-        _details = e.NameScope.Find<ContentPresenter>("Details");
-        _action = e.NameScope.Find<ArcButton>("Action");
-        _close = e.NameScope.Find<ArcButton>("Close");
+        _icon = e.NameScope.Find<ArcIcon>("PART_Icon");
+        _title = e.NameScope.Find<TextBlock>("PART_Title");
+        _details = e.NameScope.Find<ContentPresenter>("PART_Details");
+        _action = e.NameScope.Find<ArcButton>("PART_Action");
+        _close = e.NameScope.Find<ArcButton>("PART_Close");
 
         if (_close is not null)
         {
@@ -171,6 +188,8 @@ public sealed class ArcAlert : ContentControl
     private void Dismiss()
     {
         SetCurrentValue(IsOpenProperty, false);
+                var dismissedArgs = new ArcAlertDismissedEventArgs(DismissedEvent);
         Dismissed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(dismissedArgs);
     }
 }

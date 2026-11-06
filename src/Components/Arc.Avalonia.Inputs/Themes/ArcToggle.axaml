@@ -38,7 +38,7 @@
                 </Transitions>
               </Border.Transitions>
               <Panel>
-                <arc:ArcIcon x:Name="CheckGlyph"
+                <arc:ArcIcon x:Name="PART_CheckGlyph"
                              Icon="check"
                              Size="14"
                              StrokeWidth="2.2"
@@ -46,7 +46,7 @@
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"
                              IsVisible="False" />
-                <arc:ArcIcon x:Name="DashGlyph"
+                <arc:ArcIcon x:Name="PART_DashGlyph"
                              Icon="minus"
                              Size="14"
                              StrokeWidth="2.2"
@@ -115,7 +115,7 @@
                        VerticalAlignment="Center"
                        TextWrapping="Wrap"
                        IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
-            <Border x:Name="Track"
+            <Border x:Name="PART_Track"
                     Width="46"
                     Height="28"
                     CornerRadius="{DynamicResource ArcRadiusPill}"
@@ -126,7 +126,7 @@
                   <BrushTransition Property="Background" Duration="0:0:0.16" />
                 </Transitions>
               </Border.Transitions>
-              <Border x:Name="Thumb"
+              <Border x:Name="PART_Thumb"
                       Width="22"
                       Height="22"
                       CornerRadius="11"
@@ -186,7 +186,7 @@
           <TextBlock Text="{TemplateBinding Label}"
                      Classes="arc-label"
                      IsVisible="{TemplateBinding Label, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}" />
-          <StackPanel x:Name="Rows" Spacing="4" />
+          <StackPanel x:Name="PART_Rows" Spacing="4" />
         </StackPanel>
       </ControlTemplate>
     </Setter>

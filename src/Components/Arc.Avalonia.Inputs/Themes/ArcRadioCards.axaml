@@ -9,9 +9,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Panel x:Name="Host" />
-          <Canvas x:Name="RingHost" IsHitTestVisible="False">
-            <Border x:Name="Ring"
+          <Panel x:Name="PART_Host" />
+          <Canvas x:Name="PART_RingHost" IsHitTestVisible="False">
+            <Border x:Name="PART_Ring"
                     BorderBrush="{DynamicResource ArcAccent}"
                     BorderThickness="2"
                     CornerRadius="{DynamicResource ArcRadiusPanel}"

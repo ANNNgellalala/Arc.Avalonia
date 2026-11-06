@@ -21,7 +21,7 @@
                 ClipToBounds="True">
           <Panel>
             <c:ArcPanePanel x:Name="PART_Stage" />
-            <TextBlock x:Name="Status"
+            <TextBlock x:Name="PART_Status"
                        Height="0"
                        Opacity="0"
                        IsHitTestVisible="False"
@@ -32,3 +32,4 @@
     </Setter>
   </ControlTheme>
 </ResourceDictionary>
+

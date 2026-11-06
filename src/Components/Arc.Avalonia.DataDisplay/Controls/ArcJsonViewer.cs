@@ -6,6 +6,7 @@ using System.Text.Json;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -31,6 +32,7 @@ public enum ArcJsonValueType
 /// A collapsible JSON tree with type-coloured values, search that opens matching branches,
 /// paging for long arrays, and per-row copy of the value or path.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcJsonViewer : TemplatedControl
 {
     public static readonly StyledProperty<object?> DataProperty =

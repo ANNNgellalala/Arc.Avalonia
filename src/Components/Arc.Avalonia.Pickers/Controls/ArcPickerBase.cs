@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -12,6 +13,8 @@ namespace Arc.Avalonia.Pickers.Controls;
 /// Shared plumbing for the popup pickers: a field trigger, a floating panel that light-dismisses,
 /// Escape to close and focus returned to the field. The panel itself is declared in each template.
 /// </summary>
+[TemplatePart("PART_Trigger", typeof(Button))]
+[TemplatePart("PART_Popup", typeof(Popup))]
 public abstract class ArcPickerBase : TemplatedControl
 {
     public static readonly StyledProperty<bool> IsDropDownOpenProperty =

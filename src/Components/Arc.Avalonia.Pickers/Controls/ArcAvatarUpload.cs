@@ -18,6 +18,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -39,12 +40,20 @@ public enum ArcAvatarUploadStatus
 }
 
 /// <summary>Carries the square image produced by the cropper.</summary>
-public sealed class ArcAvatarCropEventArgs : EventArgs
+public sealed class ArcAvatarCropEventArgs : RoutedEventArgs
 {
+    public ArcAvatarCropEventArgs()
+    {
+    }
+
+    public ArcAvatarCropEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
     public ArcAvatarCropEventArgs(IImage image) => Image = image;
 
     /// <summary>The cropped square at <see cref="ArcAvatarUpload.OutputSize"/>.</summary>
-    public IImage Image { get; }
+    public IImage Image { get; init; } = null!;
 }
 
 /// <summary>
@@ -57,6 +66,33 @@ public sealed class ArcAvatarCropEventArgs : EventArgs
 /// buttons and the + / - keys; the zoom slider in the original is replaced by that pair of buttons. Recents,
 /// progress and errors are in-memory, and the cropper works on a square stage rather than a free crop.
 /// </summary>
+[TemplatePart("PART_AvatarButton", typeof(Button))]
+[TemplatePart("PART_AvatarBox", typeof(Grid))]
+[TemplatePart("PART_PhotoClip", typeof(Border))]
+[TemplatePart("PART_Photo", typeof(Image))]
+[TemplatePart("PART_InitialsHost", typeof(Border))]
+[TemplatePart("PART_Initials", typeof(TextBlock))]
+[TemplatePart("PART_Hover", typeof(Border))]
+[TemplatePart("PART_Drop", typeof(Border))]
+[TemplatePart("PART_Pending", typeof(Border))]
+[TemplatePart("PART_PendingPhoto", typeof(Image))]
+[TemplatePart("PART_Ring", typeof(ArcAvatarRing))]
+[TemplatePart("PART_Settle", typeof(Border))]
+[TemplatePart("PART_Check", typeof(Border))]
+[TemplatePart("PART_Label", typeof(TextBlock))]
+[TemplatePart("PART_Name", typeof(TextBlock))]
+[TemplatePart("PART_Hint", typeof(TextBlock))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
+[TemplatePart("PART_UploadButton", typeof(ArcButton))]
+[TemplatePart("PART_RemoveButton", typeof(ArcButton))]
+[TemplatePart("PART_RetryButton", typeof(ArcButton))]
+[TemplatePart("PART_CropPanel", typeof(Border))]
+[TemplatePart("PART_Crop", typeof(ArcAvatarCropSurface))]
+[TemplatePart("PART_ZoomValue", typeof(TextBlock))]
+[TemplatePart("PART_ZoomOut", typeof(Button))]
+[TemplatePart("PART_ZoomIn", typeof(Button))]
+[TemplatePart("PART_Save", typeof(ArcButton))]
+[TemplatePart("PART_Cancel", typeof(ArcButton))]
 public class ArcAvatarUpload : TemplatedControl
 {
     public static readonly StyledProperty<IImage?> SourceProperty =
@@ -283,6 +319,24 @@ public class ArcAvatarUpload : TemplatedControl
 
     /// <summary>Raised when the cropper resolves a square image, before the upload starts.</summary>
     public event EventHandler<ArcAvatarCropEventArgs>? CropConfirmed;
+
+    /// <summary>Bubbled copy of <see cref="CropConfirmed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAvatarCropEventArgs> CropConfirmedEvent =
+        RoutedEvent.Register<ArcAvatarUpload, ArcAvatarCropEventArgs>("CropConfirmed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="CropConfirmed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAvatarCropEventArgs>? CropConfirmedRouted
+    {
+        add => AddHandler(CropConfirmedEvent, value);
+        remove => RemoveHandler(CropConfirmedEvent, value);
+    }
+
+    private void RaiseCropConfirmed(IImage image)
+    {
+        var args = new ArcAvatarCropEventArgs(CropConfirmedEvent) { Image = image };
+        CropConfirmed?.Invoke(this, args);
+        RaiseEvent(args);
+    }
 
     /// <summary>Raised when the upload resolves, with the stored URL when the host returned one.</summary>
     public event EventHandler<string?>? Uploaded;
@@ -886,7 +940,7 @@ public class ArcAvatarUpload : TemplatedControl
         _pending = cropped;
         _cropOrigin = null;
         _crop.Image = null;
-        CropConfirmed?.Invoke(this, new ArcAvatarCropEventArgs(cropped));
+        RaiseCropConfirmed(cropped);
         _ = StartUploadAsync();
     }
 

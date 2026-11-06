@@ -5,6 +5,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media.Transformation;
@@ -25,6 +27,12 @@ public enum ArcDrawerSide
 /// A side sheet that keeps the page in view: it slides in from the chosen edge over the same dimmed
 /// backdrop as a dialog, with header and footer slots and the same Escape, backdrop and focus rules.
 /// </summary>
+[TemplatePart("PART_Backdrop", typeof(Border))]
+[TemplatePart("PART_Panel", typeof(Border))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_FooterHost", typeof(ContentPresenter))]
+[TemplatePart("PART_CloseButton", typeof(ArcButton))]
 public sealed class ArcDrawer : ContentControl
 {
     public static readonly StyledProperty<bool> IsOpenProperty =
@@ -71,6 +79,16 @@ public sealed class ArcDrawer : ContentControl
     }
 
     public event EventHandler? Closed;
+    /// <summary>Bubbled copy of <see cref="Closed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcDrawerClosedEventArgs> ClosedEvent =
+        RoutedEvent.Register<ArcDrawer, ArcDrawerClosedEventArgs>("Closed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Closed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcDrawerClosedEventArgs>? ClosedRouted
+    {
+        add => AddHandler(ClosedEvent, value);
+        remove => RemoveHandler(ClosedEvent, value);
+    }
 
     public bool IsOpen
     {
@@ -112,11 +130,11 @@ public sealed class ArcDrawer : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _backdrop = e.NameScope.Find<Border>("Backdrop");
-        _panel = e.NameScope.Find<Border>("Panel");
-        _title = e.NameScope.Find<TextBlock>("Title");
-        _description = e.NameScope.Find<TextBlock>("Description");
-        _footer = e.NameScope.Find<ContentPresenter>("FooterHost");
+        _backdrop = e.NameScope.Find<Border>("PART_Backdrop");
+        _panel = e.NameScope.Find<Border>("PART_Panel");
+        _title = e.NameScope.Find<TextBlock>("PART_Title");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
+        _footer = e.NameScope.Find<ContentPresenter>("PART_FooterHost");
 
         if (_backdrop is not null)
         {
@@ -130,7 +148,7 @@ public sealed class ArcDrawer : ContentControl
             };
         }
 
-        if (e.NameScope.Find<ArcButton>("CloseButton") is { } close)
+        if (e.NameScope.Find<ArcButton>("PART_CloseButton") is { } close)
         {
             close.Content = new ArcIcon { Icon = "x", Size = 15 };
             AutomationProperties.SetName(close, "Close drawer");
@@ -266,7 +284,9 @@ public sealed class ArcDrawer : ContentControl
             IsVisible = false;
             Opacity = 0;
             IsHitTestVisible = false;
-            Closed?.Invoke(this, EventArgs.Empty);
+                    var closedArgs = new ArcDrawerClosedEventArgs(ClosedEvent);
+        Closed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(closedArgs);
 
             if (_restoreFocus is { } restore)
             {

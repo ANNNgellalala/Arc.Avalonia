@@ -236,6 +236,19 @@ public class ArcRaceBarChart : ArcChartBase
             e.Pointer.Capture(this);
             ScrubTo(point.X);
             e.Handled = true;
+            return;
+        }
+
+        foreach (var hit in _barHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            RaiseItemClick(-1, hit.Entity, 0, point);
+            e.Handled = true;
+            return;
         }
     }
 
@@ -342,7 +355,7 @@ public class ArcRaceBarChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -377,7 +390,7 @@ public class ArcRaceBarChart : ArcChartBase
             FontWeight.Medium,
             maxWidth: Math.Max(60, Bounds.Width * 0.55));
 
-        var scalePen = new Pen(ChartPalette.BorderSubtle, 1);
+        var scalePen = new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline);
         var barWidth = Math.Max(40, _plot.Width - 46);
         for (var tick = 0; tick <= 3; tick++)
         {
@@ -391,7 +404,7 @@ public class ArcRaceBarChart : ArcChartBase
                     ChartFormat.Compact(value),
                     x,
                     _plot.Top - 8,
-                    11,
+                    ChartMetrics.CaptionFontSize,
                     ChartPalette.Muted,
                     alignment: tick == 3 ? TextAlignment.Right : TextAlignment.Center);
             }
@@ -411,13 +424,13 @@ public class ArcRaceBarChart : ArcChartBase
             var brush = _hoverIndex >= 0 && !hovered ? ChartPalette.Alpha(barBrush, 0.55) : barBrush;
             context.DrawRectangle(brush, null, new RoundedRect(rect, Math.Min(5, height / 2)));
 
-            var valueText = ChartText.Create(FormatValue(row.Value), 12, ChartPalette.Foreground, FontWeight.Medium);
+            var valueText = ChartText.Create(FormatValue(row.Value), ChartMetrics.LabelFontSize, ChartPalette.Foreground, FontWeight.Medium);
             var natural = ChartText.Width(row.Entity, 12, FontWeight.Medium);
             if (natural <= width - 18)
             {
                 var inside = ChartText.Create(
                     row.Entity,
-                    12,
+                    ChartMetrics.CaptionFontSize,
                     AdvancedChartInk.OnFill(brush),
                     FontWeight.Medium,
                     Math.Max(20, width - 18));
@@ -429,7 +442,7 @@ public class ArcRaceBarChart : ArcChartBase
             {
                 var outside = ChartText.Create(
                     row.Entity,
-                    12,
+                    ChartMetrics.CaptionFontSize,
                     ChartPalette.Foreground,
                     FontWeight.Medium,
                     Math.Max(24, barWidth - width - valueText.Width - 22));
@@ -478,7 +491,7 @@ public class ArcRaceBarChart : ArcChartBase
         _playRect = new Rect(6, Bounds.Height - 32, 28, 28);
         context.DrawEllipse(
             _playHover ? ChartPalette.Alpha(ChartPalette.BorderSubtle, 0.9) : ChartPalette.Surface,
-            new Pen(ChartPalette.Border, 1),
+            new Pen(ChartPalette.Border, ChartMetrics.Hairline),
             _playRect.Center,
             13,
             13);

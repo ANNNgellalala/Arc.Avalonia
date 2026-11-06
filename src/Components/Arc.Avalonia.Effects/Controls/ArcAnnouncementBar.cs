@@ -12,6 +12,7 @@ using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -21,6 +22,15 @@ namespace Arc.Avalonia.Effects.Controls;
 /// interval as a ring around the pause button; Avalonia has no ring token, so the same time is shown as
 /// a thin line under the bar.
 /// </summary>
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_ControlHost", typeof(StackPanel))]
+[TemplatePart("PART_PrevButton", typeof(ArcButton))]
+[TemplatePart("PART_PauseButton", typeof(ArcButton))]
+[TemplatePart("PART_NextButton", typeof(ArcButton))]
+[TemplatePart("PART_MessageHost", typeof(Panel))]
+[TemplatePart("PART_DismissButton", typeof(ArcButton))]
+[TemplatePart("PART_ProgressTrack", typeof(Border))]
+[TemplatePart("PART_ProgressFill", typeof(Border))]
 public class ArcAnnouncementBar : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<ArcAnnouncement>?> MessagesProperty =
@@ -107,7 +117,41 @@ public class ArcAnnouncementBar : TemplatedControl
 
     public event EventHandler<bool>? OpenChanged;
 
+    /// <summary>Bubbled copy of <see cref="OpenChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAnnouncementBarOpenChangedEventArgs> OpenChangedEvent =
+        RoutedEvent.Register<ArcAnnouncementBar, ArcAnnouncementBarOpenChangedEventArgs>("OpenChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="OpenChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAnnouncementBarOpenChangedEventArgs>? OpenChangedRouted
+    {
+        add => AddHandler(OpenChangedEvent, value);
+        remove => RemoveHandler(OpenChangedEvent, value);
+    }
+
+    private void RaiseOpenChanged(bool isOpen)
+    {
+        OpenChanged?.Invoke(this, isOpen);
+        RaiseEvent(new ArcAnnouncementBarOpenChangedEventArgs(OpenChangedEvent) { IsOpen = isOpen });
+    }
+
     public event EventHandler<int>? IndexChanged;
+
+    /// <summary>Bubbled copy of <see cref="IndexChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAnnouncementBarIndexChangedEventArgs> IndexChangedEvent =
+        RoutedEvent.Register<ArcAnnouncementBar, ArcAnnouncementBarIndexChangedEventArgs>("IndexChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="IndexChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAnnouncementBarIndexChangedEventArgs>? IndexChangedRouted
+    {
+        add => AddHandler(IndexChangedEvent, value);
+        remove => RemoveHandler(IndexChangedEvent, value);
+    }
+
+    private void RaiseIndexChanged(int index)
+    {
+        IndexChanged?.Invoke(this, index);
+        RaiseEvent(new ArcAnnouncementBarIndexChangedEventArgs(IndexChangedEvent) { Index = index });
+    }
 
     public event EventHandler<ArcAnnouncement>? ActionInvoked;
 
@@ -186,15 +230,15 @@ public class ArcAnnouncementBar : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _root = e.NameScope.Find<Border>("Root");
-        _controlHost = e.NameScope.Find<StackPanel>("ControlHost");
-        _prev = e.NameScope.Find<ArcButton>("PrevButton");
-        _pause = e.NameScope.Find<ArcButton>("PauseButton");
-        _next = e.NameScope.Find<ArcButton>("NextButton");
-        _messageHost = e.NameScope.Find<Panel>("MessageHost");
-        _dismiss = e.NameScope.Find<ArcButton>("DismissButton");
-        _progressTrack = e.NameScope.Find<Border>("ProgressTrack");
-        _progressFill = e.NameScope.Find<Border>("ProgressFill");
+        _root = e.NameScope.Find<Border>("PART_Root");
+        _controlHost = e.NameScope.Find<StackPanel>("PART_ControlHost");
+        _prev = e.NameScope.Find<ArcButton>("PART_PrevButton");
+        _pause = e.NameScope.Find<ArcButton>("PART_PauseButton");
+        _next = e.NameScope.Find<ArcButton>("PART_NextButton");
+        _messageHost = e.NameScope.Find<Panel>("PART_MessageHost");
+        _dismiss = e.NameScope.Find<ArcButton>("PART_DismissButton");
+        _progressTrack = e.NameScope.Find<Border>("PART_ProgressTrack");
+        _progressFill = e.NameScope.Find<Border>("PART_ProgressFill");
 
         _iconButtons.Clear();
         foreach (var button in new[] { _prev, _pause, _next, _dismiss })
@@ -291,7 +335,7 @@ public class ArcAnnouncementBar : TemplatedControl
 
         var index = ((Index + delta) % count + count) % count;
         SetCurrentValue(IndexProperty, index);
-        IndexChanged?.Invoke(this, index);
+        RaiseIndexChanged(index);
         RestartRotation();
     }
 
@@ -344,7 +388,7 @@ public class ArcAnnouncementBar : TemplatedControl
         if (_lastOpen != Open)
         {
             _lastOpen = Open;
-            OpenChanged?.Invoke(this, Open);
+            RaiseOpenChanged(Open);
         }
     }
 
@@ -761,7 +805,7 @@ public class ArcAnnouncementBar : TemplatedControl
 
         var next = (Index + 1) % count;
         SetCurrentValue(IndexProperty, next);
-        IndexChanged?.Invoke(this, next);
+        RaiseIndexChanged(next);
         RestartRotation();
     }
 }

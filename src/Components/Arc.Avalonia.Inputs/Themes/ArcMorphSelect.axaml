@@ -12,9 +12,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="6">
-          <TextBlock x:Name="LabelText" Classes="arc-label" />
+          <TextBlock x:Name="PART_LabelText" Classes="arc-label" />
           <Panel ClipToBounds="False" Height="44">
-            <Border x:Name="Surface"
+            <Border x:Name="PART_Surface"
                     Width="240"
                     Height="44"
                     HorizontalAlignment="Left"
@@ -31,8 +31,8 @@
                 </Transitions>
               </Border.Transitions>
               <Grid RowDefinitions="44,*">
-                <Grid x:Name="TriggerRow" ColumnDefinitions="*,Auto">
-                  <TextBlock x:Name="ValueText"
+                <Grid x:Name="PART_TriggerRow" ColumnDefinitions="*,Auto">
+                  <TextBlock x:Name="PART_ValueText"
                              Margin="14,0,8,0"
                              FontSize="{TemplateBinding FontSize}"
                              Foreground="{DynamicResource ArcForeground}"
@@ -54,7 +54,7 @@
                            VerticalAlignment="Center"
                            VerticalContentAlignment="Center"
                            IsVisible="False" />
-                  <arc:ArcIcon x:Name="Chevron"
+                  <arc:ArcIcon x:Name="PART_Chevron"
                                Grid.Column="1"
                                Icon="chevron-down"
                                Size="14"
@@ -62,12 +62,12 @@
                                Foreground="{DynamicResource ArcTextMuted}"
                                VerticalAlignment="Center" />
                 </Grid>
-                <Panel x:Name="ListHost" Grid.Row="1" IsVisible="False">
-                  <ScrollViewer x:Name="Scroller"
+                <Panel x:Name="PART_ListHost" Grid.Row="1" IsVisible="False">
+                  <ScrollViewer x:Name="PART_Scroller"
                                 HorizontalScrollBarVisibility="Disabled"
                                 VerticalScrollBarVisibility="Auto">
-                    <Panel x:Name="OptionsHost" Margin="0,2,0,6">
-                      <Border x:Name="Highlight"
+                    <Panel x:Name="PART_OptionsHost" Margin="0,2,0,6">
+                      <Border x:Name="PART_Highlight"
                               Height="36"
                               Margin="4,0,4,0"
                               VerticalAlignment="Top"
@@ -76,7 +76,7 @@
                               CornerRadius="10"
                               IsHitTestVisible="False"
                               IsVisible="False" />
-                      <StackPanel x:Name="Options" />
+                      <StackPanel x:Name="PART_Options" />
                     </Panel>
                   </ScrollViewer>
                 </Panel>

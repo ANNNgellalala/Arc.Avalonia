@@ -6,6 +6,8 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -36,6 +38,9 @@ public sealed class ArcReorderItem
 /// with the arrow keys. Neighbouring rows travel with a FLIP transform on the morph spring, and
 /// Space lift / Space drop / Escape cancel give keyboard users the same model without a drag.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
+[TemplatePart("PART_Rows", typeof(StackPanel))]
+[TemplatePart("PART_Live", typeof(TextBlock))]
 public class ArcReorderableList : TemplatedControl
 {
     private const double RowHeight = 64;
@@ -98,6 +103,16 @@ public class ArcReorderableList : TemplatedControl
     }
 
     /// <summary>Raised with the new order after a drag, an arrow move, or a keyboard drop.</summary>
+    public static readonly RoutedEvent<ArcReorderOrderChangedRoutedEventArgs> OrderChangedEvent =
+        RoutedEvent.Register<ArcReorderableList, ArcReorderOrderChangedRoutedEventArgs>("OrderChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="OrderChanged"/>.</summary>
+    public event EventHandler<ArcReorderOrderChangedRoutedEventArgs>? OrderChangedRouted
+    {
+        add => AddHandler(OrderChangedEvent, value);
+        remove => RemoveHandler(OrderChangedEvent, value);
+    }
+
     public event EventHandler<IReadOnlyList<ArcReorderItem>>? OrderChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -493,7 +508,9 @@ public class ArcReorderableList : TemplatedControl
         Announce($"{moved.Title} moved to position {to + 1} of {_items.Count}");
         if (raise)
         {
-            OrderChanged?.Invoke(this, _items.ToList());
+            var order = _items.ToList();
+        OrderChanged?.Invoke(this, order);
+        RaiseEvent(new ArcReorderOrderChangedRoutedEventArgs(OrderChangedEvent, order));
         }
     }
 
@@ -549,7 +566,9 @@ public class ArcReorderableList : TemplatedControl
                 AutomationProperties.SetHelpText(row.Handle, null);
                 _pendingFocusId = id;
                 Build(animate: false, null);
-                OrderChanged?.Invoke(this, _items.ToList());
+                var order = _items.ToList();
+        OrderChanged?.Invoke(this, order);
+        RaiseEvent(new ArcReorderOrderChangedRoutedEventArgs(OrderChangedEvent, order));
                 Announce($"{row.Item.Title} dropped at position {index + 1} of {_items.Count}");
             }
 
@@ -603,3 +622,7 @@ public class ArcReorderableList : TemplatedControl
     private static TransformOperations Translate(double y) =>
         TransformOperations.Parse(string.Create(CultureInfo.InvariantCulture, $"translateY({y}px)"));
 }
+
+
+
+

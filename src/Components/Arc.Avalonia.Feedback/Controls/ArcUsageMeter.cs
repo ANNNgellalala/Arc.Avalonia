@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -28,6 +29,7 @@ public sealed class ArcUsageSegment
 /// An allowance bar: used categories against a fixed limit, the free remainder, a percentage,
 /// threshold tones, and a caption such as "8.4k of 10k requests".
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcUsageMeter : TemplatedControl
 {
     public static readonly StyledProperty<string> LabelProperty =

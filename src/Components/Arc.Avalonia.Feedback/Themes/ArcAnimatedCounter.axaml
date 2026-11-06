@@ -8,24 +8,24 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="2">
-          <TextBlock x:Name="LabelText"
+          <TextBlock x:Name="PART_LabelText"
                      Classes="arc-caption"
                      IsVisible="False" />
           <StackPanel Orientation="Horizontal" Spacing="0">
-            <TextBlock x:Name="PrefixText"
+            <TextBlock x:Name="PART_PrefixText"
                        FontSize="{DynamicResource ArcTextLg}"
                        FontWeight="Medium"
                        Foreground="{DynamicResource ArcTextSecondary}"
                        Margin="0,0,2,4"
                        VerticalAlignment="Bottom" />
-            <TextBlock x:Name="ValueText"
+            <TextBlock x:Name="PART_ValueText"
                        FontFamily="{DynamicResource ArcFontDisplay}"
                        FontSize="{DynamicResource ArcText3xl}"
                        FontWeight="Medium"
                        LetterSpacing="-1"
                        LineHeight="40"
                        VerticalAlignment="Bottom" />
-            <TextBlock x:Name="SuffixText"
+            <TextBlock x:Name="PART_SuffixText"
                        FontSize="{DynamicResource ArcTextLg}"
                        FontWeight="Medium"
                        Foreground="{DynamicResource ArcTextSecondary}"

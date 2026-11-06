@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -12,6 +13,11 @@ namespace Arc.Avalonia.Pickers.Controls;
 /// Arc's date picker: a field that opens a calendar in a floating panel and shows the formatted date.
 /// Typed keys stay in the calendar; Enter opens the panel, Escape closes it.
 /// </summary>
+[TemplatePart("PART_Value", typeof(TextBlock))]
+[TemplatePart("PART_Label", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_Clear", typeof(Button))]
+[TemplatePart("PART_Calendar", typeof(ArcCalendar))]
 public class ArcDatePicker : ArcPickerBase
 {
     public static readonly StyledProperty<DateTime?> SelectedDateProperty =
@@ -93,6 +99,23 @@ public class ArcDatePicker : ArcPickerBase
 
     /// <summary>Raised on a pick and with null from the Clear action.</summary>
     public event EventHandler<DateTime?>? SelectedDateChanged;
+
+    /// <summary>Bubbled copy of <see cref="SelectedDateChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcDatePickerSelectedEventArgs> SelectedDateChangedEvent =
+        RoutedEvent.Register<ArcDatePicker, ArcDatePickerSelectedEventArgs>("SelectedDateChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="SelectedDateChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcDatePickerSelectedEventArgs>? SelectedDateChangedRouted
+    {
+        add => AddHandler(SelectedDateChangedEvent, value);
+        remove => RemoveHandler(SelectedDateChangedEvent, value);
+    }
+
+    private void RaiseSelectedDateChanged(DateTime? date)
+    {
+        SelectedDateChanged?.Invoke(this, date);
+        RaiseEvent(new ArcDatePickerSelectedEventArgs(SelectedDateChangedEvent) { Date = date });
+    }
 
     protected override string AccessibleRole => "Date";
 
@@ -223,7 +246,7 @@ public class ArcDatePicker : ArcPickerBase
         try
         {
             SelectedDate = date;
-            SelectedDateChanged?.Invoke(this, date);
+            RaiseSelectedDateChanged(date);
         }
         finally
         {
@@ -237,7 +260,7 @@ public class ArcDatePicker : ArcPickerBase
     private void OnClearClick(object? sender, RoutedEventArgs e)
     {
         SelectedDate = null;
-        SelectedDateChanged?.Invoke(this, null);
+        RaiseSelectedDateChanged(null);
         OnContentChanged();
         TriggerPart?.Focus();
         e.Handled = true;

@@ -4,8 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -42,6 +44,18 @@ public sealed class ArcStep
 /// Position in a multi-step flow: completed, current, upcoming, with an error state and optional
 /// navigation back to completed steps. Arrow keys move the roving focus, Enter selects.
 /// </summary>
+
+    /// <summary>Event data for the bubbling <see cref="StepSelectedRouted"/> event.</summary>
+    public sealed class ArcStepperStepSelectedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcStepperStepSelectedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+        /// <summary>The value carried by the event.</summary>
+        public int Index { get; init; }
+    }
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcStepper : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcStep>?> StepsProperty =
@@ -138,6 +152,22 @@ public class ArcStepper : TemplatedControl
 
     /// <summary>Called with the index of a completed step when it is chosen.</summary>
     public event EventHandler<int>? StepSelected;
+    /// <summary>Bubbling routed counterpart of <see cref="StepSelected"/>.</summary>
+    public static readonly RoutedEvent<ArcStepperStepSelectedEventArgs> StepSelectedEvent =
+        RoutedEvent.Register<ArcStepper, ArcStepperStepSelectedEventArgs>("StepSelected", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcStepperStepSelectedEventArgs"/> version of <see cref="StepSelected"/>.</summary>
+    public event EventHandler<ArcStepperStepSelectedEventArgs>? StepSelectedRouted
+    {
+        add => AddHandler(StepSelectedEvent, value);
+        remove => RemoveHandler(StepSelectedEvent, value);
+    }
+
+    private void RaiseStepSelected(int index)
+    {
+        StepSelected?.Invoke(this, index);
+        RaiseEvent(new ArcStepperStepSelectedEventArgs(StepSelectedEvent) { Index = index });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -184,7 +214,7 @@ public class ArcStepper : TemplatedControl
             case Key.Space:
                 if (_focusIndex < Current && StepSelected is not null)
                 {
-                    StepSelected.Invoke(this, _focusIndex);
+                    RaiseStepSelected(_focusIndex);
                     e.Handled = true;
                 }
 
@@ -376,7 +406,7 @@ public class ArcStepper : TemplatedControl
             UpdateFocusVisuals();
             if (stepIndex < Current && StepSelected is not null)
             {
-                StepSelected.Invoke(this, stepIndex);
+                RaiseStepSelected(stepIndex);
             }
 
             args.Handled = true;
@@ -449,7 +479,7 @@ public class ArcStepper : TemplatedControl
                 UpdateFocusVisuals();
                 if (index < Current && StepSelected is not null)
                 {
-                    StepSelected.Invoke(this, index);
+                    RaiseStepSelected(index);
                 }
 
                 args.Handled = true;

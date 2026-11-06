@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -41,6 +42,14 @@ public sealed class ArcSelectOption
 /// A compact single choice field: trigger plus a floating list with one highlight that glides to the
 /// selected row. Enter, Space and ArrowDown open; arrows move; Escape closes without changing value.
 /// </summary>
+[TemplatePart("PART_Trigger", typeof(Border))]
+[TemplatePart("PART_ValueText", typeof(TextBlock))]
+[TemplatePart("PART_Chevron", typeof(ArcIcon))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_MenuPopup", typeof(Popup))]
+[TemplatePart("PART_MenuSurface", typeof(Border))]
+[TemplatePart("PART_Highlight", typeof(Border))]
+[TemplatePart("PART_Menu", typeof(ListBox))]
 public class ArcSelect : ArcFieldBase
 {
     public static readonly StyledProperty<IReadOnlyList<ArcSelectOption>?> OptionsProperty =
@@ -120,16 +129,16 @@ public class ArcSelect : ArcFieldBase
             _trigger.PointerPressed -= OnTriggerPressed;
         }
 
-        _trigger = e.NameScope.Find<Border>("Trigger");
-        _valueText = e.NameScope.Find<TextBlock>("ValueText");
-        _chevron = e.NameScope.Find<ArcIcon>("Chevron");
+        _trigger = e.NameScope.Find<Border>("PART_Trigger");
+        _valueText = e.NameScope.Find<TextBlock>("PART_ValueText");
+        _chevron = e.NameScope.Find<ArcIcon>("PART_Chevron");
         _chevronTransform = _chevron?.RenderTransform as RotateTransform;
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _popup = e.NameScope.Find<Popup>("MenuPopup");
-        _surface = e.NameScope.Find<Border>("MenuSurface");
-        _highlight = e.NameScope.Find<Border>("Highlight");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _popup = e.NameScope.Find<Popup>("PART_MenuPopup");
+        _surface = e.NameScope.Find<Border>("PART_MenuSurface");
+        _highlight = e.NameScope.Find<Border>("PART_Highlight");
         _highlightTransform = _highlight?.RenderTransform as TranslateTransform;
-        _menu = e.NameScope.Find<ListBox>("Menu");
+        _menu = e.NameScope.Find<ListBox>("PART_Menu");
 
         if (_trigger is not null)
         {

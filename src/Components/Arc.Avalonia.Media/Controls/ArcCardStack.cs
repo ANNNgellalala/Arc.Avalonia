@@ -4,6 +4,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -20,6 +22,14 @@ namespace Arc.Avalonia.Media.Controls;
 /// arrow keys. The cards underneath rise as the deck shrinks, a decision can be undone, and the end of
 /// the deck offers a reset.
 /// </summary>
+[TemplatePart("PART_CardLayer", typeof(Grid))]
+[TemplatePart("PART_Stage", typeof(Border))]
+[TemplatePart("PART_Empty", typeof(StackPanel))]
+[TemplatePart("PART_Undo", typeof(ArcButton))]
+[TemplatePart("PART_Left", typeof(ArcButton))]
+[TemplatePart("PART_Right", typeof(ArcButton))]
+[TemplatePart("PART_Reset", typeof(ArcButton))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcCardStack : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcCardStackItem>?> CardsProperty =
@@ -155,25 +165,55 @@ public class ArcCardStack : TemplatedControl
     }
 
     /// <summary>Raised when a card leaves the deck, by drag, button or key.</summary>
+    public static readonly RoutedEvent<ArcCardDismissedRoutedEventArgs> CardDismissedEvent =
+        RoutedEvent.Register<ArcCardStack, ArcCardDismissedRoutedEventArgs>("CardDismissed", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CardDismissed"/>.</summary>
+    public event EventHandler<ArcCardDismissedRoutedEventArgs>? CardDismissedRouted
+    {
+        add => AddHandler(CardDismissedEvent, value);
+        remove => RemoveHandler(CardDismissedEvent, value);
+    }
+
     public event EventHandler<ArcCardDecisionEventArgs>? CardDismissed;
 
     /// <summary>Raised when the last decision is undone.</summary>
+    public static readonly RoutedEvent<ArcCardUndoneRoutedEventArgs> CardUndoneEvent =
+        RoutedEvent.Register<ArcCardStack, ArcCardUndoneRoutedEventArgs>("CardUndone", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CardUndone"/>.</summary>
+    public event EventHandler<ArcCardUndoneRoutedEventArgs>? CardUndoneRouted
+    {
+        add => AddHandler(CardUndoneEvent, value);
+        remove => RemoveHandler(CardUndoneEvent, value);
+    }
+
     public event EventHandler<ArcCardDecisionEventArgs>? CardUndone;
 
     /// <summary>Raised when every card comes back.</summary>
+    public static readonly RoutedEvent<ArcStackResetRoutedEventArgs> StackResetEvent =
+        RoutedEvent.Register<ArcCardStack, ArcStackResetRoutedEventArgs>("StackReset", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="StackReset"/>.</summary>
+    public event EventHandler<ArcStackResetRoutedEventArgs>? StackResetRouted
+    {
+        add => AddHandler(StackResetEvent, value);
+        remove => RemoveHandler(StackResetEvent, value);
+    }
+
     public event EventHandler? StackReset;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
         _layer = e.NameScope.Find<Grid>("PART_CardLayer");
-        _stage = e.NameScope.Find<Border>("Stage");
+        _stage = e.NameScope.Find<Border>("PART_Stage");
         _empty = e.NameScope.Find<StackPanel>("PART_Empty");
         _undo = e.NameScope.Find<ArcButton>("PART_Undo");
         _left = e.NameScope.Find<ArcButton>("PART_Left");
         _right = e.NameScope.Find<ArcButton>("PART_Right");
         _reset = e.NameScope.Find<ArcButton>("PART_Reset");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
 
         if (_undo is not null)
         {
@@ -536,6 +576,7 @@ public class ArcCardStack : TemplatedControl
 
         Rebuild(animateIn: false);
         CardDismissed?.Invoke(this, new ArcCardDecisionEventArgs(item, decision));
+        RaiseEvent(new ArcCardDismissedRoutedEventArgs(CardDismissedEvent, item, decision));
     }
 
     /// <summary>Reverses the last decision and brings that card back.</summary>
@@ -561,6 +602,7 @@ public class ArcCardStack : TemplatedControl
 
         Rebuild(animateIn: true, entrance: last.Decision);
         CardUndone?.Invoke(this, new ArcCardDecisionEventArgs(last.Item, last.Decision));
+        RaiseEvent(new ArcCardUndoneRoutedEventArgs(CardUndoneEvent, last.Item, last.Decision));
     }
 
     /// <summary>Brings every card back and clears the decisions.</summary>
@@ -580,6 +622,7 @@ public class ArcCardStack : TemplatedControl
 
         Rebuild(animateIn: true, entrance: ArcCardDecision.None);
         StackReset?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcStackResetRoutedEventArgs(StackResetEvent));
     }
 
     private void AnnounceCurrent()
@@ -743,5 +786,8 @@ public class ArcCardStack : TemplatedControl
         }
     }
 }
+
+
+
 
 

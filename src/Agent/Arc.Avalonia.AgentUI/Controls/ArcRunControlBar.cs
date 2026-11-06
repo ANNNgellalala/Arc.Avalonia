@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -110,21 +111,71 @@ public class ArcRunControlBar : Panel
     }
 
     /// <summary>Raised when the user confirms stopping the whole run immediately.</summary>
+    public static readonly RoutedEvent<ArcAgentRunStopRoutedEventArgs> StopRequestedEvent =
+        RoutedEvent.Register<ArcRunControlBar, ArcAgentRunStopRoutedEventArgs>("StopRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="StopRequested"/>.</summary>
+    public event EventHandler<ArcAgentRunStopRoutedEventArgs>? StopRequestedRouted
+    {
+        add => AddHandler(StopRequestedEvent, value);
+        remove => RemoveHandler(StopRequestedEvent, value);
+    }
+
     public event EventHandler? StopRequested;
 
     /// <summary>Raised when the user wants to stop after the current step completes.</summary>
     public event EventHandler? StopAfterStepRequested;
 
     /// <summary>Raised when the user pauses the run; the host changes <see cref="Status"/>.</summary>
+    public static readonly RoutedEvent<ArcAgentRunPauseRoutedEventArgs> PauseRequestedEvent =
+        RoutedEvent.Register<ArcRunControlBar, ArcAgentRunPauseRoutedEventArgs>("PauseRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="PauseRequested"/>.</summary>
+    public event EventHandler<ArcAgentRunPauseRoutedEventArgs>? PauseRequestedRouted
+    {
+        add => AddHandler(PauseRequestedEvent, value);
+        remove => RemoveHandler(PauseRequestedEvent, value);
+    }
+
     public event EventHandler? PauseRequested;
 
     /// <summary>Raised when the user resumes a paused or taken-over run; the host changes <see cref="Status"/>.</summary>
+    public static readonly RoutedEvent<ArcAgentRunResumeRoutedEventArgs> ResumeRequestedEvent =
+        RoutedEvent.Register<ArcRunControlBar, ArcAgentRunResumeRoutedEventArgs>("ResumeRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ResumeRequested"/>.</summary>
+    public event EventHandler<ArcAgentRunResumeRoutedEventArgs>? ResumeRequestedRouted
+    {
+        add => AddHandler(ResumeRequestedEvent, value);
+        remove => RemoveHandler(ResumeRequestedEvent, value);
+    }
+
     public event EventHandler? ResumeRequested;
 
     /// <summary>Raised with the new instruction the user wants to insert into the running plan.</summary>
+    public static readonly RoutedEvent<ArcAgentRunSteerRoutedEventArgs> SteerRequestedEvent =
+        RoutedEvent.Register<ArcRunControlBar, ArcAgentRunSteerRoutedEventArgs>("SteerRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SteerRequested"/>.</summary>
+    public event EventHandler<ArcAgentRunSteerRoutedEventArgs>? SteerRequestedRouted
+    {
+        add => AddHandler(SteerRequestedEvent, value);
+        remove => RemoveHandler(SteerRequestedEvent, value);
+    }
+
     public event EventHandler<string>? SteerRequested;
 
     /// <summary>Raised when the user takes over the run from the agent.</summary>
+    public static readonly RoutedEvent<ArcAgentRunTakeoverRoutedEventArgs> TakeoverRequestedEvent =
+        RoutedEvent.Register<ArcRunControlBar, ArcAgentRunTakeoverRoutedEventArgs>("TakeoverRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="TakeoverRequested"/>.</summary>
+    public event EventHandler<ArcAgentRunTakeoverRoutedEventArgs>? TakeoverRequestedRouted
+    {
+        add => AddHandler(TakeoverRequestedEvent, value);
+        remove => RemoveHandler(TakeoverRequestedEvent, value);
+    }
+
     public event EventHandler? TakeoverRequested;
 
     private void Rebuild()
@@ -269,10 +320,12 @@ public class ArcRunControlBar : Panel
                 if (Status == ArcRunBarStatus.Running)
                 {
                     PauseRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunPauseRoutedEventArgs(PauseRequestedEvent));
                 }
                 else
                 {
                     ResumeRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunResumeRoutedEventArgs(ResumeRequestedEvent));
                 }
             };
             actions.Children.Add(pause);
@@ -283,6 +336,7 @@ public class ArcRunControlBar : Panel
             handBack.Margin = new Thickness(0, 0, 6, 0);
             ArcUi.Name(handBack, "Hand the run back to the agent");
             handBack.Click += (_, _) => ResumeRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunResumeRoutedEventArgs(ResumeRequestedEvent));
             actions.Children.Add(handBack);
         }
 
@@ -315,6 +369,7 @@ public class ArcRunControlBar : Panel
             ArcUi.Name(takeover, "Take over the run from the agent");
             takeover.IsEnabled = Status != ArcRunBarStatus.TakenOver;
             takeover.Click += (_, _) => TakeoverRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunTakeoverRoutedEventArgs(TakeoverRequestedEvent));
             actions.Children.Add(takeover);
 
             var stop = ArcUi.Button(_confirmStop ? "Confirm stop" : "Stop", ArcButtonVariant.Danger, ArcButtonSize.Sm, "square");
@@ -325,6 +380,7 @@ public class ArcRunControlBar : Panel
                 {
                     _confirmStop = false;
                     StopRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunStopRoutedEventArgs(StopRequestedEvent));
                     Rebuild();
                 }
                 else
@@ -373,6 +429,7 @@ public class ArcRunControlBar : Panel
 
             _steering = false;
             SteerRequested?.Invoke(this, text);
+            RaiseEvent(new ArcAgentRunSteerRoutedEventArgs(SteerRequestedEvent, text));
             Rebuild();
         };
         Grid.SetColumn(send, 1);
@@ -438,6 +495,7 @@ public class ArcRunControlBar : Panel
         {
             _confirmStop = false;
             StopRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new ArcAgentRunStopRoutedEventArgs(StopRequestedEvent));
             Rebuild();
         };
         buttons.Children.Add(confirm);
@@ -484,3 +542,5 @@ public class ArcRunControlBar : Panel
             : string.Format(CultureInfo.InvariantCulture, "{0}m {1}s", minutes, rest);
     }
 }
+
+

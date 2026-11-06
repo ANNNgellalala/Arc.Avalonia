@@ -5,6 +5,7 @@ using Avalonia.VisualTree;
 using Avalonia.Automation;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -18,6 +19,8 @@ namespace Arc.Avalonia.Overlays.Controls;
 /// outside press or Escape, returning focus to where it started. Non-modal by design, so the rest of the
 /// page stays usable while it is open.
 /// </summary>
+[TemplatePart("PART_TriggerHost", typeof(ContentPresenter))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcPopover : ContentControl
 {
     public static readonly StyledProperty<object?> TriggerProperty =
@@ -83,8 +86,8 @@ public sealed class ArcPopover : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _triggerHost = e.NameScope.Find<ContentPresenter>("TriggerHost");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _triggerHost = e.NameScope.Find<ContentPresenter>("PART_TriggerHost");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
         UpdateTrigger();
         Sync();
     }

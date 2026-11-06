@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -14,6 +15,13 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A bounded number with stepper buttons, hold-to-repeat, arrow-key stepping and a limit hint beside
 /// the label. Typing is parsed on Enter or blur and always clamped to the range.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_LimitHint", typeof(TextBlock))]
+[TemplatePart("PART_PrefixText", typeof(TextBlock))]
+[TemplatePart("PART_SuffixText", typeof(TextBlock))]
+[TemplatePart("PART_IncreaseAction", typeof(Button))]
+[TemplatePart("PART_DecreaseAction", typeof(Button))]
 public class ArcNumberField : ArcFieldBase
 {
     public static readonly StyledProperty<double> ValueProperty =
@@ -130,12 +138,12 @@ public class ArcNumberField : ArcFieldBase
         }
 
         _input = e.NameScope.Find<TextBox>("PART_Input");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _hint = e.NameScope.Find<TextBlock>("LimitHint");
-        _prefix = e.NameScope.Find<TextBlock>("PrefixText");
-        _suffix = e.NameScope.Find<TextBlock>("SuffixText");
-        _increase = e.NameScope.Find<Button>("IncreaseAction");
-        _decrease = e.NameScope.Find<Button>("DecreaseAction");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _hint = e.NameScope.Find<TextBlock>("PART_LimitHint");
+        _prefix = e.NameScope.Find<TextBlock>("PART_PrefixText");
+        _suffix = e.NameScope.Find<TextBlock>("PART_SuffixText");
+        _increase = e.NameScope.Find<Button>("PART_IncreaseAction");
+        _decrease = e.NameScope.Find<Button>("PART_DecreaseAction");
 
         if (_input is not null)
         {

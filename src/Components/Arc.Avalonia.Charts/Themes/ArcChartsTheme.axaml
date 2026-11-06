@@ -1,10 +1,185 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:charts="using:Arc.Avalonia.Charts.Controls">
+
+  <!--
+    M2-G3a-6 chart theme.
+
+    All 20 self-drawn chart controls are plain Control subclasses that paint themselves with
+    DrawingContext, so there is no template and no PART_* contract ([TemplatePart] / OnApplyTemplate do
+    not apply; see Core/ArcChartBase.Contract.cs). This ControlTheme layer is the themeable surface
+    instead: every chart gets a ControlTheme keyed by {x:Type ...} whose setters reference Arc tokens
+    only (R4: no external theme sources, R6: no literal colours).
+
+    Colours, fonts, stroke weights and radii used while drawing resolve from ArcTokens through
+    ChartPalette/ChartMetrics, so light/dark and all 8 accents restyle every chart at render time;
+    the setters here let a host restyle one chart or override the family defaults.
+    ArcChartCard is intentionally absent: it overrides StyleKeyOverride to ArcCard and inherits that
+    control theme.
+  -->
   <Styles.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <!-- Component ControlThemes for this project are merged here. -->
-      </ResourceDictionary.MergedDictionaries>
+
+      <ControlTheme x:Key="{x:Type charts:ArcBarChart}" TargetType="charts:ArcBarChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcBrushChart}" TargetType="charts:ArcBrushChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcChartActivityHeatmap}" TargetType="charts:ArcChartActivityHeatmap">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcChartAnimatedCounter}" TargetType="charts:ArcChartAnimatedCounter">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcDonutChart}" TargetType="charts:ArcDonutChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcFunnelChart}" TargetType="charts:ArcFunnelChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcGauge}" TargetType="charts:ArcGauge">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcLineChart}" TargetType="charts:ArcLineChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcRaceBarChart}" TargetType="charts:ArcRaceBarChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcRadarChart}" TargetType="charts:ArcRadarChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcRealtimeStream}" TargetType="charts:ArcRealtimeStream">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcRidgeline}" TargetType="charts:ArcRidgeline">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcSankeyFlow}" TargetType="charts:ArcSankeyFlow">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcSlopeChart}" TargetType="charts:ArcSlopeChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcSparkline}" TargetType="charts:ArcSparkline">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcSplitBar}" TargetType="charts:ArcSplitBar">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcStreamgraph}" TargetType="charts:ArcStreamgraph">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcSunburstChart}" TargetType="charts:ArcSunburstChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcTreemap}" TargetType="charts:ArcTreemap">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
+      <ControlTheme x:Key="{x:Type charts:ArcWaffleChart}" TargetType="charts:ArcWaffleChart">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="StrokeWidth" Value="1" />
+      </ControlTheme>
+
     </ResourceDictionary>
   </Styles.Resources>
 </Styles>

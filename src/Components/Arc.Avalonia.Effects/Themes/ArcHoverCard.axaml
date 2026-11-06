@@ -7,12 +7,12 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel x:Name="Layer" ClipToBounds="False">
-          <ContentPresenter x:Name="TriggerHost"
+        <Panel x:Name="PART_Layer" ClipToBounds="False">
+          <ContentPresenter x:Name="PART_TriggerHost"
                             Content="{TemplateBinding Trigger}"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center" />
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>

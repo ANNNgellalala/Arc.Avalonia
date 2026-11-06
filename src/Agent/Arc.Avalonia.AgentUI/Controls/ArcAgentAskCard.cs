@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -157,9 +158,29 @@ public class ArcAgentAskCard : Panel
     }
 
     /// <summary>Raised with the chosen option ids and free text when the user sends an answer.</summary>
+    public static readonly RoutedEvent<ArcAgentAskSubmittedRoutedEventArgs> SubmittedEvent =
+        RoutedEvent.Register<ArcAgentAskCard, ArcAgentAskSubmittedRoutedEventArgs>("Submitted", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="Submitted"/>.</summary>
+    public event EventHandler<ArcAgentAskSubmittedRoutedEventArgs>? SubmittedRouted
+    {
+        add => AddHandler(SubmittedEvent, value);
+        remove => RemoveHandler(SubmittedEvent, value);
+    }
+
     public event EventHandler<ArcAgentAskAnswer>? Submitted;
 
     /// <summary>Raised when the user chooses to answer later.</summary>
+    public static readonly RoutedEvent<ArcAgentAskDeferredRoutedEventArgs> DeferredRequestedEvent =
+        RoutedEvent.Register<ArcAgentAskCard, ArcAgentAskDeferredRoutedEventArgs>("DeferredRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DeferredRequested"/>.</summary>
+    public event EventHandler<ArcAgentAskDeferredRoutedEventArgs>? DeferredRequestedRouted
+    {
+        add => AddHandler(DeferredRequestedEvent, value);
+        remove => RemoveHandler(DeferredRequestedEvent, value);
+    }
+
     public event EventHandler? DeferredRequested;
 
     private void Rebuild()
@@ -380,7 +401,11 @@ public class ArcAgentAskCard : Panel
 
         var later = ArcUi.Button("Answer later", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "clock");
         ArcUi.Name(later, "Answer this question later");
-        later.Click += (_, _) => DeferredRequested?.Invoke(this, EventArgs.Empty);
+        later.Click += (_, _) =>
+            {
+                DeferredRequested?.Invoke(this, EventArgs.Empty);
+                RaiseEvent(new ArcAgentAskDeferredRoutedEventArgs(DeferredRequestedEvent));
+            };
         row.Children.Add(later);
 
         var hint = ArcUi.Caption(optionCount == 0
@@ -499,6 +524,7 @@ public class ArcAgentAskCard : Panel
 
         _lastAnswer = answer;
         Submitted?.Invoke(this, answer);
+        RaiseEvent(new ArcAgentAskSubmittedRoutedEventArgs(SubmittedEvent, answer));
     }
 
     private static ArcBadge StateBadge(ArcAgentAskState state) => state switch
@@ -535,3 +561,5 @@ public class ArcAgentAskCard : Panel
         }
     };
 }
+
+

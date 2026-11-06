@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -15,6 +16,11 @@ namespace Arc.Avalonia.Pickers.Controls;
 /// Arc's calendar: a compact month grid with sliding month navigation, a gliding selection pill and a
 /// tinted range band. One tab stop; arrows, Home/End and PageUp/PageDown move a day cursor inside it.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(ArcCalendarSurface))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Previous", typeof(Button))]
+[TemplatePart("PART_Next", typeof(Button))]
+[TemplatePart("PART_Today", typeof(Button))]
 public class ArcCalendar : TemplatedControl
 {
     public static readonly StyledProperty<DateTime?> SelectedDateProperty =
@@ -133,6 +139,23 @@ public class ArcCalendar : TemplatedControl
     }
 
     public event EventHandler<DateTime>? SelectedDateChanged;
+
+    /// <summary>Bubbled copy of <see cref="SelectedDateChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcCalendarDateChangedEventArgs> SelectedDateChangedEvent =
+        RoutedEvent.Register<ArcCalendar, ArcCalendarDateChangedEventArgs>("SelectedDateChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="SelectedDateChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcCalendarDateChangedEventArgs>? SelectedDateChangedRouted
+    {
+        add => AddHandler(SelectedDateChangedEvent, value);
+        remove => RemoveHandler(SelectedDateChangedEvent, value);
+    }
+
+    private void RaiseSelectedDateChanged(DateTime date)
+    {
+        SelectedDateChanged?.Invoke(this, date);
+        RaiseEvent(new ArcCalendarDateChangedEventArgs(SelectedDateChangedEvent) { Date = date });
+    }
 
     public event EventHandler<DateTime>? DisplayMonthChanged;
 
@@ -352,7 +375,7 @@ public class ArcCalendar : TemplatedControl
 
         _cursor = date.Date;
         SelectedDate = date.Date;
-        SelectedDateChanged?.Invoke(this, date.Date);
+        RaiseSelectedDateChanged(date.Date);
     }
 
     private void SetMonth(DateTime month)
@@ -380,7 +403,7 @@ public class ArcCalendar : TemplatedControl
         {
             SelectedDate = today;
             _cursor = today;
-            SelectedDateChanged?.Invoke(this, today);
+            RaiseSelectedDateChanged(today);
         }
     }
 

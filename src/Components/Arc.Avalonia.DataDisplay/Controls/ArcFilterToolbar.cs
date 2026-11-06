@@ -4,8 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -53,6 +55,7 @@ public sealed class ArcSortOption
 /// A wrapping toolbar with search, removable filter chips, an Add filter menu, a sort menu, and a
 /// result count. Everything stays on one row until the space runs out, then wraps.
 /// </summary>
+[TemplatePart("PART_Host", typeof(WrapPanel))]
 public class ArcFilterToolbar : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcFilterChip>?> FiltersProperty =
@@ -106,7 +109,7 @@ public class ArcFilterToolbar : TemplatedControl
         ResultCountProperty.Changed.AddClassHandler<ArcFilterToolbar>((toolbar, _) => toolbar.RebuildRow());
         ResultLabelProperty.Changed.AddClassHandler<ArcFilterToolbar>((toolbar, _) => toolbar.RebuildRow());
         LabelProperty.Changed.AddClassHandler<ArcFilterToolbar>((toolbar, _) => AutomationProperties.SetName(toolbar, toolbar.Label));
-        SearchTextProperty.Changed.AddClassHandler<ArcFilterToolbar>((toolbar, _) => toolbar.SearchChanged?.Invoke(toolbar, toolbar.SearchText));
+        SearchTextProperty.Changed.AddClassHandler<ArcFilterToolbar>((toolbar, _) => toolbar.RaiseSearchChanged(toolbar.SearchText));
     }
 
     /// <summary>Applied filters, shown as chips.</summary>
@@ -175,13 +178,98 @@ public class ArcFilterToolbar : TemplatedControl
 
     public event EventHandler<string>? FilterRemoved;
 
+    /// <summary>Bubbling routed counterpart of <see cref="FilterRemoved"/>.</summary>
+    public static readonly RoutedEvent<ArcFilterRemovedEventArgs> FilterRemovedEvent =
+        RoutedEvent.Register<ArcFilterToolbar, ArcFilterRemovedEventArgs>("FilterRemoved", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcFilterRemovedEventArgs"/> version of <see cref="FilterRemoved"/>.</summary>
+    public event EventHandler<ArcFilterRemovedEventArgs>? FilterRemovedRouted
+    {
+        add => AddHandler(FilterRemovedEvent, value);
+        remove => RemoveHandler(FilterRemovedEvent, value);
+    }
+
+    private void RaiseFilterRemoved(string id)
+    {
+        FilterRemoved?.Invoke(this, id);
+        RaiseEvent(new ArcFilterRemovedEventArgs(FilterRemovedEvent) { Id = id });
+    }
+
     public event EventHandler<ArcFilterChip>? FilterAdded;
+
+    /// <summary>Bubbling routed counterpart of <see cref="FilterAdded"/>.</summary>
+    public static readonly RoutedEvent<ArcFilterAddedEventArgs> FilterAddedEvent =
+        RoutedEvent.Register<ArcFilterToolbar, ArcFilterAddedEventArgs>("FilterAdded", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcFilterAddedEventArgs"/> version of <see cref="FilterAdded"/>.</summary>
+    public event EventHandler<ArcFilterAddedEventArgs>? FilterAddedRouted
+    {
+        add => AddHandler(FilterAddedEvent, value);
+        remove => RemoveHandler(FilterAddedEvent, value);
+    }
+
+    private void RaiseFilterAdded(ArcFilterChip chip)
+    {
+        FilterAdded?.Invoke(this, chip);
+        RaiseEvent(new ArcFilterAddedEventArgs(FilterAddedEvent) { Chip = chip });
+    }
 
     public event EventHandler? ClearAllRequested;
 
+    /// <summary>Bubbling routed counterpart of <see cref="ClearAllRequested"/>.</summary>
+    public static readonly RoutedEvent<ArcFilterClearAllRequestedEventArgs> ClearAllRequestedEvent =
+        RoutedEvent.Register<ArcFilterToolbar, ArcFilterClearAllRequestedEventArgs>("ClearAllRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcFilterClearAllRequestedEventArgs"/> version of <see cref="ClearAllRequested"/>.</summary>
+    public event EventHandler<ArcFilterClearAllRequestedEventArgs>? ClearAllRequestedRouted
+    {
+        add => AddHandler(ClearAllRequestedEvent, value);
+        remove => RemoveHandler(ClearAllRequestedEvent, value);
+    }
+
+    private void RaiseClearAllRequested()
+    {
+        ClearAllRequested?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcFilterClearAllRequestedEventArgs(ClearAllRequestedEvent));
+    }
+
     public event EventHandler<string>? SearchChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="SearchChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcFilterSearchChangedEventArgs> SearchChangedEvent =
+        RoutedEvent.Register<ArcFilterToolbar, ArcFilterSearchChangedEventArgs>("SearchChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcFilterSearchChangedEventArgs"/> version of <see cref="SearchChanged"/>.</summary>
+    public event EventHandler<ArcFilterSearchChangedEventArgs>? SearchChangedRouted
+    {
+        add => AddHandler(SearchChangedEvent, value);
+        remove => RemoveHandler(SearchChangedEvent, value);
+    }
+
+    private void RaiseSearchChanged(string text)
+    {
+        SearchChanged?.Invoke(this, text);
+        RaiseEvent(new ArcFilterSearchChangedEventArgs(SearchChangedEvent) { Text = text });
+    }
+
     public event EventHandler<string?>? SortChanged;
+
+    /// <summary>Bubbling routed counterpart of <see cref="SortChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcFilterSortChangedEventArgs> SortChangedEvent =
+        RoutedEvent.Register<ArcFilterToolbar, ArcFilterSortChangedEventArgs>("SortChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcFilterSortChangedEventArgs"/> version of <see cref="SortChanged"/>.</summary>
+    public event EventHandler<ArcFilterSortChangedEventArgs>? SortChangedRouted
+    {
+        add => AddHandler(SortChangedEvent, value);
+        remove => RemoveHandler(SortChangedEvent, value);
+    }
+
+    private void RaiseSortChanged(string? sortKey)
+    {
+        SortChanged?.Invoke(this, sortKey);
+        RaiseEvent(new ArcFilterSortChangedEventArgs(SortChangedEvent) { SortKey = sortKey });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -524,7 +612,7 @@ public class ArcFilterToolbar : TemplatedControl
             button.Click += (_, _) =>
             {
                 SetCurrentValue(SortKeyProperty, captured.Key);
-                SortChanged?.Invoke(this, captured.Key);
+                RaiseSortChanged(captured.Key);
                 if (_sortPopup is not null)
                 {
                     _sortPopup.IsOpen = false;
@@ -560,7 +648,7 @@ public class ArcFilterToolbar : TemplatedControl
         }
 
         SetCurrentValue(FiltersProperty, list);
-        FilterAdded?.Invoke(this, chip);
+        RaiseFilterAdded(chip);
     }
 
     private void RemoveFilter(string id)
@@ -574,13 +662,13 @@ public class ArcFilterToolbar : TemplatedControl
             .Where(item => item.Id != id)
             .ToList();
         SetCurrentValue(FiltersProperty, list);
-        FilterRemoved?.Invoke(this, id);
+        RaiseFilterRemoved(id);
     }
 
     private void ClearAll()
     {
         SetCurrentValue(FiltersProperty, new List<ArcFilterChip>());
-        ClearAllRequested?.Invoke(this, EventArgs.Empty);
+        RaiseClearAllRequested();
     }
 
     private void UpdatePopupMenus()
@@ -595,4 +683,61 @@ public class ArcFilterToolbar : TemplatedControl
             ShowSortOptions();
         }
     }
+}
+
+/// <summary>Event data for the bubbling <see cref="FilterRemovedRouted"/> event.</summary>
+public sealed class ArcFilterRemovedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcFilterRemovedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public string Id { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="FilterAddedRouted"/> event.</summary>
+public sealed class ArcFilterAddedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcFilterAddedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcFilterChip Chip { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="ClearAllRequestedRouted"/> event.</summary>
+public sealed class ArcFilterClearAllRequestedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcFilterClearAllRequestedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+}
+
+/// <summary>Event data for the bubbling <see cref="SearchChangedRouted"/> event.</summary>
+public sealed class ArcFilterSearchChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcFilterSearchChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public string Text { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="SortChangedRouted"/> event.</summary>
+public sealed class ArcFilterSortChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcFilterSortChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public string? SortKey { get; init; }
 }

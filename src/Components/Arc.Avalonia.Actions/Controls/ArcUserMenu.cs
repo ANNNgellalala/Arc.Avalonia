@@ -7,6 +7,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -64,6 +65,23 @@ public sealed class ArcUserMenuItem
 /// press closes it where the pointer went. The panel is a panel-radius surface with a hairline border and
 /// the floating shadow.
 /// </summary>
+[TemplatePart("PART_Trigger", typeof(ArcButton))]
+[TemplatePart("PART_Chevron", typeof(ArcIcon))]
+[TemplatePart("PART_TriggerName", typeof(TextBlock))]
+[TemplatePart("PART_Initials", typeof(TextBlock))]
+[TemplatePart("PART_Presence", typeof(Border))]
+[TemplatePart("PART_PresenceBar", typeof(Border))]
+[TemplatePart("PART_PresenceHole", typeof(Border))]
+[TemplatePart("PART_NameText", typeof(TextBlock))]
+[TemplatePart("PART_PanelInitials", typeof(TextBlock))]
+[TemplatePart("PART_EmailText", typeof(TextBlock))]
+[TemplatePart("PART_PlanBadge", typeof(Border))]
+[TemplatePart("PART_PlanText", typeof(TextBlock))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
+[TemplatePart("PART_Panel", typeof(Border))]
+[TemplatePart("PART_HighlightLayer", typeof(Canvas))]
+[TemplatePart("PART_Highlight", typeof(ArcAdvancedGlide))]
+[TemplatePart("PART_StopsHost", typeof(StackPanel))]
 public sealed class ArcUserMenu : TemplatedControl
 {
     public static readonly StyledProperty<string> UserNameProperty =
@@ -174,6 +192,16 @@ public sealed class ArcUserMenu : TemplatedControl
 
     /// <summary>Raised with the chosen appearance; applying it to the page is up to the app.</summary>
     public event EventHandler<ArcUserMenuTheme>? ThemeChanged;
+    /// <summary>Bubbled copy of <see cref="ThemeChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcUserMenuThemeChangedEventArgs> ThemeChangedEvent =
+        RoutedEvent.Register<ArcUserMenu, ArcUserMenuThemeChangedEventArgs>("ThemeChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ThemeChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcUserMenuThemeChangedEventArgs>? ThemeChangedRouted
+    {
+        add => AddHandler(ThemeChangedEvent, value);
+        remove => RemoveHandler(ThemeChangedEvent, value);
+    }
 
     /// <summary>Display name in the identity header and the optional trigger label (neutral default "Your account").</summary>
     public string UserName
@@ -261,23 +289,23 @@ public sealed class ArcUserMenu : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _trigger = e.NameScope.Find<ArcButton>("Trigger");
-        _chevron = e.NameScope.Find<ArcIcon>("Chevron");
-        _triggerName = e.NameScope.Find<TextBlock>("TriggerName");
-        _initials = e.NameScope.Find<TextBlock>("Initials");
-        _presence = e.NameScope.Find<Border>("Presence");
-        _presenceBar = e.NameScope.Find<Border>("PresenceBar");
-        _presenceHole = e.NameScope.Find<Border>("PresenceHole");
-        _nameText = e.NameScope.Find<TextBlock>("NameText");
-        _panelInitials = e.NameScope.Find<TextBlock>("PanelInitials");
-        _emailText = e.NameScope.Find<TextBlock>("EmailText");
-        _planBadge = e.NameScope.Find<Border>("PlanBadge");
-        _planText = e.NameScope.Find<TextBlock>("PlanText");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
-        _panel = e.NameScope.Find<Border>("Panel");
-        _highlightLayer = e.NameScope.Find<Canvas>("HighlightLayer");
-        _highlight = e.NameScope.Find<ArcAdvancedGlide>("Highlight");
-        _stopsHost = e.NameScope.Find<StackPanel>("StopsHost");
+        _trigger = e.NameScope.Find<ArcButton>("PART_Trigger");
+        _chevron = e.NameScope.Find<ArcIcon>("PART_Chevron");
+        _triggerName = e.NameScope.Find<TextBlock>("PART_TriggerName");
+        _initials = e.NameScope.Find<TextBlock>("PART_Initials");
+        _presence = e.NameScope.Find<Border>("PART_Presence");
+        _presenceBar = e.NameScope.Find<Border>("PART_PresenceBar");
+        _presenceHole = e.NameScope.Find<Border>("PART_PresenceHole");
+        _nameText = e.NameScope.Find<TextBlock>("PART_NameText");
+        _panelInitials = e.NameScope.Find<TextBlock>("PART_PanelInitials");
+        _emailText = e.NameScope.Find<TextBlock>("PART_EmailText");
+        _planBadge = e.NameScope.Find<Border>("PART_PlanBadge");
+        _planText = e.NameScope.Find<TextBlock>("PART_PlanText");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
+        _panel = e.NameScope.Find<Border>("PART_Panel");
+        _highlightLayer = e.NameScope.Find<Canvas>("PART_HighlightLayer");
+        _highlight = e.NameScope.Find<ArcAdvancedGlide>("PART_Highlight");
+        _stopsHost = e.NameScope.Find<StackPanel>("PART_StopsHost");
 
         if (_trigger is not null)
         {
@@ -725,7 +753,9 @@ public sealed class ArcUserMenu : TemplatedControl
     {
         SetCurrentValue(ThemePreferenceProperty, theme);
         ApplyThemeSelection();
+                var themeChangedArgs = new ArcUserMenuThemeChangedEventArgs(ThemeChangedEvent) { Theme = theme };
         ThemeChanged?.Invoke(this, theme);
+        RaiseEvent(themeChangedArgs);
     }
 
     private void RebuildMenu()

@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -18,6 +19,7 @@ namespace Arc.Avalonia.Effects.Controls;
 /// the text when the control is disabled, stops entirely under reduced motion, and the label rises into
 /// place when it changes. It is a status region, not a progress bar.
 /// </summary>
+[TemplatePart("PART_Layers", typeof(Panel))]
 public class ArcTextShimmer : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty =

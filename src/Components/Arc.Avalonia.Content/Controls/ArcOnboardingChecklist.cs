@@ -6,6 +6,8 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -36,6 +38,7 @@ public sealed class ArcChecklistStep
 /// one primary action per row, a body hide toggle and dismiss. Completing a step folds the ring
 /// forward and announces the new count; reduced motion snaps both.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcOnboardingChecklist : TemplatedControl
 {
     public static readonly StyledProperty<string> TitleProperty =
@@ -148,11 +151,51 @@ public class ArcOnboardingChecklist : TemplatedControl
         set => SetValue(DismissedProperty, value);
     }
 
+    public static readonly RoutedEvent<ArcChecklistStepInvokedRoutedEventArgs> StepInvokedEvent =
+        RoutedEvent.Register<ArcOnboardingChecklist, ArcChecklistStepInvokedRoutedEventArgs>("StepInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="StepInvoked"/>.</summary>
+    public event EventHandler<ArcChecklistStepInvokedRoutedEventArgs>? StepInvokedRouted
+    {
+        add => AddHandler(StepInvokedEvent, value);
+        remove => RemoveHandler(StepInvokedEvent, value);
+    }
+
     public event EventHandler<ArcChecklistStep>? StepInvoked;
+
+    public static readonly RoutedEvent<ArcChecklistCompletedChangedRoutedEventArgs> CompletedChangedEvent =
+        RoutedEvent.Register<ArcOnboardingChecklist, ArcChecklistCompletedChangedRoutedEventArgs>("CompletedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CompletedChanged"/>.</summary>
+    public event EventHandler<ArcChecklistCompletedChangedRoutedEventArgs>? CompletedChangedRouted
+    {
+        add => AddHandler(CompletedChangedEvent, value);
+        remove => RemoveHandler(CompletedChangedEvent, value);
+    }
 
     public event EventHandler<IReadOnlyList<string>>? CompletedChanged;
 
+    public static readonly RoutedEvent<ArcChecklistDismissedRoutedEventArgs> DismissedChangedEvent =
+        RoutedEvent.Register<ArcOnboardingChecklist, ArcChecklistDismissedRoutedEventArgs>("DismissedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DismissedChanged"/>.</summary>
+    public event EventHandler<ArcChecklistDismissedRoutedEventArgs>? DismissedChangedRouted
+    {
+        add => AddHandler(DismissedChangedEvent, value);
+        remove => RemoveHandler(DismissedChangedEvent, value);
+    }
+
     public event EventHandler? DismissedChanged;
+
+    public static readonly RoutedEvent<ArcChecklistHiddenChangedRoutedEventArgs> HiddenChangedEvent =
+        RoutedEvent.Register<ArcOnboardingChecklist, ArcChecklistHiddenChangedRoutedEventArgs>("HiddenChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="HiddenChanged"/>.</summary>
+    public event EventHandler<ArcChecklistHiddenChangedRoutedEventArgs>? HiddenChangedRouted
+    {
+        add => AddHandler(HiddenChangedEvent, value);
+        remove => RemoveHandler(HiddenChangedEvent, value);
+    }
 
     public event EventHandler<bool>? HiddenChanged;
 
@@ -506,6 +549,7 @@ public class ArcOnboardingChecklist : TemplatedControl
             action.Click += (_, _) =>
             {
                 StepInvoked?.Invoke(this, step);
+        RaiseEvent(new ArcChecklistStepInvokedRoutedEventArgs(StepInvokedEvent, step));
                 MarkStep(step, true);
             };
             Grid.SetColumn(action, 2);
@@ -669,6 +713,7 @@ public class ArcOnboardingChecklist : TemplatedControl
             ? $"{step.Title} complete. {order.Count} of {total} steps done."
             : $"{step.Title} not complete. {order.Count} of {total} steps done.");
         CompletedChanged?.Invoke(this, order);
+        RaiseEvent(new ArcChecklistCompletedChangedRoutedEventArgs(CompletedChangedEvent, order));
     }
 
     private List<string> OrderedCompleted() =>
@@ -679,12 +724,14 @@ public class ArcOnboardingChecklist : TemplatedControl
         _hidden = !_hidden;
         BuildShell();
         HiddenChanged?.Invoke(this, _hidden);
+        RaiseEvent(new ArcChecklistHiddenChangedRoutedEventArgs(HiddenChangedEvent, _hidden));
     }
 
     private void DismissCard()
     {
         SetCurrentValue(DismissedProperty, true);
         DismissedChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcChecklistDismissedRoutedEventArgs(DismissedChangedEvent));
     }
 
     private void FocusTitle(string id)
@@ -820,3 +867,7 @@ internal sealed class ArcChecklistRing : Control
         context.DrawGeometry(null, pen, geometry);
     }
 }
+
+
+
+

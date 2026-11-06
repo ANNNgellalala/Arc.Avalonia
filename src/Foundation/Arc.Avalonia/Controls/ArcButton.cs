@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 
 namespace Arc.Avalonia.Controls;
@@ -23,6 +24,7 @@ public enum ArcButtonSize
 /// <summary>
 /// Arc's button: one clear action with quiet secondary states, press feedback and an in-place spinner.
 /// </summary>
+[TemplatePart("PART_Spinner", typeof(Controls.ArcSpinner))]
 public class ArcButton : Button
 {
     public static readonly StyledProperty<ArcButtonVariant> VariantProperty =
@@ -81,7 +83,7 @@ public class ArcButton : Button
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _spinner = e.NameScope.Find<Controls.ArcSpinner>("Spinner");
+        _spinner = e.NameScope.Find<Controls.ArcSpinner>("PART_Spinner");
         if (_spinner is not null)
         {
             _spinner.IsVisible = Loading;

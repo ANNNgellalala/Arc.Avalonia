@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -19,6 +20,9 @@ namespace Arc.Avalonia.Internal;
 /// panel-radius card with the floating shadow. It hosts itself inside its owner's overlay canvas, so it
 /// renders in the gallery (and in screenshots) without a popup window.
 /// </summary>
+[TemplatePart("PART_MenuHost", typeof(Panel))]
+[TemplatePart("PART_Items", typeof(StackPanel))]
+[TemplatePart("PART_Highlight", typeof(ArcGlide))]
 public sealed class ArcMenuSurface : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcMenuItem>?> ItemsProperty =
@@ -72,9 +76,9 @@ public sealed class ArcMenuSurface : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _host = e.NameScope.Find<Panel>("MenuHost");
-        _items = e.NameScope.Find<StackPanel>("Items");
-        _highlight = e.NameScope.Find<ArcGlide>("Highlight");
+        _host = e.NameScope.Find<Panel>("PART_MenuHost");
+        _items = e.NameScope.Find<StackPanel>("PART_Items");
+        _highlight = e.NameScope.Find<ArcGlide>("PART_Highlight");
         BuildRows();
     }
 

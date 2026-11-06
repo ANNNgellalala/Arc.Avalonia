@@ -194,7 +194,7 @@ public class ArcGauge : ArcChartBase
                 "target",
                 Math.Clamp(labelPoint.X, 22, Bounds.Width - 22),
                 Math.Clamp(labelPoint.Y, 12, Bounds.Height - 22),
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
         }
@@ -206,7 +206,7 @@ public class ArcGauge : ArcChartBase
             FormatNumber(Minimum),
             Math.Max(2, startPoint.X + 2),
             Math.Min(Bounds.Height - 10, startPoint.Y + 15),
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Left);
         ChartText.Draw(
@@ -214,7 +214,7 @@ public class ArcGauge : ArcChartBase
             FormatNumber(Maximum),
             Math.Min(Bounds.Width - 2, endPoint.X - 2),
             Math.Min(Bounds.Height - 10, endPoint.Y + 15),
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Right);
 
@@ -223,7 +223,7 @@ public class ArcGauge : ArcChartBase
             Label ?? string.Empty,
             center.X,
             center.Y - 33,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: diameter * 0.7);
@@ -244,7 +244,7 @@ public class ArcGauge : ArcChartBase
                 Detail,
                 center.X,
                 detailY,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Secondary,
                 alignment: TextAlignment.Center,
                 maxWidth: diameter * 0.78);
@@ -258,7 +258,7 @@ public class ArcGauge : ArcChartBase
                 activeThreshold!.Label!,
                 center.X,
                 detailY,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Tone(activeThreshold.Tone),
                 FontWeight.Medium,
                 TextAlignment.Center,

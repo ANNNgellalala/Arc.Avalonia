@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -196,6 +197,9 @@ public sealed class ArcScrollOverlay : Control
 /// fades in while scrolling or hovering, and edge fades that appear only when content overflows. Keyboard
 /// scrolling stays native to the viewport, and vertical wheel movement drives horizontal strips.
 /// </summary>
+[TemplatePart("PART_Viewport", typeof(ScrollViewer))]
+[TemplatePart("PART_FadeX", typeof(Border))]
+[TemplatePart("PART_Overlay", typeof(ArcScrollOverlay))]
 public class ArcScrollArea : ContentControl
 {
     public static readonly StyledProperty<ArcScrollOrientation> OrientationProperty =
@@ -293,7 +297,7 @@ public class ArcScrollArea : ContentControl
     {
         base.OnApplyTemplate(e);
         _viewport = e.NameScope.Find<ScrollViewer>("PART_Viewport");
-        _fadeX = e.NameScope.Find<Border>("FadeX");
+        _fadeX = e.NameScope.Find<Border>("PART_FadeX");
         _overlay = e.NameScope.Find<ArcScrollOverlay>("PART_Overlay");
 
         if (_viewport is not null)
@@ -770,6 +774,7 @@ public class ArcScrollArea : ContentControl
         _hideTimer = null;
     }
 }
+
 
 
 

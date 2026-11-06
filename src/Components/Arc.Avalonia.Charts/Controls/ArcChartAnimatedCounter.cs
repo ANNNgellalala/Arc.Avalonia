@@ -148,7 +148,7 @@ public class ArcChartAnimatedCounter : ArcChartBase
                 Label!,
                 centerX,
                 20,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center,
                 maxWidth: Bounds.Width - 16);

@@ -9,26 +9,26 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="8">
-          <Grid x:Name="Header" ColumnDefinitions="*,Auto" IsVisible="False">
-            <TextBlock x:Name="LabelText"
+          <Grid x:Name="PART_Header" ColumnDefinitions="*,Auto" IsVisible="False">
+            <TextBlock x:Name="PART_LabelText"
                        Classes="arc-label"
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Center" />
-            <StackPanel x:Name="ValuePanel"
+            <StackPanel x:Name="PART_ValuePanel"
                         Grid.Column="1"
                         Orientation="Horizontal"
                         Spacing="6"
                         Margin="12,0,0,0"
                         VerticalAlignment="Center">
-              <TextBlock x:Name="ValueText" Classes="arc-label" VerticalAlignment="Center" />
-              <ac:ArcIcon x:Name="Check"
+              <TextBlock x:Name="PART_ValueText" Classes="arc-label" VerticalAlignment="Center" />
+              <ac:ArcIcon x:Name="PART_Check"
                          Icon="check"
                          Size="15"
                          IsVisible="False"
                          VerticalAlignment="Center" />
             </StackPanel>
           </Grid>
-          <c:ArcProgressTrack x:Name="Bar"
+          <c:ArcProgressTrack x:Name="PART_Bar"
                               TrackBrush="{DynamicResource ArcControlTrack}" />
         </StackPanel>
       </ControlTemplate>

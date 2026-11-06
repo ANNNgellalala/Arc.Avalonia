@@ -20,7 +20,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Ring"
+          <Border x:Name="PART_Ring"
                   Margin="-4"
                   CornerRadius="{DynamicResource ArcRadiusControl}"
                   BorderThickness="2"
@@ -41,7 +41,7 @@
               </Transitions>
             </Border.Transitions>
             <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" ColumnDefinitions="Auto,Auto">
-              <TextBlock x:Name="Label"
+              <TextBlock x:Name="PART_Label"
                          Grid.Column="0"
                          Foreground="{TemplateBinding Foreground}"
                          FontWeight="{TemplateBinding FontWeight}"
@@ -56,18 +56,18 @@
                      Margin="8,0,0,0"
                      VerticalAlignment="Center"
                      RenderTransformOrigin="0.5,0.5">
-                <c:ArcIcon x:Name="Arrow"
+                <c:ArcIcon x:Name="PART_Arrow"
                            Icon="arrow-right"
                            Size="17"
                            Foreground="{TemplateBinding Foreground}"
                            IsVisible="True" />
-                <c:ArcSpinner x:Name="Spinner"
+                <c:ArcSpinner x:Name="PART_Spinner"
                               Width="16"
                               Height="16"
                               StrokeWidth="1.75"
                               Stroke="{TemplateBinding Foreground}"
                               IsVisible="False" />
-                <c:ArcIcon x:Name="Check"
+                <c:ArcIcon x:Name="PART_Check"
                            Icon="check"
                            Size="17"
                            StrokeWidth="2"
@@ -127,7 +127,7 @@
     </Style>
 
     <!-- Keyboard focus gets the ring; pointer focus never draws one. -->
-    <Style Selector="^:focus-visible /template/ Border#Ring">
+    <Style Selector="^:focus-visible /template/ Border#PART_Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
 

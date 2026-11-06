@@ -3,6 +3,7 @@ using System.IO;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -329,6 +330,8 @@ public sealed class ArcCompareSurface : Control
 /// Arc's image compare: two images stacked under a draggable divider, moved by pointer or by arrow keys,
 /// reporting the settled percentage. The handle recenters on a double click.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(ArcCompareSurface))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcImageCompare : TemplatedControl
 {
     public static readonly StyledProperty<string?> BeforeSourceProperty =
@@ -467,13 +470,23 @@ public class ArcImageCompare : TemplatedControl
     public double Value => _position;
 
     /// <summary>Raised when the divider settles on a new position.</summary>
+    public static readonly RoutedEvent<ArcImageComparePositionChangedRoutedEventArgs> PositionChangedEvent =
+        RoutedEvent.Register<ArcImageCompare, ArcImageComparePositionChangedRoutedEventArgs>("PositionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="PositionChanged"/>.</summary>
+    public event EventHandler<ArcImageComparePositionChangedRoutedEventArgs>? PositionChangedRouted
+    {
+        add => AddHandler(PositionChangedEvent, value);
+        remove => RemoveHandler(PositionChangedEvent, value);
+    }
+
     public event EventHandler<double>? PositionChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
         _surface = e.NameScope.Find<ArcCompareSurface>("PART_Surface");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
         SyncPosition();
         Reload();
         UpdateAutomation();
@@ -571,6 +584,7 @@ public class ArcImageCompare : TemplatedControl
         if (settle)
         {
             PositionChanged?.Invoke(this, _position);
+        RaiseEvent(new ArcImageComparePositionChangedRoutedEventArgs(PositionChangedEvent, _position));
         }
     }
 
@@ -714,4 +728,6 @@ public class ArcImageCompare : TemplatedControl
         }
     }
 }
+
+
 

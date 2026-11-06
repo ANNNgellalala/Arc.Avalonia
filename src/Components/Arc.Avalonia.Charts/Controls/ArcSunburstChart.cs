@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
@@ -117,10 +118,32 @@ public class ArcSunburstChart : ArcChartBase
         set => SetValue(ValueFormatProperty, value);
     }
 
-    /// <summary>Raised when an arc, a legend row, the centre, or Back changes the focus or selects a leaf.</summary>
+    /// <summary>Raised when an arc, a legend row, the centre, or Back changes the focus or selects a leaf (legacy CLR notification, unchanged).</summary>
     public event EventHandler<ArcSunburstSelection>? NodeSelected;
 
+    /// <summary>
+    /// Additive routed counterpart of <see cref="NodeSelected"/> (M2-G3a-6): bubbles through the visual tree.
+    /// Both notifications fire for every selection change.
+    /// </summary>
+    public static readonly RoutedEvent<ArcSunburstNodeEventArgs> NodeSelectedEvent =
+        RoutedEvent.Register<ArcSunburstChart, ArcSunburstNodeEventArgs>("NodeSelected", RoutingStrategies.Bubble);
+
+    /// <summary>CLR surface for <see cref="NodeSelectedEvent"/>.</summary>
+    public event EventHandler<ArcSunburstNodeEventArgs>? NodeSelectedRouted
+    {
+        add => AddHandler(NodeSelectedEvent, value);
+        remove => RemoveHandler(NodeSelectedEvent, value);
+    }
+
     protected override double DefaultHeight => 244;
+
+    /// <summary>Raises the legacy CLR event and the additive routed event together (dual notification).</summary>
+    private void NotifyNodeSelected(ArcSunburstNode node, IReadOnlyList<ArcSunburstNode> path)
+    {
+        var selection = new ArcSunburstSelection(node, path);
+        NodeSelected?.Invoke(this, selection);
+        RaiseEvent(new ArcSunburstNodeEventArgs(NodeSelectedEvent) { Node = node, Path = path });
+    }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
@@ -187,6 +210,7 @@ public class ArcSunburstChart : ArcChartBase
         {
             if (hit.Bounds.Contains(point))
             {
+                RaiseLegendClick(-1, hit.Node.Label, true);
                 ZoomTo(hit.Node);
                 e.Handled = true;
                 return;
@@ -202,6 +226,7 @@ public class ArcSunburstChart : ArcChartBase
 
         if (NodeAt(point) is { } node)
         {
+            RaiseItemClick(-1, node.Label, node.Total, point);
             ZoomTo(node);
             e.Handled = true;
         }
@@ -281,7 +306,7 @@ public class ArcSunburstChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -321,7 +346,7 @@ public class ArcSunburstChart : ArcChartBase
             // A leaf root has no rings; keep a quiet ring so the readout still reads as a chart.
             context.DrawGeometry(
                 ChartPalette.Alpha(ChartPalette.Series(0), 0.9),
-                new Pen(ChartPalette.Surface, 1),
+                new Pen(ChartPalette.Surface, ChartMetrics.Hairline),
                 ChartGeometry.DonutSegment(_center, _outerRadius, _holeRadius, -90, 359.9));
         }
 
@@ -362,7 +387,7 @@ public class ArcSunburstChart : ArcChartBase
 
                 context.DrawGeometry(
                     brush,
-                    new Pen(ChartPalette.Surface, 1),
+                    new Pen(ChartPalette.Surface, ChartMetrics.Hairline),
                     ChartGeometry.DonutSegment(origin, itemOuter, inner, start - 90, sweep));
             }
         }
@@ -506,7 +531,7 @@ public class ArcSunburstChart : ArcChartBase
     private void DrawCenter(DrawingContext context, ArcSunburstNode root, double total)
     {
         var radius = Math.Max(10, _holeRadius - 2);
-        context.DrawEllipse(ChartPalette.Surface, new Pen(ChartPalette.BorderSubtle, 1), _center, radius, radius);
+        context.DrawEllipse(ChartPalette.Surface, new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline), _center, radius, radius);
 
         var active = _active;
         var label = active?.Label ?? CenterLabel;
@@ -523,7 +548,7 @@ public class ArcSunburstChart : ArcChartBase
             label,
             _center.X,
             _center.Y - 19,
-            11,
+            ChartMetrics.CaptionFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: textWidth);
@@ -542,7 +567,7 @@ public class ArcSunburstChart : ArcChartBase
             detail,
             _center.X,
             _center.Y + 18,
-            10,
+            ChartMetrics.CaptionFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: textWidth);
@@ -577,7 +602,7 @@ public class ArcSunburstChart : ArcChartBase
             context.DrawRectangle(BrushFor(childPath), null, new Rect(x, y + 7, 8, 8), 2, 2);
             var name = ChartText.Create(
                 child.Label,
-                12,
+                ChartMetrics.CaptionFontSize,
                 active ? ChartPalette.Foreground : ChartPalette.Secondary,
                 active ? FontWeight.Medium : FontWeight.Normal,
                 Math.Max(30, width - 58));
@@ -587,7 +612,7 @@ public class ArcSunburstChart : ArcChartBase
                 ChartFormat.Percent(child.Total / Math.Max(1, total), 0),
                 x + width,
                 y + 11,
-                11,
+                ChartMetrics.CaptionFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Right);
             _legendHits.Add((row, child));
@@ -601,7 +626,7 @@ public class ArcSunburstChart : ArcChartBase
                 $"+{focus.Children.Count - rows} more",
                 x,
                 y + 8,
-                11,
+                ChartMetrics.CaptionFontSize,
                 ChartPalette.Muted);
         }
     }
@@ -615,7 +640,7 @@ public class ArcSunburstChart : ArcChartBase
         {
             if (index > 0)
             {
-                var separator = ChartText.Create(" / ", 11, ChartPalette.Muted);
+                var separator = ChartText.Create(" / ", ChartMetrics.CaptionFontSize, ChartPalette.Muted);
                 if (x + separator.Width > limit)
                 {
                     return;
@@ -628,7 +653,7 @@ public class ArcSunburstChart : ArcChartBase
             var current = index == path.Count - 1;
             var text = ChartText.Create(
                 path[index].Label,
-                11,
+                ChartMetrics.CaptionFontSize,
                 current ? ChartPalette.Foreground : ChartPalette.Muted,
                 current ? FontWeight.Medium : FontWeight.Normal,
                 Math.Max(20, limit - x));
@@ -654,13 +679,13 @@ public class ArcSunburstChart : ArcChartBase
         _backHit = rect;
         context.DrawRectangle(
             _backHover ? ChartPalette.Alpha(ChartPalette.BorderSubtle, 0.85) : ChartPalette.Surface,
-            new Pen(ChartPalette.Border, 1),
+            new Pen(ChartPalette.Border, ChartMetrics.Hairline),
             new RoundedRect(rect, 10.5));
         var pen = new Pen(ChartPalette.Secondary, 1.5);
         var midY = rect.Center.Y;
         context.DrawLine(pen, new Point(rect.X + 13, midY - 3.4), new Point(rect.X + 9.8, midY));
         context.DrawLine(pen, new Point(rect.X + 9.8, midY), new Point(rect.X + 13, midY + 3.4));
-        ChartText.Draw(context, "Back", rect.X + 20, midY, 11, ChartPalette.Secondary);
+        ChartText.Draw(context, "Back", rect.X + 20, midY, ChartMetrics.CaptionFontSize, ChartPalette.Secondary);
     }
 
     private ArcSunburstNode? NodeAt(Point point)
@@ -819,7 +844,7 @@ public class ArcSunburstChart : ArcChartBase
         if (node.IsLeaf)
         {
             SetActive(node);
-            NodeSelected?.Invoke(this, new ArcSunburstSelection(node, PathTo(root, node)));
+            NotifyNodeSelected(node, PathTo(root, node));
             return;
         }
 
@@ -827,7 +852,7 @@ public class ArcSunburstChart : ArcChartBase
         _active = null;
         _activeAncestors.Clear();
         InvalidateVisual();
-        NodeSelected?.Invoke(this, new ArcSunburstSelection(node, PathTo(root, node)));
+        NotifyNodeSelected(node, PathTo(root, node));
     }
 
     private void ZoomOut(bool toRoot = false)
@@ -845,7 +870,7 @@ public class ArcSunburstChart : ArcChartBase
         _active = null;
         _activeAncestors.Clear();
         InvalidateVisual();
-        NodeSelected?.Invoke(this, new ArcSunburstSelection(_focus, PathTo(root, _focus)));
+        NotifyNodeSelected(_focus, PathTo(root, _focus));
     }
 
     private void ResetInteraction()

@@ -7,6 +7,8 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -80,6 +82,7 @@ public sealed record ArcChatDraft(string Text, IReadOnlyList<ArcChatAttachment> 
 /// A two-way conversation with grouped bubbles, day separators, initials avatars, a typing row,
 /// a composer with an attachment tray, and a message log that stays pinned to the newest message.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcChatThread : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcChatParticipant>?> ParticipantsProperty =
@@ -233,6 +236,16 @@ public class ArcChatThread : TemplatedControl
     }
 
     /// <summary>Raised with the trimmed composer text and files after a send.</summary>
+    public static readonly RoutedEvent<ArcChatSendRoutedEventArgs> SendEvent =
+        RoutedEvent.Register<ArcChatThread, ArcChatSendRoutedEventArgs>("Send", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="Send"/>.</summary>
+    public event EventHandler<ArcChatSendRoutedEventArgs>? SendRouted
+    {
+        add => AddHandler(SendEvent, value);
+        remove => RemoveHandler(SendEvent, value);
+    }
+
     public event EventHandler<ArcChatDraft>? Send;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -959,6 +972,7 @@ public class ArcChatThread : TemplatedControl
         RenderMessages(true);
         Dispatcher.UIThread.Post(() => _animateId = null, DispatcherPriority.Background);
         Send?.Invoke(this, draft);
+        RaiseEvent(new ArcChatSendRoutedEventArgs(SendEvent, draft));
         _composer.Focus();
     }
 
@@ -1091,3 +1105,7 @@ public class ArcChatThread : TemplatedControl
         }
     }
 }
+
+
+
+

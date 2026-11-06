@@ -6,6 +6,7 @@ using System.Text;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -225,9 +226,19 @@ public static class ArcPhoneCountries
 }
 
 /// <summary>Details for a phone value change, mirroring Arc's change details.</summary>
-public sealed class ArcPhoneValueEventArgs : EventArgs
+public sealed class ArcPhoneValueEventArgs : RoutedEventArgs
 {
     public ArcPhoneValueEventArgs(string value, string country, string formatted, bool valid)
+    {
+        Value = value;
+        Country = country;
+        Formatted = formatted;
+        Valid = valid;
+    }
+
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcPhoneValueEventArgs(RoutedEvent routedEvent, string value, string country, string formatted, bool valid)
+        : base(routedEvent)
     {
         Value = value;
         Country = country;
@@ -250,6 +261,19 @@ public sealed class ArcPhoneValueEventArgs : EventArgs
 /// Arc's phone input: a country button that grows into a searchable list, formatting as you type, a
 /// national display value and an E.164 value.
 /// </summary>
+[TemplatePart("PART_Stack", typeof(StackPanel))]
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_Shell", typeof(Border))]
+[TemplatePart("PART_CountryButton", typeof(Button))]
+[TemplatePart("PART_IsoText", typeof(TextBlock))]
+[TemplatePart("PART_DialText", typeof(TextBlock))]
+[TemplatePart("PART_Number", typeof(TextBox))]
+[TemplatePart("PART_ValidMark", typeof(ArcIcon))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_Picker", typeof(Border))]
+[TemplatePart("PART_Search", typeof(TextBox))]
+[TemplatePart("PART_Rows", typeof(StackPanel))]
+[TemplatePart("PART_Scroller", typeof(ScrollViewer))]
 public class ArcPhoneInput : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -327,6 +351,16 @@ public class ArcPhoneInput : TemplatedControl
 
     /// <summary>Raised on every edit with the E.164 value and the current country and validity.</summary>
     public event EventHandler<ArcPhoneValueEventArgs>? ValueChanged;
+
+    public static readonly RoutedEvent<ArcPhoneValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcPhoneInput, ArcPhoneValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcPhoneValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     /// <summary>Raised when the country changes, including from a pasted international number.</summary>
     public event EventHandler? CountryChanged;
@@ -443,19 +477,19 @@ public class ArcPhoneInput : TemplatedControl
             _search.TextChanged -= OnSearchTextChanged;
         }
 
-        _stack = e.NameScope.Find<StackPanel>("Stack");
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _shell = e.NameScope.Find<Border>("Shell");
-        _countryButton = e.NameScope.Find<Button>("CountryButton");
-        _isoText = e.NameScope.Find<TextBlock>("IsoText");
-        _dialText = e.NameScope.Find<TextBlock>("DialText");
+        _stack = e.NameScope.Find<StackPanel>("PART_Stack");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _shell = e.NameScope.Find<Border>("PART_Shell");
+        _countryButton = e.NameScope.Find<Button>("PART_CountryButton");
+        _isoText = e.NameScope.Find<TextBlock>("PART_IsoText");
+        _dialText = e.NameScope.Find<TextBlock>("PART_DialText");
         _box = e.NameScope.Find<TextBox>("PART_Number");
-        _validMark = e.NameScope.Find<ArcIcon>("ValidMark");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _picker = e.NameScope.Find<Border>("Picker");
+        _validMark = e.NameScope.Find<ArcIcon>("PART_ValidMark");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _picker = e.NameScope.Find<Border>("PART_Picker");
         _search = e.NameScope.Find<TextBox>("PART_Search");
-        _rows = e.NameScope.Find<StackPanel>("Rows");
-        _scroller = e.NameScope.Find<ScrollViewer>("Scroller");
+        _rows = e.NameScope.Find<StackPanel>("PART_Rows");
+        _scroller = e.NameScope.Find<ScrollViewer>("PART_Scroller");
 
         if (_box is not null)
         {
@@ -736,6 +770,7 @@ public class ArcPhoneInput : TemplatedControl
         SetCurrentValue(ValueProperty, e164);
         UpdateAutomation();
         ValueChanged?.Invoke(this, new ArcPhoneValueEventArgs(e164, _country.Iso, Formatted, IsValid));
+        RaiseEvent(new ArcPhoneValueEventArgs(ValueChangedEvent, e164, _country.Iso, Formatted, IsValid));
     }
 
     private string _lastEmit = string.Empty;

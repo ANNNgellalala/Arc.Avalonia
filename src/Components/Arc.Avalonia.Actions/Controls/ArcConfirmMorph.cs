@@ -5,6 +5,8 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
@@ -42,6 +44,8 @@ public enum ArcConfirmMorphState
 /// A destructive button that morphs in place into an inline question, then a spinner, then a result with
 /// Undo. Only the pill's width springs; every face starts at the pill's leading edge, so nothing squashes.
 /// </summary>
+[TemplatePart("PART_Pill", typeof(Border))]
+[TemplatePart("PART_Faces", typeof(Panel))]
 public sealed class ArcConfirmMorph : Button
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -136,6 +140,16 @@ public sealed class ArcConfirmMorph : Button
     }
 
     public event EventHandler<ArcConfirmMorphState>? StateChanged;
+    /// <summary>Bubbled copy of <see cref="StateChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcConfirmMorphStateChangedEventArgs> StateChangedEvent =
+        RoutedEvent.Register<ArcConfirmMorph, ArcConfirmMorphStateChangedEventArgs>("StateChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="StateChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcConfirmMorphStateChangedEventArgs>? StateChangedRouted
+    {
+        add => AddHandler(StateChangedEvent, value);
+        remove => RemoveHandler(StateChangedEvent, value);
+    }
 
     /// <summary>Runs on confirm; return a task to show the pending face, throw to show the error face.</summary>
     public Func<Task>? Confirm { get; set; }
@@ -261,8 +275,8 @@ public sealed class ArcConfirmMorph : Button
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _pill = e.NameScope.Find<Border>("Pill");
-        _faces = e.NameScope.Find<Panel>("Faces");
+        _pill = e.NameScope.Find<Border>("PART_Pill");
+        _faces = e.NameScope.Find<Panel>("PART_Faces");
         Rebuild(animate: false);
         OnStateChanged();
     }
@@ -344,7 +358,9 @@ public sealed class ArcConfirmMorph : Button
                 break;
         }
 
+                var stateChangedArgs = new ArcConfirmMorphStateChangedEventArgs(StateChangedEvent) { State = state };
         StateChanged?.Invoke(this, state);
+        RaiseEvent(stateChangedArgs);
     }
 
     private void StartResultTimer()

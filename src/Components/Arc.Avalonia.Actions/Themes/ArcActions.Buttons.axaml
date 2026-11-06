@@ -16,20 +16,20 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Border x:Name="Surface"
+          <Border x:Name="PART_Surface"
                   Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
                   CornerRadius="{TemplateBinding CornerRadius}"
                   Padding="{TemplateBinding Padding}">
             <Panel ClipToBounds="False">
-              <Panel x:Name="HighlightLayer" IsHitTestVisible="False">
-                <i:ArcGlide x:Name="Highlight" CornerRadius="16" />
+              <Panel x:Name="PART_HighlightLayer" IsHitTestVisible="False">
+                <i:ArcGlide x:Name="PART_Highlight" CornerRadius="16" />
               </Panel>
-              <StackPanel x:Name="Segments" Orientation="Horizontal" />
+              <StackPanel x:Name="PART_Segments" Orientation="Horizontal" />
             </Panel>
           </Border>
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -48,22 +48,22 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <StackPanel Orientation="Horizontal">
-            <c:ArcButton x:Name="Main"
+            <c:ArcButton x:Name="PART_Main"
                          Size="Md"
                          Padding="16,0"
                          CornerRadius="18,0,0,18" />
-            <Border x:Name="Divider"
+            <Border x:Name="PART_Divider"
                     Classes="split-divider"
                     Width="1"
                     Height="24"
                     VerticalAlignment="Center" />
-            <c:ArcButton x:Name="Chevron"
+            <c:ArcButton x:Name="PART_Chevron"
                          Size="Md"
                          Compact="True"
                          Width="44"
                          CornerRadius="0,18,18,0" />
           </StackPanel>
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -78,14 +78,14 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Border x:Name="Ring"
+          <Border x:Name="PART_Ring"
                   Margin="-4"
                   CornerRadius="{DynamicResource ArcRadiusPill}"
                   BorderThickness="2"
                   BorderBrush="{DynamicResource ArcFocusOutline}"
                   IsVisible="False"
                   IsHitTestVisible="False" />
-          <Border x:Name="Pill"
+          <Border x:Name="PART_Pill"
                   HorizontalAlignment="Left"
                   Background="{DynamicResource ArcSurfaceMuted}"
                   BorderBrush="Transparent"
@@ -94,28 +94,28 @@
                   MinHeight="44"
                   Padding="16,0"
                   ClipToBounds="True">
-            <Panel x:Name="Faces" VerticalAlignment="Center" />
+            <Panel x:Name="PART_Faces" VerticalAlignment="Center" />
           </Border>
         </Panel>
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^.confirming /template/ Border#Pill">
+    <Style Selector="^.confirming /template/ Border#PART_Pill">
       <Setter Property="Background" Value="{DynamicResource ArcSurface}" />
       <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
     </Style>
-    <Style Selector="^.done /template/ Border#Pill">
+    <Style Selector="^.done /template/ Border#PART_Pill">
       <Setter Property="Background" Value="{DynamicResource ArcSuccessSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
-    <Style Selector="^.error /template/ Border#Pill">
+    <Style Selector="^.error /template/ Border#PART_Pill">
       <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
-    <Style Selector="^.pending /template/ Border#Pill">
+    <Style Selector="^.pending /template/ Border#PART_Pill">
       <Setter Property="Opacity" Value="0.85" />
     </Style>
-    <Style Selector="^:focus-visible /template/ Border#Ring">
+    <Style Selector="^:focus-visible /template/ Border#PART_Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>

@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -21,6 +22,10 @@ public enum ArcTimeFormat
 /// Arc's time picker: a field that opens a list of times at a fixed minute step, centred on the current
 /// value. Arrow keys move through times and wrap; Enter picks and closes.
 /// </summary>
+[TemplatePart("PART_Value", typeof(TextBlock))]
+[TemplatePart("PART_Label", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_List", typeof(ListBox))]
 public class ArcTimePicker : ArcPickerBase
 {
     public static readonly StyledProperty<TimeSpan?> ValueProperty =
@@ -73,6 +78,23 @@ public class ArcTimePicker : ArcPickerBase
 
     /// <summary>Raised with the new value whenever the visitor moves through the list.</summary>
     public event EventHandler<TimeSpan>? TimeChanged;
+
+    /// <summary>Bubbled copy of <see cref="TimeChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcTimePickerChangedEventArgs> TimeChangedEvent =
+        RoutedEvent.Register<ArcTimePicker, ArcTimePickerChangedEventArgs>("TimeChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="TimeChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcTimePickerChangedEventArgs>? TimeChangedRouted
+    {
+        add => AddHandler(TimeChangedEvent, value);
+        remove => RemoveHandler(TimeChangedEvent, value);
+    }
+
+    private void RaiseTimeChanged(TimeSpan time)
+    {
+        TimeChanged?.Invoke(this, time);
+        RaiseEvent(new ArcTimePickerChangedEventArgs(TimeChangedEvent) { Time = time });
+    }
 
     protected override string AccessibleRole => "Time";
 
@@ -271,7 +293,7 @@ public class ArcTimePicker : ArcPickerBase
         }
 
         OnContentChanged();
-        TimeChanged?.Invoke(this, time);
+        RaiseTimeChanged(time);
     }
 
     private void OnListKeyDown(object? sender, KeyEventArgs e)

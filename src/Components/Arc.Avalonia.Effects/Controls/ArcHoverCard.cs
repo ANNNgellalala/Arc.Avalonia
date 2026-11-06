@@ -15,6 +15,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -23,6 +24,9 @@ namespace Arc.Avalonia.Effects.Controls;
 /// focus, stays open while the pointer travels into it, and closes on Escape or after a short grace
 /// delay. The surface is hosted in the control's own overlay canvas so a page can screenshot it open.
 /// </summary>
+[TemplatePart("PART_Layer", typeof(Panel))]
+[TemplatePart("PART_TriggerHost", typeof(ContentPresenter))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public class ArcHoverCard : ContentControl
 {
     public static readonly StyledProperty<object?> TriggerProperty =
@@ -115,9 +119,9 @@ public class ArcHoverCard : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _layer = e.NameScope.Find<Panel>("Layer");
-        _triggerHost = e.NameScope.Find<ContentPresenter>("TriggerHost");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _layer = e.NameScope.Find<Panel>("PART_Layer");
+        _triggerHost = e.NameScope.Find<ContentPresenter>("PART_TriggerHost");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
 
         if (_triggerHost is not null)
         {

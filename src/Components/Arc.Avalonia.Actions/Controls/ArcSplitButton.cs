@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
@@ -20,6 +22,10 @@ public enum ArcSplitButtonVariant
 /// One default action joined to a chevron that opens the nearby alternatives. The menu half never
 /// scales, so the menu always opens from a still anchor.
 /// </summary>
+[TemplatePart("PART_Main", typeof(ArcButton))]
+[TemplatePart("PART_Chevron", typeof(ArcButton))]
+[TemplatePart("PART_Divider", typeof(Border))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcSplitButton : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -69,6 +75,16 @@ public sealed class ArcSplitButton : TemplatedControl
 
     /// <summary>Runs the main action.</summary>
     public event EventHandler? Click;
+    /// <summary>Bubbled copy of <see cref="Click"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcSplitButtonClickEventArgs> ClickEvent =
+        RoutedEvent.Register<ArcSplitButton, ArcSplitButtonClickEventArgs>("Click", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Click"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcSplitButtonClickEventArgs>? ClickRouted
+    {
+        add => AddHandler(ClickEvent, value);
+        remove => RemoveHandler(ClickEvent, value);
+    }
 
     /// <summary>Main action label.</summary>
     public string? Label
@@ -107,14 +123,19 @@ public sealed class ArcSplitButton : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _main = e.NameScope.Find<ArcButton>("Main");
-        _chevron = e.NameScope.Find<ArcButton>("Chevron");
-        _divider = e.NameScope.Find<Border>("Divider");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _main = e.NameScope.Find<ArcButton>("PART_Main");
+        _chevron = e.NameScope.Find<ArcButton>("PART_Chevron");
+        _divider = e.NameScope.Find<Border>("PART_Divider");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
 
         if (_main is not null)
         {
-            _main.Click += (_, _) => Click?.Invoke(this, EventArgs.Empty);
+            _main.Click += (_, _) =>
+            {
+                var clickArgs = new ArcSplitButtonClickEventArgs(ClickEvent);
+                Click?.Invoke(this, EventArgs.Empty);
+                RaiseEvent(clickArgs);
+            };
             _main.KeyDown += OnMainKeyDown;
         }
 

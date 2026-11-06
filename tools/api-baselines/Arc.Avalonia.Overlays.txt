@@ -3,9 +3,26 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.Overlays.Controls.ArcDialog[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcDialogClosedEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcDialogClosedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Overlays.Controls.ArcDrawer[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcDrawerClosedEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcDrawerClosedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Overlays.Controls.ArcPopover[]
   ctor Arc.Avalonia.Overlays.Controls.ArcShareAccess[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessDoneEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessDoneEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkAccessChangedEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkAccessChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkCopiedEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkCopiedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessPeopleChangedEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessPeopleChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessRemoveEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessRemoveEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessUndoRemoveEventArgs[]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareAccessUndoRemoveEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Overlays.Controls.ArcShareSuggestion> people, System.String role]
   ctor Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs[System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Overlays.Controls.ArcShareSuggestion> people, System.String role]
   ctor Arc.Avalonia.Overlays.Controls.ArcSharePerson[]
   ctor Arc.Avalonia.Overlays.Controls.ArcShareRoleOption[]
@@ -19,7 +36,16 @@
   event System.EventHandler Closed
   event System.EventHandler Done
   event System.EventHandler PeopleChanged
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcDialogClosedEventArgs> ClosedRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcDrawerClosedEventArgs> ClosedRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessDoneEventArgs> DoneRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkAccessChangedEventArgs> LinkAccessChangedRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkCopiedEventArgs> LinkCopiedRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessPeopleChangedEventArgs> PeopleChangedRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessRemoveEventArgs> RemoveRouted
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareAccessUndoRemoveEventArgs> UndoRemoveRouted
   event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs> Invite
+  event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs> InviteRouted
   event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess> LinkAccessChanged
   event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcSharePerson> Remove
   event System.EventHandler<Arc.Avalonia.Overlays.Controls.ArcSharePerson> UndoRemove
@@ -31,6 +57,15 @@
   field static Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess Restricted
   field static Arc.Avalonia.Overlays.Controls.ArcTooltipSide Bottom
   field static Arc.Avalonia.Overlays.Controls.ArcTooltipSide Top
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcDialogClosedEventArgs> ClosedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcDrawerClosedEventArgs> ClosedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessDoneEventArgs> DoneEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkAccessChangedEventArgs> LinkAccessChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkCopiedEventArgs> LinkCopiedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessPeopleChangedEventArgs> PeopleChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessRemoveEventArgs> RemoveEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareAccessUndoRemoveEventArgs> UndoRemoveEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs> InviteEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Overlays.Controls.ArcDrawerSide> SideProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess> LinkAccessProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Overlays.Controls.ArcTooltipSide> SideProperty
@@ -86,7 +121,10 @@
   method System.Void set_BaseUri[System.Uri ]
   method System.Void Undo[]
   property Arc.Avalonia.Overlays.Controls.ArcDrawerSide Side {get;set}
+  property Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess Access {get;set}
   property Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess LinkAccess {get;set}
+  property Arc.Avalonia.Overlays.Controls.ArcSharePerson Person {get;set}
+  property Arc.Avalonia.Overlays.Controls.ArcSharePerson Person {get;set}
   property Arc.Avalonia.Overlays.Controls.ArcTooltipSide Side {get;set}
   property System.Boolean AllowForLink {get;set}
   property System.Boolean CloseOnBackdropPress {get;set}
@@ -118,6 +156,7 @@
   property System.String Label {get;set}
   property System.String Label {get;set}
   property System.String Label {get;set}
+  property System.String Link {get;set}
   property System.String LinkRole {get;set}
   property System.String LinkUrl {get;set}
   property System.String Role {get;set}
@@ -137,10 +176,18 @@ type enum Arc.Avalonia.Overlays.Controls.ArcDrawerSide : System.IComparable, Sys
 type enum Arc.Avalonia.Overlays.Controls.ArcShareLinkAccess : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Overlays.Controls.ArcTooltipSide : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type sealed Arc.Avalonia.Overlays.Controls.ArcDialog : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Overlays.Controls.ArcDialogClosedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Overlays.Controls.ArcDrawer : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Overlays.Controls.ArcDrawerClosedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Overlays.Controls.ArcPopover : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccess : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
-type sealed Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs : System.EventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessDoneEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkAccessChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessLinkCopiedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessPeopleChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessRemoveEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareAccessUndoRemoveEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Overlays.Controls.ArcShareInviteEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Overlays.Controls.ArcSharePerson
 type sealed Arc.Avalonia.Overlays.Controls.ArcShareRoleOption
 type sealed Arc.Avalonia.Overlays.Controls.ArcShareSuggestion

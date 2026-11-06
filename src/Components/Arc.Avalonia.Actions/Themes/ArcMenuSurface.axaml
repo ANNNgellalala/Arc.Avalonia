@@ -19,9 +19,9 @@
                 Padding="{TemplateBinding Padding}"
                 MinWidth="{TemplateBinding MinWidth}"
                 MaxWidth="{TemplateBinding MaxWidth}">
-          <Panel x:Name="MenuHost">
-            <i:ArcGlide x:Name="Highlight" CornerRadius="{DynamicResource ArcRadiusControl}" />
-            <StackPanel x:Name="Items" Spacing="2" />
+          <Panel x:Name="PART_MenuHost">
+            <i:ArcGlide x:Name="PART_Highlight" CornerRadius="{DynamicResource ArcRadiusControl}" />
+            <StackPanel x:Name="PART_Items" Spacing="2" />
           </Panel>
         </Border>
       </ControlTemplate>

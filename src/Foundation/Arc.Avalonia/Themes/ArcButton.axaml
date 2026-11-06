@@ -40,7 +40,7 @@
               </Transitions>
             </Border.Transitions>
             <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" ColumnDefinitions="Auto,Auto">
-              <c:ArcSpinner x:Name="Spinner"
+              <c:ArcSpinner x:Name="PART_Spinner"
                             Grid.Column="0"
                             Width="16"
                             Height="16"

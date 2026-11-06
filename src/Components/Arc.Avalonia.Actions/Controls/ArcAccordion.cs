@@ -7,6 +7,7 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -26,6 +27,7 @@ public enum ArcAccordionSize
 /// Questions and answers revealed in place: one row open at a time, height and opacity moving together
 /// on the smooth spring with no overshoot, and the chevron turning as the row opens.
 /// </summary>
+[TemplatePart("PART_Rows", typeof(StackPanel))]
 public sealed class ArcAccordion : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcAccordionItem>?> ItemsProperty =
@@ -96,7 +98,7 @@ public sealed class ArcAccordion : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _host = e.NameScope.Find<StackPanel>("Rows");
+        _host = e.NameScope.Find<StackPanel>("PART_Rows");
         if (!string.IsNullOrWhiteSpace(Label))
         {
             AutomationProperties.SetName(this, Label!);

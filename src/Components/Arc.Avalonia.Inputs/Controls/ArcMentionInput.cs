@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -112,9 +113,12 @@ public sealed class ArcMentionValue
     public override string ToString() => Text;
 }
 
-public sealed class ArcMentionValueEventArgs : EventArgs
+public sealed class ArcMentionValueEventArgs : RoutedEventArgs
 {
     public ArcMentionValueEventArgs(ArcMentionValue value) => Value = value;
+
+    /// <summary>Routed payload factory used by <c>SubmittedRouted</c>.</summary>
+    public ArcMentionValueEventArgs(RoutedEvent routedEvent, ArcMentionValue value) : base(routedEvent) => Value = value;
 
     public ArcMentionValue Value { get; }
 }
@@ -123,6 +127,13 @@ public sealed class ArcMentionValueEventArgs : EventArgs
 /// Arc's mention input: an autosizing field where @people and #channels become tokens, with a
 /// suggestion list at the caret and keyboard control of the list.
 /// </summary>
+[TemplatePart("PART_Shell", typeof(Border))]
+[TemplatePart("PART_Mirror", typeof(TextBlock))]
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_Panel", typeof(Border))]
+[TemplatePart("PART_Rows", typeof(StackPanel))]
+[TemplatePart("PART_Scroller", typeof(ScrollViewer))]
 public class ArcMentionInput : TemplatedControl
 {
     public static readonly StyledProperty<ArcMentionValue?> ValueProperty =
@@ -199,6 +210,16 @@ public class ArcMentionInput : TemplatedControl
 
     /// <summary>Raised on Enter when <see cref="SubmitOnEnter"/> is set and the text is not blank.</summary>
     public event EventHandler<ArcMentionValueEventArgs>? Submitted;
+
+    public static readonly RoutedEvent<ArcMentionValueEventArgs> SubmittedEvent =
+        RoutedEvent.Register<ArcMentionInput, ArcMentionValueEventArgs>("Submitted", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="Submitted"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcMentionValueEventArgs>? SubmittedRouted
+    {
+        add => AddHandler(SubmittedEvent, value);
+        remove => RemoveHandler(SubmittedEvent, value);
+    }
 
     public ArcMentionValue? Value
     {
@@ -369,13 +390,13 @@ public class ArcMentionInput : TemplatedControl
             _box.LostFocus -= OnBoxLostFocus;
         }
 
-        _shell = e.NameScope.Find<Border>("Shell");
-        _mirror = e.NameScope.Find<TextBlock>("Mirror");
+        _shell = e.NameScope.Find<Border>("PART_Shell");
+        _mirror = e.NameScope.Find<TextBlock>("PART_Mirror");
         _box = e.NameScope.Find<TextBox>("PART_Input");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _panel = e.NameScope.Find<Border>("Panel");
-        _rows = e.NameScope.Find<StackPanel>("Rows");
-        _scroller = e.NameScope.Find<ScrollViewer>("Scroller");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _panel = e.NameScope.Find<Border>("PART_Panel");
+        _rows = e.NameScope.Find<StackPanel>("PART_Rows");
+        _scroller = e.NameScope.Find<ScrollViewer>("PART_Scroller");
 
         if (_box is not null)
         {
@@ -926,7 +947,9 @@ public class ArcMentionInput : TemplatedControl
             e.Handled = true;
             if (!string.IsNullOrWhiteSpace(_text))
             {
-                Submitted?.Invoke(this, new ArcMentionValueEventArgs(new ArcMentionValue(_text, _mentions.ToList())));
+                var submittedValue = new ArcMentionValue(_text, _mentions.ToList());
+                Submitted?.Invoke(this, new ArcMentionValueEventArgs(submittedValue));
+                RaiseEvent(new ArcMentionValueEventArgs(SubmittedEvent, submittedValue));
             }
         }
     }

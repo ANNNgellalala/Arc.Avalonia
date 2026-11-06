@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 
@@ -11,6 +12,9 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A search entry point: search icon, reserved clear-button slot and an optional keyboard shortcut
 /// hint. Escape clears the query, matching native search fields.
 /// </summary>
+[TemplatePart("PART_ShortcutHint", typeof(TextBlock))]
+[TemplatePart("PART_ShortcutPill", typeof(Control))]
+[TemplatePart("PART_ClearAction", typeof(Button))]
 public class ArcSearchField : ArcTextFieldBase
 {
     public static readonly StyledProperty<string?> ShortcutHintProperty =
@@ -35,15 +39,15 @@ public class ArcSearchField : ArcTextFieldBase
 
     protected override void OnFieldTemplateApplied(TemplateAppliedEventArgs e)
     {
-        _shortcut = e.NameScope.Find<TextBlock>("ShortcutHint");
-        _shortcutPill = e.NameScope.Find<Control>("ShortcutPill");
+        _shortcut = e.NameScope.Find<TextBlock>("PART_ShortcutHint");
+        _shortcutPill = e.NameScope.Find<Control>("PART_ShortcutPill");
 
         if (InputBox is not null)
         {
             AutomationProperties.SetName(InputBox, Label ?? "Search");
         }
 
-        if (e.NameScope.Find<Button>("ClearAction") is { } clear)
+        if (e.NameScope.Find<Button>("PART_ClearAction") is { } clear)
         {
             AutomationProperties.SetName(clear, "Clear search");
         }

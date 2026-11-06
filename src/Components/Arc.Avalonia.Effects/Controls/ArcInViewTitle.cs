@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -17,6 +18,7 @@ namespace Arc.Avalonia.Effects.Controls;
 /// line, tracking and wipe. Opacity leads, the blur clears next and the transform settles last so the
 /// words are readable before they arrive. Reduced motion shows the title instantly with no mask.
 /// </summary>
+[TemplatePart("PART_Lines", typeof(StackPanel))]
 public class ArcInViewTitle : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty =

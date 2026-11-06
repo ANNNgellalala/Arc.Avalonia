@@ -6,7 +6,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.Interactivity;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -14,6 +16,10 @@ namespace Arc.Avalonia.Pickers.Controls;
 /// Arc's colour picker: a swatch field that opens the full colour surface. Values are always hex with
 /// alpha digits when the colour is not opaque; the editor raises every change while the panel stays open.
 /// </summary>
+[TemplatePart("PART_Swatch", typeof(Border))]
+[TemplatePart("PART_Name", typeof(TextBlock))]
+[TemplatePart("PART_Hex", typeof(TextBlock))]
+[TemplatePart("PART_Editor", typeof(ArcColorEditor))]
 public class ArcColorPicker : ArcPickerBase
 {
     public static readonly StyledProperty<Color> ValueProperty =
@@ -89,6 +95,23 @@ public class ArcColorPicker : ArcPickerBase
 
     /// <summary>Raised as the colour changes, including while dragging.</summary>
     public event EventHandler<Color>? ValueChanged;
+
+    /// <summary>Bubbled copy of <see cref="ValueChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcColorValueChangedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcColorPicker, ArcColorValueChangedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ValueChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcColorValueChangedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
+    private void RaiseValueChanged(Color color)
+    {
+        ValueChanged?.Invoke(this, color);
+        RaiseEvent(new ArcColorValueChangedEventArgs(ValueChangedEvent) { Color = color });
+    }
 
     /// <summary>Raised when the saved swatch row changes.</summary>
     public event EventHandler<IReadOnlyList<ArcColorSwatch>>? SwatchesChanged;
@@ -212,7 +235,7 @@ public class ArcColorPicker : ArcPickerBase
         }
 
         UpdateTrigger();
-        ValueChanged?.Invoke(this, color);
+        RaiseValueChanged(color);
     }
 
     private void OnEditorSwatchesChanged(object? sender, IReadOnlyList<ArcColorSwatch> swatches)

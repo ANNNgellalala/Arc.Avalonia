@@ -5,6 +5,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Arc.Avalonia.Motion;
@@ -17,6 +18,7 @@ namespace Arc.Avalonia.Actions.Controls;
 /// drops one host into a panel and calls <see cref="Show"/>, and the host takes care of stacking and
 /// removal. Every toast dismisses itself after its duration.
 /// </summary>
+[TemplatePart("PART_Stack", typeof(StackPanel))]
 public sealed class ArcToastHost : TemplatedControl
 {
     private readonly List<ArcToast> _pending = new();
@@ -25,7 +27,7 @@ public sealed class ArcToastHost : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _stack = e.NameScope.Find<StackPanel>("Stack");
+        _stack = e.NameScope.Find<StackPanel>("PART_Stack");
         AutomationProperties.SetName(this, "Notifications");
 
         if (_stack is not null && _pending.Count > 0)

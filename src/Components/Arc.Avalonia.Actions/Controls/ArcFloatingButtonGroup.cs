@@ -6,6 +6,8 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -84,6 +86,10 @@ public sealed class ArcFloatingButtonItem
 /// the pointer or keyboard focus moves, and a pressed state that settles in place. Buttons never scale and
 /// the tray never resizes; only the highlight moves. The tray is a toolbar with a single roving tab stop.
 /// </summary>
+[TemplatePart("PART_Tray", typeof(Border))]
+[TemplatePart("PART_HighlightLayer", typeof(Panel))]
+[TemplatePart("PART_Highlight", typeof(ArcAdvancedGlide))]
+[TemplatePart("PART_ItemsHost", typeof(StackPanel))]
 public sealed class ArcFloatingButtonGroup : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcFloatingButtonItem>?> ItemsProperty =
@@ -131,6 +137,16 @@ public sealed class ArcFloatingButtonGroup : TemplatedControl
 
     /// <summary>Raised with the item id after its own command runs.</summary>
     public event EventHandler<string?>? ActionInvoked;
+    /// <summary>Bubbled copy of <see cref="ActionInvoked"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcFloatingButtonGroupActionInvokedEventArgs> ActionInvokedEvent =
+        RoutedEvent.Register<ArcFloatingButtonGroup, ArcFloatingButtonGroupActionInvokedEventArgs>("ActionInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ActionInvoked"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcFloatingButtonGroupActionInvokedEventArgs>? ActionInvokedRouted
+    {
+        add => AddHandler(ActionInvokedEvent, value);
+        remove => RemoveHandler(ActionInvokedEvent, value);
+    }
 
     /// <summary>The buttons in order; put <see cref="ArcFloatingButtonItem.IsSeparator"/> between clusters.</summary>
     public IList<ArcFloatingButtonItem>? Items
@@ -185,10 +201,10 @@ public sealed class ArcFloatingButtonGroup : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _tray = e.NameScope.Find<Border>("Tray");
-        _highlightLayer = e.NameScope.Find<Panel>("HighlightLayer");
-        _highlight = e.NameScope.Find<ArcAdvancedGlide>("Highlight");
-        _host = e.NameScope.Find<StackPanel>("ItemsHost");
+        _tray = e.NameScope.Find<Border>("PART_Tray");
+        _highlightLayer = e.NameScope.Find<Panel>("PART_HighlightLayer");
+        _highlight = e.NameScope.Find<ArcAdvancedGlide>("PART_Highlight");
+        _host = e.NameScope.Find<StackPanel>("PART_ItemsHost");
         Rebuild();
     }
 
@@ -429,7 +445,9 @@ public sealed class ArcFloatingButtonGroup : TemplatedControl
             item.Command.Execute(item.CommandParameter);
         }
 
+                var actionInvokedArgs = new ArcFloatingButtonGroupActionInvokedEventArgs(ActionInvokedEvent) { ActionId = item.Id };
         ActionInvoked?.Invoke(this, item.Id);
+        RaiseEvent(actionInvokedArgs);
     }
 
     private void SetTabStop(ArcButton button)

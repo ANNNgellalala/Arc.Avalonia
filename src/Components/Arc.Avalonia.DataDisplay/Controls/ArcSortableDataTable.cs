@@ -7,8 +7,10 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
@@ -61,6 +63,7 @@ public sealed class ArcTableItemName
 /// A structured-records table with sortable headers, optional selection, zebra rows, right-aligned
 /// numeric columns with tabular figures, and an empty state. Rows are plain objects or dictionaries.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcSortableDataTable : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<object>?> RowsProperty =
@@ -179,7 +182,41 @@ public class ArcSortableDataTable : TemplatedControl
 
     public event EventHandler<ArcTableSort>? SortChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="SortChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTableSortChangedEventArgs> SortChangedEvent =
+        RoutedEvent.Register<ArcSortableDataTable, ArcTableSortChangedEventArgs>("SortChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTableSortChangedEventArgs"/> version of <see cref="SortChanged"/>.</summary>
+    public event EventHandler<ArcTableSortChangedEventArgs>? SortChangedRouted
+    {
+        add => AddHandler(SortChangedEvent, value);
+        remove => RemoveHandler(SortChangedEvent, value);
+    }
+
+    private void RaiseSortChanged(ArcTableSort sort)
+    {
+        SortChanged?.Invoke(this, sort);
+        RaiseEvent(new ArcTableSortChangedEventArgs(SortChangedEvent) { Sort = sort });
+    }
+
     public event EventHandler<IReadOnlyList<string>>? SelectionChanged;
+
+    /// <summary>Bubbling routed counterpart of <see cref="SelectionChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTableSelectionChangedEventArgs> SelectionChangedEvent =
+        RoutedEvent.Register<ArcSortableDataTable, ArcTableSelectionChangedEventArgs>("SelectionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTableSelectionChangedEventArgs"/> version of <see cref="SelectionChanged"/>.</summary>
+    public event EventHandler<ArcTableSelectionChangedEventArgs>? SelectionChangedRouted
+    {
+        add => AddHandler(SelectionChangedEvent, value);
+        remove => RemoveHandler(SelectionChangedEvent, value);
+    }
+
+    private void RaiseSelectionChanged(IReadOnlyList<string> selectedKeys)
+    {
+        SelectionChanged?.Invoke(this, selectedKeys);
+        RaiseEvent(new ArcTableSelectionChangedEventArgs(SelectionChangedEvent) { SelectedKeys = selectedKeys });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -334,7 +371,7 @@ public class ArcSortableDataTable : TemplatedControl
                 }
 
                 Rebuild();
-                SelectionChanged?.Invoke(this, _selected.ToList());
+                RaiseSelectionChanged(_selected.ToList());
                 args.Handled = true;
             };
             cell.Child = all;
@@ -547,7 +584,7 @@ public class ArcSortableDataTable : TemplatedControl
         var ascending = _sort is null || _sort.Key != column.Key || _sort.Direction == ArcSortDirection.Desc;
         _sort = new ArcTableSort { Key = column.Key, Direction = ascending ? ArcSortDirection.Asc : ArcSortDirection.Desc };
         Rebuild();
-        SortChanged?.Invoke(this, _sort);
+        RaiseSortChanged(_sort);
     }
 
     private void ToggleSelection(string key)
@@ -563,7 +600,7 @@ public class ArcSortableDataTable : TemplatedControl
         }
 
         Rebuild();
-        SelectionChanged?.Invoke(this, _selected.ToList());
+        RaiseSelectionChanged(_selected.ToList());
     }
 
     private void SelectRange(string from, string to)
@@ -586,7 +623,7 @@ public class ArcSortableDataTable : TemplatedControl
         }
 
         Rebuild();
-        SelectionChanged?.Invoke(this, _selected.ToList());
+        RaiseSelectionChanged(_selected.ToList());
     }
 
     private void UpdateFooter()
@@ -621,7 +658,7 @@ public class ArcSortableDataTable : TemplatedControl
             {
                 _selected.Clear();
                 Rebuild();
-                SelectionChanged?.Invoke(this, _selected.ToList());
+                RaiseSelectionChanged(_selected.ToList());
             };
             Grid.SetColumn(clear, 1);
             line.Children.Add(clear);
@@ -693,7 +730,7 @@ public class ArcSortableDataTable : TemplatedControl
                 {
                     _selected.Clear();
                     Rebuild();
-                    SelectionChanged?.Invoke(this, _selected.ToList());
+                    RaiseSelectionChanged(_selected.ToList());
                     e.Handled = true;
                 }
 
@@ -807,3 +844,27 @@ public class ArcSortableDataTable : TemplatedControl
     }
 }
 
+
+/// <summary>Event data for the bubbling <see cref="SortChangedRouted"/> event.</summary>
+public sealed class ArcTableSortChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTableSortChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcTableSort Sort { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="SelectionChangedRouted"/> event.</summary>
+public sealed class ArcTableSelectionChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTableSelectionChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public IReadOnlyList<string> SelectedKeys { get; init; } = null!;
+}

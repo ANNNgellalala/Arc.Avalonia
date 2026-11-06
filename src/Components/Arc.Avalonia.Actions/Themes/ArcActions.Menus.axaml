@@ -10,10 +10,10 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <c:ArcButton x:Name="Trigger"
+          <c:ArcButton x:Name="PART_Trigger"
                        Variant="Secondary"
                        Size="Md" />
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -26,20 +26,20 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Border x:Name="Ring"
+          <Border x:Name="PART_Ring"
                   Margin="-3"
                   CornerRadius="{DynamicResource ArcRadiusPanel}"
                   BorderThickness="2"
                   BorderBrush="{DynamicResource ArcFocusOutline}"
                   IsVisible="False"
                   IsHitTestVisible="False" />
-          <Border x:Name="Target"
+          <Border x:Name="PART_Target"
                   Background="Transparent"
                   CornerRadius="{DynamicResource ArcRadiusPanel}">
             <ContentPresenter Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}" />
           </Border>
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>

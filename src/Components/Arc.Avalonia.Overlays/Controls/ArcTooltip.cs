@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
@@ -25,6 +26,7 @@ public enum ArcTooltipSide
 /// delay on hover, immediately on keyboard focus, and hides on Escape. Never the only place for
 /// information someone needs.
 /// </summary>
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcTooltip : ContentControl
 {
     public static readonly StyledProperty<string?> TextProperty =
@@ -88,7 +90,7 @@ public sealed class ArcTooltip : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
         Sync();
     }
 

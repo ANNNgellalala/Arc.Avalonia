@@ -12,7 +12,7 @@
                 Padding="3"
                 HorizontalAlignment="Left">
           <Panel>
-            <Border x:Name="Pill"
+            <Border x:Name="PART_Pill"
                     Background="{DynamicResource ArcSurface}"
                     CornerRadius="{DynamicResource ArcRadiusPill}"
                     BoxShadow="{DynamicResource ArcShadowResting}"
@@ -38,7 +38,7 @@
                 </TranslateTransform>
               </Border.RenderTransform>
             </Border>
-            <StackPanel x:Name="Segments" Orientation="Horizontal" />
+            <StackPanel x:Name="PART_Segments" Orientation="Horizontal" />
           </Panel>
         </Border>
       </ControlTemplate>

@@ -6,6 +6,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
@@ -16,6 +18,7 @@ namespace Arc.Avalonia.Navigation.Controls;
 /// Previous and next arrows around a five page window, with the current page in the accent and ellipses
 /// where the window skips. Fully controlled: keep the page in your own state and react to the change.
 /// </summary>
+[TemplatePart("PART_Buttons", typeof(StackPanel))]
 public sealed class ArcPagination : TemplatedControl
 {
     public static readonly StyledProperty<int> PageProperty =
@@ -43,6 +46,17 @@ public sealed class ArcPagination : TemplatedControl
     /// <summary>Raised with the requested page.</summary>
     public event EventHandler<int>? PageChanged;
 
+    /// <summary>Bubbled copy of <see cref="PageChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcPaginationPageChangedEventArgs> PageChangedEvent =
+        RoutedEvent.Register<ArcPagination, ArcPaginationPageChangedEventArgs>("PageChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="PageChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcPaginationPageChangedEventArgs>? PageChangedRouted
+    {
+        add => AddHandler(PageChangedEvent, value);
+        remove => RemoveHandler(PageChangedEvent, value);
+    }
+
     /// <summary>Current page, 1-based; clamped to the range.</summary>
     public int Page
     {
@@ -65,7 +79,7 @@ public sealed class ArcPagination : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _buttons = e.NameScope.Find<StackPanel>("Buttons");
+        _buttons = e.NameScope.Find<StackPanel>("PART_Buttons");
         AutomationProperties.SetName(this, Label ?? "Pagination");
         Build();
     }
@@ -170,7 +184,9 @@ public sealed class ArcPagination : TemplatedControl
         }
 
         SetCurrentValue(PageProperty, target);
+                var pageChangedArgs = new ArcPaginationPageChangedEventArgs(PageChangedEvent) { PageIndex = target };
         PageChanged?.Invoke(this, target);
+        RaiseEvent(pageChangedArgs);
     }
 
     private static IEnumerable<object> Tokens(int page, int count)

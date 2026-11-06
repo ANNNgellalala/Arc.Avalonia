@@ -8,7 +8,7 @@
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <StackPanel x:Name="Rows" HorizontalAlignment="Stretch" />
+        <StackPanel x:Name="PART_Rows" HorizontalAlignment="Stretch" />
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -21,21 +21,21 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="6" HorizontalAlignment="Stretch">
-          <Border x:Name="Clip"
+          <Border x:Name="PART_Clip"
                   HorizontalAlignment="Stretch"
                   ClipToBounds="True">
             <Panel>
-              <TextBlock x:Name="Body"
+              <TextBlock x:Name="PART_Body"
                          TextWrapping="Wrap"
                          LineHeight="20"
                          Classes="arc-body-sm" />
-              <Border x:Name="Fade"
+              <Border x:Name="PART_Fade"
                       Height="26"
                       VerticalAlignment="Bottom"
                       IsHitTestVisible="False" />
             </Panel>
           </Border>
-          <c:ArcButton x:Name="Toggle"
+          <c:ArcButton x:Name="PART_Toggle"
                      Variant="Ghost"
                      Size="Sm"
                      MinHeight="28"

@@ -181,7 +181,7 @@ public class ArcSlopeChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -197,11 +197,11 @@ public class ArcSlopeChart : ArcChartBase
         }
 
         context.DrawLine(
-            new Pen(ChartPalette.BorderSubtle, 1),
+            new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
             new Point(Crisp(_startX), _top - 2),
             new Point(Crisp(_startX), _bottom + 2));
         context.DrawLine(
-            new Pen(ChartPalette.BorderSubtle, 1),
+            new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
             new Point(Crisp(_endX), _top - 2),
             new Point(Crisp(_endX), _bottom + 2));
 
@@ -210,7 +210,7 @@ public class ArcSlopeChart : ArcChartBase
             StartLabel,
             _startX,
             14,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: 72);
@@ -219,7 +219,7 @@ public class ArcSlopeChart : ArcChartBase
             EndLabel,
             _endX,
             14,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: 72);
@@ -255,7 +255,7 @@ public class ArcSlopeChart : ArcChartBase
             if (Math.Abs(startYs[i] - startPoint.Y) > 1.5)
             {
                 context.DrawLine(
-                    new Pen(ChartPalette.BorderSubtle, 1),
+                    new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
                     new Point(88, startYs[i]),
                     new Point(_startX - 4, startPoint.Y));
             }
@@ -265,7 +265,7 @@ public class ArcSlopeChart : ArcChartBase
                 item.Name,
                 82,
                 startYs[i],
-                12,
+                ChartMetrics.LabelFontSize,
                 isHighlight || isActive ? ChartPalette.Foreground : ChartPalette.Secondary,
                 isHighlight || isActive ? FontWeight.Medium : FontWeight.Normal,
                 TextAlignment.Right,
@@ -274,7 +274,7 @@ public class ArcSlopeChart : ArcChartBase
             if (Math.Abs(endYs[i] - endPoint.Y) > 1.5)
             {
                 context.DrawLine(
-                    new Pen(ChartPalette.BorderSubtle, 1),
+                    new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
                     new Point(_endX + 4, endPoint.Y),
                     new Point(_endX + 9, endYs[i]));
             }
@@ -284,7 +284,7 @@ public class ArcSlopeChart : ArcChartBase
                 FormatValue(item.End),
                 _endX + 9,
                 endYs[i],
-                12,
+                ChartMetrics.LabelFontSize,
                 isHighlight || isActive ? ChartPalette.Foreground : ChartPalette.Secondary,
                 isHighlight || isActive ? FontWeight.Medium : FontWeight.Normal,
                 maxWidth: 48);
@@ -295,7 +295,7 @@ public class ArcSlopeChart : ArcChartBase
                     "#" + ranks[i],
                     Bounds.Width - 2,
                     endYs[i],
-                    12,
+                    ChartMetrics.LabelFontSize,
                     ChartPalette.Muted,
                     alignment: TextAlignment.Right);
             }

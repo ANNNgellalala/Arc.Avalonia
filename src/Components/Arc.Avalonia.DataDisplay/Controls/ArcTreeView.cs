@@ -4,8 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -30,6 +32,7 @@ public sealed class ArcTreeNode
 /// A hierarchy of folders and files with chevrons, 18 px indentation, a gliding selection, and
 /// full tree keyboard navigation (arrows, Home/End, Enter/Space).
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcTreeView : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcTreeNode>?> NodesProperty =
@@ -104,7 +107,41 @@ public class ArcTreeView : TemplatedControl
 
     public event EventHandler<ArcTreeNode>? Selected;
 
+    /// <summary>Bubbling routed counterpart of <see cref="Selected"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeSelectedEventArgs> SelectedEvent =
+        RoutedEvent.Register<ArcTreeView, ArcTreeSelectedEventArgs>("Selected", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeSelectedEventArgs"/> version of <see cref="Selected"/>.</summary>
+    public event EventHandler<ArcTreeSelectedEventArgs>? SelectedRouted
+    {
+        add => AddHandler(SelectedEvent, value);
+        remove => RemoveHandler(SelectedEvent, value);
+    }
+
+    private void RaiseSelected(ArcTreeNode node)
+    {
+        Selected?.Invoke(this, node);
+        RaiseEvent(new ArcTreeSelectedEventArgs(SelectedEvent) { Node = node });
+    }
+
     public event EventHandler<IReadOnlyList<string>>? ExpandedChanged;
+
+    /// <summary>Bubbling routed counterpart of <see cref="ExpandedChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeExpandedChangedEventArgs> ExpandedChangedEvent =
+        RoutedEvent.Register<ArcTreeView, ArcTreeExpandedChangedEventArgs>("ExpandedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeExpandedChangedEventArgs"/> version of <see cref="ExpandedChanged"/>.</summary>
+    public event EventHandler<ArcTreeExpandedChangedEventArgs>? ExpandedChangedRouted
+    {
+        add => AddHandler(ExpandedChangedEvent, value);
+        remove => RemoveHandler(ExpandedChangedEvent, value);
+    }
+
+    private void RaiseExpandedChanged(IReadOnlyList<string> expandedKeys)
+    {
+        ExpandedChanged?.Invoke(this, expandedKeys);
+        RaiseEvent(new ArcTreeExpandedChangedEventArgs(ExpandedChangedEvent) { ExpandedKeys = expandedKeys });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -265,7 +302,7 @@ public class ArcTreeView : TemplatedControl
     private void Select(ArcTreeNode node)
     {
         SetCurrentValue(SelectedIdProperty, node.Id);
-        Selected?.Invoke(this, node);
+        RaiseSelected(node);
     }
 
     private void Toggle(ArcTreeNode node)
@@ -290,7 +327,7 @@ public class ArcTreeView : TemplatedControl
             SetCurrentValue(ExpandedIdsProperty, _expanded.ToList());
         }
 
-        ExpandedChanged?.Invoke(this, _expanded.ToList());
+        RaiseExpandedChanged(_expanded.ToList());
         Rebuild();
     }
 
@@ -421,4 +458,28 @@ public class ArcTreeView : TemplatedControl
             }
         }
     }
+}
+
+/// <summary>Event data for the bubbling <see cref="SelectedRouted"/> event.</summary>
+public sealed class ArcTreeSelectedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeSelectedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcTreeNode Node { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="ExpandedChangedRouted"/> event.</summary>
+public sealed class ArcTreeExpandedChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeExpandedChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public IReadOnlyList<string> ExpandedKeys { get; init; } = null!;
 }

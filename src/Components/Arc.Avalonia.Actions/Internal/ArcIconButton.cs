@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 
 namespace Arc.Avalonia.Internal;
@@ -11,6 +12,7 @@ namespace Arc.Avalonia.Internal;
 /// A quiet icon-only button used inside composite controls (row actions, chevrons, remove buttons).
 /// It carries its own focus ring so keyboard users can reach every inline action.
 /// </summary>
+[TemplatePart("PART_Icon", typeof(Arc.Avalonia.Controls.ArcIcon))]
 public class ArcIconButton : Button
 {
     public static readonly StyledProperty<string?> IconProperty =
@@ -80,7 +82,7 @@ public class ArcIconButton : Button
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _icon = e.NameScope.Find<Arc.Avalonia.Controls.ArcIcon>("Icon");
+        _icon = e.NameScope.Find<Arc.Avalonia.Controls.ArcIcon>("PART_Icon");
         ApplyIcon();
         ApplyBox();
     }
@@ -117,6 +119,13 @@ public class ArcIconButton : Button
 /// A borderless text button used for header cells, menu rows, and inline links. Same focus ring
 /// as <see cref="ArcIconButton"/>, so composite controls never have to re-invent focus.
 /// </summary>
+/// <remarks>
+/// The class overrides <c>OnApplyTemplate</c> only to re-apply <see cref="Text"/>
+/// after a template change; it does not query template parts. <c>PART_Ring</c> is still part of the
+/// public theme contract: the control theme's <c>:focus-visible</c> selector drives it, so a custom
+/// theme must provide that part for the keyboard focus ring (declared here for R10 / custom themes).
+/// </remarks>
+[TemplatePart("PART_Ring", typeof(Border))]
 public class ArcFlatButton : Button
 {
     public static readonly StyledProperty<string?> TextProperty =

@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -46,6 +47,10 @@ public sealed class ArcBillingToggleOption
 /// Arc's billing toggle: a monthly and yearly switch with a savings badge. One thumb glides between
 /// the options and the badge tints and rewrites itself in place once its period is chosen.
 /// </summary>
+[TemplatePart("PART_Track", typeof(Border))]
+[TemplatePart("PART_Host", typeof(Panel))]
+[TemplatePart("PART_Thumb", typeof(Border))]
+[TemplatePart("PART_OptionsHost", typeof(StackPanel))]
 public class ArcBillingToggle : TemplatedControl
 {
     public static readonly StyledProperty<string?> ValueProperty =
@@ -131,10 +136,10 @@ public class ArcBillingToggle : TemplatedControl
             _optionsHost.RemoveHandler(KeyDownEvent, OnOptionsKeyDown);
         }
 
-        _track = e.NameScope.Find<Border>("Track");
-        _host = e.NameScope.Find<Panel>("Host");
-        _thumb = e.NameScope.Find<Border>("Thumb");
-        _optionsHost = e.NameScope.Find<StackPanel>("OptionsHost");
+        _track = e.NameScope.Find<Border>("PART_Track");
+        _host = e.NameScope.Find<Panel>("PART_Host");
+        _thumb = e.NameScope.Find<Border>("PART_Thumb");
+        _optionsHost = e.NameScope.Find<StackPanel>("PART_OptionsHost");
 
         if (_optionsHost is not null)
         {

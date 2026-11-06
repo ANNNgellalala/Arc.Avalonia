@@ -18,8 +18,8 @@
             <StackPanel Margin="20" Spacing="16">
               <!-- Heading -->
               <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                <TextBlock x:Name="Heading" Classes="arc-heading" TextWrapping="Wrap" VerticalAlignment="Center" />
-                <c:ArcButton x:Name="DoneButton"
+                <TextBlock x:Name="PART_Heading" Classes="arc-heading" TextWrapping="Wrap" VerticalAlignment="Center" />
+                <c:ArcButton x:Name="PART_DoneButton"
                              Grid.Column="1"
                              Variant="Secondary"
                              Size="Sm"
@@ -31,47 +31,47 @@
               <!-- Invite field, error line and invite row -->
               <StackPanel Spacing="8">
                 <Panel>
-                  <Border x:Name="FieldRing"
+                  <Border x:Name="PART_FieldRing"
                           Classes="sa-field-ring"
                           Margin="-3"
                           IsVisible="False" />
-                  <Border x:Name="FieldShell"
+                  <Border x:Name="PART_FieldShell"
                           Classes="sa-field"
                           MinHeight="46"
                           Padding="6,4">
                     <Panel>
-                      <TextBlock x:Name="Placeholder"
+                      <TextBlock x:Name="PART_Placeholder"
                                  Classes="arc-body-sm sa-placeholder"
                                  Text="Add people by name or email"
                                  Margin="8,0"
                                  VerticalAlignment="Center"
                                  IsHitTestVisible="False" />
-                      <WrapPanel x:Name="Chips" Orientation="Horizontal" VerticalAlignment="Center" />
+                      <WrapPanel x:Name="PART_Chips" Orientation="Horizontal" VerticalAlignment="Center" />
                     </Panel>
                   </Border>
                 </Panel>
 
-                <StackPanel x:Name="ErrorRow"
+                <StackPanel x:Name="PART_ErrorRow"
                             Orientation="Horizontal"
                             Spacing="6"
                             IsVisible="False"
                             Margin="2,0">
                   <c:ArcIcon Icon="circle-alert" Size="14" Classes="sa-error-icon" VerticalAlignment="Center" />
-                  <TextBlock x:Name="ErrorText"
+                  <TextBlock x:Name="PART_ErrorText"
                              Classes="arc-caption sa-error-text"
                              TextWrapping="Wrap"
                              MaxWidth="360" />
                 </StackPanel>
 
                 <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                  <c:ArcButton x:Name="InviteRole"
+                  <c:ArcButton x:Name="PART_InviteRole"
                                Variant="Ghost"
                                Size="Sm"
                                Height="32"
                                MinHeight="32"
                                Padding="8,0"
                                HorizontalAlignment="Left" />
-                  <c:ArcButton x:Name="InviteButton"
+                  <c:ArcButton x:Name="PART_InviteButton"
                                Grid.Column="1"
                                Variant="Primary"
                                Size="Sm"
@@ -85,10 +85,10 @@
               <StackPanel Spacing="6">
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,2">
                   <TextBlock Classes="arc-label" Text="People with access" />
-                  <TextBlock x:Name="PeopleCount" Grid.Column="1" Classes="arc-caption" VerticalAlignment="Center" />
+                  <TextBlock x:Name="PART_PeopleCount" Grid.Column="1" Classes="arc-caption" VerticalAlignment="Center" />
                 </Grid>
-                <StackPanel x:Name="PeopleHost" Orientation="Vertical" Spacing="1" />
-                <Border x:Name="UndoBar"
+                <StackPanel x:Name="PART_PeopleHost" Orientation="Vertical" Spacing="1" />
+                <Border x:Name="PART_UndoBar"
                         Classes="sa-undo"
                         IsVisible="False"
                         Height="0"
@@ -96,8 +96,8 @@
                         ClipToBounds="True"
                         Margin="0,4,0,0">
                   <Grid ColumnDefinitions="*,Auto" Margin="12,0" VerticalAlignment="Center">
-                    <TextBlock x:Name="UndoText" Classes="arc-caption sa-undo-text" VerticalAlignment="Center" />
-                    <c:ArcButton x:Name="UndoButton"
+                    <TextBlock x:Name="PART_UndoText" Classes="arc-caption sa-undo-text" VerticalAlignment="Center" />
+                    <c:ArcButton x:Name="PART_UndoButton"
                                  Grid.Column="1"
                                  Variant="Ghost"
                                  Size="Sm"
@@ -113,25 +113,25 @@
 
               <!-- General access -->
               <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-                <Border x:Name="AccessIconBox"
+                <Border x:Name="PART_AccessIconBox"
                         Classes="sa-icon-box"
                         Width="32"
                         Height="32"
                         VerticalAlignment="Center">
-                  <c:ArcIcon x:Name="AccessIcon"
+                  <c:ArcIcon x:Name="PART_AccessIcon"
                              Icon="lock"
                              Size="16"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center" />
                 </Border>
                 <StackPanel Grid.Column="1" Spacing="1" Margin="10,0" VerticalAlignment="Center">
-                  <TextBlock x:Name="AccessTitle" Classes="arc-body-sm arc-medium" />
-                  <TextBlock x:Name="AccessDescription"
+                  <TextBlock x:Name="PART_AccessTitle" Classes="arc-body-sm arc-medium" />
+                  <TextBlock x:Name="PART_AccessDescription"
                              Classes="arc-caption"
                              TextWrapping="Wrap"
                              MaxWidth="260" />
                 </StackPanel>
-                <c:ArcButton x:Name="AccessButton"
+                <c:ArcButton x:Name="PART_AccessButton"
                              Grid.Column="2"
                              Variant="Secondary"
                              Size="Sm"
@@ -142,14 +142,14 @@
                              VerticalAlignment="Center" />
               </Grid>
 
-              <Grid x:Name="LinkRoleRow"
+              <Grid x:Name="PART_LinkRoleRow"
                     ColumnDefinitions="*,Auto"
                     IsVisible="False"
                     Margin="42,0,0,0">
                 <TextBlock Classes="arc-caption"
                            Text="Anyone with the link can"
                            VerticalAlignment="Center" />
-                <c:ArcButton x:Name="LinkRoleButton"
+                <c:ArcButton x:Name="PART_LinkRoleButton"
                              Grid.Column="1"
                              Variant="Ghost"
                              Size="Sm"
@@ -162,12 +162,12 @@
               <!-- Link and copy -->
               <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
                 <Border Classes="sa-link" Height="34" Padding="10,0" VerticalAlignment="Center">
-                  <TextBlock x:Name="LinkText"
+                  <TextBlock x:Name="PART_LinkText"
                              Classes="arc-body-sm sa-link-text"
                              VerticalAlignment="Center"
                              TextTrimming="CharacterEllipsis" />
                 </Border>
-                <c:ArcButton x:Name="CopyButton"
+                <c:ArcButton x:Name="PART_CopyButton"
                              Grid.Column="1"
                              Variant="Secondary"
                              Size="Sm"
@@ -178,14 +178,14 @@
                              Width="132"
                              VerticalAlignment="Center">
                   <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
-                    <c:ArcIcon x:Name="CopyIcon" Icon="copy" Size="15" Classes="sa-copy-icon" VerticalAlignment="Center" />
-                    <TextBlock x:Name="CopyLabel" Text="Copy link" VerticalAlignment="Center" />
+                    <c:ArcIcon x:Name="PART_CopyIcon" Icon="copy" Size="15" Classes="sa-copy-icon" VerticalAlignment="Center" />
+                    <TextBlock x:Name="PART_CopyLabel" Text="Copy link" VerticalAlignment="Center" />
                   </StackPanel>
                 </c:ArcButton>
               </Grid>
             </StackPanel>
 
-            <Canvas x:Name="Overlay" ClipToBounds="False" />
+            <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
           </Panel>
         </Border>
       </ControlTemplate>

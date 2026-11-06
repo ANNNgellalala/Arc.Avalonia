@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -16,6 +17,10 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A 1-to-N star rating with hover preview, half stars, clearing, keyboard control and a value word.
 /// The stars are drawn by <see cref="ArcStar"/>; the control itself owns focus and automation.
 /// </summary>
+[TemplatePart("PART_Stars", typeof(StackPanel))]
+[TemplatePart("PART_ValueText", typeof(TextBlock))]
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
 public class ArcRating : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -173,10 +178,10 @@ public class ArcRating : TemplatedControl
             _starHost.PointerExited -= OnPointerExited;
         }
 
-        _starsRow = e.NameScope.Find<StackPanel>("Stars");
-        _valueText = e.NameScope.Find<TextBlock>("ValueText");
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _description = e.NameScope.Find<TextBlock>("Description");
+        _starsRow = e.NameScope.Find<StackPanel>("PART_Stars");
+        _valueText = e.NameScope.Find<TextBlock>("PART_ValueText");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
 
         if (_starsRow is not null)
         {

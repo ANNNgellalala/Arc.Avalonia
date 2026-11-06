@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -174,6 +175,16 @@ public class ArcQuickCaptureBar : Panel
     }
 
     /// <summary>Raised with the draft text when the visitor confirms; the host parses and persists.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> SubmitRequestedEvent =
+        RoutedEvent.Register<ArcQuickCaptureBar, ArcLifeTodayRoutedEventArgs>("SubmitRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SubmitRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? SubmitRequestedRouted
+    {
+        add => AddHandler(SubmitRequestedEvent, value);
+        remove => RemoveHandler(SubmitRequestedEvent, value);
+    }
+
     public event Action<string>? SubmitRequested;
 
     /// <summary>Raised with the chip id when the visitor removes a parsed detail.</summary>
@@ -319,6 +330,7 @@ public class ArcQuickCaptureBar : Panel
         }
 
         SubmitRequested?.Invoke(text);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(SubmitRequestedEvent) { Text = text });
     }
 
     private void UpdateConfirm() =>
@@ -454,3 +466,5 @@ public class ArcQuickCaptureBar : Panel
         _ => ArcBadgeTone.Neutral
     };
 }
+
+

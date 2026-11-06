@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Automation;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -17,6 +18,11 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// Shared behaviour for the text-entry family: a single native TextBox inside the Arc shell, clear
 /// affordance, optional leading and trailing icons and two-way <see cref="Value"/>.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_LeadingIcon", typeof(ArcIcon))]
+[TemplatePart("PART_TrailingIcon", typeof(ArcIcon))]
+[TemplatePart("PART_ClearAction", typeof(Button))]
 public abstract class ArcTextFieldBase : ArcFieldBase
 {
     public static readonly StyledProperty<string?> ValueProperty =
@@ -113,10 +119,10 @@ public abstract class ArcTextFieldBase : ArcFieldBase
         }
 
         InputBox = e.NameScope.Find<TextBox>("PART_Input");
-        MessageText = e.NameScope.Find<TextBlock>("Message");
-        _leadingIcon = e.NameScope.Find<ArcIcon>("LeadingIcon");
-        _trailingIcon = e.NameScope.Find<ArcIcon>("TrailingIcon");
-        _clearButton = e.NameScope.Find<Button>("ClearAction");
+        MessageText = e.NameScope.Find<TextBlock>("PART_Message");
+        _leadingIcon = e.NameScope.Find<ArcIcon>("PART_LeadingIcon");
+        _trailingIcon = e.NameScope.Find<ArcIcon>("PART_TrailingIcon");
+        _clearButton = e.NameScope.Find<Button>("PART_ClearAction");
 
         if (InputBox is not null)
         {

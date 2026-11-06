@@ -212,7 +212,7 @@ public class ArcSparkline : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -244,7 +244,7 @@ public class ArcSparkline : ArcChartBase
                     Change,
                     Bounds.Width - 2,
                     20,
-                    12,
+                    ChartMetrics.LabelFontSize,
                     ChartPalette.Tone(Tone),
                     FontWeight.Medium,
                     TextAlignment.Right);

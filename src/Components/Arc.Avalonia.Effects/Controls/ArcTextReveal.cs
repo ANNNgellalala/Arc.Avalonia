@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -16,6 +17,7 @@ namespace Arc.Avalonia.Effects.Controls;
 /// per-unit stagger whose total is capped so long copy never drags. Reduced motion shows the final
 /// state immediately, and the accessibility name is the whole sentence rather than the fragments.
 /// </summary>
+[TemplatePart("PART_Lines", typeof(StackPanel))]
 public class ArcTextReveal : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty =

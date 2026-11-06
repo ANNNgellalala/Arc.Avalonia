@@ -11,6 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -46,6 +47,15 @@ public enum ArcRangeMonths
 /// Arc's date range picker: a compact field that opens a panel with one or two months and a preset
 /// rail. Selection is a draft until Apply; Escape or Cancel discards it.
 /// </summary>
+[TemplatePart("PART_Value", typeof(TextBlock))]
+[TemplatePart("PART_Label", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_Footer", typeof(TextBlock))]
+[TemplatePart("PART_Apply", typeof(Button))]
+[TemplatePart("PART_Cancel", typeof(Button))]
+[TemplatePart("PART_Presets", typeof(StackPanel))]
+[TemplatePart("PART_CalendarLeft", typeof(ArcCalendar))]
+[TemplatePart("PART_CalendarRight", typeof(ArcCalendar))]
 public class ArcDateRangePicker : ArcPickerBase
 {
     public static readonly StyledProperty<ArcDateRange?> RangeProperty =
@@ -146,6 +156,23 @@ public class ArcDateRangePicker : ArcPickerBase
 
     /// <summary>Raised with the applied range.</summary>
     public event EventHandler<ArcDateRange>? RangeChanged;
+
+    /// <summary>Bubbled copy of <see cref="RangeChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcDateRangeChangedEventArgs> RangeChangedEvent =
+        RoutedEvent.Register<ArcDateRangePicker, ArcDateRangeChangedEventArgs>("RangeChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="RangeChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcDateRangeChangedEventArgs>? RangeChangedRouted
+    {
+        add => AddHandler(RangeChangedEvent, value);
+        remove => RemoveHandler(RangeChangedEvent, value);
+    }
+
+    private void RaiseRangeChanged(ArcDateRange range)
+    {
+        RangeChanged?.Invoke(this, range);
+        RaiseEvent(new ArcDateRangeChangedEventArgs(RangeChangedEvent) { Range = range });
+    }
 
     protected override string AccessibleRole => "Date range";
 
@@ -570,7 +597,7 @@ public class ArcDateRangePicker : ArcPickerBase
 
         SetCurrentValue(RangeProperty, range);
         OnContentChanged();
-        RangeChanged?.Invoke(this, range);
+        RaiseRangeChanged(range);
         CloseAndFocus();
         e.Handled = true;
     }

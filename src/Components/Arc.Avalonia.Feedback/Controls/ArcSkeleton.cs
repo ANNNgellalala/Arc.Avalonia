@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
@@ -22,6 +23,8 @@ public enum ArcSkeletonShape
 /// A pulsing placeholder whose shape matches the content that is loading. Blocks breathe in a
 /// staggered wave; reduced motion keeps them still at a readable value.
 /// </summary>
+[TemplatePart("PART_Placeholder", typeof(StackPanel))]
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
 public class ArcSkeleton : ContentControl
 {
     public static readonly StyledProperty<string> LabelProperty =

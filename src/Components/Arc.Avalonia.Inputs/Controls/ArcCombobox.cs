@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -41,6 +42,14 @@ public sealed class ArcComboboxOption
 /// A searchable single choice field. Typing filters the list in place; focus never leaves the input, so
 /// ArrowDown, ArrowUp, Enter and Escape stay available while the query is being edited.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_EmptyText", typeof(TextBlock))]
+[TemplatePart("PART_Trigger", typeof(Border))]
+[TemplatePart("PART_ClearAction", typeof(Button))]
+[TemplatePart("PART_MenuPopup", typeof(Popup))]
+[TemplatePart("PART_MenuSurface", typeof(Border))]
+[TemplatePart("PART_Menu", typeof(ListBox))]
 public class ArcCombobox : ArcFieldBase
 {
     public static readonly StyledProperty<IReadOnlyList<ArcComboboxOption>?> OptionsProperty =
@@ -136,13 +145,13 @@ public class ArcCombobox : ArcFieldBase
         }
 
         _input = e.NameScope.Find<TextBox>("PART_Input");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _emptyText = e.NameScope.Find<TextBlock>("EmptyText");
-        _trigger = e.NameScope.Find<Border>("Trigger");
-        _clear = e.NameScope.Find<Button>("ClearAction");
-        _popup = e.NameScope.Find<Popup>("MenuPopup");
-        _surface = e.NameScope.Find<Border>("MenuSurface");
-        _menu = e.NameScope.Find<ListBox>("Menu");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _emptyText = e.NameScope.Find<TextBlock>("PART_EmptyText");
+        _trigger = e.NameScope.Find<Border>("PART_Trigger");
+        _clear = e.NameScope.Find<Button>("PART_ClearAction");
+        _popup = e.NameScope.Find<Popup>("PART_MenuPopup");
+        _surface = e.NameScope.Find<Border>("PART_MenuSurface");
+        _menu = e.NameScope.Find<ListBox>("PART_Menu");
 
         if (_input is not null)
         {

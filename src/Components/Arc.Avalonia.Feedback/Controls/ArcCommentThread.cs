@@ -4,8 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -56,6 +58,27 @@ public sealed class ArcComment
 /// A threaded discussion: nested replies, reaction chips, a resolve state that folds the thread
 /// into a chip, and a compose row at the bottom. Command/Ctrl+Enter sends from either composer.
 /// </summary>
+
+    /// <summary>Event data for the bubbling <see cref="CommentsChangedRouted"/> event.</summary>
+    public sealed class ArcCommentThreadCommentsChangedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcCommentThreadCommentsChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+    }
+
+    /// <summary>Event data for the bubbling <see cref="ResolvedChangedRouted"/> event.</summary>
+    public sealed class ArcCommentThreadResolvedChangedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcCommentThreadResolvedChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+        /// <summary>The value carried by the event.</summary>
+        public bool Resolved { get; init; }
+    }
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcCommentThread : TemplatedControl
 {
     public static readonly StyledProperty<string?> TitleProperty =
@@ -135,8 +158,40 @@ public class ArcCommentThread : TemplatedControl
     }
 
     public event EventHandler? CommentsChanged;
+    /// <summary>Bubbling routed counterpart of <see cref="CommentsChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcCommentThreadCommentsChangedEventArgs> CommentsChangedEvent =
+        RoutedEvent.Register<ArcCommentThread, ArcCommentThreadCommentsChangedEventArgs>("CommentsChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcCommentThreadCommentsChangedEventArgs"/> version of <see cref="CommentsChanged"/>.</summary>
+    public event EventHandler<ArcCommentThreadCommentsChangedEventArgs>? CommentsChangedRouted
+    {
+        add => AddHandler(CommentsChangedEvent, value);
+        remove => RemoveHandler(CommentsChangedEvent, value);
+    }
+
+    private void RaiseCommentsChanged()
+    {
+        CommentsChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcCommentThreadCommentsChangedEventArgs(CommentsChangedEvent));
+    }
 
     public event EventHandler<bool>? ResolvedChanged;
+    /// <summary>Bubbling routed counterpart of <see cref="ResolvedChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcCommentThreadResolvedChangedEventArgs> ResolvedChangedEvent =
+        RoutedEvent.Register<ArcCommentThread, ArcCommentThreadResolvedChangedEventArgs>("ResolvedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcCommentThreadResolvedChangedEventArgs"/> version of <see cref="ResolvedChanged"/>.</summary>
+    public event EventHandler<ArcCommentThreadResolvedChangedEventArgs>? ResolvedChangedRouted
+    {
+        add => AddHandler(ResolvedChangedEvent, value);
+        remove => RemoveHandler(ResolvedChangedEvent, value);
+    }
+
+    private void RaiseResolvedChanged(bool resolved)
+    {
+        ResolvedChanged?.Invoke(this, resolved);
+        RaiseEvent(new ArcCommentThreadResolvedChangedEventArgs(ResolvedChangedEvent) { Resolved = resolved });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -274,7 +329,7 @@ public class ArcCommentThread : TemplatedControl
     private void SetResolved(bool value)
     {
         SetCurrentValue(ResolvedProperty, value);
-        ResolvedChanged?.Invoke(this, value);
+        RaiseResolvedChanged(value);
     }
 
     private Control BuildResolvedNote()
@@ -370,7 +425,7 @@ public class ArcCommentThread : TemplatedControl
         _replyingTo = null;
         RenderThread();
         BuildHeader();
-        CommentsChanged?.Invoke(this, EventArgs.Empty);
+        RaiseCommentsChanged();
     }
 
     private void RenderThread()
@@ -473,7 +528,7 @@ public class ArcCommentThread : TemplatedControl
             }
 
             RenderThread();
-            CommentsChanged?.Invoke(this, EventArgs.Empty);
+            RaiseCommentsChanged();
         };
         actions.Children.Add(add);
         content.Children.Add(actions);
@@ -535,7 +590,7 @@ public class ArcCommentThread : TemplatedControl
         {
             ToggleReaction(comment, reaction);
             RenderThread();
-            CommentsChanged?.Invoke(this, EventArgs.Empty);
+            RaiseCommentsChanged();
             args.Handled = true;
         };
         return chip;
@@ -619,7 +674,7 @@ public class ArcCommentThread : TemplatedControl
         _replyBox = null;
         RenderThread();
         BuildHeader();
-        CommentsChanged?.Invoke(this, EventArgs.Empty);
+        RaiseCommentsChanged();
     }
 
     private static int CountAll(IEnumerable<ArcComment> comments)

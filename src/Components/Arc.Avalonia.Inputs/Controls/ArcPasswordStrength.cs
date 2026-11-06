@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -32,9 +33,20 @@ public sealed class ArcPasswordRule
 }
 
 /// <summary>Carries the value and its computed strength when a password changes.</summary>
-public sealed class ArcPasswordStrengthChangedEventArgs : EventArgs
+public sealed class ArcPasswordStrengthChangedEventArgs : RoutedEventArgs
 {
     public ArcPasswordStrengthChangedEventArgs(string value, int level, string label, int met, int total)
+    {
+        Value = value;
+        Level = level;
+        Label = label;
+        Met = met;
+        Total = total;
+    }
+
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcPasswordStrengthChangedEventArgs(RoutedEvent routedEvent, string value, int level, string label, int met, int total)
+        : base(routedEvent)
     {
         Value = value;
         Level = level;
@@ -59,6 +71,16 @@ public sealed class ArcPasswordStrengthChangedEventArgs : EventArgs
 /// A new-password field with a four-segment strength meter, a morphing strength word and a live rule
 /// checklist. Scoring is local and simple, matching the documented on-device estimate.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_StrengthWord", typeof(TextBlock))]
+[TemplatePart("PART_RulesList", typeof(StackPanel))]
+[TemplatePart("PART_RevealAction", typeof(Button))]
+[TemplatePart("PART_RevealGlyph", typeof(ArcIcon))]
+[TemplatePart("PART_Seg1", typeof(Border))]
+[TemplatePart("PART_Seg2", typeof(Border))]
+[TemplatePart("PART_Seg3", typeof(Border))]
+[TemplatePart("PART_Seg4", typeof(Border))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
 public class ArcPasswordStrength : ArcFieldBase
 {
     public static readonly StyledProperty<string?> ValueProperty =
@@ -99,6 +121,16 @@ public class ArcPasswordStrength : ArcFieldBase
 
     /// <summary>Raised on every change with the value and computed strength.</summary>
     public event EventHandler<ArcPasswordStrengthChangedEventArgs>? ValueChanged;
+
+    public static readonly RoutedEvent<ArcPasswordStrengthChangedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcPasswordStrength, ArcPasswordStrengthChangedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcPasswordStrengthChangedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     public string? Value
     {
@@ -148,14 +180,14 @@ public class ArcPasswordStrength : ArcFieldBase
         }
 
         _input = e.NameScope.Find<TextBox>("PART_Input");
-        _word = e.NameScope.Find<TextBlock>("StrengthWord");
-        _rulesList = e.NameScope.Find<StackPanel>("RulesList");
-        _revealButton = e.NameScope.Find<Button>("RevealAction");
-        _revealGlyph = e.NameScope.Find<ArcIcon>("RevealGlyph");
-        _segments[0] = e.NameScope.Find<Border>("Seg1");
-        _segments[1] = e.NameScope.Find<Border>("Seg2");
-        _segments[2] = e.NameScope.Find<Border>("Seg3");
-        _segments[3] = e.NameScope.Find<Border>("Seg4");
+        _word = e.NameScope.Find<TextBlock>("PART_StrengthWord");
+        _rulesList = e.NameScope.Find<StackPanel>("PART_RulesList");
+        _revealButton = e.NameScope.Find<Button>("PART_RevealAction");
+        _revealGlyph = e.NameScope.Find<ArcIcon>("PART_RevealGlyph");
+        _segments[0] = e.NameScope.Find<Border>("PART_Seg1");
+        _segments[1] = e.NameScope.Find<Border>("PART_Seg2");
+        _segments[2] = e.NameScope.Find<Border>("PART_Seg3");
+        _segments[3] = e.NameScope.Find<Border>("PART_Seg4");
 
         if (_input is not null)
         {
@@ -177,8 +209,8 @@ public class ArcPasswordStrength : ArcFieldBase
             };
         }
 
-        ApplyMessage(e.NameScope.Find<TextBlock>("Message"));
-        _message = e.NameScope.Find<TextBlock>("Message");
+        ApplyMessage(e.NameScope.Find<TextBlock>("PART_Message"));
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
         UpdateReveal();
         UpdateStrength();
     }
@@ -265,6 +297,7 @@ public class ArcPasswordStrength : ArcFieldBase
 
         UpdateRuleRows(rules);
         ValueChanged?.Invoke(this, new ArcPasswordStrengthChangedEventArgs(password, _level, StrengthLabel, _met, _total));
+        RaiseEvent(new ArcPasswordStrengthChangedEventArgs(ValueChangedEvent, password, _level, StrengthLabel, _met, _total));
     }
 
     private void UpdateRuleRows(IReadOnlyList<ArcPasswordRule> rules)

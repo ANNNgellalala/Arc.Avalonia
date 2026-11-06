@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input.Platform;
@@ -20,6 +21,7 @@ namespace Arc.Avalonia.DataDisplay.Controls;
 /// A source surface with filename, language label, line numbers, a lightweight syntax tint, copy,
 /// and an optional Show all collapse for long files.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcCodeBlock : TemplatedControl
 {
     public static readonly StyledProperty<string> CodeProperty =

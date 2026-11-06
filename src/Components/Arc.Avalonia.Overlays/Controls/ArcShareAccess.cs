@@ -8,6 +8,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
@@ -90,9 +91,15 @@ public enum ArcShareLinkAccess
     Anyone
 }
 
-public sealed class ArcShareInviteEventArgs : EventArgs
+public sealed class ArcShareInviteEventArgs : RoutedEventArgs
 {
     public ArcShareInviteEventArgs(IReadOnlyList<ArcShareSuggestion> people, string? role)
+    {
+        People = people;
+        Role = role;
+    }
+
+    public ArcShareInviteEventArgs(RoutedEvent routedEvent, IReadOnlyList<ArcShareSuggestion> people, string? role) : base(routedEvent)
     {
         People = people;
         Role = role;
@@ -115,6 +122,33 @@ public sealed class ArcShareInviteEventArgs : EventArgs
 /// count updates without a rolling digit, and the clipboard confirmation falls back to a failure state
 /// when the platform clipboard is unavailable. No Pro source was consulted.
 /// </summary>
+[TemplatePart("PART_Heading", typeof(TextBlock))]
+[TemplatePart("PART_DoneButton", typeof(ArcButton))]
+[TemplatePart("PART_FieldShell", typeof(Border))]
+[TemplatePart("PART_FieldRing", typeof(Border))]
+[TemplatePart("PART_Chips", typeof(WrapPanel))]
+[TemplatePart("PART_Placeholder", typeof(TextBlock))]
+[TemplatePart("PART_ErrorRow", typeof(StackPanel))]
+[TemplatePart("PART_ErrorText", typeof(TextBlock))]
+[TemplatePart("PART_InviteRole", typeof(ArcButton))]
+[TemplatePart("PART_InviteButton", typeof(ArcButton))]
+[TemplatePart("PART_PeopleHost", typeof(StackPanel))]
+[TemplatePart("PART_PeopleCount", typeof(TextBlock))]
+[TemplatePart("PART_UndoBar", typeof(Border))]
+[TemplatePart("PART_UndoText", typeof(TextBlock))]
+[TemplatePart("PART_UndoButton", typeof(ArcButton))]
+[TemplatePart("PART_AccessIconBox", typeof(Border))]
+[TemplatePart("PART_AccessIcon", typeof(ArcIcon))]
+[TemplatePart("PART_AccessTitle", typeof(TextBlock))]
+[TemplatePart("PART_AccessDescription", typeof(TextBlock))]
+[TemplatePart("PART_AccessButton", typeof(ArcButton))]
+[TemplatePart("PART_LinkRoleRow", typeof(Grid))]
+[TemplatePart("PART_LinkRoleButton", typeof(ArcButton))]
+[TemplatePart("PART_LinkText", typeof(TextBlock))]
+[TemplatePart("PART_CopyButton", typeof(ArcButton))]
+[TemplatePart("PART_CopyIcon", typeof(ArcIcon))]
+[TemplatePart("PART_CopyLabel", typeof(TextBlock))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcShareAccess : TemplatedControl
 {
     public static readonly StyledProperty<string> TitleProperty =
@@ -279,22 +313,92 @@ public sealed class ArcShareAccess : TemplatedControl
 
     /// <summary>Raised with the valid chips and the chosen role when Invite is pressed.</summary>
     public event EventHandler<ArcShareInviteEventArgs>? Invite;
+    /// <summary>Bubbled copy of <see cref="Invite"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareInviteEventArgs> InviteEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareInviteEventArgs>("Invite", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Invite"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareInviteEventArgs>? InviteRouted
+    {
+        add => AddHandler(InviteEvent, value);
+        remove => RemoveHandler(InviteEvent, value);
+    }
 
     /// <summary>Raised after someone is removed, once the row has folded away.</summary>
     public event EventHandler<ArcSharePerson>? Remove;
+    /// <summary>Bubbled copy of <see cref="Remove"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessRemoveEventArgs> RemoveEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessRemoveEventArgs>("Remove", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Remove"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessRemoveEventArgs>? RemoveRouted
+    {
+        add => AddHandler(RemoveEvent, value);
+        remove => RemoveHandler(RemoveEvent, value);
+    }
 
     /// <summary>Raised when a removal is undone.</summary>
     public event EventHandler<ArcSharePerson>? UndoRemove;
+    /// <summary>Bubbled copy of <see cref="UndoRemove"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessUndoRemoveEventArgs> UndoRemoveEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessUndoRemoveEventArgs>("UndoRemove", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="UndoRemove"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessUndoRemoveEventArgs>? UndoRemoveRouted
+    {
+        add => AddHandler(UndoRemoveEvent, value);
+        remove => RemoveHandler(UndoRemoveEvent, value);
+    }
 
     /// <summary>Raised after an invite, a role change, a removal or an undo, with the whole next list.</summary>
     public event EventHandler? PeopleChanged;
+    /// <summary>Bubbled copy of <see cref="PeopleChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessPeopleChangedEventArgs> PeopleChangedEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessPeopleChangedEventArgs>("PeopleChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="PeopleChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessPeopleChangedEventArgs>? PeopleChangedRouted
+    {
+        add => AddHandler(PeopleChangedEvent, value);
+        remove => RemoveHandler(PeopleChangedEvent, value);
+    }
 
     public event EventHandler<ArcShareLinkAccess>? LinkAccessChanged;
+    /// <summary>Bubbled copy of <see cref="LinkAccessChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessLinkAccessChangedEventArgs> LinkAccessChangedEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessLinkAccessChangedEventArgs>("LinkAccessChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="LinkAccessChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessLinkAccessChangedEventArgs>? LinkAccessChangedRouted
+    {
+        add => AddHandler(LinkAccessChangedEvent, value);
+        remove => RemoveHandler(LinkAccessChangedEvent, value);
+    }
 
     /// <summary>Raised once the link is on the clipboard.</summary>
     public event EventHandler<string>? LinkCopied;
+    /// <summary>Bubbled copy of <see cref="LinkCopied"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessLinkCopiedEventArgs> LinkCopiedEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessLinkCopiedEventArgs>("LinkCopied", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="LinkCopied"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessLinkCopiedEventArgs>? LinkCopiedRouted
+    {
+        add => AddHandler(LinkCopiedEvent, value);
+        remove => RemoveHandler(LinkCopiedEvent, value);
+    }
 
     public event EventHandler? Done;
+    /// <summary>Bubbled copy of <see cref="Done"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcShareAccessDoneEventArgs> DoneEvent =
+        RoutedEvent.Register<ArcShareAccess, ArcShareAccessDoneEventArgs>("Done", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Done"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcShareAccessDoneEventArgs>? DoneRouted
+    {
+        add => AddHandler(DoneEvent, value);
+        remove => RemoveHandler(DoneEvent, value);
+    }
 
     public string Title
     {
@@ -373,33 +477,33 @@ public sealed class ArcShareAccess : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _heading = e.NameScope.Find<TextBlock>("Heading");
-        _done = e.NameScope.Find<ArcButton>("DoneButton");
-        _fieldShell = e.NameScope.Find<Border>("FieldShell");
-        _fieldRing = e.NameScope.Find<Border>("FieldRing");
-        _chipsHost = e.NameScope.Find<WrapPanel>("Chips");
-        _placeholder = e.NameScope.Find<TextBlock>("Placeholder");
-        _errorRow = e.NameScope.Find<StackPanel>("ErrorRow");
-        _errorText = e.NameScope.Find<TextBlock>("ErrorText");
-        _inviteRoleButton = e.NameScope.Find<ArcButton>("InviteRole");
-        _inviteButton = e.NameScope.Find<ArcButton>("InviteButton");
-        _peopleHost = e.NameScope.Find<StackPanel>("PeopleHost");
-        _peopleCount = e.NameScope.Find<TextBlock>("PeopleCount");
-        _undoBar = e.NameScope.Find<Border>("UndoBar");
-        _undoText = e.NameScope.Find<TextBlock>("UndoText");
-        _undoButton = e.NameScope.Find<ArcButton>("UndoButton");
-        _accessIconBox = e.NameScope.Find<Border>("AccessIconBox");
-        _accessIcon = e.NameScope.Find<ArcIcon>("AccessIcon");
-        _accessTitle = e.NameScope.Find<TextBlock>("AccessTitle");
-        _accessDescription = e.NameScope.Find<TextBlock>("AccessDescription");
-        _accessButton = e.NameScope.Find<ArcButton>("AccessButton");
-        _linkRoleRow = e.NameScope.Find<Grid>("LinkRoleRow");
-        _linkRoleButton = e.NameScope.Find<ArcButton>("LinkRoleButton");
-        _linkText = e.NameScope.Find<TextBlock>("LinkText");
-        _copyButton = e.NameScope.Find<ArcButton>("CopyButton");
-        _copyIcon = e.NameScope.Find<ArcIcon>("CopyIcon");
-        _copyLabel = e.NameScope.Find<TextBlock>("CopyLabel");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _heading = e.NameScope.Find<TextBlock>("PART_Heading");
+        _done = e.NameScope.Find<ArcButton>("PART_DoneButton");
+        _fieldShell = e.NameScope.Find<Border>("PART_FieldShell");
+        _fieldRing = e.NameScope.Find<Border>("PART_FieldRing");
+        _chipsHost = e.NameScope.Find<WrapPanel>("PART_Chips");
+        _placeholder = e.NameScope.Find<TextBlock>("PART_Placeholder");
+        _errorRow = e.NameScope.Find<StackPanel>("PART_ErrorRow");
+        _errorText = e.NameScope.Find<TextBlock>("PART_ErrorText");
+        _inviteRoleButton = e.NameScope.Find<ArcButton>("PART_InviteRole");
+        _inviteButton = e.NameScope.Find<ArcButton>("PART_InviteButton");
+        _peopleHost = e.NameScope.Find<StackPanel>("PART_PeopleHost");
+        _peopleCount = e.NameScope.Find<TextBlock>("PART_PeopleCount");
+        _undoBar = e.NameScope.Find<Border>("PART_UndoBar");
+        _undoText = e.NameScope.Find<TextBlock>("PART_UndoText");
+        _undoButton = e.NameScope.Find<ArcButton>("PART_UndoButton");
+        _accessIconBox = e.NameScope.Find<Border>("PART_AccessIconBox");
+        _accessIcon = e.NameScope.Find<ArcIcon>("PART_AccessIcon");
+        _accessTitle = e.NameScope.Find<TextBlock>("PART_AccessTitle");
+        _accessDescription = e.NameScope.Find<TextBlock>("PART_AccessDescription");
+        _accessButton = e.NameScope.Find<ArcButton>("PART_AccessButton");
+        _linkRoleRow = e.NameScope.Find<Grid>("PART_LinkRoleRow");
+        _linkRoleButton = e.NameScope.Find<ArcButton>("PART_LinkRoleButton");
+        _linkText = e.NameScope.Find<TextBlock>("PART_LinkText");
+        _copyButton = e.NameScope.Find<ArcButton>("PART_CopyButton");
+        _copyIcon = e.NameScope.Find<ArcIcon>("PART_CopyIcon");
+        _copyLabel = e.NameScope.Find<TextBlock>("PART_CopyLabel");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
 
         BuildField();
         UpdatePlaceholder();
@@ -407,7 +511,12 @@ public sealed class ArcShareAccess : TemplatedControl
 
         if (_done is not null)
         {
-            _done.Click += (_, _) => Done?.Invoke(this, EventArgs.Empty);
+            _done.Click += (_, _) =>
+            {
+                var doneArgs = new ArcShareAccessDoneEventArgs(DoneEvent);
+                Done?.Invoke(this, EventArgs.Empty);
+                RaiseEvent(doneArgs);
+            };
         }
 
         if (_undoButton is not null)
@@ -545,8 +654,12 @@ public sealed class ArcShareAccess : TemplatedControl
 
         ShowUndo(person);
         UpdateCount();
+                var removeArgs = new ArcShareAccessRemoveEventArgs(RemoveEvent) { Person = person };
         Remove?.Invoke(this, person);
+        RaiseEvent(removeArgs);
+                var peopleChangedArgs = new ArcShareAccessPeopleChangedEventArgs(PeopleChangedEvent);
         PeopleChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(peopleChangedArgs);
     }
 
     /// <summary>Restores the last removal, if the undo bar is still showing.</summary>
@@ -568,8 +681,12 @@ public sealed class ArcShareAccess : TemplatedControl
         _commitTimer.Stop();
         HideUndo();
         BuildPeople();
+        var undoRemoveArgs = new ArcShareAccessUndoRemoveEventArgs(UndoRemoveEvent) { Person = person };
         UndoRemove?.Invoke(this, person);
+        RaiseEvent(undoRemoveArgs);
+        var peopleChangedArgs = new ArcShareAccessPeopleChangedEventArgs(PeopleChangedEvent);
         PeopleChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(peopleChangedArgs);
     }
 
     /// <summary>
@@ -626,7 +743,9 @@ public sealed class ArcShareAccess : TemplatedControl
         SetCopyState(copied ? CopyState.Copied : CopyState.Failed);
         if (copied)
         {
-            LinkCopied?.Invoke(this, LinkUrl ?? string.Empty);
+                    var linkCopiedArgs = new ArcShareAccessLinkCopiedEventArgs(LinkCopiedEvent) { Link = LinkUrl ?? string.Empty };
+        LinkCopied?.Invoke(this, LinkUrl ?? string.Empty);
+        RaiseEvent(linkCopiedArgs);
         }
 
         _copyTimer.Stop();
@@ -1304,8 +1423,12 @@ public sealed class ArcShareAccess : TemplatedControl
         HighlightNew(added);
         UpdateInviteState();
 
+                var inviteArgs = new ArcShareInviteEventArgs(InviteEvent, people, InviteRole);
         Invite?.Invoke(this, new ArcShareInviteEventArgs(people, InviteRole));
+        RaiseEvent(inviteArgs);
+                var peopleChangedArgs = new ArcShareAccessPeopleChangedEventArgs(PeopleChangedEvent);
         PeopleChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(peopleChangedArgs);
     }
 
     private void CommitUndo()
@@ -1686,7 +1809,9 @@ public sealed class ArcShareAccess : TemplatedControl
         }
 
         SetCurrentValue(LinkAccessProperty, access);
+                var linkAccessChangedArgs = new ArcShareAccessLinkAccessChangedEventArgs(LinkAccessChangedEvent) { Access = access };
         LinkAccessChanged?.Invoke(this, access);
+        RaiseEvent(linkAccessChangedArgs);
     }
 
     // ---------------------------------------------------------------- menus
@@ -1876,7 +2001,9 @@ public sealed class ArcShareAccess : TemplatedControl
             }
         }
 
+                var peopleChangedArgs = new ArcShareAccessPeopleChangedEventArgs(PeopleChangedEvent);
         PeopleChanged?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(peopleChangedArgs);
     }
 
     private void CloseMenu(bool returnFocus)
@@ -2035,6 +2162,5 @@ internal static class ArcShareVisuals
         return string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant();
     }
 }
-
 
 

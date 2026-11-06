@@ -20,7 +20,7 @@
                   IsVisible="False"
                   IsHitTestVisible="False" />
           <StackPanel Spacing="16" HorizontalAlignment="Center">
-            <Border x:Name="Stage"
+            <Border x:Name="PART_Stage"
                     Background="{DynamicResource ArcSurfaceMuted}"
                     CornerRadius="{DynamicResource ArcRadiusSurface}"
                     Padding="18,18,18,56"
@@ -66,7 +66,7 @@
               </StackPanel>
             </Grid>
           </StackPanel>
-          <TextBlock x:Name="Status"
+          <TextBlock x:Name="PART_Status"
                      Height="0"
                      Opacity="0"
                      IsHitTestVisible="False"
@@ -80,3 +80,4 @@
     </Style>
   </ControlTheme>
 </ResourceDictionary>
+

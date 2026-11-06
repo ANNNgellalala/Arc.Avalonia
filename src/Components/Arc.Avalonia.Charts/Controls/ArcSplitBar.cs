@@ -124,6 +124,23 @@ public class ArcSplitBar : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        foreach (var hit in _legendHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            var items = Visible();
+            if (hit.Index >= 0 && hit.Index < items.Count)
+            {
+                RaiseLegendClick(hit.Index, items[hit.Index].Name, true);
+            }
+
+            break;
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -171,7 +188,7 @@ public class ArcSplitBar : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -181,7 +198,7 @@ public class ArcSplitBar : ArcChartBase
         var label = active?.Name ?? TotalLabel;
         var value = active?.Value ?? total;
         var share = active is null ? 1 : active.Value / total;
-        ChartText.Draw(context, label, 4, 15, 12, ChartPalette.Muted);
+        ChartText.Draw(context, label, 4, 15, ChartMetrics.LabelFontSize, ChartPalette.Muted);
         ChartText.Draw(
             context,
             FormatValue(value),
@@ -244,8 +261,8 @@ public class ArcSplitBar : ArcChartBase
         for (var i = 0; i < segments.Count; i++)
         {
             var segment = segments[i];
-            var name = ChartText.Create(segment.Name, 12, i == _activeIndex ? ChartPalette.Foreground : ChartPalette.Secondary, i == _activeIndex ? FontWeight.Medium : FontWeight.Normal, 96);
-            var percent = ChartText.Create(ChartFormat.Percent(segment.Value / total, 0), 12, ChartPalette.Muted);
+            var name = ChartText.Create(segment.Name, ChartMetrics.LabelFontSize, i == _activeIndex ? ChartPalette.Foreground : ChartPalette.Secondary, i == _activeIndex ? FontWeight.Medium : FontWeight.Normal, 96);
+            var percent = ChartText.Create(ChartFormat.Percent(segment.Value / total, 0), ChartMetrics.LabelFontSize, ChartPalette.Muted);
             var width = 10 + 5 + name.Width + 6 + percent.Width + 12;
             if (x + width > Bounds.Width && x > 4)
             {

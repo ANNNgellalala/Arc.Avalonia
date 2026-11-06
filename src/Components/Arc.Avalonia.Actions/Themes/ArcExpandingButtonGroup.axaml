@@ -8,14 +8,14 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Tray"
+        <Border x:Name="PART_Tray"
                 Background="{DynamicResource ArcSurface}"
                 BorderBrush="{DynamicResource ArcBorder}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource ArcRadiusPill}"
                 Padding="3"
                 HorizontalAlignment="Left">
-          <StackPanel x:Name="ItemsHost"
+          <StackPanel x:Name="PART_ItemsHost"
                       Orientation="Horizontal"
                       Spacing="2"
                       Background="Transparent"

@@ -93,6 +93,18 @@ public class ArcChartActivityHeatmap : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        if (!_grid.Contains(point) || _step <= 0)
+        {
+            return;
+        }
+
+        var column = Math.Clamp((int)((point.X - _grid.Left) / _step), 0, Math.Max(0, _weeks - 1));
+        var row = Math.Clamp((int)((point.Y - _grid.Top) / _step), 0, 6);
+        var index = column * 7 + row;
+        var values = Values;
+        RaiseItemClick(index, string.Empty, values is not null && index < values.Count ? values[index] : 0, point);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -148,7 +160,7 @@ public class ArcChartActivityHeatmap : ArcChartBase
                 "No activity",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -253,7 +265,7 @@ public class ArcChartActivityHeatmap : ArcChartBase
                 date.ToString("MMM", Culture),
                 x,
                 _grid.Top - 9,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Left,
                 maxWidth: Math.Max(26, _step * 4));
@@ -276,7 +288,7 @@ public class ArcChartActivityHeatmap : ArcChartBase
                 day.ToString()[..3],
                 _grid.Left - 8,
                 _grid.Top + row * _step + _cell / 2,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Right);
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -235,9 +236,29 @@ public class ArcToolApprovalSheet : Panel
     }
 
     /// <summary>Raised with the arguments and scope the user approved.</summary>
+    public static readonly RoutedEvent<ArcAgentApprovalRoutedEventArgs> ApproveRequestedEvent =
+        RoutedEvent.Register<ArcToolApprovalSheet, ArcAgentApprovalRoutedEventArgs>("ApproveRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ApproveRequested"/>.</summary>
+    public event EventHandler<ArcAgentApprovalRoutedEventArgs>? ApproveRequestedRouted
+    {
+        add => AddHandler(ApproveRequestedEvent, value);
+        remove => RemoveHandler(ApproveRequestedEvent, value);
+    }
+
     public event EventHandler<ArcApprovalDecision>? ApproveRequested;
 
     /// <summary>Raised with the reason the user typed when denying the request.</summary>
+    public static readonly RoutedEvent<ArcAgentDenyRoutedEventArgs> DenyRequestedEvent =
+        RoutedEvent.Register<ArcToolApprovalSheet, ArcAgentDenyRoutedEventArgs>("DenyRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DenyRequested"/>.</summary>
+    public event EventHandler<ArcAgentDenyRoutedEventArgs>? DenyRequestedRouted
+    {
+        add => AddHandler(DenyRequestedEvent, value);
+        remove => RemoveHandler(DenyRequestedEvent, value);
+    }
+
     public event EventHandler<string>? DenyRequested;
 
     /// <summary>Raised when the user hands the decision to somebody else.</summary>
@@ -611,6 +632,7 @@ public class ArcToolApprovalSheet : Panel
             }
 
             DenyRequested?.Invoke(this, reason);
+            RaiseEvent(new ArcAgentDenyRoutedEventArgs(DenyRequestedEvent, reason));
             _denyOpen = false;
             Rebuild();
         };
@@ -657,11 +679,13 @@ public class ArcToolApprovalSheet : Panel
             })
             .ToList();
 
-        ApproveRequested?.Invoke(this, new ArcApprovalDecision
+        var decision = new ArcApprovalDecision
         {
             ModifiedArguments = arguments,
             Scope = Scope
-        });
+        };
+        ApproveRequested?.Invoke(this, decision);
+        RaiseEvent(new ArcAgentApprovalRoutedEventArgs(ApproveRequestedEvent, decision));
     }
 
     private void StartCountdown()
@@ -776,3 +800,4 @@ public class ArcToolApprovalSheet : Panel
         new ArcApprovalArgument { Name = "attendee", Value = "sam@northwind.example", Editable = false }
     };
 }
+

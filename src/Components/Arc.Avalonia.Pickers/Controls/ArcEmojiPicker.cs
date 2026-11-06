@@ -15,6 +15,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -119,6 +120,18 @@ public sealed class ArcEmojiCell : INotifyPropertyChanged
 /// tone menu is replaced by six always-visible tone chips, so the state reads at a glance, and the active
 /// category is marked by an accent-tinted tab pill rather than a gliding indicator.
 /// </summary>
+[TemplatePart("PART_Search", typeof(TextBox))]
+[TemplatePart("PART_Clear", typeof(Button))]
+[TemplatePart("PART_Categories", typeof(ListBox))]
+[TemplatePart("PART_Tones", typeof(ListBox))]
+[TemplatePart("PART_Grid", typeof(ListBox))]
+[TemplatePart("PART_RecentHost", typeof(Border))]
+[TemplatePart("PART_RecentRow", typeof(StackPanel))]
+[TemplatePart("PART_PreviewGlyph", typeof(TextBlock))]
+[TemplatePart("PART_PreviewName", typeof(TextBlock))]
+[TemplatePart("PART_Count", typeof(TextBlock))]
+[TemplatePart("PART_Empty", typeof(Border))]
+[TemplatePart("PART_SearchPlaceholder", typeof(TextBlock))]
 public class ArcEmojiPicker : TemplatedControl
 {
     public static readonly StyledProperty<bool> IsOpenProperty =
@@ -293,6 +306,23 @@ public class ArcEmojiPicker : TemplatedControl
 
     /// <summary>Raised when an emoji is chosen by click, Enter, Space or a recent chip.</summary>
     public event EventHandler<ArcEmojiSelection>? Selected;
+
+    /// <summary>Bubbled copy of <see cref="Selected"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcEmojiSelectedEventArgs> SelectedEvent =
+        RoutedEvent.Register<ArcEmojiPicker, ArcEmojiSelectedEventArgs>("Selected", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Selected"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcEmojiSelectedEventArgs>? SelectedRouted
+    {
+        add => AddHandler(SelectedEvent, value);
+        remove => RemoveHandler(SelectedEvent, value);
+    }
+
+    private void RaiseSelected(ArcEmojiSelection selection)
+    {
+        Selected?.Invoke(this, selection);
+        RaiseEvent(new ArcEmojiSelectedEventArgs(SelectedEvent) { Selection = selection });
+    }
 
     /// <summary>Raised when Escape or a host closes the panel.</summary>
     public event EventHandler? Closed;
@@ -925,7 +955,8 @@ public class ArcEmojiPicker : TemplatedControl
 
         PushRecent(emoji);
         UpdatePreview(emoji);
-        Selected?.Invoke(this, new ArcEmojiSelection(glyph, emoji.Glyph, emoji.Name, SkinTone));
+        var selection = new ArcEmojiSelection(glyph, emoji.Glyph, emoji.Name, SkinTone);
+        RaiseSelected(selection);
     }
 
     private void MoveActive(Key key, KeyModifiers modifiers)
@@ -1417,7 +1448,8 @@ public class ArcEmojiPicker : TemplatedControl
         }
 
         UpdatePreview(emoji);
-        Selected?.Invoke(this, new ArcEmojiSelection(glyph, emoji.Glyph, emoji.Name, SkinTone));
+        var selection = new ArcEmojiSelection(glyph, emoji.Glyph, emoji.Name, SkinTone);
+        RaiseSelected(selection);
     }
 
     private void UpdateAutomation()

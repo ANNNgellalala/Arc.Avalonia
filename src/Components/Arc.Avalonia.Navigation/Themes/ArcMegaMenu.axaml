@@ -11,21 +11,21 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Border x:Name="Bar"
+          <Border x:Name="PART_Bar"
                   Classes="mm-bar"
                   Padding="12,9"
                   VerticalAlignment="Top">
             <Grid ColumnDefinitions="Auto,Auto,*,Auto" VerticalAlignment="Center">
-              <ContentControl x:Name="BrandHost"
+              <ContentControl x:Name="PART_BrandHost"
                               Grid.Column="0"
                               VerticalAlignment="Center" />
-              <Panel x:Name="TriggerZone"
+              <Panel x:Name="PART_TriggerZone"
                      Grid.Column="1"
                      Margin="12,0,0,0"
                      VerticalAlignment="Center">
-                <i:ArcGlide x:Name="BarHighlight" Classes="mm-highlight" CornerRadius="12" />
-                <i:ArcGlide x:Name="Caret" Classes="mm-caret" CornerRadius="1" />
-                <StackPanel x:Name="Triggers"
+                <i:ArcGlide x:Name="PART_BarHighlight" Classes="mm-highlight" CornerRadius="12" />
+                <i:ArcGlide x:Name="PART_Caret" Classes="mm-caret" CornerRadius="1" />
+                <StackPanel x:Name="PART_Triggers"
                             Orientation="Horizontal"
                             VerticalAlignment="Center" />
               </Panel>
@@ -34,11 +34,11 @@
                           Spacing="6"
                           HorizontalAlignment="Right"
                           VerticalAlignment="Center">
-                <StackPanel x:Name="ActionsHost"
+                <StackPanel x:Name="PART_ActionsHost"
                             Orientation="Horizontal"
                             Spacing="4"
                             VerticalAlignment="Center" />
-                <c:ArcButton x:Name="MenuButton"
+                <c:ArcButton x:Name="PART_MenuButton"
                              Variant="Secondary"
                              Size="Sm"
                              Height="36"
@@ -52,7 +52,7 @@
               </StackPanel>
             </Grid>
           </Border>
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>

@@ -6,6 +6,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -22,6 +24,11 @@ namespace Arc.Avalonia.Overlays.Controls;
 /// and footer actions. Escape and a backdrop press close it, focus is trapped while it is open, and it
 /// returns focus when it closes. It fills the nearest panel, so a page can host it directly.
 /// </summary>
+[TemplatePart("PART_Backdrop", typeof(Border))]
+[TemplatePart("PART_Panel", typeof(Border))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_FooterHost", typeof(ContentPresenter))]
 public sealed class ArcDialog : ContentControl
 {
     public static readonly StyledProperty<bool> IsOpenProperty =
@@ -63,6 +70,16 @@ public sealed class ArcDialog : ContentControl
     }
 
     public event EventHandler? Closed;
+    /// <summary>Bubbled copy of <see cref="Closed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcDialogClosedEventArgs> ClosedEvent =
+        RoutedEvent.Register<ArcDialog, ArcDialogClosedEventArgs>("Closed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Closed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcDialogClosedEventArgs>? ClosedRouted
+    {
+        add => AddHandler(ClosedEvent, value);
+        remove => RemoveHandler(ClosedEvent, value);
+    }
 
     /// <summary>Whether the dialog is showing; settable so a page can present the open state.</summary>
     public bool IsOpen
@@ -99,11 +116,11 @@ public sealed class ArcDialog : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _backdrop = e.NameScope.Find<Border>("Backdrop");
-        _panel = e.NameScope.Find<Border>("Panel");
-        _title = e.NameScope.Find<TextBlock>("Title");
-        _description = e.NameScope.Find<TextBlock>("Description");
-        _footer = e.NameScope.Find<ContentPresenter>("FooterHost");
+        _backdrop = e.NameScope.Find<Border>("PART_Backdrop");
+        _panel = e.NameScope.Find<Border>("PART_Panel");
+        _title = e.NameScope.Find<TextBlock>("PART_Title");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
+        _footer = e.NameScope.Find<ContentPresenter>("PART_FooterHost");
 
         if (_backdrop is not null)
         {
@@ -224,7 +241,9 @@ public sealed class ArcDialog : ContentControl
             IsVisible = false;
             Opacity = 0;
             IsHitTestVisible = false;
-            Closed?.Invoke(this, EventArgs.Empty);
+                    var closedArgs = new ArcDialogClosedEventArgs(ClosedEvent);
+        Closed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(closedArgs);
 
             if (_restoreFocus is { } restore)
             {

@@ -8,9 +8,9 @@
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Frame" Classes="expandable-card" ClipToBounds="True">
+        <Border x:Name="PART_Frame" Classes="expandable-card" ClipToBounds="True">
           <Grid RowDefinitions="Auto,Auto">
-            <c:ArcButton x:Name="Header"
+            <c:ArcButton x:Name="PART_Header"
                          Classes="expandable-header"
                          Variant="Ghost"
                          HorizontalAlignment="Stretch"
@@ -20,13 +20,13 @@
               <c:ArcButton.Content>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                   <StackPanel Spacing="2" VerticalAlignment="Center">
-                    <TextBlock x:Name="TitleBlock" Classes="arc-label" TextWrapping="Wrap" />
-                    <TextBlock x:Name="DescriptionBlock"
+                    <TextBlock x:Name="PART_TitleBlock" Classes="arc-label" TextWrapping="Wrap" />
+                    <TextBlock x:Name="PART_DescriptionBlock"
                                Classes="arc-caption"
                                TextWrapping="Wrap"
                                IsVisible="False" />
                   </StackPanel>
-                  <c:ArcIcon x:Name="Chevron"
+                  <c:ArcIcon x:Name="PART_Chevron"
                              Grid.Column="1"
                              Icon="chevron-down"
                              Size="18"
@@ -36,12 +36,12 @@
               </c:ArcButton.Content>
             </c:ArcButton>
 
-            <Border x:Name="PanelClip"
+            <Border x:Name="PART_PanelClip"
                     Grid.Row="1"
                     Height="0"
                     IsVisible="False"
                     ClipToBounds="True">
-              <ContentPresenter x:Name="Body"
+              <ContentPresenter x:Name="PART_Body"
                                 Margin="16,0,16,16"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}" />

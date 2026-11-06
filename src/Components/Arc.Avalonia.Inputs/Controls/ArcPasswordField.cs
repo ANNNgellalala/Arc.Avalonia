@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Arc.Avalonia.Controls;
@@ -11,6 +12,9 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A password field with an eye toggle. The character stays masked by the native TextBox; revealing is
 /// a property on the field, so the caret and selection behave exactly like a plain input.
 /// </summary>
+[TemplatePart("PART_RevealAction", typeof(Button))]
+[TemplatePart("PART_RevealGlyph", typeof(ArcIcon))]
+[TemplatePart("PART_CapsHint", typeof(TextBlock))]
 public class ArcPasswordField : ArcTextFieldBase
 {
     public static readonly StyledProperty<bool> RevealedProperty =
@@ -75,9 +79,9 @@ public class ArcPasswordField : ArcTextFieldBase
 
     protected override void OnFieldTemplateApplied(TemplateAppliedEventArgs e)
     {
-        _revealButton = e.NameScope.Find<Button>("RevealAction");
-        _revealGlyph = e.NameScope.Find<ArcIcon>("RevealGlyph");
-        _capsHint = e.NameScope.Find<TextBlock>("CapsHint");
+        _revealButton = e.NameScope.Find<Button>("PART_RevealAction");
+        _revealGlyph = e.NameScope.Find<ArcIcon>("PART_RevealGlyph");
+        _capsHint = e.NameScope.Find<TextBlock>("PART_CapsHint");
 
         if (_revealButton is not null)
         {

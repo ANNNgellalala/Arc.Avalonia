@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -49,6 +50,7 @@ public sealed class ArcTimelineEvent
 /// A vertical activity feed grouped by day, newest first. Rows with detail expand in place;
 /// arrow keys move between rows and Enter toggles, and the connector line reads as one path.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcTimeline : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcTimelineEvent>?> EventsProperty =

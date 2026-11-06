@@ -10,9 +10,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Backdrop"
+          <Border x:Name="PART_Backdrop"
                   CornerRadius="{DynamicResource ArcRadiusPanel}" />
-          <Border x:Name="Panel"
+          <Border x:Name="PART_Panel"
                   MinWidth="320"
                   MaxWidth="440"
                   HorizontalAlignment="Center"
@@ -26,8 +26,8 @@
                   Focusable="True"
                   RenderTransformOrigin="0.5,0.5">
             <StackPanel Spacing="6">
-              <TextBlock x:Name="Title" Classes="arc-heading" TextWrapping="Wrap" />
-              <TextBlock x:Name="Description"
+              <TextBlock x:Name="PART_Title" Classes="arc-heading" TextWrapping="Wrap" />
+              <TextBlock x:Name="PART_Description"
                          Classes="arc-body-sm arc-secondary"
                          TextWrapping="Wrap"
                          Margin="0,2,0,0" />
@@ -35,7 +35,7 @@
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="0,10,0,0" />
-              <ContentPresenter x:Name="FooterHost"
+              <ContentPresenter x:Name="PART_FooterHost"
                                 HorizontalAlignment="Right"
                                 Margin="0,18,0,0" />
             </StackPanel>
@@ -52,9 +52,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Backdrop"
+          <Border x:Name="PART_Backdrop"
                   CornerRadius="{DynamicResource ArcRadiusPanel}" />
-          <Border x:Name="Panel"
+          <Border x:Name="PART_Panel"
                   Width="420"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Stretch"
@@ -68,12 +68,12 @@
             <Grid RowDefinitions="Auto,*,Auto">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="6">
-                  <TextBlock x:Name="Title" Classes="arc-heading" TextWrapping="Wrap" />
-                  <TextBlock x:Name="Description"
+                  <TextBlock x:Name="PART_Title" Classes="arc-heading" TextWrapping="Wrap" />
+                  <TextBlock x:Name="PART_Description"
                              Classes="arc-body-sm arc-secondary"
                              TextWrapping="Wrap" />
                 </StackPanel>
-                <c:ArcButton x:Name="CloseButton"
+                <c:ArcButton x:Name="PART_CloseButton"
                              Grid.Column="1"
                              Variant="Ghost"
                              Size="Sm"
@@ -90,7 +90,7 @@
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                 Margin="0,18,0,0" />
 
-              <ContentPresenter x:Name="FooterHost"
+              <ContentPresenter x:Name="PART_FooterHost"
                                 Grid.Row="2"
                                 HorizontalAlignment="Right"
                                 Margin="0,18,0,0" />
@@ -108,10 +108,10 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <ContentPresenter x:Name="TriggerHost"
+          <ContentPresenter x:Name="PART_TriggerHost"
                             Content="{TemplateBinding Trigger}"
                             HorizontalAlignment="Left" />
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -128,7 +128,7 @@
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalAlignment="Left" />
-          <Canvas x:Name="Overlay" ClipToBounds="False" />
+          <Canvas x:Name="PART_Overlay" ClipToBounds="False" />
         </Panel>
       </ControlTemplate>
     </Setter>

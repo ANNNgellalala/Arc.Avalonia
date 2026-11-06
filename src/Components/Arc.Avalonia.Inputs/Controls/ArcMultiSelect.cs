@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -19,6 +20,16 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// Picks several values from a fixed list. Chosen values stay visible as small chips in the trigger,
 /// with a +N overflow, while the menu rows carry checkboxes.
 /// </summary>
+[TemplatePart("PART_Trigger", typeof(Border))]
+[TemplatePart("PART_Ring", typeof(Border))]
+[TemplatePart("PART_ChipPanel", typeof(StackPanel))]
+[TemplatePart("PART_PlaceholderText", typeof(TextBlock))]
+[TemplatePart("PART_Overflow", typeof(TextBlock))]
+[TemplatePart("PART_Chevron", typeof(ArcIcon))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_MenuPopup", typeof(Popup))]
+[TemplatePart("PART_MenuSurface", typeof(Border))]
+[TemplatePart("PART_Menu", typeof(ListBox))]
 public class ArcMultiSelect : ArcFieldBase
 {
     public static readonly StyledProperty<IReadOnlyList<ArcSelectOption>?> OptionsProperty =
@@ -112,17 +123,17 @@ public class ArcMultiSelect : ArcFieldBase
             _trigger.PointerPressed -= OnTriggerPressed;
         }
 
-        _trigger = e.NameScope.Find<Border>("Trigger");
-        _ring = e.NameScope.Find<Border>("Ring");
-        _chipPanel = e.NameScope.Find<StackPanel>("ChipPanel");
-        _placeholder = e.NameScope.Find<TextBlock>("PlaceholderText");
-        _overflow = e.NameScope.Find<TextBlock>("Overflow");
-        _chevron = e.NameScope.Find<ArcIcon>("Chevron");
+        _trigger = e.NameScope.Find<Border>("PART_Trigger");
+        _ring = e.NameScope.Find<Border>("PART_Ring");
+        _chipPanel = e.NameScope.Find<StackPanel>("PART_ChipPanel");
+        _placeholder = e.NameScope.Find<TextBlock>("PART_PlaceholderText");
+        _overflow = e.NameScope.Find<TextBlock>("PART_Overflow");
+        _chevron = e.NameScope.Find<ArcIcon>("PART_Chevron");
         _chevronTransform = _chevron?.RenderTransform as RotateTransform;
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _popup = e.NameScope.Find<Popup>("MenuPopup");
-        _surface = e.NameScope.Find<Border>("MenuSurface");
-        _menu = e.NameScope.Find<ListBox>("Menu");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _popup = e.NameScope.Find<Popup>("PART_MenuPopup");
+        _surface = e.NameScope.Find<Border>("PART_MenuSurface");
+        _menu = e.NameScope.Find<ListBox>("PART_Menu");
 
         if (_trigger is not null)
         {

@@ -11,6 +11,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -19,6 +20,14 @@ namespace Arc.Avalonia.Pickers.Controls;
 /// WCAG contrast readout and the saved swatch row. Reused inside <see cref="ArcColorPicker"/> and shown
 /// inline in the gallery so the open state is visible in screenshots.
 /// </summary>
+[TemplatePart("PART_Area", typeof(ArcColorArea))]
+[TemplatePart("PART_Hue", typeof(ArcColorRamp))]
+[TemplatePart("PART_Alpha", typeof(ArcColorRamp))]
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Format", typeof(ArcButton))]
+[TemplatePart("PART_Swatches", typeof(StackPanel))]
+[TemplatePart("PART_Contrast", typeof(StackPanel))]
+[TemplatePart("PART_Error", typeof(TextBlock))]
 public class ArcColorEditor : TemplatedControl
 {
     public static readonly StyledProperty<Color> ValueProperty =
@@ -100,6 +109,23 @@ public class ArcColorEditor : TemplatedControl
 
     /// <summary>Raised when the visitor changes the color.</summary>
     public event EventHandler<Color>? ValueChanged;
+
+    /// <summary>Bubbled copy of <see cref="ValueChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcColorValueChangedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcColorEditor, ArcColorValueChangedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ValueChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcColorValueChangedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
+    private void RaiseValueChanged(Color color)
+    {
+        ValueChanged?.Invoke(this, color);
+        RaiseEvent(new ArcColorValueChangedEventArgs(ValueChangedEvent) { Color = color });
+    }
 
     /// <summary>Raised when the saved swatch row changes.</summary>
     public event EventHandler<IReadOnlyList<ArcColorSwatch>>? SwatchesChanged;
@@ -251,7 +277,7 @@ public class ArcColorEditor : TemplatedControl
         PushToSurfaces();
         UpdateReadouts();
         UpdateInput();
-        ValueChanged?.Invoke(this, color);
+        RaiseValueChanged(color);
     }
 
     private void OnAreaChanged(object? sender, EventArgs e)

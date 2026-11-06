@@ -10,7 +10,8 @@ namespace Arc.Avalonia.Theme;
 /// <summary>
 /// The single-line theme entry point (ADR 0003): <c>&lt;arc:ArcTheme/&gt;</c> inside
 /// <c>Application.Styles</c> installs the Fluent baseline, the 11 component theme families and keeps the
-/// Arc palette / Fluent resource-key overrides in sync with <see cref="ArcThemeManager.Apply"/>.
+/// Arc palette / Fluent resource-key overrides in sync with
+/// <see cref="ArcThemeManager.Apply(Application, ArcThemeOptions)"/>.
 /// </summary>
 /// <remarks>
 /// The Fluent baseline is created in code rather than as a <c>&lt;FluentTheme/&gt;</c> element because the

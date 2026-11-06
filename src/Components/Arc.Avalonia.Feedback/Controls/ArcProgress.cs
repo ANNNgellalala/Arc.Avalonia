@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -29,6 +30,12 @@ public enum ArcProgressTone
 /// Determinate (or indeterminate) task progress. One spring drives the fill and the counted
 /// percentage together, so the graphic never disagrees with the number.
 /// </summary>
+[TemplatePart("PART_Bar", typeof(ArcProgressTrack))]
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_ValueText", typeof(TextBlock))]
+[TemplatePart("PART_Check", typeof(ArcIcon))]
+[TemplatePart("PART_Header", typeof(Panel))]
+[TemplatePart("PART_ValuePanel", typeof(Panel))]
 public class ArcProgress : TemplatedControl
 {
     public static readonly StyledProperty<double> ValueProperty =
@@ -130,12 +137,12 @@ public class ArcProgress : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _track = e.NameScope.Find<ArcProgressTrack>("Bar");
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _valueText = e.NameScope.Find<TextBlock>("ValueText");
-        _check = e.NameScope.Find<ArcIcon>("Check");
-        _header = e.NameScope.Find<Panel>("Header");
-        _valuePanel = e.NameScope.Find<Panel>("ValuePanel");
+        _track = e.NameScope.Find<ArcProgressTrack>("PART_Bar");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _valueText = e.NameScope.Find<TextBlock>("PART_ValueText");
+        _check = e.NameScope.Find<ArcIcon>("PART_Check");
+        _header = e.NameScope.Find<Panel>("PART_Header");
+        _valuePanel = e.NameScope.Find<Panel>("PART_ValuePanel");
 
         if (_track is not null)
         {

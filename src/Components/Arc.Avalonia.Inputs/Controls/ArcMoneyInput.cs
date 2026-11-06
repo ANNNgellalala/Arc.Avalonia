@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Styling;
@@ -15,9 +16,19 @@ using Avalonia.Threading;
 namespace Arc.Avalonia.Inputs.Controls;
 
 /// <summary>Value and display details reported when a money amount changes.</summary>
-public sealed class ArcMoneyChangedEventArgs : EventArgs
+public sealed class ArcMoneyChangedEventArgs : RoutedEventArgs
 {
     public ArcMoneyChangedEventArgs(long? value, string currency, decimal? major, string formatted)
+    {
+        Value = value;
+        Currency = currency;
+        Major = major;
+        Formatted = formatted;
+    }
+
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcMoneyChangedEventArgs(RoutedEvent routedEvent, long? value, string currency, decimal? major, string formatted)
+        : base(routedEvent)
     {
         Value = value;
         Currency = currency;
@@ -39,6 +50,11 @@ public sealed class ArcMoneyChangedEventArgs : EventArgs
 /// A currency amount field. Typed digits are grouped live, the value is exposed in minor units for
 /// exact arithmetic, and quick-add chips and arrow keys nudge the amount by whole major units.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_RangeHint", typeof(TextBlock))]
+[TemplatePart("PART_CurrencySymbol", typeof(TextBlock))]
+[TemplatePart("PART_QuickAddPanel", typeof(StackPanel))]
 public class ArcMoneyInput : ArcFieldBase
 {
     public static readonly StyledProperty<long?> ValueProperty =
@@ -92,6 +108,16 @@ public class ArcMoneyInput : ArcFieldBase
 
     /// <summary>Raised with the amount in minor units plus display details.</summary>
     public event EventHandler<ArcMoneyChangedEventArgs>? ValueChanged;
+
+    public static readonly RoutedEvent<ArcMoneyChangedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcMoneyInput, ArcMoneyChangedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcMoneyChangedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     /// <summary>Amount in minor units (cents for USD); null is empty.</summary>
     public long? Value
@@ -168,10 +194,10 @@ public class ArcMoneyInput : ArcFieldBase
         }
 
         _input = e.NameScope.Find<TextBox>("PART_Input");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _rangeHint = e.NameScope.Find<TextBlock>("RangeHint");
-        _symbol = e.NameScope.Find<TextBlock>("CurrencySymbol");
-        _quickAddPanel = e.NameScope.Find<StackPanel>("QuickAddPanel");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _rangeHint = e.NameScope.Find<TextBlock>("PART_RangeHint");
+        _symbol = e.NameScope.Find<TextBlock>("PART_CurrencySymbol");
+        _quickAddPanel = e.NameScope.Find<StackPanel>("PART_QuickAddPanel");
 
         if (_input is not null)
         {
@@ -196,6 +222,7 @@ public class ArcMoneyInput : ArcFieldBase
     {
         SyncInput();
         ValueChanged?.Invoke(this, new ArcMoneyChangedEventArgs(Value, Currency, Major, Formatted));
+        RaiseEvent(new ArcMoneyChangedEventArgs(ValueChangedEvent, Value, Currency, Major, Formatted));
     }
 
     private void OnTextChanged(object? sender, TextChangedEventArgs e)

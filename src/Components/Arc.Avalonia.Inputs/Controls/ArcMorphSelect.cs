@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -62,9 +63,17 @@ public sealed class ArcMorphSelectGroup : ArcMorphSelectItem
     public IList<ArcMorphSelectOption> Options { get; }
 }
 
-public sealed class ArcMorphSelectValueEventArgs : EventArgs
+public sealed class ArcMorphSelectValueEventArgs : RoutedEventArgs
 {
     public ArcMorphSelectValueEventArgs(string value, ArcMorphSelectOption option)
+    {
+        Value = value;
+        Option = option;
+    }
+
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcMorphSelectValueEventArgs(RoutedEvent routedEvent, string value, ArcMorphSelectOption option)
+        : base(routedEvent)
     {
         Value = value;
         Option = option;
@@ -79,6 +88,17 @@ public sealed class ArcMorphSelectValueEventArgs : EventArgs
 /// Arc's morph select: the trigger surface grows into the option list in place, with a gliding
 /// highlight, optional search and type-ahead, and no separate popup window.
 /// </summary>
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_TriggerRow", typeof(Grid))]
+[TemplatePart("PART_ValueText", typeof(TextBlock))]
+[TemplatePart("PART_Search", typeof(TextBox))]
+[TemplatePart("PART_Chevron", typeof(ArcIcon))]
+[TemplatePart("PART_ListHost", typeof(Panel))]
+[TemplatePart("PART_Scroller", typeof(ScrollViewer))]
+[TemplatePart("PART_OptionsHost", typeof(Panel))]
+[TemplatePart("PART_Highlight", typeof(Border))]
+[TemplatePart("PART_Options", typeof(StackPanel))]
 public class ArcMorphSelect : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -156,6 +176,16 @@ public class ArcMorphSelect : TemplatedControl
 
     /// <summary>Raised with the new value and its option.</summary>
     public event EventHandler<ArcMorphSelectValueEventArgs>? ValueChanged;
+
+    public static readonly RoutedEvent<ArcMorphSelectValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcMorphSelect, ArcMorphSelectValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcMorphSelectValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     /// <summary>Raised when the surface opens or folds back.</summary>
     public event EventHandler? OpenChanged;
@@ -244,17 +274,17 @@ public class ArcMorphSelect : TemplatedControl
             _search.TextChanged -= OnSearchTextChanged;
         }
 
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _surface = e.NameScope.Find<Border>("Surface");
-        _triggerRow = e.NameScope.Find<Grid>("TriggerRow");
-        _valueText = e.NameScope.Find<TextBlock>("ValueText");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _surface = e.NameScope.Find<Border>("PART_Surface");
+        _triggerRow = e.NameScope.Find<Grid>("PART_TriggerRow");
+        _valueText = e.NameScope.Find<TextBlock>("PART_ValueText");
         _search = e.NameScope.Find<TextBox>("PART_Search");
-        _chevron = e.NameScope.Find<ArcIcon>("Chevron");
-        _listHost = e.NameScope.Find<Panel>("ListHost");
-        _scroller = e.NameScope.Find<ScrollViewer>("Scroller");
-        _optionsHost = e.NameScope.Find<Panel>("OptionsHost");
-        _highlight = e.NameScope.Find<Border>("Highlight");
-        _options = e.NameScope.Find<StackPanel>("Options");
+        _chevron = e.NameScope.Find<ArcIcon>("PART_Chevron");
+        _listHost = e.NameScope.Find<Panel>("PART_ListHost");
+        _scroller = e.NameScope.Find<ScrollViewer>("PART_Scroller");
+        _optionsHost = e.NameScope.Find<Panel>("PART_OptionsHost");
+        _highlight = e.NameScope.Find<Border>("PART_Highlight");
+        _options = e.NameScope.Find<StackPanel>("PART_Options");
 
         if (_search is not null)
         {
@@ -978,6 +1008,7 @@ public class ArcMorphSelect : TemplatedControl
         SetOpen(false, animate: true);
         Focus();
         ValueChanged?.Invoke(this, new ArcMorphSelectValueEventArgs(option.Value, option));
+        RaiseEvent(new ArcMorphSelectValueEventArgs(ValueChangedEvent, option.Value, option));
     }
 
     private void UpdateAutomation()

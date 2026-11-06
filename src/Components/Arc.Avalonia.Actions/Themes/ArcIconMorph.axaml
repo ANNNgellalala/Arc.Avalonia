@@ -9,12 +9,12 @@
         <Panel ClipToBounds="False"
                Width="{TemplateBinding Size}"
                Height="{TemplateBinding Size}">
-          <c:ArcIcon x:Name="From"
+          <c:ArcIcon x:Name="PART_From"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
                      Foreground="{TemplateBinding Foreground}"
                      RenderTransformOrigin="0.5,0.5" />
-          <c:ArcIcon x:Name="To"
+          <c:ArcIcon x:Name="PART_To"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
                      Foreground="{TemplateBinding Foreground}"

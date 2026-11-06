@@ -11,9 +11,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <StackPanel x:Name="Stack" Spacing="6">
-            <TextBlock x:Name="LabelText" Classes="arc-label" />
-            <Border x:Name="Shell"
+          <StackPanel x:Name="PART_Stack" Spacing="6">
+            <TextBlock x:Name="PART_LabelText" Classes="arc-label" />
+            <Border x:Name="PART_Shell"
                     MinHeight="{DynamicResource ArcControlHeightMd}"
                     Background="{DynamicResource ArcSurface}"
                     BorderBrush="{DynamicResource ArcBorderStrong}"
@@ -25,7 +25,7 @@
                 </Transitions>
               </Border.Transitions>
               <Grid ColumnDefinitions="Auto,Auto,*,Auto" VerticalAlignment="Center">
-                <Button x:Name="CountryButton"
+                <Button x:Name="PART_CountryButton"
                         Theme="{DynamicResource ArcAdvancedTextButton}"
                         Padding="4,4"
                         Margin="8,0,0,0"
@@ -35,13 +35,13 @@
                             CornerRadius="6"
                             Padding="6,2"
                             VerticalAlignment="Center">
-                      <TextBlock x:Name="IsoText"
+                      <TextBlock x:Name="PART_IsoText"
                                  FontSize="11"
                                  FontWeight="Medium"
                                  LetterSpacing="0.4"
                                  Foreground="{DynamicResource ArcTextSecondary}" />
                     </Border>
-                    <TextBlock x:Name="DialText"
+                    <TextBlock x:Name="PART_DialText"
                                Classes="arc-body-sm"
                                Foreground="{DynamicResource ArcTextSecondary}"
                                VerticalAlignment="Center" />
@@ -75,7 +75,7 @@
                          VerticalContentAlignment="Center"
                          AcceptsReturn="False"
                          TextWrapping="NoWrap" />
-                <arc:ArcIcon x:Name="ValidMark"
+                <arc:ArcIcon x:Name="PART_ValidMark"
                              Grid.Column="3"
                              Icon="check"
                              Size="16"
@@ -85,13 +85,13 @@
                              VerticalAlignment="Center" />
               </Grid>
             </Border>
-            <TextBlock x:Name="Message"
+            <TextBlock x:Name="PART_Message"
                        Classes="arc-caption"
                        TextWrapping="Wrap"
                        IsVisible="False" />
           </StackPanel>
 
-          <Border x:Name="Picker"
+          <Border x:Name="PART_Picker"
                   IsVisible="False"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Left"
@@ -119,11 +119,11 @@
                        CaretBrush="{DynamicResource ArcAccentStrong}"
                        PlaceholderText="Search countries"
                        PlaceholderForeground="{DynamicResource ArcTextMuted}" />
-              <ScrollViewer x:Name="Scroller"
+              <ScrollViewer x:Name="PART_Scroller"
                             MaxHeight="264"
                             HorizontalScrollBarVisibility="Disabled"
                             VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="Rows" />
+                <StackPanel x:Name="PART_Rows" />
               </ScrollViewer>
             </StackPanel>
           </Border>

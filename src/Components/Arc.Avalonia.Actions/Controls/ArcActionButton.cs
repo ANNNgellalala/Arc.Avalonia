@@ -5,6 +5,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Threading;
@@ -29,6 +30,10 @@ public enum ArcActionButtonState
 /// The label crossfades and rises in place; the width follows layout rather than springing because
 /// Avalonia has no auto-width animation, and the check scales in instead of drawing its stroke.
 /// </summary>
+[TemplatePart("PART_Label", typeof(TextBlock))]
+[TemplatePart("PART_Arrow", typeof(ArcIcon))]
+[TemplatePart("PART_Check", typeof(ArcIcon))]
+[TemplatePart("PART_Spinner", typeof(ArcSpinner))]
 public sealed class ArcActionButton : Button
 {
     public static readonly StyledProperty<string> LabelProperty =
@@ -151,10 +156,10 @@ public sealed class ArcActionButton : Button
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _label = e.NameScope.Find<TextBlock>("Label");
-        _arrow = e.NameScope.Find<ArcIcon>("Arrow");
-        _check = e.NameScope.Find<ArcIcon>("Check");
-        _spinner = e.NameScope.Find<ArcSpinner>("Spinner");
+        _label = e.NameScope.Find<TextBlock>("PART_Label");
+        _arrow = e.NameScope.Find<ArcIcon>("PART_Arrow");
+        _check = e.NameScope.Find<ArcIcon>("PART_Check");
+        _spinner = e.NameScope.Find<ArcSpinner>("PART_Spinner");
 
         SetUpMotion(_label);
         SetUpMotion(_arrow);

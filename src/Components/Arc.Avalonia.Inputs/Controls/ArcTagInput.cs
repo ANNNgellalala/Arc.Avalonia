@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -20,6 +21,10 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A field that turns typed text into removable tags. Enter or comma adds, Backspace removes the last
 /// tag, and the arrow keys pick tags so Delete can remove a specific one.
 /// </summary>
+[TemplatePart("PART_Input", typeof(TextBox))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_TagPanel", typeof(WrapPanel))]
+[TemplatePart("PART_Shell", typeof(Border))]
 public class ArcTagInput : ArcFieldBase
 {
     public static readonly StyledProperty<IReadOnlyList<string>?> ValueProperty =
@@ -75,9 +80,9 @@ public class ArcTagInput : ArcFieldBase
         }
 
         _input = e.NameScope.Find<TextBox>("PART_Input");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _panel = e.NameScope.Find<WrapPanel>("TagPanel");
-        _shell = e.NameScope.Find<Border>("Shell");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _panel = e.NameScope.Find<WrapPanel>("PART_TagPanel");
+        _shell = e.NameScope.Find<Border>("PART_Shell");
 
         if (_input is not null)
         {

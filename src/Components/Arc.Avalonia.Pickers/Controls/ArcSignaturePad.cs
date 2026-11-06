@@ -15,6 +15,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -399,6 +400,11 @@ public sealed class ArcSignatureSurface : Control
 /// Arc's signature pad: smooth ink that thins with speed, undo and clear, and a transparent PNG export at
 /// three times the pad resolution. Strokes are exposed so a form can persist and replay them.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(ArcSignatureSurface))]
+[TemplatePart("PART_Undo", typeof(Button))]
+[TemplatePart("PART_Clear", typeof(Button))]
+[TemplatePart("PART_Colors", typeof(StackPanel))]
+[TemplatePart("PART_Widths", typeof(StackPanel))]
 public class ArcSignaturePad : TemplatedControl
 {
     private readonly List<List<ArcInkStroke>> _history = new() { new List<ArcInkStroke>() };
@@ -487,6 +493,23 @@ public class ArcSignaturePad : TemplatedControl
 
     /// <summary>Raised after every change, including undo, redo and clear.</summary>
     public event EventHandler<IReadOnlyList<ArcInkStroke>>? StrokesChanged;
+
+    /// <summary>Bubbled copy of <see cref="StrokesChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcStrokesChangedEventArgs> StrokesChangedEvent =
+        RoutedEvent.Register<ArcSignaturePad, ArcStrokesChangedEventArgs>("StrokesChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="StrokesChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcStrokesChangedEventArgs>? StrokesChangedRouted
+    {
+        add => AddHandler(StrokesChangedEvent, value);
+        remove => RemoveHandler(StrokesChangedEvent, value);
+    }
+
+    private void RaiseStrokesChanged(IReadOnlyList<ArcInkStroke> strokes)
+    {
+        StrokesChanged?.Invoke(this, strokes);
+        RaiseEvent(new ArcStrokesChangedEventArgs(StrokesChangedEvent) { Strokes = strokes });
+    }
 
     /// <summary>Raised after <see cref="SavePng"/> wrote a file.</summary>
     public event EventHandler<string>? PngSaved;
@@ -701,7 +724,7 @@ public class ArcSignaturePad : TemplatedControl
 
     private void Publish()
     {
-        StrokesChanged?.Invoke(this, Strokes);
+        RaiseStrokesChanged(Strokes);
     }
 
     private void SyncSurface()

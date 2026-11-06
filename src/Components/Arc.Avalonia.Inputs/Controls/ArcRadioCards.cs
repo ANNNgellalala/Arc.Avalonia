@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -59,9 +60,12 @@ public sealed class ArcRadioCardOption
     public string? DisabledReason { get; }
 }
 
-public sealed class ArcRadioCardsValueEventArgs : EventArgs
+public sealed class ArcRadioCardsValueEventArgs : RoutedEventArgs
 {
     public ArcRadioCardsValueEventArgs(string value) => Value = value;
+
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcRadioCardsValueEventArgs(RoutedEvent routedEvent, string value) : base(routedEvent) => Value = value;
 
     public string Value { get; }
 }
@@ -70,6 +74,9 @@ public sealed class ArcRadioCardsValueEventArgs : EventArgs
 /// Arc's radio cards: selectable option cards with a sliding selection ring, price and description
 /// slots, and roving radio keyboard behaviour.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
+[TemplatePart("PART_RingHost", typeof(Canvas))]
+[TemplatePart("PART_Ring", typeof(Border))]
 public class ArcRadioCards : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcRadioCardOption>?> OptionsProperty =
@@ -109,6 +116,16 @@ public class ArcRadioCards : TemplatedControl
     /// <summary>Raised when a new card is selected.</summary>
     public event EventHandler<ArcRadioCardsValueEventArgs>? ValueChanged;
 
+    public static readonly RoutedEvent<ArcRadioCardsValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcRadioCards, ArcRadioCardsValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcRadioCardsValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
     /// <summary>Choices: value, label, description, meta, icon and an optional disabled reason.</summary>
     public IList<ArcRadioCardOption>? Options
     {
@@ -139,9 +156,9 @@ public class ArcRadioCards : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _host = e.NameScope.Find<Panel>("Host");
-        _ringHost = e.NameScope.Find<Canvas>("RingHost");
-        _ring = e.NameScope.Find<Border>("Ring");
+        _host = e.NameScope.Find<Panel>("PART_Host");
+        _ringHost = e.NameScope.Find<Canvas>("PART_RingHost");
+        _ring = e.NameScope.Find<Border>("PART_Ring");
         Build();
     }
 
@@ -350,6 +367,7 @@ public class ArcRadioCards : TemplatedControl
         SetCurrentValue(ValueProperty, option.Value);
         ApplyValue(animate: true);
         ValueChanged?.Invoke(this, new ArcRadioCardsValueEventArgs(option.Value));
+        RaiseEvent(new ArcRadioCardsValueEventArgs(ValueChangedEvent, option.Value));
     }
 
     private void OnCardKeyDown(object? sender, KeyEventArgs e)

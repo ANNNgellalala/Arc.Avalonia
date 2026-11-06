@@ -1,0 +1,29 @@
+{
+  "$comment": "R10 契约门禁的过渡基线：按 kind+file+symbol 把“改造进行中”的命中降级为 exempt，避免堵死 check-all。切片完成后用 -UpdateBaseline 刷新，理想状态 allow=[]。",
+  "version": 1,
+  "generatedAt": "2026-11-07T02:59:49+08:00",
+  "counters": {
+    "scannedFiles": 228,
+    "templatedControls": 108,
+    "withTemplatePart": 108,
+    "routedEventFields": 115,
+    "withWrapper": 115,
+    "legacyEventsTotal": 105,
+    "legacyEventsWithRouted": 75,
+    "legacyEventsMissingRouted": 30,
+    "nonPartLookups": 0,
+    "missingTemplatePart": 0,
+    "violations": 0,
+    "missing-templatepart": 0,
+    "undeclared-part": 0,
+    "invalid-templatepart-name": 0,
+    "routedevent-no-wrapper": 0,
+    "routedevent-args-base": 0
+  },
+  "allow": [],
+  "notes": [
+    "本文件不是架构豁免：R10 的“新文件/新控件”违规不在 allow 内时会照常 RED。",
+    "刷新命令: pwsh -NoProfile tools/check-contracts.ps1 -UpdateBaseline",
+    "ADR: docs/adr/0005-control-contract.md"
+  ]
+}

@@ -125,6 +125,20 @@ public class ArcStreamgraph : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        foreach (var hit in _legendHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            var layers = Series;
+            var name = layers is not null && hit.Index >= 0 && hit.Index < layers.Count ? layers[hit.Index].Name : string.Empty;
+            RaiseLegendClick(hit.Index, name, true);
+            break;
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -178,7 +192,7 @@ public class ArcStreamgraph : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -269,7 +283,7 @@ public class ArcStreamgraph : ArcChartBase
         for (var index = 0; index < series.Count; index++)
         {
             var item = series[index];
-            var text = ChartText.Create(item.Name, 12, ChartPalette.Secondary);
+            var text = ChartText.Create(item.Name, ChartMetrics.LabelFontSize, ChartPalette.Secondary);
             var width = 14 + 5 + text.Width + 12;
             if (x + width > Bounds.Width)
             {
@@ -311,7 +325,7 @@ public class ArcStreamgraph : ArcChartBase
                 return;
             }
 
-            var text = ChartText.Create(labels[index], 12, ChartPalette.Muted, maxWidth: 64);
+            var text = ChartText.Create(labels[index], ChartMetrics.LabelFontSize, ChartPalette.Muted, maxWidth: 64);
             var x = Math.Clamp(
                 PointX(index, count),
                 text.Width / 2 + 2,

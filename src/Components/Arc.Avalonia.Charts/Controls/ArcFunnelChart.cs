@@ -85,7 +85,13 @@ public class ArcFunnelChart : ArcChartBase
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        SetActive(IndexAt(e.GetPosition(this)));
+        var position = e.GetPosition(this);
+        var index = IndexAt(position);
+        SetActive(index);
+        if (index >= 0 && Stages is { } stages && index < stages.Count)
+        {
+            RaiseItemClick(index, stages[index].Label, stages[index].Value, position);
+        }
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
@@ -107,7 +113,13 @@ public class ArcFunnelChart : ArcChartBase
             InvalidateVisual();
         }
 
-        SetActive(IndexAt(e.GetPosition(this)));
+        var position = e.GetPosition(this);
+        var index = IndexAt(position);
+        SetActive(index);
+        if (index >= 0 && Stages is { } stages && index < stages.Count)
+        {
+            RaiseItemClick(index, stages[index].Label, stages[index].Value, position);
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -167,7 +179,7 @@ public class ArcFunnelChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -285,7 +297,7 @@ public class ArcFunnelChart : ArcChartBase
             var active = index == _active;
             var name = ChartText.Create(
                 stage.Label,
-                12,
+                ChartMetrics.CaptionFontSize,
                 active ? ChartPalette.Foreground : ChartPalette.Secondary,
                 active ? FontWeight.Medium : FontWeight.Normal,
                 Math.Max(40, labelRight - 4));
@@ -295,7 +307,7 @@ public class ArcFunnelChart : ArcChartBase
                 FormatValue(stage.Value),
                 labelRight,
                 centerY + 8,
-                13,
+                ChartMetrics.TitleFontSize,
                 active ? ChartPalette.Foreground : ChartPalette.Muted,
                 FontWeight.Medium,
                 TextAlignment.Right);
@@ -323,7 +335,7 @@ public class ArcFunnelChart : ArcChartBase
                 ChartFormat.Percent(ratio, 0),
                 x,
                 y - 5,
-                11,
+                ChartMetrics.CaptionFontSize,
                 color,
                 FontWeight.Medium);
             ChartText.Draw(
@@ -331,7 +343,7 @@ public class ArcFunnelChart : ArcChartBase
                 "kept",
                 x,
                 y + 5,
-                11,
+                ChartMetrics.CaptionFontSize,
                 ChartPalette.Muted);
         }
     }

@@ -168,6 +168,16 @@ public class ArcReminderRow : Panel
     }
 
     /// <summary>Raised when the completion control is toggled; the argument is the new checked state.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> CompletedChangedEvent =
+        RoutedEvent.Register<ArcReminderRow, ArcLifeTodayRoutedEventArgs>("CompletedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CompletedChanged"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? CompletedChangedRouted
+    {
+        add => AddHandler(CompletedChangedEvent, value);
+        remove => RemoveHandler(CompletedChangedEvent, value);
+    }
+
     public event Action<bool>? CompletedChanged;
 
     /// <summary>Raised when the user asks to delay the reminder by the given span.</summary>
@@ -185,6 +195,7 @@ public class ArcReminderRow : Panel
         {
             IsChecked = !IsChecked;
             CompletedChanged?.Invoke(IsChecked);
+        RaiseEvent(new ArcLifeTodayRoutedEventArgs(CompletedChangedEvent) { Flag = IsChecked });
             e.Handled = true;
             return;
         }
@@ -252,6 +263,7 @@ public class ArcReminderRow : Panel
         {
             IsChecked = !IsChecked;
             CompletedChanged?.Invoke(IsChecked);
+        RaiseEvent(new ArcLifeTodayRoutedEventArgs(CompletedChangedEvent) { Flag = IsChecked });
         };
 
         var title = Ui.Text(Title, "arc-body arc-medium");
@@ -382,3 +394,5 @@ public class ArcReminderRow : Panel
         _ => ("Missed", ArcBadgeTone.Danger)
     };
 }
+
+

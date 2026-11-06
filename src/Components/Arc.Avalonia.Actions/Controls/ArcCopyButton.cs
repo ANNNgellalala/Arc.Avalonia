@@ -7,6 +7,8 @@ using Avalonia.Layout;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 
+using Avalonia.Interactivity;
+
 namespace Arc.Avalonia.Actions.Controls;
 
 public enum ArcCopyState
@@ -67,6 +69,16 @@ public sealed class ArcCopyButton : ArcButton
 
     /// <summary>Raised after a successful copy.</summary>
     public event EventHandler? Copied;
+    /// <summary>Bubbled copy of <see cref="Copied"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcCopyButtonCopiedEventArgs> CopiedEvent =
+        RoutedEvent.Register<ArcCopyButton, ArcCopyButtonCopiedEventArgs>("Copied", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Copied"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcCopyButtonCopiedEventArgs>? CopiedRouted
+    {
+        add => AddHandler(CopiedEvent, value);
+        remove => RemoveHandler(CopiedEvent, value);
+    }
 
     /// <summary>The text placed on the clipboard.</summary>
     public string? Value
@@ -133,7 +145,9 @@ public sealed class ArcCopyButton : ArcButton
             data.Add(item);
             await clipboard.SetDataAsync(data).ConfigureAwait(true);
             SetCurrentValue(StateProperty, ArcCopyState.Copied);
-            Copied?.Invoke(this, EventArgs.Empty);
+                    var copiedArgs = new ArcCopyButtonCopiedEventArgs(CopiedEvent);
+        Copied?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(copiedArgs);
         }
         catch
         {

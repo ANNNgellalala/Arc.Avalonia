@@ -4,6 +4,8 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -17,6 +19,10 @@ namespace Arc.Avalonia.Actions.Controls;
 /// Long text clamped to a few lines with a soft bottom fade. Read more opens it to its full height and
 /// Show less closes it; the toggle only appears when the text really overflows.
 /// </summary>
+[TemplatePart("PART_Body", typeof(TextBlock))]
+[TemplatePart("PART_Clip", typeof(Border))]
+[TemplatePart("PART_Fade", typeof(Border))]
+[TemplatePart("PART_Toggle", typeof(ArcButton))]
 public sealed class ArcExpandableText : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty =
@@ -64,6 +70,16 @@ public sealed class ArcExpandableText : TemplatedControl
     }
 
     public event EventHandler<bool>? ExpandedChanged;
+    /// <summary>Bubbled copy of <see cref="ExpandedChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcExpandableTextExpandedChangedEventArgs> ExpandedChangedEvent =
+        RoutedEvent.Register<ArcExpandableText, ArcExpandableTextExpandedChangedEventArgs>("ExpandedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ExpandedChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcExpandableTextExpandedChangedEventArgs>? ExpandedChangedRouted
+    {
+        add => AddHandler(ExpandedChangedEvent, value);
+        remove => RemoveHandler(ExpandedChangedEvent, value);
+    }
 
     public string? Text
     {
@@ -99,10 +115,10 @@ public sealed class ArcExpandableText : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _body = e.NameScope.Find<TextBlock>("Body");
-        _clip = e.NameScope.Find<Border>("Clip");
-        _fade = e.NameScope.Find<Border>("Fade");
-        _toggle = e.NameScope.Find<ArcButton>("Toggle");
+        _body = e.NameScope.Find<TextBlock>("PART_Body");
+        _clip = e.NameScope.Find<Border>("PART_Clip");
+        _fade = e.NameScope.Find<Border>("PART_Fade");
+        _toggle = e.NameScope.Find<ArcButton>("PART_Toggle");
 
         if (_clip is not null && !ArcThemeManager.ReducedMotion)
         {
@@ -122,7 +138,9 @@ public sealed class ArcExpandableText : TemplatedControl
             _toggle.Click += (_, _) =>
             {
                 SetCurrentValue(IsExpandedProperty, !IsExpanded);
-                ExpandedChanged?.Invoke(this, IsExpanded);
+                        var expandedChangedArgs = new ArcExpandableTextExpandedChangedEventArgs(ExpandedChangedEvent) { IsExpanded = IsExpanded };
+        ExpandedChanged?.Invoke(this, IsExpanded);
+        RaiseEvent(expandedChangedArgs);
             };
         }
 

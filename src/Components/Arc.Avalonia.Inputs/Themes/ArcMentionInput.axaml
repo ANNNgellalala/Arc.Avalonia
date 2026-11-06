@@ -12,7 +12,7 @@
         <Panel ClipToBounds="False">
           <StackPanel Spacing="6">
             <TextBlock Text="{TemplateBinding Label}" Classes="arc-label" />
-            <Border x:Name="Shell"
+            <Border x:Name="PART_Shell"
                     MinHeight="0"
                     Padding="14,12"
                     Background="{DynamicResource ArcSurface}"
@@ -25,7 +25,7 @@
                 </Transitions>
               </Border.Transitions>
               <Grid>
-                <TextBlock x:Name="Mirror"
+                <TextBlock x:Name="PART_Mirror"
                            FontFamily="{TemplateBinding FontFamily}"
                            FontSize="{TemplateBinding FontSize}"
                            Foreground="{DynamicResource ArcForeground}"
@@ -50,13 +50,13 @@
                          VerticalContentAlignment="Top" />
               </Grid>
             </Border>
-            <TextBlock x:Name="Message"
+            <TextBlock x:Name="PART_Message"
                        Classes="arc-caption"
                        TextWrapping="Wrap"
                        IsVisible="False" />
           </StackPanel>
 
-          <Border x:Name="Panel"
+          <Border x:Name="PART_Panel"
                   IsVisible="False"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Left"
@@ -69,11 +69,11 @@
                   CornerRadius="{DynamicResource ArcRadiusPanel}"
                   BoxShadow="{DynamicResource ArcShadowFloating}"
                   Padding="6">
-            <ScrollViewer x:Name="Scroller"
+            <ScrollViewer x:Name="PART_Scroller"
                           MaxHeight="264"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
-              <StackPanel x:Name="Rows" Spacing="1" />
+              <StackPanel x:Name="PART_Rows" Spacing="1" />
             </ScrollViewer>
           </Border>
         </Panel>

@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using LayoutOrientation = Avalonia.Layout.Orientation;
@@ -40,6 +41,10 @@ public enum ArcButtonGroupOrientation
 /// Related actions joined into one surface: hairline dividers between segments, one highlight gliding
 /// between them, and an optional trailing chevron that opens more actions.
 /// </summary>
+[TemplatePart("PART_Segments", typeof(StackPanel))]
+[TemplatePart("PART_HighlightLayer", typeof(Panel))]
+[TemplatePart("PART_Highlight", typeof(ArcGlide))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcButtonGroup : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcButtonGroupItem>?> ItemsProperty =
@@ -147,10 +152,10 @@ public sealed class ArcButtonGroup : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _segments = e.NameScope.Find<StackPanel>("Segments");
-        _highlightLayer = e.NameScope.Find<Panel>("HighlightLayer");
-        _highlight = e.NameScope.Find<ArcGlide>("Highlight");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _segments = e.NameScope.Find<StackPanel>("PART_Segments");
+        _highlightLayer = e.NameScope.Find<Panel>("PART_HighlightLayer");
+        _highlight = e.NameScope.Find<ArcGlide>("PART_Highlight");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
         _menu.Attach(_overlay);
         BuildSegments();
         SyncMenu();

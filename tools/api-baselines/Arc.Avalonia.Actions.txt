@@ -5,25 +5,47 @@
   ctor Arc.Avalonia.Actions.Controls.ArcAccordion[]
   ctor Arc.Avalonia.Actions.Controls.ArcActionButton[]
   ctor Arc.Avalonia.Actions.Controls.ArcActionSwap[]
+  ctor Arc.Avalonia.Actions.Controls.ArcActionSwapValueChangedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcActionSwapValueChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcAdvancedGlide[]
   ctor Arc.Avalonia.Actions.Controls.ArcAlert[]
+  ctor Arc.Avalonia.Actions.Controls.ArcAlertDismissedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcAlertDismissedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcButtonGroup[]
   ctor Arc.Avalonia.Actions.Controls.ArcConfirmMorph[]
+  ctor Arc.Avalonia.Actions.Controls.ArcConfirmMorphStateChangedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcConfirmMorphStateChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcContextMenu[]
   ctor Arc.Avalonia.Actions.Controls.ArcCopyButton[]
+  ctor Arc.Avalonia.Actions.Controls.ArcCopyButtonCopiedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcCopyButtonCopiedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcDropdownMenu[]
   ctor Arc.Avalonia.Actions.Controls.ArcExpandableText[]
+  ctor Arc.Avalonia.Actions.Controls.ArcExpandableTextExpandedChangedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcExpandableTextExpandedChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroup[]
+  ctor Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroupActionInvokedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroupActionInvokedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcExpandingButtonItem[]
   ctor Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroup[]
+  ctor Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroupActionInvokedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroupActionInvokedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcFloatingButtonItem[]
   ctor Arc.Avalonia.Actions.Controls.ArcIconMorph[]
   ctor Arc.Avalonia.Actions.Controls.ArcSplitButton[]
+  ctor Arc.Avalonia.Actions.Controls.ArcSplitButtonClickEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcSplitButtonClickEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcThemeSwitcher[]
+  ctor Arc.Avalonia.Actions.Controls.ArcThemeSwitcherThemeChangedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcThemeSwitcherThemeChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcToast[]
+  ctor Arc.Avalonia.Actions.Controls.ArcToastClosedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcToastClosedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Actions.Controls.ArcToastHost[]
   ctor Arc.Avalonia.Actions.Controls.ArcUserMenu[]
   ctor Arc.Avalonia.Actions.Controls.ArcUserMenuItem[]
+  ctor Arc.Avalonia.Actions.Controls.ArcUserMenuThemeChangedEventArgs[]
+  ctor Arc.Avalonia.Actions.Controls.ArcUserMenuThemeChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Internal.ArcAccordionItem[]
   ctor Arc.Avalonia.Internal.ArcAccordionItem[System.String title, System.Object content]
   ctor Arc.Avalonia.Internal.ArcActionSwapState[]
@@ -50,8 +72,19 @@
   event System.EventHandler Closed
   event System.EventHandler Copied
   event System.EventHandler Dismissed
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcActionSwapValueChangedEventArgs> ValueChangedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcAlertDismissedEventArgs> DismissedRouted
   event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcConfirmMorphState> StateChanged
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcConfirmMorphStateChangedEventArgs> StateChangedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcCopyButtonCopiedEventArgs> CopiedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcExpandableTextExpandedChangedEventArgs> ExpandedChangedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroupActionInvokedEventArgs> ActionInvokedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroupActionInvokedEventArgs> ActionInvokedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcSplitButtonClickEventArgs> ClickRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcThemeSwitcherThemeChangedEventArgs> ThemeChangedRouted
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcToastClosedEventArgs> ClosedRouted
   event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcUserMenuTheme> ThemeChanged
+  event System.EventHandler<Arc.Avalonia.Actions.Controls.ArcUserMenuThemeChangedEventArgs> ThemeChangedRouted
   event System.EventHandler<Arc.Avalonia.Internal.ArcActionSwapState> ValueChanged
   event System.EventHandler<Arc.Avalonia.Theme.ArcColorScheme> ThemeChanged
   event System.EventHandler<System.Boolean> ExpandedChanged
@@ -125,6 +158,17 @@
   field static Arc.Avalonia.Internal.ArcActionSwapTone Quiet
   field static Arc.Avalonia.Internal.ArcActionSwapTone Success
   field static Arc.Avalonia.Internal.ArcActionSwapTone Warning
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcActionSwapValueChangedEventArgs> ValueChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcAlertDismissedEventArgs> DismissedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcConfirmMorphStateChangedEventArgs> StateChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcCopyButtonCopiedEventArgs> CopiedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcExpandableTextExpandedChangedEventArgs> ExpandedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroupActionInvokedEventArgs> ActionInvokedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroupActionInvokedEventArgs> ActionInvokedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcSplitButtonClickEventArgs> ClickEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcThemeSwitcherThemeChangedEventArgs> ThemeChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcToastClosedEventArgs> ClosedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Actions.Controls.ArcUserMenuThemeChangedEventArgs> ThemeChangedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Actions.Controls.ArcAccordionSize> SizeProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Actions.Controls.ArcActionButtonState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Actions.Controls.ArcAlertTone> ToneProperty
@@ -301,6 +345,7 @@
   property Arc.Avalonia.Actions.Controls.ArcChevronPointing Pointing {get;set}
   property Arc.Avalonia.Actions.Controls.ArcConfirmMode ConfirmMode {get;set}
   property Arc.Avalonia.Actions.Controls.ArcConfirmMorphState State {get;set}
+  property Arc.Avalonia.Actions.Controls.ArcConfirmMorphState State {get;set}
   property Arc.Avalonia.Actions.Controls.ArcConfirmTone Tone {get;set}
   property Arc.Avalonia.Actions.Controls.ArcCopyState State {get;set}
   property Arc.Avalonia.Actions.Controls.ArcExpandingButtonSize Size {get;set}
@@ -313,11 +358,14 @@
   property Arc.Avalonia.Actions.Controls.ArcSplitButtonVariant Variant {get;set}
   property Arc.Avalonia.Actions.Controls.ArcUserMenuAlign Align {get;set}
   property Arc.Avalonia.Actions.Controls.ArcUserMenuStatus Status {get;set}
+  property Arc.Avalonia.Actions.Controls.ArcUserMenuTheme Theme {get;set}
   property Arc.Avalonia.Actions.Controls.ArcUserMenuTheme ThemePreference {get;set}
   property Arc.Avalonia.Controls.ArcButtonSize Size {get;set}
   property Arc.Avalonia.Controls.ArcButtonVariant Variant {get;set}
+  property Arc.Avalonia.Internal.ArcActionSwapState State {get;set}
   property Arc.Avalonia.Internal.ArcActionSwapTone Tone {get;set}
   property Arc.Avalonia.Internal.ArcMenuDefinition Menu {get;set}
+  property Arc.Avalonia.Theme.ArcColorScheme Scheme {get;set}
   property Arc.Avalonia.Theme.ArcColorScheme Scheme {get;set}
   property System.Action Action {get;set}
   property System.Action Action {get;set}
@@ -341,6 +389,7 @@
   property System.Boolean IsDisabled {get;set}
   property System.Boolean IsDisabled {get;set}
   property System.Boolean IsDismissible {get;set}
+  property System.Boolean IsExpanded {get;set}
   property System.Boolean IsExpanded {get;set}
   property System.Boolean IsOpen {get;set}
   property System.Boolean IsOpen {get;set}
@@ -395,6 +444,8 @@
   property System.Object Content {get;set}
   property System.Object Content {get;set}
   property System.Object Current {get}
+  property System.String ActionId {get;set}
+  property System.String ActionId {get;set}
   property System.String ActionLabel {get;set}
   property System.String ActionLabel {get;set}
   property System.String CancelLabel {get;set}
@@ -502,25 +553,36 @@ type enum Arc.Avalonia.Internal.ArcActionSwapTone : System.IComparable, System.I
 type sealed Arc.Avalonia.Actions.Controls.ArcAccordion : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcActionButton : Avalonia.Controls.Button, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IClickableControl, Avalonia.Input.ICommandSource, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcActionSwap : Arc.Avalonia.Controls.ArcButton, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IClickableControl, Avalonia.Input.ICommandSource, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcActionSwapValueChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcAdvancedGlide : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcAlert : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcAlertDismissedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcButtonGroup : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcConfirmMorph : Avalonia.Controls.Button, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IClickableControl, Avalonia.Input.ICommandSource, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcConfirmMorphStateChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcContextMenu : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcCopyButton : Arc.Avalonia.Controls.ArcButton, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IClickableControl, Avalonia.Input.ICommandSource, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcCopyButtonCopiedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcDropdownMenu : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcExpandableText : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcExpandableTextExpandedChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroup : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcExpandingButtonGroupActionInvokedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcExpandingButtonItem
 type sealed Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroup : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcFloatingButtonGroupActionInvokedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcFloatingButtonItem
 type sealed Arc.Avalonia.Actions.Controls.ArcIconMorph : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcSplitButton : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcSplitButtonClickEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcThemeSwitcher : Arc.Avalonia.Controls.ArcButton, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IClickableControl, Avalonia.Input.ICommandSource, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcThemeSwitcherThemeChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcToast : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Actions.Controls.ArcToastClosedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Actions.Controls.ArcToastHost : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcUserMenu : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Actions.Controls.ArcUserMenuItem
+type sealed Arc.Avalonia.Actions.Controls.ArcUserMenuThemeChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Internal.ArcAccordionItem
 type sealed Arc.Avalonia.Internal.ArcActionSwapState
 type sealed Arc.Avalonia.Internal.ArcBreadcrumbItem

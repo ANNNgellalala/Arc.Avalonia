@@ -5,6 +5,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -31,6 +33,16 @@ public enum ArcCountdownVariant
 /// A countdown to a fixed moment with tabular digits. At zero the digits give way to the live
 /// state, and the remaining time is exposed as words for assistive tech.
 /// </summary>
+
+    /// <summary>Event data for the bubbling <see cref="CompletedRouted"/> event.</summary>
+    public sealed class ArcCountdownCompletedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcCountdownCompletedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+    }
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcCountdown : TemplatedControl
 {
     public static readonly StyledProperty<DateTimeOffset?> TargetProperty =
@@ -110,6 +122,22 @@ public class ArcCountdown : TemplatedControl
 
     /// <summary>Fires once when the countdown reaches zero.</summary>
     public event EventHandler? Completed;
+    /// <summary>Bubbling routed counterpart of <see cref="Completed"/>.</summary>
+    public static readonly RoutedEvent<ArcCountdownCompletedEventArgs> CompletedEvent =
+        RoutedEvent.Register<ArcCountdown, ArcCountdownCompletedEventArgs>("Completed", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcCountdownCompletedEventArgs"/> version of <see cref="Completed"/>.</summary>
+    public event EventHandler<ArcCountdownCompletedEventArgs>? CompletedRouted
+    {
+        add => AddHandler(CompletedEvent, value);
+        remove => RemoveHandler(CompletedEvent, value);
+    }
+
+    private void RaiseCompleted()
+    {
+        Completed?.Invoke(this, EventArgs.Empty);
+        RaiseEvent(new ArcCountdownCompletedEventArgs(CompletedEvent));
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -180,7 +208,7 @@ public class ArcCountdown : TemplatedControl
             if (!_completed)
             {
                 _completed = true;
-                Completed?.Invoke(this, EventArgs.Empty);
+                RaiseCompleted();
             }
 
             _host.Children.Clear();

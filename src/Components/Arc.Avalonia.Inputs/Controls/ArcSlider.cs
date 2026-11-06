@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -17,6 +18,16 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A single-value slider with a quiet track, an accent fill, optional ticks, a value bubble while
 /// dragging and arrow, Home, End and PageUp/PageDown support.
 /// </summary>
+[TemplatePart("PART_TrackArea", typeof(Panel))]
+[TemplatePart("PART_Track", typeof(Border))]
+[TemplatePart("PART_Fill", typeof(Border))]
+[TemplatePart("PART_Thumb", typeof(Border))]
+[TemplatePart("PART_Bubble", typeof(Border))]
+[TemplatePart("PART_BubbleText", typeof(TextBlock))]
+[TemplatePart("PART_Readout", typeof(TextBlock))]
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_Marks", typeof(Canvas))]
 public class ArcSlider : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -150,16 +161,16 @@ public class ArcSlider : TemplatedControl
             _trackArea.SizeChanged -= OnTrackSizeChanged;
         }
 
-        _trackArea = e.NameScope.Find<Panel>("TrackArea");
-        _track = e.NameScope.Find<Border>("Track");
-        _fill = e.NameScope.Find<Border>("Fill");
-        _thumb = e.NameScope.Find<Border>("Thumb");
-        _bubble = e.NameScope.Find<Border>("Bubble");
-        _bubbleText = e.NameScope.Find<TextBlock>("BubbleText");
-        _readout = e.NameScope.Find<TextBlock>("Readout");
-        _label = e.NameScope.Find<TextBlock>("LabelText");
-        _description = e.NameScope.Find<TextBlock>("Description");
-        _marksLayer = e.NameScope.Find<Canvas>("Marks");
+        _trackArea = e.NameScope.Find<Panel>("PART_TrackArea");
+        _track = e.NameScope.Find<Border>("PART_Track");
+        _fill = e.NameScope.Find<Border>("PART_Fill");
+        _thumb = e.NameScope.Find<Border>("PART_Thumb");
+        _bubble = e.NameScope.Find<Border>("PART_Bubble");
+        _bubbleText = e.NameScope.Find<TextBlock>("PART_BubbleText");
+        _readout = e.NameScope.Find<TextBlock>("PART_Readout");
+        _label = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
+        _marksLayer = e.NameScope.Find<Canvas>("PART_Marks");
         _thumbTransform = _thumb?.RenderTransform as TranslateTransform;
         _bubbleTransform = _bubble?.RenderTransform as TranslateTransform;
 

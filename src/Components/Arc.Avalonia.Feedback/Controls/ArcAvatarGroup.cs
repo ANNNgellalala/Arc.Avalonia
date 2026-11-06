@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -26,6 +27,7 @@ public sealed class ArcAvatarMember
 /// An overlapping stack of avatars with a +N overflow chip. Hover fans the stack apart;
 /// reduced motion keeps it still.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcAvatarGroup : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcAvatarMember>?> MembersProperty =

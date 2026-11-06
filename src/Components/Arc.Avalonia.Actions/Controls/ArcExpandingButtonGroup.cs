@@ -7,6 +7,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -64,6 +65,7 @@ public sealed class ArcExpandingButtonItem
 /// The group is a toolbar with one roving tab stop and wraps arrow-key navigation at the ends. Touch's
 /// first tap to reveal and second to run is not ported; this control targets pointer and keyboard.
 /// </summary>
+[TemplatePart("PART_ItemsHost", typeof(StackPanel))]
 public sealed class ArcExpandingButtonGroup : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcExpandingButtonItem>?> ItemsProperty =
@@ -113,6 +115,16 @@ public sealed class ArcExpandingButtonGroup : TemplatedControl
 
     /// <summary>Raised with the item id whenever an action runs, before its own callback.</summary>
     public event EventHandler<string?>? ActionInvoked;
+    /// <summary>Bubbled copy of <see cref="ActionInvoked"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcExpandingButtonGroupActionInvokedEventArgs> ActionInvokedEvent =
+        RoutedEvent.Register<ArcExpandingButtonGroup, ArcExpandingButtonGroupActionInvokedEventArgs>("ActionInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ActionInvoked"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcExpandingButtonGroupActionInvokedEventArgs>? ActionInvokedRouted
+    {
+        add => AddHandler(ActionInvokedEvent, value);
+        remove => RemoveHandler(ActionInvokedEvent, value);
+    }
 
     public IList<ArcExpandingButtonItem>? Items
     {
@@ -150,7 +162,7 @@ public sealed class ArcExpandingButtonGroup : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _host = e.NameScope.Find<StackPanel>("ItemsHost");
+        _host = e.NameScope.Find<StackPanel>("PART_ItemsHost");
         AutomationProperties.SetName(this, string.IsNullOrWhiteSpace(Label) ? "Actions" : Label!);
         AutomationProperties.SetHelpText(this, "Toolbar");
         Rebuild();
@@ -480,7 +492,9 @@ public sealed class ArcExpandingButtonGroup : TemplatedControl
         }
 
         Expand(slot.Item.Id, animate: true);
+                var actionInvokedArgs = new ArcExpandingButtonGroupActionInvokedEventArgs(ActionInvokedEvent) { ActionId = slot.Item.Id };
         ActionInvoked?.Invoke(this, slot.Item.Id);
+        RaiseEvent(actionInvokedArgs);
 
         var result = true;
         if (slot.Item.OnSelect is not null)

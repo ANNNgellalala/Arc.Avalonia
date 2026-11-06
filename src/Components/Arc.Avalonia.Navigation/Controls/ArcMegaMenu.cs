@@ -6,6 +6,8 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -114,11 +116,18 @@ public sealed class ArcMegaMenuDestination
     public string? Section { get; set; }
 }
 
-public sealed class ArcMegaMenuInvokedEventArgs : EventArgs
+public sealed class ArcMegaMenuInvokedEventArgs : RoutedEventArgs
 {
+    public ArcMegaMenuInvokedEventArgs()
+    {
+    }
+
     public ArcMegaMenuInvokedEventArgs(ArcMegaMenuDestination destination) => Destination = destination;
 
-    public ArcMegaMenuDestination Destination { get; }
+    public ArcMegaMenuInvokedEventArgs(RoutedEvent routedEvent, ArcMegaMenuDestination destination) : base(routedEvent) =>
+        Destination = destination;
+
+    public ArcMegaMenuDestination Destination { get; } = null!;
 }
 
 /// <summary>
@@ -138,6 +147,15 @@ public sealed class ArcMegaMenuInvokedEventArgs : EventArgs
 /// folded sheet sizes itself from its laid out content, so a section opens in one step rather than growing
 /// its height rows one by one. No Pro source was consulted.
 /// </summary>
+[TemplatePart("PART_Bar", typeof(Border))]
+[TemplatePart("PART_BrandHost", typeof(ContentControl))]
+[TemplatePart("PART_TriggerZone", typeof(Panel))]
+[TemplatePart("PART_Triggers", typeof(StackPanel))]
+[TemplatePart("PART_ActionsHost", typeof(StackPanel))]
+[TemplatePart("PART_MenuButton", typeof(ArcButton))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
+[TemplatePart("PART_BarHighlight", typeof(ArcGlide))]
+[TemplatePart("PART_Caret", typeof(ArcGlide))]
 public sealed class ArcMegaMenu : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcMegaMenuSection>?> SectionsProperty =
@@ -357,9 +375,29 @@ public sealed class ArcMegaMenu : TemplatedControl
 
     /// <summary>Raised with the open section's value, or null when every menu closes.</summary>
     public event EventHandler<string?>? SectionChanged;
+    /// <summary>Bubbled copy of <see cref="SectionChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcMegaMenuSectionChangedEventArgs> SectionChangedEvent =
+        RoutedEvent.Register<ArcMegaMenu, ArcMegaMenuSectionChangedEventArgs>("SectionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="SectionChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcMegaMenuSectionChangedEventArgs>? SectionChangedRouted
+    {
+        add => AddHandler(SectionChangedEvent, value);
+        remove => RemoveHandler(SectionChangedEvent, value);
+    }
 
     /// <summary>Raised for every destination: links, feature cards, plain sections, actions and the brand.</summary>
     public event EventHandler<ArcMegaMenuInvokedEventArgs>? ItemInvoked;
+    /// <summary>Bubbled copy of <see cref="ItemInvoked"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcMegaMenuInvokedEventArgs> ItemInvokedEvent =
+        RoutedEvent.Register<ArcMegaMenu, ArcMegaMenuInvokedEventArgs>("ItemInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ItemInvoked"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcMegaMenuInvokedEventArgs>? ItemInvokedRouted
+    {
+        add => AddHandler(ItemInvokedEvent, value);
+        remove => RemoveHandler(ItemInvokedEvent, value);
+    }
 
     public IList<ArcMegaMenuSection>? Sections
     {
@@ -450,15 +488,15 @@ public sealed class ArcMegaMenu : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _bar = e.NameScope.Find<Border>("Bar");
-        _brandHost = e.NameScope.Find<ContentControl>("BrandHost");
-        _triggerZone = e.NameScope.Find<Panel>("TriggerZone");
-        _triggers = e.NameScope.Find<StackPanel>("Triggers");
-        _actionsHost = e.NameScope.Find<StackPanel>("ActionsHost");
-        _menuButton = e.NameScope.Find<ArcButton>("MenuButton");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
-        _barHighlight = e.NameScope.Find<ArcGlide>("BarHighlight");
-        _caret = e.NameScope.Find<ArcGlide>("Caret");
+        _bar = e.NameScope.Find<Border>("PART_Bar");
+        _brandHost = e.NameScope.Find<ContentControl>("PART_BrandHost");
+        _triggerZone = e.NameScope.Find<Panel>("PART_TriggerZone");
+        _triggers = e.NameScope.Find<StackPanel>("PART_Triggers");
+        _actionsHost = e.NameScope.Find<StackPanel>("PART_ActionsHost");
+        _menuButton = e.NameScope.Find<ArcButton>("PART_MenuButton");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
+        _barHighlight = e.NameScope.Find<ArcGlide>("PART_BarHighlight");
+        _caret = e.NameScope.Find<ArcGlide>("PART_Caret");
 
         if (_menuButton is not null)
         {
@@ -1103,7 +1141,9 @@ public sealed class ArcMegaMenu : TemplatedControl
             }
         });
 
+                var sectionChangedArgs = new ArcMegaMenuSectionChangedEventArgs(SectionChangedEvent) { Section = section!.Value };
         SectionChanged?.Invoke(this, section!.Value);
+        RaiseEvent(sectionChangedArgs);
     }
 
     private void ClosePanel(bool returnFocus)
@@ -1154,7 +1194,9 @@ public sealed class ArcMegaMenu : TemplatedControl
         }
 
         _shownIndex = -1;
+                var sectionChangedArgs = new ArcMegaMenuSectionChangedEventArgs(SectionChangedEvent) { Section = null };
         SectionChanged?.Invoke(this, null);
+        RaiseEvent(sectionChangedArgs);
         UpdateCaretForRest();
 
         if (returnFocus && _activeIndex >= 0 && _activeIndex < _triggerButtons.Count)
@@ -2368,11 +2410,15 @@ public sealed class ArcMegaMenu : TemplatedControl
             _syncing = true;
             SetCurrentValue(ActiveSectionProperty, sections[index].Value);
             _syncing = false;
-            SectionChanged?.Invoke(this, sections[index].Value);
+                    var sectionChangedArgs = new ArcMegaMenuSectionChangedEventArgs(SectionChangedEvent) { Section = sections[index].Value };
+        SectionChanged?.Invoke(this, sections[index].Value);
+        RaiseEvent(sectionChangedArgs);
         }
         else if (index < 0)
         {
-            SectionChanged?.Invoke(this, null);
+                    var sectionChangedArgs = new ArcMegaMenuSectionChangedEventArgs(SectionChangedEvent) { Section = null };
+        SectionChanged?.Invoke(this, null);
+        RaiseEvent(sectionChangedArgs);
         }
 
         ApplySheetHeight();
@@ -2441,11 +2487,11 @@ public sealed class ArcMegaMenu : TemplatedControl
 
     private void Invoke(ArcMegaMenuDestination destination, Action? action)
     {
-        ItemInvoked?.Invoke(this, new ArcMegaMenuInvokedEventArgs(destination));
+                ItemInvoked?.Invoke(this, new ArcMegaMenuInvokedEventArgs(destination));
+        RaiseEvent(new ArcMegaMenuInvokedEventArgs(ItemInvokedEvent, destination));
         action?.Invoke();
     }
 }
-
 
 
 

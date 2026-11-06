@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
@@ -13,6 +14,10 @@ namespace Arc.Avalonia.Feedback.Controls;
 /// A number that rolls to its target with tabular figures and a width that does not jitter while
 /// the digits change. Reduced motion jumps straight to the value.
 /// </summary>
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_PrefixText", typeof(TextBlock))]
+[TemplatePart("PART_ValueText", typeof(TextBlock))]
+[TemplatePart("PART_SuffixText", typeof(TextBlock))]
 public class ArcAnimatedCounter : TemplatedControl
 {
     public static readonly StyledProperty<double> ValueProperty =
@@ -106,10 +111,10 @@ public class ArcAnimatedCounter : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _prefixText = e.NameScope.Find<TextBlock>("PrefixText");
-        _valueText = e.NameScope.Find<TextBlock>("ValueText");
-        _suffixText = e.NameScope.Find<TextBlock>("SuffixText");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _prefixText = e.NameScope.Find<TextBlock>("PART_PrefixText");
+        _valueText = e.NameScope.Find<TextBlock>("PART_ValueText");
+        _suffixText = e.NameScope.Find<TextBlock>("PART_SuffixText");
 
         if (_valueText is not null)
         {

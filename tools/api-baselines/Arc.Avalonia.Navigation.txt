@@ -8,20 +8,36 @@
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuDestination[]
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuFeature[]
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuGroup[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs[]
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs[Arc.Avalonia.Navigation.Controls.ArcMegaMenuDestination destination]
+  ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Navigation.Controls.ArcMegaMenuDestination destination]
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuLink[]
   ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuSection[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuSectionChangedEventArgs[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcMegaMenuSectionChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Navigation.Controls.ArcPagination[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcPaginationPageChangedEventArgs[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcPaginationPageChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Navigation.Controls.ArcTabs[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcTabsSelectionChangedEventArgs[]
+  ctor Arc.Avalonia.Navigation.Controls.ArcTabsSelectionChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
   event System.EventHandler<Arc.Avalonia.Internal.ArcTabItem> SelectionChanged
   event System.EventHandler<Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs> ItemInvoked
+  event System.EventHandler<Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs> ItemInvokedRouted
+  event System.EventHandler<Arc.Avalonia.Navigation.Controls.ArcMegaMenuSectionChangedEventArgs> SectionChangedRouted
+  event System.EventHandler<Arc.Avalonia.Navigation.Controls.ArcPaginationPageChangedEventArgs> PageChangedRouted
+  event System.EventHandler<Arc.Avalonia.Navigation.Controls.ArcTabsSelectionChangedEventArgs> SelectionChangedRouted
   event System.EventHandler<System.Int32> PageChanged
   event System.EventHandler<System.String> SectionChanged
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Navigation.Controls.ArcMegaMenuActionVariant Primary
   field static Arc.Avalonia.Navigation.Controls.ArcMegaMenuActionVariant Quiet
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs> ItemInvokedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Navigation.Controls.ArcMegaMenuSectionChangedEventArgs> SectionChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Navigation.Controls.ArcPaginationPageChangedEventArgs> PageChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Navigation.Controls.ArcTabsSelectionChangedEventArgs> SelectionChangedEvent
   field static Avalonia.StyledProperty<System.Boolean> ForceNarrowProperty
   field static Avalonia.StyledProperty<System.Boolean> IsNarrowProperty
   field static Avalonia.StyledProperty<System.Boolean> IsOpenProperty
@@ -63,6 +79,7 @@
   method System.Void Populate:/Themes/ArcNavigationTheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void PushParent[System.Object ]
   method System.Void set_BaseUri[System.Uri ]
+  property Arc.Avalonia.Internal.ArcTabItem Item {get;set}
   property Arc.Avalonia.Navigation.Controls.ArcMegaMenuActionVariant Variant {get;set}
   property Arc.Avalonia.Navigation.Controls.ArcMegaMenuDestination Destination {get}
   property Arc.Avalonia.Navigation.Controls.ArcMegaMenuFeature Feature {get;set}
@@ -84,6 +101,7 @@
   property System.Int32 OpenDelay {get;set}
   property System.Int32 Page {get;set}
   property System.Int32 PageCount {get;set}
+  property System.Int32 PageIndex {get;set}
   property System.Int32 SelectedIndex {get;set}
   property System.Object Current {get}
   property System.String ActiveSection {get;set}
@@ -111,6 +129,7 @@
   property System.String Label {get;set}
   property System.String Label {get;set}
   property System.String Section {get;set}
+  property System.String Section {get;set}
   property System.String SelectedValue {get;set}
   property System.String Title {get;set}
   property System.String Title {get;set}
@@ -127,8 +146,11 @@ type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuAction
 type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuDestination
 type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuFeature
 type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuGroup
-type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs : System.EventArgs
+type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuInvokedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuLink
 type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuSection
+type sealed Arc.Avalonia.Navigation.Controls.ArcMegaMenuSectionChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Navigation.Controls.ArcPagination : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Navigation.Controls.ArcPaginationPageChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Navigation.Controls.ArcTabs : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Navigation.Controls.ArcTabsSelectionChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs

@@ -16,6 +16,7 @@ using Avalonia.VisualTree;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -25,6 +26,15 @@ namespace Arc.Avalonia.Effects.Controls;
 /// dismissal. The grabber is a button: arrows move one detent, Home and End jump to the ends, Enter or
 /// Space toggles. The scrim dims with the sheet, so a drag reads as one gesture.
 /// </summary>
+[TemplatePart("PART_Layer", typeof(Panel))]
+[TemplatePart("PART_Scrim", typeof(Border))]
+[TemplatePart("PART_Sheet", typeof(Border))]
+[TemplatePart("PART_Header", typeof(StackPanel))]
+[TemplatePart("PART_Grabber", typeof(ArcButton))]
+[TemplatePart("PART_CloseButton", typeof(ArcButton))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Description", typeof(TextBlock))]
+[TemplatePart("PART_Body", typeof(ContentPresenter))]
 public class ArcBottomSheet : ContentControl
 {
     public static readonly StyledProperty<bool> IsOpenProperty =
@@ -85,7 +95,41 @@ public class ArcBottomSheet : ContentControl
 
     public event EventHandler<bool>? OpenChanged;
 
+    /// <summary>Bubbled copy of <see cref="OpenChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcBottomSheetOpenChangedEventArgs> OpenChangedEvent =
+        RoutedEvent.Register<ArcBottomSheet, ArcBottomSheetOpenChangedEventArgs>("OpenChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="OpenChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcBottomSheetOpenChangedEventArgs>? OpenChangedRouted
+    {
+        add => AddHandler(OpenChangedEvent, value);
+        remove => RemoveHandler(OpenChangedEvent, value);
+    }
+
+    private void RaiseOpenChanged(bool isOpen)
+    {
+        OpenChanged?.Invoke(this, isOpen);
+        RaiseEvent(new ArcBottomSheetOpenChangedEventArgs(OpenChangedEvent) { IsOpen = isOpen });
+    }
+
     public event EventHandler<int>? DetentChanged;
+
+    /// <summary>Bubbled copy of <see cref="DetentChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcBottomSheetDetentChangedEventArgs> DetentChangedEvent =
+        RoutedEvent.Register<ArcBottomSheet, ArcBottomSheetDetentChangedEventArgs>("DetentChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="DetentChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcBottomSheetDetentChangedEventArgs>? DetentChangedRouted
+    {
+        add => AddHandler(DetentChangedEvent, value);
+        remove => RemoveHandler(DetentChangedEvent, value);
+    }
+
+    private void RaiseDetentChanged(int detentIndex)
+    {
+        DetentChanged?.Invoke(this, detentIndex);
+        RaiseEvent(new ArcBottomSheetDetentChangedEventArgs(DetentChangedEvent) { DetentIndex = detentIndex });
+    }
 
     /// <summary>Whether the sheet is showing; settable so a page can present the open state.</summary>
     public bool IsOpen
@@ -145,15 +189,15 @@ public class ArcBottomSheet : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _layer = e.NameScope.Find<Panel>("Layer");
-        _scrim = e.NameScope.Find<Border>("Scrim");
-        _sheet = e.NameScope.Find<Border>("Sheet");
-        _header = e.NameScope.Find<StackPanel>("Header");
-        _grabber = e.NameScope.Find<ArcButton>("Grabber");
-        _close = e.NameScope.Find<ArcButton>("CloseButton");
-        _title = e.NameScope.Find<TextBlock>("Title");
-        _description = e.NameScope.Find<TextBlock>("Description");
-        _body = e.NameScope.Find<ContentPresenter>("Body");
+        _layer = e.NameScope.Find<Panel>("PART_Layer");
+        _scrim = e.NameScope.Find<Border>("PART_Scrim");
+        _sheet = e.NameScope.Find<Border>("PART_Sheet");
+        _header = e.NameScope.Find<StackPanel>("PART_Header");
+        _grabber = e.NameScope.Find<ArcButton>("PART_Grabber");
+        _close = e.NameScope.Find<ArcButton>("PART_CloseButton");
+        _title = e.NameScope.Find<TextBlock>("PART_Title");
+        _description = e.NameScope.Find<TextBlock>("PART_Description");
+        _body = e.NameScope.Find<ContentPresenter>("PART_Body");
 
         if (_grabber is not null)
         {
@@ -280,7 +324,7 @@ public class ArcBottomSheet : ContentControl
                 AnnounceDetent();
             }, DispatcherPriority.Loaded);
 
-            OpenChanged?.Invoke(this, true);
+            RaiseOpenChanged(true);
         }
         else if (!IsOpen && _wasOpen)
         {
@@ -294,7 +338,7 @@ public class ArcBottomSheet : ContentControl
                     _layer.IsVisible = false;
                 }
             });
-            OpenChanged?.Invoke(this, false);
+            RaiseOpenChanged(false);
 
             if (_restoreFocus is { } restore)
             {
@@ -389,7 +433,7 @@ public class ArcBottomSheet : ContentControl
         }
 
         AnnounceDetent();
-        DetentChanged?.Invoke(this, _detentIndex);
+        RaiseDetentChanged(_detentIndex);
     }
 
     private void AnnounceDetent()

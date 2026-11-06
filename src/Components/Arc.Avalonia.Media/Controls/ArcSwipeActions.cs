@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -50,6 +52,10 @@ public sealed class ArcSwipeActionButton : Button
 /// Left and Right reveal the same actions from the keyboard, Tab walks into them and Escape puts the
 /// row away, so the gesture is never the only path.
 /// </summary>
+[TemplatePart("PART_LeadingHost", typeof(StackPanel))]
+[TemplatePart("PART_TrailingHost", typeof(StackPanel))]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcSwipeActions : ContentControl
 {
     public const double ActionWidth = 84;
@@ -125,6 +131,16 @@ public class ArcSwipeActions : ContentControl
     }
 
     /// <summary>Raised when an action is tapped or committed by a full swipe.</summary>
+    public static readonly RoutedEvent<ArcSwipeActionInvokedRoutedEventArgs> ActionInvokedEvent =
+        RoutedEvent.Register<ArcSwipeActions, ArcSwipeActionInvokedRoutedEventArgs>("ActionInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ActionInvoked"/>.</summary>
+    public event EventHandler<ArcSwipeActionInvokedRoutedEventArgs>? ActionInvokedRouted
+    {
+        add => AddHandler(ActionInvokedEvent, value);
+        remove => RemoveHandler(ActionInvokedEvent, value);
+    }
+
     public event EventHandler<ArcSwipeAction>? ActionInvoked;
 
     /// <summary>True when either side is showing.</summary>
@@ -133,10 +149,10 @@ public class ArcSwipeActions : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _leadingHost = e.NameScope.Find<StackPanel>("LeadingHost");
-        _trailingHost = e.NameScope.Find<StackPanel>("TrailingHost");
-        _surface = e.NameScope.Find<Border>("Surface");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _leadingHost = e.NameScope.Find<StackPanel>("PART_LeadingHost");
+        _trailingHost = e.NameScope.Find<StackPanel>("PART_TrailingHost");
+        _surface = e.NameScope.Find<Border>("PART_Surface");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
         if (_surface is not null)
         {
             _surface.RenderTransform = _translate;
@@ -238,6 +254,7 @@ public class ArcSwipeActions : ContentControl
     {
         action.Action?.Invoke();
         ActionInvoked?.Invoke(this, action);
+        RaiseEvent(new ArcSwipeActionInvokedRoutedEventArgs(ActionInvokedEvent, action));
         Close();
     }
 
@@ -576,5 +593,8 @@ public class ArcSwipeActions : ContentControl
         }
     }
 }
+
+
+
 
 

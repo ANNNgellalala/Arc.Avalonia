@@ -4,8 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -36,9 +38,12 @@ public sealed class ArcSegmentOption
 }
 
 /// <summary>Reports the value a pointer or keyboard focus is about to choose.</summary>
-public sealed class ArcSegmentIntentEventArgs : EventArgs
+public sealed class ArcSegmentIntentEventArgs : RoutedEventArgs
 {
     public ArcSegmentIntentEventArgs(string? value) => Value = value;
+
+    /// <summary>Routed payload factory used by <c>OptionIntentRouted</c>.</summary>
+    public ArcSegmentIntentEventArgs(RoutedEvent routedEvent, string? value) : base(routedEvent) => Value = value;
 
     public string? Value { get; }
 }
@@ -47,6 +52,8 @@ public sealed class ArcSegmentIntentEventArgs : EventArgs
 /// Two to five short, mutually exclusive view options. One shared pill glides between segments on the
 /// morph spring; arrows, Home and End select, and only the selected segment is a tab stop.
 /// </summary>
+[TemplatePart("PART_Segments", typeof(StackPanel))]
+[TemplatePart("PART_Pill", typeof(Border))]
 public class ArcSegmentedControl : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<ArcSegmentOption>?> OptionsProperty =
@@ -74,6 +81,16 @@ public class ArcSegmentedControl : TemplatedControl
 
     public event EventHandler<ArcSegmentIntentEventArgs>? OptionIntent;
 
+    public static readonly RoutedEvent<ArcSegmentIntentEventArgs> OptionIntentEvent =
+        RoutedEvent.Register<ArcSegmentedControl, ArcSegmentIntentEventArgs>("OptionIntent", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="OptionIntent"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcSegmentIntentEventArgs>? OptionIntentRouted
+    {
+        add => AddHandler(OptionIntentEvent, value);
+        remove => RemoveHandler(OptionIntentEvent, value);
+    }
+
     public IReadOnlyList<ArcSegmentOption>? Options
     {
         get => GetValue(OptionsProperty);
@@ -96,8 +113,8 @@ public class ArcSegmentedControl : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _segments = e.NameScope.Find<StackPanel>("Segments");
-        _pill = e.NameScope.Find<Border>("Pill");
+        _segments = e.NameScope.Find<StackPanel>("PART_Segments");
+        _pill = e.NameScope.Find<Border>("PART_Pill");
         _pillTransform = _pill?.RenderTransform as TranslateTransform;
         SizeChanged += (_, _) => UpdatePill(false);
         Rebuild();
@@ -155,8 +172,16 @@ public class ArcSegmentedControl : TemplatedControl
 
             AutomationProperties.SetName(button, option.Label);
             button.Click += (_, _) => Commit(option.Value);
-            button.PointerEntered += (_, _) => OptionIntent?.Invoke(this, new ArcSegmentIntentEventArgs(option.Value));
-            button.GotFocus += (_, _) => OptionIntent?.Invoke(this, new ArcSegmentIntentEventArgs(option.Value));
+            button.PointerEntered += (_, _) =>
+            {
+                OptionIntent?.Invoke(this, new ArcSegmentIntentEventArgs(option.Value));
+                RaiseEvent(new ArcSegmentIntentEventArgs(OptionIntentEvent, option.Value));
+            };
+            button.GotFocus += (_, _) =>
+            {
+                OptionIntent?.Invoke(this, new ArcSegmentIntentEventArgs(option.Value));
+                RaiseEvent(new ArcSegmentIntentEventArgs(OptionIntentEvent, option.Value));
+            };
             button.KeyDown += OnSegmentKeyDown;
 
             _buttons.Add(button);

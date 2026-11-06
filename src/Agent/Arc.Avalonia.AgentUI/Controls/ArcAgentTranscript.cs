@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -209,6 +210,16 @@ public class ArcAgentTranscript : Panel
     }
 
     /// <summary>Raised when a failed event's Retry action is pressed; the host decides whether to re-run it.</summary>
+    public static readonly RoutedEvent<ArcAgentRetryRequestedRoutedEventArgs> RetryRequestedEvent =
+        RoutedEvent.Register<ArcAgentTranscript, ArcAgentRetryRequestedRoutedEventArgs>("RetryRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="RetryRequested"/>; incremental streaming behaviour is unchanged.</summary>
+    public event EventHandler<ArcAgentRetryRequestedRoutedEventArgs>? RetryRequestedRouted
+    {
+        add => AddHandler(RetryRequestedEvent, value);
+        remove => RemoveHandler(RetryRequestedEvent, value);
+    }
+
     public event EventHandler<ArcAgentEvent>? RetryRequested;
 
     /// <summary>
@@ -640,7 +651,11 @@ public class ArcAgentTranscript : Panel
             var retry = ArcUi.Button("Retry", ArcButtonVariant.Secondary, ArcButtonSize.Sm, "refresh-cw");
             retry.HorizontalAlignment = HorizontalAlignment.Left;
             AutomationProperties.SetName(retry, $"Retry {evt.Title}");
-            retry.Click += (_, _) => RetryRequested?.Invoke(this, evt);
+            retry.Click += (_, _) =>
+            {
+                RetryRequested?.Invoke(this, evt);
+                RaiseEvent(new ArcAgentRetryRequestedRoutedEventArgs(RetryRequestedEvent, evt));
+            };
             panel.Children.Add(retry);
         }
 
@@ -824,4 +839,6 @@ public class ArcAgentTranscript : Panel
         };
     }
 }
+
+
 

@@ -244,6 +244,18 @@ public class ArcBrushChart : ArcChartBase
         }
 
         var point = e.GetPosition(this);
+        foreach (var hit in _eventHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            RaiseItemClick(hit.Event.Index, hit.Event.Label, 0, point);
+            e.Handled = true;
+            return;
+        }
+
         if (_strip.Contains(point))
         {
             if (e.ClickCount == 2)
@@ -289,6 +301,16 @@ public class ArcBrushChart : ArcChartBase
 
         _drag = DragMode.None;
         _dragMoved = false;
+
+        var rangeSeries = Series;
+        var rangeCount = rangeSeries?.Count ?? 0;
+        if (rangeCount > 0)
+        {
+            var startIndex = Math.Clamp((int)Math.Round(WindowStart * (rangeCount - 1)), 0, rangeCount - 1);
+            var endIndex = Math.Clamp((int)Math.Round(WindowEnd * (rangeCount - 1)), 0, rangeCount - 1);
+            RaiseRangeSelect(startIndex, endIndex, rangeSeries![startIndex], rangeSeries[endIndex]);
+        }
+
         e.Pointer.Capture(null);
         e.Handled = true;
     }
@@ -455,8 +477,8 @@ public class ArcBrushChart : ArcChartBase
         var seriesBrush = ChartPalette.Series(0);
         var events = VisibleEvents(count, start, end);
 
-        var gridPen = new Pen(ChartPalette.Border, 1);
-        var baselinePen = new Pen(ChartPalette.BorderStrong, 1);
+        var gridPen = new Pen(ChartPalette.Border, ChartMetrics.Hairline);
+        var baselinePen = new Pen(ChartPalette.BorderStrong, ChartMetrics.Hairline);
 
         if (ShowGrid)
         {
@@ -556,7 +578,7 @@ public class ArcBrushChart : ArcChartBase
                 ChartFormat.Compact(value),
                 plot.Right + 8,
                 y,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted);
         }
     }
@@ -595,7 +617,7 @@ public class ArcBrushChart : ArcChartBase
                 return;
             }
 
-            var text = ChartText.Create(label, 12, ChartPalette.Muted, maxWidth: 72);
+            var text = ChartText.Create(label, ChartMetrics.LabelFontSize, ChartPalette.Muted, maxWidth: 72);
             var x = PlotX(index, count, start, end, plot);
             x = Math.Clamp(
                 x,
@@ -617,8 +639,8 @@ public class ArcBrushChart : ArcChartBase
         {
             var x = Math.Round(PlotX(item.Index, count, start, end, plot)) + 0.5;
             var pen = _hoverEvent?.Index == item.Index
-                ? new Pen(EventBrush(item.Tone), 1)
-                : new Pen(ChartPalette.BorderStrong, 1);
+                ? new Pen(EventBrush(item.Tone), ChartMetrics.Hairline)
+                : new Pen(ChartPalette.BorderStrong, ChartMetrics.Hairline);
             context.DrawLine(pen, new Point(x, plot.Top - 10), new Point(x, plot.Bottom));
         }
     }
@@ -650,7 +672,7 @@ public class ArcBrushChart : ArcChartBase
 
             var text = ChartText.Create(
                 item.Label,
-                12,
+                ChartMetrics.CaptionFontSize,
                 active ? ChartPalette.Foreground : ChartPalette.Secondary,
                 maxWidth: 104);
             var right = x + 16;
@@ -984,7 +1006,7 @@ public class ArcBrushChart : ArcChartBase
             "No data yet",
             Bounds.Width / 2,
             Bounds.Height / 2,
-            13,
+            ChartMetrics.TitleFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center);
     }

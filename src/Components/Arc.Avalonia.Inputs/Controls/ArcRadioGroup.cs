@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -38,6 +39,7 @@ public sealed class ArcRadioOption
 /// A small set of mutually exclusive options shown as rows with optional descriptions. Real radio
 /// buttons keep native semantics; arrow keys move the selection with a roving tab stop.
 /// </summary>
+[TemplatePart("PART_Rows", typeof(StackPanel))]
 public class ArcRadioGroup : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<ArcRadioOption>?> OptionsProperty =
@@ -85,7 +87,7 @@ public class ArcRadioGroup : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _rows = e.NameScope.Find<StackPanel>("Rows");
+        _rows = e.NameScope.Find<StackPanel>("PART_Rows");
         Rebuild();
     }
 

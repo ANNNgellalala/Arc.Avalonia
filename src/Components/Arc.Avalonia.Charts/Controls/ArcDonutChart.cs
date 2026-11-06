@@ -153,6 +153,23 @@ public class ArcDonutChart : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        foreach (var hit in _legendHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            var items = VisibleSegments();
+            if (hit.Index >= 0 && hit.Index < items.Count)
+            {
+                RaiseLegendClick(hit.Index, items[hit.Index].Name, true);
+            }
+
+            break;
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -205,7 +222,7 @@ public class ArcDonutChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -277,7 +294,7 @@ public class ArcDonutChart : ArcChartBase
             label,
             _center.X,
             _center.Y - 17,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: _innerRadius * 1.8);
@@ -295,7 +312,7 @@ public class ArcDonutChart : ArcChartBase
             detail,
             _center.X,
             _center.Y + 25,
-            12,
+            ChartMetrics.LabelFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center,
             maxWidth: _innerRadius * 1.8);
@@ -320,7 +337,7 @@ public class ArcDonutChart : ArcChartBase
             context.DrawRectangle(brush, null, new Rect(x, y + 7, 8, 8), 2, 2);
             var name = ChartText.Create(
                 segment.Name,
-                12,
+                ChartMetrics.CaptionFontSize,
                 i == _activeIndex ? ChartPalette.Foreground : ChartPalette.Secondary,
                 i == _activeIndex ? FontWeight.Medium : FontWeight.Normal,
                 Math.Max(24, available - 46));
@@ -330,7 +347,7 @@ public class ArcDonutChart : ArcChartBase
                 ChartFormat.Percent(segment.Value / total, 0),
                 x + available,
                 y + 11,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Right);
             _legendHits.Add((row, i));

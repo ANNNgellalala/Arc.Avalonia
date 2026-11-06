@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -260,6 +261,16 @@ public class ArcRoutineScheduleEditor : Panel
     }
 
     /// <summary>Raised with the structured rule when the visitor saves; the host validates and persists it.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> SaveRequestedEvent =
+        RoutedEvent.Register<ArcRoutineScheduleEditor, ArcLifeTodayRoutedEventArgs>("SaveRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SaveRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? SaveRequestedRouted
+    {
+        add => AddHandler(SaveRequestedEvent, value);
+        remove => RemoveHandler(SaveRequestedEvent, value);
+    }
+
     public event Action<ArcScheduleSpec>? SaveRequested;
 
     /// <summary>Raised when the visitor discards the edit.</summary>
@@ -614,7 +625,9 @@ public class ArcRoutineScheduleEditor : Panel
         }
 
         SetCurrentValue(StateProperty, ArcRoutineEditorState.Saved);
-        SaveRequested?.Invoke(CreateSpec());
+        var spec = CreateSpec();
+        SaveRequested?.Invoke(spec);
+        RaiseEvent(new ArcLifeTodayRoutedEventArgs(SaveRequestedEvent) { Spec = spec });
         Refresh();
     }
 
@@ -763,3 +776,5 @@ public class ArcRoutineScheduleEditor : Panel
         _ => ArcBadgeTone.Neutral
     };
 }
+
+

@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -37,6 +38,7 @@ public sealed class ArcChipOption
 /// Filter chips that morph when selected. Several can be active by default; single mode still lets the
 /// active chip be cleared. Long sets fold behind a +N more chip, and selected chips always stay visible.
 /// </summary>
+[TemplatePart("PART_ChipPanel", typeof(WrapPanel))]
 public class ArcChipGroup : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<ArcChipOption>?> OptionsProperty =
@@ -104,7 +106,7 @@ public class ArcChipGroup : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _chips = e.NameScope.Find<WrapPanel>("ChipPanel");
+        _chips = e.NameScope.Find<WrapPanel>("PART_ChipPanel");
         Rebuild();
     }
 

@@ -7,6 +7,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -21,6 +23,10 @@ namespace Arc.Avalonia.Navigation.Controls;
 /// Peer views of the same object: a muted tab strip with one selection pill that glides between triggers,
 /// and a panel that swaps in place with a short directional fade.
 /// </summary>
+[TemplatePart("PART_Triggers", typeof(StackPanel))]
+[TemplatePart("PART_GlideLayer", typeof(Panel))]
+[TemplatePart("PART_Glide", typeof(ArcGlide))]
+[TemplatePart("PART_PanelHost", typeof(ContentControl))]
 public sealed class ArcTabs : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcTabItem>?> ItemsProperty =
@@ -58,6 +64,17 @@ public sealed class ArcTabs : TemplatedControl
 
     public event EventHandler<ArcTabItem>? SelectionChanged;
 
+    /// <summary>Bubbled copy of <see cref="SelectionChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcTabsSelectionChangedEventArgs> SelectionChangedEvent =
+        RoutedEvent.Register<ArcTabs, ArcTabsSelectionChangedEventArgs>("SelectionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="SelectionChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcTabsSelectionChangedEventArgs>? SelectionChangedRouted
+    {
+        add => AddHandler(SelectionChangedEvent, value);
+        remove => RemoveHandler(SelectionChangedEvent, value);
+    }
+
     public IList<ArcTabItem>? Items
     {
         get => GetValue(ItemsProperty);
@@ -88,10 +105,10 @@ public sealed class ArcTabs : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _triggerHost = e.NameScope.Find<StackPanel>("Triggers");
-        _glideLayer = e.NameScope.Find<Panel>("GlideLayer");
-        _glide = e.NameScope.Find<ArcGlide>("Glide");
-        _panelHost = e.NameScope.Find<ContentControl>("PanelHost");
+        _triggerHost = e.NameScope.Find<StackPanel>("PART_Triggers");
+        _glideLayer = e.NameScope.Find<Panel>("PART_GlideLayer");
+        _glide = e.NameScope.Find<ArcGlide>("PART_Glide");
+        _panelHost = e.NameScope.Find<ContentControl>("PART_PanelHost");
         if (_glide is not null)
         {
             _glide.Classes.Add("pill");
@@ -256,7 +273,9 @@ public sealed class ArcTabs : TemplatedControl
         ShowPanel(items[index], animate, index >= _lastIndex ? 1 : -1);
         _lastIndex = index;
         MoveGlide();
-        SelectionChanged?.Invoke(this, items[index]);
+                        var selectionChangedArgs = new ArcTabsSelectionChangedEventArgs(SelectionChangedEvent) { Item = items[index] };
+                SelectionChanged?.Invoke(this, items[index]);
+                RaiseEvent(selectionChangedArgs);
     }
 
     private void ShowPanel(ArcTabItem item, bool animate, int direction)

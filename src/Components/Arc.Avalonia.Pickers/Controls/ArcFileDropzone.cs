@@ -16,6 +16,7 @@ using Avalonia.Styling;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Pickers.Controls;
 
@@ -52,6 +53,12 @@ public sealed class ArcFileDropzoneItem
 /// Arc's file dropzone: a generous dashed target that accepts drops or opens the system picker, plus a
 /// list of files with their size and a remove action.
 /// </summary>
+[TemplatePart("PART_Drop", typeof(Button))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
+[TemplatePart("PART_Hint", typeof(TextBlock))]
+[TemplatePart("PART_Note", typeof(TextBlock))]
+[TemplatePart("PART_Error", typeof(TextBlock))]
+[TemplatePart("PART_List", typeof(StackPanel))]
 public class ArcFileDropzone : TemplatedControl
 {
     public static readonly StyledProperty<string?> AcceptProperty =
@@ -178,6 +185,23 @@ public class ArcFileDropzone : TemplatedControl
 
     /// <summary>Raised whenever the file list changes.</summary>
     public event EventHandler<IReadOnlyList<IStorageFile>>? FilesChanged;
+
+    /// <summary>Bubbled copy of <see cref="FilesChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcFilesChangedEventArgs> FilesChangedEvent =
+        RoutedEvent.Register<ArcFileDropzone, ArcFilesChangedEventArgs>("FilesChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="FilesChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcFilesChangedEventArgs>? FilesChangedRouted
+    {
+        add => AddHandler(FilesChangedEvent, value);
+        remove => RemoveHandler(FilesChangedEvent, value);
+    }
+
+    private void RaiseFilesChanged(IReadOnlyList<IStorageFile> files)
+    {
+        FilesChanged?.Invoke(this, files);
+        RaiseEvent(new ArcFilesChangedEventArgs(FilesChangedEvent) { Files = files });
+    }
 
     /// <summary>Raised with the full row list whenever it changes.</summary>
     public event EventHandler<IReadOnlyList<ArcFileDropzoneItem>>? ItemsChanged;
@@ -439,7 +463,7 @@ public class ArcFileDropzone : TemplatedControl
         if (added.Count > 0)
         {
             var all = _items.Where(item => item.File is not null).Select(item => item.File!).ToArray();
-            FilesChanged?.Invoke(this, all);
+            RaiseFilesChanged(all);
         }
 
         ItemsChanged?.Invoke(this, _items.ToArray());
@@ -632,7 +656,8 @@ public class ArcFileDropzone : TemplatedControl
         RenderList();
         UpdateDropState();
         ItemsChanged?.Invoke(this, _items.ToArray());
-        FilesChanged?.Invoke(this, _items.Where(row => row.File is not null).Select(row => row.File!).ToArray());
+        var files = _items.Where(row => row.File is not null).Select(row => row.File!).ToArray();
+        RaiseFilesChanged(files);
     }
 
     private void OnDragEnter(object? sender, DragEventArgs e) => HandleDrag(e);

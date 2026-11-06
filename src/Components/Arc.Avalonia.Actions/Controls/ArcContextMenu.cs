@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
@@ -14,6 +15,9 @@ namespace Arc.Avalonia.Actions.Controls;
 /// Wraps a target and opens a menu of secondary actions at the pointer, or under the target from the
 /// keyboard. A plain click opens it too, so do not wrap targets that need their own click action.
 /// </summary>
+[TemplatePart("PART_Target", typeof(Border))]
+[TemplatePart("PART_Ring", typeof(Border))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcContextMenu : ContentControl
 {
     public static readonly StyledProperty<IList<ArcMenuItem>?> ItemsProperty =
@@ -79,9 +83,9 @@ public sealed class ArcContextMenu : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _target = e.NameScope.Find<Border>("Target");
-        _ring = e.NameScope.Find<Border>("Ring");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _target = e.NameScope.Find<Border>("PART_Target");
+        _ring = e.NameScope.Find<Border>("PART_Ring");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
 
         if (_target is not null)
         {

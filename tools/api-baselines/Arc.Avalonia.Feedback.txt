@@ -11,10 +11,16 @@
   ctor Arc.Avalonia.Feedback.Controls.ArcCommentAuthor[]
   ctor Arc.Avalonia.Feedback.Controls.ArcCommentReaction[]
   ctor Arc.Avalonia.Feedback.Controls.ArcCommentThread[]
+  ctor Arc.Avalonia.Feedback.Controls.ArcCommentThreadCommentsChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Feedback.Controls.ArcCommentThreadResolvedChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Feedback.Controls.ArcCountdown[]
+  ctor Arc.Avalonia.Feedback.Controls.ArcCountdownCompletedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Feedback.Controls.ArcEmptyState[]
+  ctor Arc.Avalonia.Feedback.Controls.ArcHeatmapDateSelectedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Feedback.Controls.ArcHeatmapDay[]
   ctor Arc.Avalonia.Feedback.Controls.ArcHeatmapGrid[]
+  ctor Arc.Avalonia.Feedback.Controls.ArcHeatmapHoverChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Feedback.Controls.ArcHeatmapSelectedDateChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Feedback.Controls.ArcMetricCard[]
   ctor Arc.Avalonia.Feedback.Controls.ArcPresenceStack[]
   ctor Arc.Avalonia.Feedback.Controls.ArcProgress[]
@@ -22,6 +28,7 @@
   ctor Arc.Avalonia.Feedback.Controls.ArcSkeleton[]
   ctor Arc.Avalonia.Feedback.Controls.ArcStep[]
   ctor Arc.Avalonia.Feedback.Controls.ArcStepper[]
+  ctor Arc.Avalonia.Feedback.Controls.ArcStepperStepSelectedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Feedback.Controls.ArcTimeline[]
   ctor Arc.Avalonia.Feedback.Controls.ArcTimelineEvent[]
   ctor Arc.Avalonia.Feedback.Controls.ArcUsageBar[]
@@ -32,7 +39,14 @@
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
   event System.EventHandler CommentsChanged
   event System.EventHandler Completed
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcCommentThreadCommentsChangedEventArgs> CommentsChangedRouted
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcCommentThreadResolvedChangedEventArgs> ResolvedChangedRouted
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcCountdownCompletedEventArgs> CompletedRouted
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcHeatmapDateSelectedEventArgs> DateSelectedRouted
   event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcHeatmapDay> HoverChanged
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcHeatmapHoverChangedEventArgs> HoverChangedRouted
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcHeatmapSelectedDateChangedEventArgs> SelectedDateChangedRouted
+  event System.EventHandler<Arc.Avalonia.Feedback.Controls.ArcStepperStepSelectedEventArgs> StepSelectedRouted
   event System.EventHandler<System.Boolean> ResolvedChanged
   event System.EventHandler<System.DateOnly> DateSelected
   event System.EventHandler<System.DateOnly> SelectedDateChanged
@@ -82,6 +96,13 @@
   field static Arc.Avalonia.Feedback.Controls.ArcTimelineTone Danger
   field static Arc.Avalonia.Feedback.Controls.ArcTimelineTone Neutral
   field static Arc.Avalonia.Feedback.Controls.ArcTimelineTone Success
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcCommentThreadCommentsChangedEventArgs> CommentsChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcCommentThreadResolvedChangedEventArgs> ResolvedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcCountdownCompletedEventArgs> CompletedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcHeatmapDateSelectedEventArgs> DateSelectedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcHeatmapHoverChangedEventArgs> HoverChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcHeatmapSelectedDateChangedEventArgs> SelectedDateChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Feedback.Controls.ArcStepperStepSelectedEventArgs> StepSelectedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Feedback.Controls.ArcAvatarShape> ShapeProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Feedback.Controls.ArcAvatarSize> SizeProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Feedback.Controls.ArcAvatarSize> SizeProperty
@@ -236,6 +257,7 @@
   property Arc.Avalonia.Feedback.Controls.ArcCommentAuthor Author {get;set}
   property Arc.Avalonia.Feedback.Controls.ArcCommentAuthor CurrentUser {get;set}
   property Arc.Avalonia.Feedback.Controls.ArcCountdownVariant Variant {get;set}
+  property Arc.Avalonia.Feedback.Controls.ArcHeatmapDay Day {get;set}
   property Arc.Avalonia.Feedback.Controls.ArcMetricTrend Trend {get;set}
   property Arc.Avalonia.Feedback.Controls.ArcPresenceSize Size {get;set}
   property Arc.Avalonia.Feedback.Controls.ArcPresenceStatus Status {get;set}
@@ -260,6 +282,7 @@
   property System.Boolean IsTyping {get;set}
   property System.Boolean Loading {get;set}
   property System.Boolean Resolved {get;set}
+  property System.Boolean Resolved {get;set}
   property System.Boolean ShowNames {get;set}
   property System.Boolean ShowOthers {get;set}
   property System.Boolean ShowValue {get;set}
@@ -280,6 +303,8 @@
   property System.Collections.Generic.List<Arc.Avalonia.Feedback.Controls.ArcCommentReaction> Reactions {get;set}
   property System.Collections.Generic.List<System.String> Users {get;set}
   property System.DateOnly Date {get;set}
+  property System.DateOnly Date {get;set}
+  property System.DateOnly Date {get;set}
   property System.DateTimeOffset At {get;set}
   property System.DateTimeOffset Now {get;set}
   property System.Double Fraction {get;set}
@@ -298,6 +323,7 @@
   property System.Int32 Decimals {get;set}
   property System.Int32 Decimals {get;set}
   property System.Int32 Highlight {get;set}
+  property System.Int32 Index {get;set}
   property System.Int32 Lines {get;set}
   property System.Int32 Max {get;set}
   property System.Int32 Max {get;set}
@@ -406,10 +432,17 @@ type sealed Arc.Avalonia.Feedback.Controls.ArcAvatarMember
 type sealed Arc.Avalonia.Feedback.Controls.ArcComment
 type sealed Arc.Avalonia.Feedback.Controls.ArcCommentAuthor
 type sealed Arc.Avalonia.Feedback.Controls.ArcCommentReaction
+type sealed Arc.Avalonia.Feedback.Controls.ArcCommentThreadCommentsChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Feedback.Controls.ArcCommentThreadResolvedChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Feedback.Controls.ArcCountdownCompletedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Feedback.Controls.ArcHeatmapDateSelectedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Feedback.Controls.ArcHeatmapDay
 type sealed Arc.Avalonia.Feedback.Controls.ArcHeatmapGrid : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Feedback.Controls.ArcHeatmapHoverChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Feedback.Controls.ArcHeatmapSelectedDateChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Feedback.Controls.ArcProgressTrack : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Feedback.Controls.ArcStep
+type sealed Arc.Avalonia.Feedback.Controls.ArcStepperStepSelectedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Feedback.Controls.ArcTimelineEvent
 type sealed Arc.Avalonia.Feedback.Controls.ArcUsageBar : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Feedback.Controls.ArcUsageSegment

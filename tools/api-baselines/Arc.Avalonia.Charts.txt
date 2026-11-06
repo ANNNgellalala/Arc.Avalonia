@@ -27,26 +27,43 @@
   ctor Arc.Avalonia.Charts.Controls.ArcSunburstChart[]
   ctor Arc.Avalonia.Charts.Controls.ArcSunburstNode[System.String label, Arc.Avalonia.Charts.Controls.ArcSunburstNode[] children]
   ctor Arc.Avalonia.Charts.Controls.ArcSunburstNode[System.String label, System.Double value, Arc.Avalonia.Charts.Controls.ArcSunburstNode[] children]
+  ctor Arc.Avalonia.Charts.Controls.ArcSunburstNodeEventArgs[]
   ctor Arc.Avalonia.Charts.Controls.ArcSunburstSelection[Arc.Avalonia.Charts.Controls.ArcSunburstNode Node, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ArcSunburstNode> Path]
   ctor Arc.Avalonia.Charts.Controls.ArcTreemap[]
   ctor Arc.Avalonia.Charts.Controls.ArcWaffleChart[]
   ctor Arc.Avalonia.Charts.Controls.ChartEvent[System.Int32 Index, System.String Label, Arc.Avalonia.Charts.Controls.ChartTone Tone, System.String Description]
+  ctor Arc.Avalonia.Charts.Controls.ChartItemEventArgs[]
+  ctor Arc.Avalonia.Charts.Controls.ChartLegendEventArgs[]
+  ctor Arc.Avalonia.Charts.Controls.ChartPointEventArgs[]
+  ctor Arc.Avalonia.Charts.Controls.ChartRangeEventArgs[]
   ctor Arc.Avalonia.Charts.Controls.ChartSeries[System.String Name, System.Collections.Generic.IReadOnlyList<System.Double> Values, Avalonia.Media.IBrush Brush, System.Boolean Dashed]
   ctor Arc.Avalonia.Charts.Controls.ChartValue[System.String Name, System.Double Value, Avalonia.Media.IBrush Brush]
   ctor Arc.Avalonia.Charts.Controls.GaugeThreshold[System.Double From, Arc.Avalonia.Charts.Controls.ChartTone Tone, System.String Label]
   ctor Arc.Avalonia.Charts.Controls.SlopeItem[System.String Name, System.Double Start, System.Double End, Avalonia.Media.IBrush Brush]
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
+  event System.EventHandler<Arc.Avalonia.Charts.Controls.ArcSunburstNodeEventArgs> NodeSelectedRouted
   event System.EventHandler<Arc.Avalonia.Charts.Controls.ArcSunburstSelection> NodeSelected
+  event System.EventHandler<Arc.Avalonia.Charts.Controls.ChartItemEventArgs> ItemClick
+  event System.EventHandler<Arc.Avalonia.Charts.Controls.ChartLegendEventArgs> LegendClick
+  event System.EventHandler<Arc.Avalonia.Charts.Controls.ChartPointEventArgs> PointClick
+  event System.EventHandler<Arc.Avalonia.Charts.Controls.ChartRangeEventArgs> RangeSelect
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Charts.Controls.ChartTone Accent
   field static Arc.Avalonia.Charts.Controls.ChartTone Danger
   field static Arc.Avalonia.Charts.Controls.ChartTone Success
   field static Arc.Avalonia.Charts.Controls.ChartTone Warning
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Charts.Controls.ArcSunburstNodeEventArgs> NodeSelectedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Charts.Controls.ChartItemEventArgs> ItemClickEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Charts.Controls.ChartLegendEventArgs> LegendClickEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Charts.Controls.ChartPointEventArgs> PointClickEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Charts.Controls.ChartRangeEventArgs> RangeSelectEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Charts.Controls.ArcSunburstNode> RootProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Charts.Controls.ChartTone> ToneProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Charts.Controls.ChartTone> ToneProperty
+  field static Avalonia.StyledProperty<Avalonia.Media.IBrush> BackgroundProperty
   field static Avalonia.StyledProperty<Avalonia.Media.IBrush> BarBrushProperty
+  field static Avalonia.StyledProperty<Avalonia.Media.IBrush> ForegroundProperty
   field static Avalonia.StyledProperty<Avalonia.Media.IBrush> StrokeProperty
   field static Avalonia.StyledProperty<System.Boolean> AllowNodeDragProperty
   field static Avalonia.StyledProperty<System.Boolean> AnimateOnLoadProperty
@@ -106,6 +123,7 @@
   field static Avalonia.StyledProperty<System.Double> MaxValueProperty
   field static Avalonia.StyledProperty<System.Double> MinimumProperty
   field static Avalonia.StyledProperty<System.Double> RingThicknessProperty
+  field static Avalonia.StyledProperty<System.Double> StrokeWidthProperty
   field static Avalonia.StyledProperty<System.Double> ValueProperty
   field static Avalonia.StyledProperty<System.Double> ValueProperty
   field static Avalonia.StyledProperty<System.Double> WindowEndProperty
@@ -282,8 +300,10 @@
   method System.Void Render[Avalonia.Media.DrawingContext context]
   method System.Void Render[Avalonia.Media.DrawingContext context]
   method System.Void Render[Avalonia.Media.DrawingContext context]
+  method System.Void Render[Avalonia.Media.DrawingContext context]
   method System.Void Resume[]
   method System.Void set_BaseUri[System.Uri ]
+  property Arc.Avalonia.Charts.Controls.ArcSunburstNode Node {get;set}
   property Arc.Avalonia.Charts.Controls.ArcSunburstNode Node {get;set}
   property Arc.Avalonia.Charts.Controls.ArcSunburstNode Root {get;set}
   property Arc.Avalonia.Charts.Controls.ChartTone Tone {get;set}
@@ -291,17 +311,22 @@
   property Arc.Avalonia.Charts.Controls.ChartTone Tone {get;set}
   property Arc.Avalonia.Charts.Controls.ChartTone Tone {get;set}
   property Avalonia.Controls.Control Chart {get;set}
+  property Avalonia.Media.IBrush Background {get;set}
   property Avalonia.Media.IBrush BarBrush {get;set}
   property Avalonia.Media.IBrush Brush {get;set}
   property Avalonia.Media.IBrush Brush {get;set}
   property Avalonia.Media.IBrush Brush {get;set}
+  property Avalonia.Media.IBrush Foreground {get;set}
   property Avalonia.Media.IBrush Stroke {get;set}
+  property Avalonia.Point Position {get;set}
+  property Avalonia.Point Position {get;set}
   property System.Boolean AllowNodeDrag {get;set}
   property System.Boolean AnimateOnLoad {get;set}
   property System.Boolean Dashed {get;set}
   property System.Boolean IsLeaf {get}
   property System.Boolean IsLive {get;set}
   property System.Boolean IsPlaying {get;set}
+  property System.Boolean IsVisible {get;set}
   property System.Boolean ShowArea {get;set}
   property System.Boolean ShowArea {get;set}
   property System.Boolean ShowAverage {get;set}
@@ -330,6 +355,7 @@
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ArcSankeyNode> Nodes {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ArcSunburstNode> Children {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ArcSunburstNode> Path {get;set}
+  property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ArcSunburstNode> Path {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ChartEvent> Events {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ChartSeries> Series {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Charts.Controls.ChartSeries> Series {get;set}
@@ -356,6 +382,7 @@
   property System.Collections.Generic.IReadOnlyList<System.String> Labels {get;set}
   property System.DateTime StartDate {get;set}
   property System.Double End {get;set}
+  property System.Double EndValue {get;set}
   property System.Double FrameDuration {get;set}
   property System.Double From {get;set}
   property System.Double Maximum {get;set}
@@ -363,7 +390,11 @@
   property System.Double Minimum {get;set}
   property System.Double RingThickness {get;set}
   property System.Double Start {get;set}
+  property System.Double StartValue {get;set}
+  property System.Double StrokeWidth {get;set}
   property System.Double Total {get}
+  property System.Double Value {get;set}
+  property System.Double Value {get;set}
   property System.Double Value {get;set}
   property System.Double Value {get;set}
   property System.Double Value {get;set}
@@ -391,10 +422,16 @@
   property System.Func<System.Double, System.String> ValueFormat {get;set}
   property System.Int32 Decimals {get;set}
   property System.Int32 Depth {get;set}
+  property System.Int32 EndIndex {get;set}
   property System.Int32 FrameIndex {get;set}
   property System.Int32 Height {get}
   property System.Int32 HighlightIndex {get;set}
   property System.Int32 Index {get;set}
+  property System.Int32 Index {get;set}
+  property System.Int32 Index {get;set}
+  property System.Int32 PointIndex {get;set}
+  property System.Int32 SeriesIndex {get;set}
+  property System.Int32 StartIndex {get;set}
   property System.Int32 TopN {get;set}
   property System.Int32 WindowSize {get;set}
   property System.Nullable<System.DateTime> Start {get;set}
@@ -422,8 +459,11 @@
   property System.String Name {get;set}
   property System.String Name {get;set}
   property System.String Name {get;set}
+  property System.String Name {get;set}
+  property System.String Name {get;set}
   property System.String Period {get;set}
   property System.String Prefix {get;set}
+  property System.String SeriesName {get;set}
   property System.String StartLabel {get;set}
   property System.String Subtitle {get;set}
   property System.String Suffix {get;set}
@@ -481,8 +521,13 @@ type sealed Arc.Avalonia.Charts.Controls.ArcRaceFrame : System.IEquatable<Arc.Av
 type sealed Arc.Avalonia.Charts.Controls.ArcSankeyLink : System.IEquatable<Arc.Avalonia.Charts.Controls.ArcSankeyLink>
 type sealed Arc.Avalonia.Charts.Controls.ArcSankeyNode : System.IEquatable<Arc.Avalonia.Charts.Controls.ArcSankeyNode>
 type sealed Arc.Avalonia.Charts.Controls.ArcSunburstNode
+type sealed Arc.Avalonia.Charts.Controls.ArcSunburstNodeEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Charts.Controls.ArcSunburstSelection : System.IEquatable<Arc.Avalonia.Charts.Controls.ArcSunburstSelection>
 type sealed Arc.Avalonia.Charts.Controls.ChartEvent : System.IEquatable<Arc.Avalonia.Charts.Controls.ChartEvent>
+type sealed Arc.Avalonia.Charts.Controls.ChartItemEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Charts.Controls.ChartLegendEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Charts.Controls.ChartPointEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Charts.Controls.ChartRangeEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Charts.Controls.ChartSeries : System.IEquatable<Arc.Avalonia.Charts.Controls.ChartSeries>
 type sealed Arc.Avalonia.Charts.Controls.ChartValue : System.IEquatable<Arc.Avalonia.Charts.Controls.ChartValue>
 type sealed Arc.Avalonia.Charts.Controls.GaugeThreshold : System.IEquatable<Arc.Avalonia.Charts.Controls.GaugeThreshold>

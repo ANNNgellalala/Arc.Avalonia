@@ -131,6 +131,11 @@ public class ArcBarChart : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        if (_hoverIndex >= 0 && Values is { } barValues && _hoverIndex < barValues.Count)
+        {
+            RaisePointClick(string.Empty, 0, _hoverIndex, barValues[_hoverIndex], e.GetPosition(this));
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -183,7 +188,7 @@ public class ArcBarChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -203,7 +208,7 @@ public class ArcBarChart : ArcChartBase
                 var value = max * tick / 3;
                 var y = Crisp(ChartFormat.Map(value, 0, max, _plot.Bottom, _plot.Top));
                 context.DrawLine(
-                    new Pen(ChartPalette.BorderSubtle, 1),
+                    new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline),
                     new Point(_plot.Left, y),
                     new Point(_plot.Right, y));
                 ChartText.Draw(
@@ -211,7 +216,7 @@ public class ArcBarChart : ArcChartBase
                     ChartFormat.Compact(value),
                     _plot.Left - 6,
                     y,
-                    12,
+                    ChartMetrics.LabelFontSize,
                     ChartPalette.Muted,
                     alignment: TextAlignment.Right);
             }
@@ -230,7 +235,7 @@ public class ArcBarChart : ArcChartBase
                 "avg " + FormatValue(average),
                 _plot.Right,
                 averageY - 9,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Right);
         }
@@ -266,7 +271,7 @@ public class ArcBarChart : ArcChartBase
         }
 
         context.DrawLine(
-            new Pen(ChartPalette.Border, 1),
+            new Pen(ChartPalette.Border, ChartMetrics.Hairline),
             new Point(_plot.Left, _plot.Bottom + 0.5),
             new Point(_plot.Right, _plot.Bottom + 0.5));
 
@@ -317,7 +322,7 @@ public class ArcBarChart : ArcChartBase
                 labels[index],
                 _plot.Left + slot * (index + 0.5),
                 _plot.Bottom + 11,
-                12,
+                ChartMetrics.LabelFontSize,
                 index == _hoverIndex ? ChartPalette.Secondary : ChartPalette.Muted,
                 alignment: TextAlignment.Center,
                 maxWidth: Math.Max(30, slot - 2));

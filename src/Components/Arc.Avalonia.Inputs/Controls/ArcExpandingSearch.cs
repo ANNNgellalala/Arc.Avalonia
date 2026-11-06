@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -44,9 +45,12 @@ public sealed class ArcExpandingSearchItem
     public IList<string>? Keywords { get; }
 }
 
-public sealed class ArcExpandingSearchSelectedEventArgs : EventArgs
+public sealed class ArcExpandingSearchSelectedEventArgs : RoutedEventArgs
 {
     public ArcExpandingSearchSelectedEventArgs(ArcExpandingSearchItem item) => Item = item;
+
+    /// <summary>Routed payload factory used by <c>SelectedRouted</c>.</summary>
+    public ArcExpandingSearchSelectedEventArgs(RoutedEvent routedEvent, ArcExpandingSearchItem item) : base(routedEvent) => Item = item;
 
     public ArcExpandingSearchItem Item { get; }
 }
@@ -55,6 +59,13 @@ public sealed class ArcExpandingSearchSelectedEventArgs : EventArgs
 /// Arc's expanding search: an icon button that morphs into a field on a width spring, with grouped
 /// results beneath and Escape folding it back to the icon.
 /// </summary>
+[TemplatePart("PART_Field", typeof(Border))]
+[TemplatePart("PART_Icon", typeof(ArcIcon))]
+[TemplatePart("PART_Query", typeof(TextBox))]
+[TemplatePart("PART_ClearButton", typeof(Button))]
+[TemplatePart("PART_Panel", typeof(Border))]
+[TemplatePart("PART_Rows", typeof(StackPanel))]
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcExpandingSearch : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -136,6 +147,16 @@ public class ArcExpandingSearch : TemplatedControl
 
     /// <summary>Raised when a result is chosen; the field then folds back.</summary>
     public event EventHandler<ArcExpandingSearchSelectedEventArgs>? Selected;
+
+    public static readonly RoutedEvent<ArcExpandingSearchSelectedEventArgs> SelectedEvent =
+        RoutedEvent.Register<ArcExpandingSearch, ArcExpandingSearchSelectedEventArgs>("Selected", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="Selected"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcExpandingSearchSelectedEventArgs>? SelectedRouted
+    {
+        add => AddHandler(SelectedEvent, value);
+        remove => RemoveHandler(SelectedEvent, value);
+    }
 
     /// <summary>Raised when the field opens or folds.</summary>
     public event EventHandler? ExpandedChanged;
@@ -242,13 +263,13 @@ public class ArcExpandingSearch : TemplatedControl
             _clear.Click -= OnClearClicked;
         }
 
-        _field = e.NameScope.Find<Border>("Field");
-        _icon = e.NameScope.Find<ArcIcon>("Icon");
+        _field = e.NameScope.Find<Border>("PART_Field");
+        _icon = e.NameScope.Find<ArcIcon>("PART_Icon");
         _query = e.NameScope.Find<TextBox>("PART_Query");
-        _clear = e.NameScope.Find<Button>("ClearButton");
-        _panel = e.NameScope.Find<Border>("Panel");
-        _rows = e.NameScope.Find<StackPanel>("Rows");
-        _host = e.NameScope.Find<Panel>("Host");
+        _clear = e.NameScope.Find<Button>("PART_ClearButton");
+        _panel = e.NameScope.Find<Border>("PART_Panel");
+        _rows = e.NameScope.Find<StackPanel>("PART_Rows");
+        _host = e.NameScope.Find<Panel>("PART_Host");
 
         if (_query is not null)
         {
@@ -748,6 +769,7 @@ public class ArcExpandingSearch : TemplatedControl
     private void Select(ArcExpandingSearchItem item)
     {
         Selected?.Invoke(this, new ArcExpandingSearchSelectedEventArgs(item));
+        RaiseEvent(new ArcExpandingSearchSelectedEventArgs(SelectedEvent, item));
         SetExpanded(false, animate: true);
         Focus();
     }

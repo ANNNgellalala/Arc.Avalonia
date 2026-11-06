@@ -11,7 +11,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <Border x:Name="Shell"
+          <Border x:Name="PART_Shell"
                   MinHeight="{TemplateBinding MinHeight}"
                   Padding="12,0,6,0"
                   Background="{DynamicResource ArcSurface}"
@@ -28,7 +28,7 @@
             </Border.RenderTransform>
             <Grid RowDefinitions="*,Auto">
               <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-                <Border x:Name="Handle"
+                <Border x:Name="PART_Handle"
                         Background="Transparent"
                         CornerRadius="12"
                         Padding="4,6,8,6"
@@ -41,7 +41,7 @@
                       <BrushTransition Property="Background" Duration="0:0:0.12" />
                     </Transitions>
                   </Border.Transitions>
-                  <TextBlock x:Name="LabelText"
+                  <TextBlock x:Name="PART_LabelText"
                              Classes="arc-label"
                              Foreground="{DynamicResource ArcTextSecondary}"
                              VerticalAlignment="Center" />
@@ -65,25 +65,25 @@
                          VerticalContentAlignment="Center"
                          AcceptsReturn="False"
                          TextWrapping="NoWrap" />
-                <Button x:Name="UnitButton"
+                <Button x:Name="PART_UnitButton"
                         Grid.Column="2"
                         Theme="{DynamicResource ArcAdvancedTextButton}"
                         Margin="0,0,2,0"
                         VerticalAlignment="Center"
                         IsVisible="False">
-                  <TextBlock x:Name="UnitText"
+                  <TextBlock x:Name="PART_UnitText"
                              FontSize="{DynamicResource ArcTextXs}"
                              FontWeight="Medium"
                              Foreground="{DynamicResource ArcTextSecondary}" />
                 </Button>
               </Grid>
-              <Panel x:Name="FillHost" Grid.Row="1" Height="2" Margin="0,0,0,4" Background="Transparent">
+              <Panel x:Name="PART_FillHost" Grid.Row="1" Height="2" Margin="0,0,0,4" Background="Transparent">
                 <Border Height="2"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom"
                         Background="{DynamicResource ArcBorder}"
                         CornerRadius="1" />
-                <Border x:Name="TrackFill"
+                <Border x:Name="PART_TrackFill"
                         Height="2"
                         Width="0"
                         HorizontalAlignment="Left"

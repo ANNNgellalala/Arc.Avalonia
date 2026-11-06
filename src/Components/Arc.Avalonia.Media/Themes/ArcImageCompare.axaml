@@ -27,7 +27,7 @@
                                  FrameRadius="25"
                                  AspectRatio="{TemplateBinding AspectRatio}" />
           </Border>
-          <TextBlock x:Name="Status"
+          <TextBlock x:Name="PART_Status"
                      Height="0"
                      Opacity="0"
                      IsHitTestVisible="False"
@@ -41,3 +41,4 @@
     </Style>
   </ControlTheme>
 </ResourceDictionary>
+

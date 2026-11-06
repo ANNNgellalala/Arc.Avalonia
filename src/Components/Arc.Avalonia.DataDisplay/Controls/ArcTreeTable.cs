@@ -7,8 +7,10 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -115,6 +117,12 @@ public sealed class ArcTreeTableSort
 /// support follows the public treegrid table (arrows, Home/End, PageUp/PageDown, <c>*</c>, Space,
 /// Enter, Ctrl/Cmd+A) plus label typeahead.
 /// </remarks>
+[TemplatePart("PART_Toolbar", typeof(Panel))]
+[TemplatePart("PART_HeaderHost", typeof(Border))]
+[TemplatePart("PART_Scroll", typeof(ScrollViewer))]
+[TemplatePart("PART_Body", typeof(Panel))]
+[TemplatePart("PART_FooterHost", typeof(Border))]
+[TemplatePart("PART_Live", typeof(TextBlock))]
 public class ArcTreeTable : TemplatedControl
 {
     private const double RowHeight = 44;
@@ -383,12 +391,80 @@ public class ArcTreeTable : TemplatedControl
 
     public event EventHandler<ArcTreeTableSort?>? SortChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="SortChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeTableSortChangedEventArgs> SortChangedEvent =
+        RoutedEvent.Register<ArcTreeTable, ArcTreeTableSortChangedEventArgs>("SortChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeTableSortChangedEventArgs"/> version of <see cref="SortChanged"/>.</summary>
+    public event EventHandler<ArcTreeTableSortChangedEventArgs>? SortChangedRouted
+    {
+        add => AddHandler(SortChangedEvent, value);
+        remove => RemoveHandler(SortChangedEvent, value);
+    }
+
+    private void RaiseSortChanged(ArcTreeTableSort? sort)
+    {
+        SortChanged?.Invoke(this, sort);
+        RaiseEvent(new ArcTreeTableSortChangedEventArgs(SortChangedEvent) { Sort = sort });
+    }
+
     public event EventHandler<IReadOnlyList<string>>? SelectionChanged;
+
+    /// <summary>Bubbling routed counterpart of <see cref="SelectionChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeTableSelectionChangedEventArgs> SelectionChangedEvent =
+        RoutedEvent.Register<ArcTreeTable, ArcTreeTableSelectionChangedEventArgs>("SelectionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeTableSelectionChangedEventArgs"/> version of <see cref="SelectionChanged"/>.</summary>
+    public event EventHandler<ArcTreeTableSelectionChangedEventArgs>? SelectionChangedRouted
+    {
+        add => AddHandler(SelectionChangedEvent, value);
+        remove => RemoveHandler(SelectionChangedEvent, value);
+    }
+
+    private void RaiseSelectionChanged(IReadOnlyList<string> selectedKeys)
+    {
+        SelectionChanged?.Invoke(this, selectedKeys);
+        RaiseEvent(new ArcTreeTableSelectionChangedEventArgs(SelectionChangedEvent) { SelectedKeys = selectedKeys });
+    }
 
     public event EventHandler<IReadOnlyList<string>>? ExpandedChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="ExpandedChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeTableExpandedChangedEventArgs> ExpandedChangedEvent =
+        RoutedEvent.Register<ArcTreeTable, ArcTreeTableExpandedChangedEventArgs>("ExpandedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeTableExpandedChangedEventArgs"/> version of <see cref="ExpandedChanged"/>.</summary>
+    public event EventHandler<ArcTreeTableExpandedChangedEventArgs>? ExpandedChangedRouted
+    {
+        add => AddHandler(ExpandedChangedEvent, value);
+        remove => RemoveHandler(ExpandedChangedEvent, value);
+    }
+
+    private void RaiseExpandedChanged(IReadOnlyList<string> expandedKeys)
+    {
+        ExpandedChanged?.Invoke(this, expandedKeys);
+        RaiseEvent(new ArcTreeTableExpandedChangedEventArgs(ExpandedChangedEvent) { ExpandedKeys = expandedKeys });
+    }
+
     /// <summary>Raised when a row without children is clicked or gets Enter.</summary>
     public event EventHandler<ArcTreeTableRow>? RowActivated;
+
+    /// <summary>Bubbling routed counterpart of <see cref="RowActivated"/>.</summary>
+    public static readonly RoutedEvent<ArcTreeTableRowActivatedEventArgs> RowActivatedEvent =
+        RoutedEvent.Register<ArcTreeTable, ArcTreeTableRowActivatedEventArgs>("RowActivated", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcTreeTableRowActivatedEventArgs"/> version of <see cref="RowActivated"/>.</summary>
+    public event EventHandler<ArcTreeTableRowActivatedEventArgs>? RowActivatedRouted
+    {
+        add => AddHandler(RowActivatedEvent, value);
+        remove => RemoveHandler(RowActivatedEvent, value);
+    }
+
+    private void RaiseRowActivated(ArcTreeTableRow row)
+    {
+        RowActivated?.Invoke(this, row);
+        RaiseEvent(new ArcTreeTableRowActivatedEventArgs(RowActivatedEvent) { Row = row });
+    }
 
     /// <summary>Re-reads rows, columns and child lists after they were changed in place.</summary>
     public void Refresh()
@@ -1211,7 +1287,7 @@ public class ArcTreeTable : TemplatedControl
         }
 
         RebuildContent();
-        SortChanged?.Invoke(this, _sortKey is null
+        RaiseSortChanged(_sortKey is null
             ? null
             : new ArcTreeTableSort { Key = _sortKey, Descending = _sortDescending });
         Announce(_sortKey is null
@@ -1992,7 +2068,7 @@ public class ArcTreeTable : TemplatedControl
         _syncingSelection = true;
         SetCurrentValue(SelectedIdsProperty, ordered);
         _syncingSelection = false;
-        SelectionChanged?.Invoke(this, ordered);
+        RaiseSelectionChanged(ordered);
     }
 
     private List<string> PreOrderIds()
@@ -2067,7 +2143,7 @@ public class ArcTreeTable : TemplatedControl
             _syncingExpansion = false;
         }
 
-        ExpandedChanged?.Invoke(this, ordered);
+        RaiseExpandedChanged(ordered);
     }
 
     private void StartQueuedLoads()
@@ -2270,7 +2346,7 @@ public class ArcTreeTable : TemplatedControl
 
     private void Activate(ArcTreeTableRow row)
     {
-        RowActivated?.Invoke(this, row);
+        RaiseRowActivated(row);
         Announce($"{LabelOf(row)} activated.");
     }
 
@@ -2553,4 +2629,52 @@ public class ArcTreeTable : TemplatedControl
 
         _live.Text = $"{message} {_visible.Count} rows visible.";
     }
+}
+
+/// <summary>Event data for the bubbling <see cref="SortChangedRouted"/> event.</summary>
+public sealed class ArcTreeTableSortChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeTableSortChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcTreeTableSort? Sort { get; init; }
+}
+
+/// <summary>Event data for the bubbling <see cref="SelectionChangedRouted"/> event.</summary>
+public sealed class ArcTreeTableSelectionChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeTableSelectionChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public IReadOnlyList<string> SelectedKeys { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="ExpandedChangedRouted"/> event.</summary>
+public sealed class ArcTreeTableExpandedChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeTableExpandedChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public IReadOnlyList<string> ExpandedKeys { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="RowActivatedRouted"/> event.</summary>
+public sealed class ArcTreeTableRowActivatedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcTreeTableRowActivatedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcTreeTableRow Row { get; init; } = null!;
 }

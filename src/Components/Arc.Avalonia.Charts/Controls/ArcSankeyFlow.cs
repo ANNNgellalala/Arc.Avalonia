@@ -186,6 +186,7 @@ public class ArcSankeyFlow : ArcChartBase
         if (node is not null)
         {
             SetActiveNode(node.Id);
+            RaiseItemClick(-1, node.Node.Label, node.Value, point);
             if (AllowNodeDrag)
             {
                 _dragNode = node.Id;
@@ -321,7 +322,7 @@ public class ArcSankeyFlow : ArcChartBase
                 "No flows",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -494,7 +495,7 @@ public class ArcSankeyFlow : ArcChartBase
             var brush = active ? box.Brush : ChartPalette.Alpha(box.Brush, 0.4);
             context.DrawRectangle(
                 brush,
-                new Pen(ChartPalette.Surface, 1),
+                new Pen(ChartPalette.Surface, ChartMetrics.Hairline),
                 new RoundedRect(new Rect(box.X, box.Y, box.Width, box.Height), 3));
         }
 
@@ -548,8 +549,8 @@ public class ArcSankeyFlow : ArcChartBase
         {
             // The outer columns own a full gutter, so name and value stack without crowding a ribbon.
             var room = box.Column == firstColumn ? box.X - 11 : Bounds.Width - box.X - box.Width - 11;
-            var name = ChartText.Create(box.Node.Label, 12, nameBrush, weight, Math.Max(30, room));
-            var value = ChartText.Create(FormatValue(box.Value), 11, ChartPalette.Muted, maxWidth: Math.Max(30, room));
+            var name = ChartText.Create(box.Node.Label, ChartMetrics.LabelFontSize, nameBrush, weight, Math.Max(30, room));
+            var value = ChartText.Create(FormatValue(box.Value), ChartMetrics.CaptionFontSize, ChartPalette.Muted, maxWidth: Math.Max(30, room));
             var stack = box.Height >= 26;
             if (box.Column == firstColumn)
             {
@@ -575,8 +576,8 @@ public class ArcSankeyFlow : ArcChartBase
 
         // A middle column sits between the ribbons: a surface chip keeps the label readable.
         var roomForChip = Math.Max(48, Math.Min(Bounds.Width - 8, NextColumnLeft(box.Column) - box.X - box.Width - 12));
-        var nameText = ChartText.Create(box.Node.Label, 12, nameBrush, weight, Math.Max(28, roomForChip - 8));
-        var valueText = ChartText.Create(FormatValue(box.Value), 11, ChartPalette.Muted, maxWidth: Math.Max(28, roomForChip - 8));
+        var nameText = ChartText.Create(box.Node.Label, ChartMetrics.LabelFontSize, nameBrush, weight, Math.Max(28, roomForChip - 8));
+        var valueText = ChartText.Create(FormatValue(box.Value), ChartMetrics.CaptionFontSize, ChartPalette.Muted, maxWidth: Math.Max(28, roomForChip - 8));
         var width = Math.Min(roomForChip, Math.Max(nameText.Width, valueText.Width) + 10);
         var chip = new Rect(box.X + box.Width + 6, centerY - 14, width, 28);
         context.DrawRectangle(ChartPalette.Alpha(ChartPalette.Surface, 0.94), null, new RoundedRect(chip, 5));

@@ -7,6 +7,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -15,6 +16,8 @@ namespace Arc.Avalonia.Effects.Controls;
 /// sharpens in from below, and the frame springs to the new width. Reduced motion swaps both instantly.
 /// The label never wraps, so keep it short.
 /// </summary>
+[TemplatePart("PART_Frame", typeof(Border))]
+[TemplatePart("PART_Layers", typeof(Panel))]
 public class ArcTextMorph : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty =

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -26,9 +27,12 @@ public enum ArcInlineEditVariant
 }
 
 /// <summary>Carries one save attempt so a handler can refuse it or keep it pending.</summary>
-public sealed class ArcInlineEditSaveEventArgs : EventArgs
+public sealed class ArcInlineEditSaveEventArgs : RoutedEventArgs
 {
     public ArcInlineEditSaveEventArgs(string value) => Value = value;
+
+    /// <summary>Routed payload factory used by <c>SaveRouted</c>.</summary>
+    public ArcInlineEditSaveEventArgs(RoutedEvent routedEvent, string value) : base(routedEvent) => Value = value;
 
     /// <summary>The draft that should be persisted.</summary>
     public string Value { get; }
@@ -47,6 +51,15 @@ public sealed class ArcInlineEditSaveEventArgs : EventArgs
 /// Arc's inline edit: text that becomes a field in place on click or Enter, saves on Enter or blur,
 /// rolls back on Escape, and reports saving and validation state in a message slot beneath.
 /// </summary>
+[TemplatePart("PART_Resting", typeof(Border))]
+[TemplatePart("PART_RestingText", typeof(TextBlock))]
+[TemplatePart("PART_EditorShell", typeof(Border))]
+[TemplatePart("PART_Editor", typeof(TextBox))]
+[TemplatePart("PART_Busy", typeof(ArcSpinner))]
+[TemplatePart("PART_SaveButton", typeof(Button))]
+[TemplatePart("PART_CancelButton", typeof(Button))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_SavedMark", typeof(ArcIcon))]
 public class ArcInlineEdit : TemplatedControl
 {
     public static readonly StyledProperty<string?> ValueProperty =
@@ -98,6 +111,16 @@ public class ArcInlineEdit : TemplatedControl
 
     /// <summary>Raised when a commit should persist the new value. Without a handler the value saves immediately.</summary>
     public event EventHandler<ArcInlineEditSaveEventArgs>? Save;
+
+    public static readonly RoutedEvent<ArcInlineEditSaveEventArgs> SaveEvent =
+        RoutedEvent.Register<ArcInlineEdit, ArcInlineEditSaveEventArgs>("Save", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="Save"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcInlineEditSaveEventArgs>? SaveRouted
+    {
+        add => AddHandler(SaveEvent, value);
+        remove => RemoveHandler(SaveEvent, value);
+    }
 
     /// <summary>Raised whenever <see cref="Value"/> changes, from a save or from code.</summary>
     public event EventHandler? ValueChanged;
@@ -194,6 +217,7 @@ public class ArcInlineEdit : TemplatedControl
         _error = null;
         var args = new ArcInlineEditSaveEventArgs(draft);
         Save?.Invoke(this, args);
+        RaiseEvent(new ArcInlineEditSaveEventArgs(SaveEvent, draft));
         if (!string.IsNullOrWhiteSpace(args.Error))
         {
             _error = args.Error;
@@ -318,15 +342,15 @@ public class ArcInlineEdit : TemplatedControl
             _cancelButton.Click -= OnCancelClicked;
         }
 
-        _resting = e.NameScope.Find<Border>("Resting");
-        _restingText = e.NameScope.Find<TextBlock>("RestingText");
-        _editor = e.NameScope.Find<Border>("Editor");
+        _resting = e.NameScope.Find<Border>("PART_Resting");
+        _restingText = e.NameScope.Find<TextBlock>("PART_RestingText");
+        _editor = e.NameScope.Find<Border>("PART_EditorShell");
         _box = e.NameScope.Find<TextBox>("PART_Editor");
-        _busy = e.NameScope.Find<ArcSpinner>("Busy");
-        _saveButton = e.NameScope.Find<Button>("SaveButton");
-        _cancelButton = e.NameScope.Find<Button>("CancelButton");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _check = e.NameScope.Find<ArcIcon>("SavedMark");
+        _busy = e.NameScope.Find<ArcSpinner>("PART_Busy");
+        _saveButton = e.NameScope.Find<Button>("PART_SaveButton");
+        _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _check = e.NameScope.Find<ArcIcon>("PART_SavedMark");
 
         if (_box is not null)
         {

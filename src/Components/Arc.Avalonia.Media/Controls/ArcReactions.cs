@@ -5,6 +5,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -107,6 +109,10 @@ internal sealed class ArcReactionBurst : Control
 /// Arc's reaction bar: one-tap pills with counts that tick to their new value in tabular figures, a
 /// burst when you add one, and an add button that opens a keyboard-navigable picker tray.
 /// </summary>
+[TemplatePart("PART_Pills", typeof(WrapPanel))]
+[TemplatePart("PART_BurstLayer", typeof(Canvas))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
+[TemplatePart("PART_Picker", typeof(Popup))]
 public class ArcReactions : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcReactionOption>?> OptionsProperty =
@@ -187,14 +193,24 @@ public class ArcReactions : TemplatedControl
     }
 
     /// <summary>Raised with the next list and the single change that produced it.</summary>
+    public static readonly RoutedEvent<ArcReactionsValueChangedRoutedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcReactions, ArcReactionsValueChangedRoutedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ValueChanged"/>.</summary>
+    public event EventHandler<ArcReactionsValueChangedRoutedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
     public event EventHandler<ArcReactionsChangedEventArgs>? ValueChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _host = e.NameScope.Find<WrapPanel>("Pills");
-        _burstLayer = e.NameScope.Find<Canvas>("BurstLayer");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _host = e.NameScope.Find<WrapPanel>("PART_Pills");
+        _burstLayer = e.NameScope.Find<Canvas>("PART_BurstLayer");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
         _picker = e.NameScope.Find<Popup>("PART_Picker");
         if (_picker is not null && !_pickerWired)
         {
@@ -441,9 +457,9 @@ public class ArcReactions : TemplatedControl
         }
 
         Announce(change, id);
-        ValueChanged?.Invoke(this, new ArcReactionsChangedEventArgs(
-            _reactions.Select(reaction => new ArcReaction(reaction.Id, reaction.Count, reaction.Reacted)).ToList(),
-            change));
+        var next = _reactions.Select(reaction => new ArcReaction(reaction.Id, reaction.Count, reaction.Reacted)).ToList();
+        ValueChanged?.Invoke(this, new ArcReactionsChangedEventArgs(next, change));
+        RaiseEvent(new ArcReactionsValueChangedRoutedEventArgs(ValueChangedEvent, next, change));
     }
 
     private void Announce(ArcReactionChange change, string id)
@@ -620,6 +636,9 @@ public class ArcReactions : TemplatedControl
         }
     }
 }
+
+
+
 
 
 

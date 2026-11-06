@@ -16,7 +16,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Ring"
+          <Border x:Name="PART_Ring"
                   Margin="-3"
                   CornerRadius="8"
                   BorderThickness="2"
@@ -32,7 +32,7 @@
                 <BrushTransition Property="Background" Duration="0:0:0.16" />
               </Transitions>
             </Border.Transitions>
-            <ac:ArcIcon x:Name="Icon"
+            <ac:ArcIcon x:Name="PART_Icon"
                         Foreground="{TemplateBinding Foreground}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center" />
@@ -56,7 +56,7 @@
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
-    <Style Selector="^:focus-visible /template/ Border#Ring">
+    <Style Selector="^:focus-visible /template/ Border#PART_Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>
@@ -74,7 +74,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Ring"
+          <Border x:Name="PART_Ring"
                   Margin="-3"
                   CornerRadius="14"
                   BorderThickness="2"
@@ -109,7 +109,7 @@
     <Style Selector="^:pointerover /template/ Border#Root">
       <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
     </Style>
-    <Style Selector="^:focus-visible /template/ Border#Ring">
+    <Style Selector="^:focus-visible /template/ Border#PART_Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^:disabled">

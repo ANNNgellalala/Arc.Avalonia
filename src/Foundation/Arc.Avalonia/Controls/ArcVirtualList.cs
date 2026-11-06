@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Threading;
@@ -36,7 +37,14 @@ public enum ArcVirtualListScrollState
 /// scrolls the viewport to the end once layout has run. The host owns the data, the append and any jump-to-latest
 /// affordance; the list only mirrors it.
 /// </para>
+/// <para>
+/// The control ships no ControlTheme of its own: it reuses the host theme's <see cref="ListBox"/> template and
+/// reads that template's <c>PART_ScrollViewer</c> to report <see cref="ScrollState"/>. A theme that names the
+/// scroll viewer differently still works through the visual-tree fallback, but the contract expects
+/// <c>PART_ScrollViewer</c>.
+/// </para>
 /// </summary>
+[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer))]
 public class ArcVirtualList : ListBox
 {
     /// <summary>
@@ -124,14 +132,17 @@ public class ArcVirtualList : ListBox
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        HookScrollViewer();
+        // Prefer the declared theme part; themes that name the scroll viewer differently fall back to the
+        // first ScrollViewer in the visual tree (see HookScrollViewer). No virtualisation or row-reuse logic
+        // is involved here — this only wires scroll-state reporting.
+        HookScrollViewer(e.NameScope.Find<ScrollViewer>("PART_ScrollViewer"));
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         // The template (and with it the ScrollViewer) can be applied after the first attach pass.
-        Dispatcher.UIThread.Post(HookScrollViewer, DispatcherPriority.Loaded);
+        Dispatcher.UIThread.Post(() => HookScrollViewer(), DispatcherPriority.Loaded);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -208,9 +219,9 @@ public class ArcVirtualList : ListBox
         UpdateScrollState(_scrollViewer);
     }
 
-    private void HookScrollViewer()
+    private void HookScrollViewer(ScrollViewer? templatePart = null)
     {
-        var scrollViewer = this.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+        var scrollViewer = templatePart ?? this.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
         if (ReferenceEquals(scrollViewer, _scrollViewer))
         {
             if (scrollViewer is not null)

@@ -6,18 +6,32 @@
   ctor Arc.Avalonia.Content.Controls.ArcChatDraft[System.String Text, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Content.Controls.ArcChatAttachment> Attachments]
   ctor Arc.Avalonia.Content.Controls.ArcChatMessage[]
   ctor Arc.Avalonia.Content.Controls.ArcChatParticipant[]
+  ctor Arc.Avalonia.Content.Controls.ArcChatSendRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Content.Controls.ArcChatDraft draft]
   ctor Arc.Avalonia.Content.Controls.ArcChatThread[]
+  ctor Arc.Avalonia.Content.Controls.ArcChecklistCompletedChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.Collections.Generic.IReadOnlyList<System.String> completedIds]
+  ctor Arc.Avalonia.Content.Controls.ArcChecklistDismissedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Content.Controls.ArcChecklistHiddenChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.Boolean hidden]
   ctor Arc.Avalonia.Content.Controls.ArcChecklistStep[]
+  ctor Arc.Avalonia.Content.Controls.ArcChecklistStepInvokedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Content.Controls.ArcChecklistStep step]
   ctor Arc.Avalonia.Content.Controls.ArcOnboardingChecklist[]
   ctor Arc.Avalonia.Content.Controls.ArcReorderableList[]
   ctor Arc.Avalonia.Content.Controls.ArcReorderItem[]
+  ctor Arc.Avalonia.Content.Controls.ArcReorderOrderChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Content.Controls.ArcReorderItem> items]
+  ctor Arc.Avalonia.Content.Controls.ArcRichTextChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Content.Controls.ArcRichTextValue value]
   ctor Arc.Avalonia.Content.Controls.ArcRichTextEditor[]
   ctor Arc.Avalonia.Content.Controls.ArcRichTextValue[System.String Html, System.String Markdown, System.String Text, System.Boolean Empty]
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
   event System.EventHandler DismissedChanged
   event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChatDraft> Send
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChatSendRoutedEventArgs> SendRouted
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChecklistCompletedChangedRoutedEventArgs> CompletedChangedRouted
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChecklistDismissedRoutedEventArgs> DismissedChangedRouted
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChecklistHiddenChangedRoutedEventArgs> HiddenChangedRouted
   event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChecklistStep> StepInvoked
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcChecklistStepInvokedRoutedEventArgs> StepInvokedRouted
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcReorderOrderChangedRoutedEventArgs> OrderChangedRouted
+  event System.EventHandler<Arc.Avalonia.Content.Controls.ArcRichTextChangedRoutedEventArgs> TextChangedRouted
   event System.EventHandler<Arc.Avalonia.Content.Controls.ArcRichTextValue> TextChanged
   event System.EventHandler<System.Boolean> HiddenChanged
   event System.EventHandler<System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Content.Controls.ArcReorderItem>> OrderChanged
@@ -28,6 +42,13 @@
   field static Arc.Avalonia.Content.Controls.ArcChatMessageStatus Read
   field static Arc.Avalonia.Content.Controls.ArcChatMessageStatus Sending
   field static Arc.Avalonia.Content.Controls.ArcChatMessageStatus Sent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcChatSendRoutedEventArgs> SendEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcChecklistCompletedChangedRoutedEventArgs> CompletedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcChecklistDismissedRoutedEventArgs> DismissedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcChecklistHiddenChangedRoutedEventArgs> HiddenChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcChecklistStepInvokedRoutedEventArgs> StepInvokedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcReorderOrderChangedRoutedEventArgs> OrderChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Content.Controls.ArcRichTextChangedRoutedEventArgs> TextChangedEvent
   field static Avalonia.StyledProperty<System.Boolean> AllowAttachmentsProperty
   field static Avalonia.StyledProperty<System.Boolean> AutoFocusProperty
   field static Avalonia.StyledProperty<System.Boolean> DefaultHiddenProperty
@@ -101,12 +122,16 @@
   method System.Void SetHtml[System.String html]
   method System.Void SetMarkdown[System.String markdown]
   method System.Void Undo[]
+  property Arc.Avalonia.Content.Controls.ArcChatDraft Draft {get}
+  property Arc.Avalonia.Content.Controls.ArcChecklistStep Step {get}
+  property Arc.Avalonia.Content.Controls.ArcRichTextValue Value {get}
   property System.Boolean AllowAttachments {get;set}
   property System.Boolean AutoFocus {get;set}
   property System.Boolean DefaultHidden {get;set}
   property System.Boolean Disabled {get;set}
   property System.Boolean Dismissed {get;set}
   property System.Boolean Empty {get;set}
+  property System.Boolean Hidden {get}
   property System.Boolean IsImage {get;set}
   property System.Boolean ReadOnly {get;set}
   property System.Boolean ShowComposer {get;set}
@@ -119,6 +144,8 @@
   property System.Collections.Generic.IList<Arc.Avalonia.Content.Controls.ArcChatMessage> Messages {get;set}
   property System.Collections.Generic.IList<Arc.Avalonia.Content.Controls.ArcReorderItem> Items {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Content.Controls.ArcChatAttachment> Attachments {get;set}
+  property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Content.Controls.ArcReorderItem> Items {get}
+  property System.Collections.Generic.IReadOnlyList<System.String> CompletedIds {get}
   property System.Collections.Generic.List<Arc.Avalonia.Content.Controls.ArcChatAttachment> Attachments {get;set}
   property System.DateTimeOffset CreatedAt {get;set}
   property System.Int64 Size {get;set}
@@ -171,6 +198,13 @@ type sealed Arc.Avalonia.Content.Controls.ArcChatAttachment
 type sealed Arc.Avalonia.Content.Controls.ArcChatDraft : System.IEquatable<Arc.Avalonia.Content.Controls.ArcChatDraft>
 type sealed Arc.Avalonia.Content.Controls.ArcChatMessage
 type sealed Arc.Avalonia.Content.Controls.ArcChatParticipant
+type sealed Arc.Avalonia.Content.Controls.ArcChatSendRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Content.Controls.ArcChecklistCompletedChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Content.Controls.ArcChecklistDismissedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Content.Controls.ArcChecklistHiddenChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Content.Controls.ArcChecklistStep
+type sealed Arc.Avalonia.Content.Controls.ArcChecklistStepInvokedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Content.Controls.ArcReorderItem
+type sealed Arc.Avalonia.Content.Controls.ArcReorderOrderChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Content.Controls.ArcRichTextChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Content.Controls.ArcRichTextValue : System.IEquatable<Arc.Avalonia.Content.Controls.ArcRichTextValue>

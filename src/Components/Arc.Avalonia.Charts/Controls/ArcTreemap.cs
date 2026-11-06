@@ -83,6 +83,16 @@ public class ArcTreemap : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        foreach (var tile in _tiles)
+        {
+            if (tile.Bounds.Contains(point))
+            {
+                RaiseItemClick(ItemIndex(tile.Item), tile.Item.Name, tile.Item.Value, point);
+                break;
+            }
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -129,7 +139,7 @@ public class ArcTreemap : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -170,7 +180,7 @@ public class ArcTreemap : ArcChartBase
                 item.Name,
                 inset.Left + pad,
                 inset.Top + pad + 6,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Foreground,
                 FontWeight.Medium,
                 maxWidth: textWidth);
@@ -181,7 +191,7 @@ public class ArcTreemap : ArcChartBase
                     FormatValue(item.Value),
                     inset.Left + pad,
                     inset.Top + pad + 23,
-                    12,
+                    ChartMetrics.LabelFontSize,
                     ChartPalette.Secondary,
                     maxWidth: textWidth);
             }

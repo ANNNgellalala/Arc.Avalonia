@@ -7,9 +7,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel ClipToBounds="False">
-          <WrapPanel x:Name="Pills" Orientation="Horizontal" HorizontalAlignment="Left" />
-          <Canvas x:Name="BurstLayer" IsHitTestVisible="False" ClipToBounds="False" />
-          <TextBlock x:Name="Status"
+          <WrapPanel x:Name="PART_Pills" Orientation="Horizontal" HorizontalAlignment="Left" />
+          <Canvas x:Name="PART_BurstLayer" IsHitTestVisible="False" ClipToBounds="False" />
+          <TextBlock x:Name="PART_Status"
                      Height="0"
                      Opacity="0"
                      IsHitTestVisible="False"
@@ -94,3 +94,4 @@
     </Style>
   </ControlTheme>
 </ResourceDictionary>
+

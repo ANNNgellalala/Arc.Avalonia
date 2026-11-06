@@ -5,6 +5,7 @@
   ctor Arc.Avalonia.LifeToday.Controls.ArcAgendaItem[]
   ctor Arc.Avalonia.LifeToday.Controls.ArcDailyBrief[]
   ctor Arc.Avalonia.LifeToday.Controls.ArcDayAgenda[]
+  ctor Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.LifeToday.Controls.ArcMedicationItem[]
   ctor Arc.Avalonia.LifeToday.Controls.ArcMedicationSchedule[]
   ctor Arc.Avalonia.LifeToday.Controls.ArcQuickCaptureBar[]
@@ -54,6 +55,17 @@
   event System.Action<System.TimeSpan> SnoozeRequested
   event System.EventHandler CancelRequested
   event System.EventHandler CancelRequested
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> AcceptSuggestionRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> CompletedChangedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> CompleteRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> ItemActivatedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> RefillRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SaveRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SnoozeRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SnoozeRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SubmitRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> TakeRequestedRouted
+  event System.EventHandler<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> UndoTakenRequestedRouted
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.LifeToday.Controls.ArcAgendaItemStatus Current
   field static Arc.Avalonia.LifeToday.Controls.ArcAgendaItemStatus Done
@@ -124,6 +136,17 @@
   field static Arc.Avalonia.LifeToday.Controls.ArcSuggestionState Dismissed
   field static Arc.Avalonia.LifeToday.Controls.ArcSuggestionState Pending
   field static Arc.Avalonia.LifeToday.Controls.ArcSuggestionState Snoozed
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> AcceptSuggestionRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> CompletedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> CompleteRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> ItemActivatedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> RefillRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SaveRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SnoozeRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SnoozeRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> SubmitRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> TakeRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs> UndoTakenRequestedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.LifeToday.Controls.ArcDailyBriefState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.LifeToday.Controls.ArcDayAgendaState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.LifeToday.Controls.ArcMedicationScheduleState> StateProperty
@@ -215,9 +238,11 @@
   property Arc.Avalonia.LifeToday.Controls.ArcRoutineOverlapPolicy OverlapPolicy {get;set}
   property Arc.Avalonia.LifeToday.Controls.ArcRoutineRepeat Repeat {get;set}
   property Arc.Avalonia.LifeToday.Controls.ArcRoutineRepeat Repeat {get;set}
+  property Arc.Avalonia.LifeToday.Controls.ArcScheduleSpec Spec {get;set}
   property Arc.Avalonia.LifeToday.Controls.ArcSuggestionState SuggestionState {get;set}
   property System.Boolean AllDay {get;set}
   property System.Boolean Conflict {get;set}
+  property System.Boolean Flag {get;set}
   property System.Boolean IsChecked {get;set}
   property System.Boolean IsExpanded {get;set}
   property System.Boolean ShowRefillPrompt {get;set}
@@ -275,6 +300,7 @@
   property System.String Suggestion {get;set}
   property System.String SuggestionSource {get;set}
   property System.String Text {get;set}
+  property System.String Text {get;set}
   property System.String TimeText {get;set}
   property System.String TimeText {get;set}
   property System.String TimeText {get;set}
@@ -286,6 +312,7 @@
   property System.String Title {get;set}
   property System.String ValidationMessage {get;set}
   property System.String WeatherText {get;set}
+  property System.TimeSpan Span {get;set}
   property System.Uri BaseUri {get;set}
 type class Arc.Avalonia.LifeToday.Controls.ArcDailyBrief : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.LifeToday.Controls.ArcDayAgenda : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
@@ -315,6 +342,7 @@ type enum Arc.Avalonia.LifeToday.Controls.ArcRoutineOverlapPolicy : System.IComp
 type enum Arc.Avalonia.LifeToday.Controls.ArcRoutineRepeat : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.LifeToday.Controls.ArcSuggestionState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type sealed Arc.Avalonia.LifeToday.Controls.ArcAgendaItem
+type sealed Arc.Avalonia.LifeToday.Controls.ArcLifeTodayRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.LifeToday.Controls.ArcMedicationItem
 type sealed Arc.Avalonia.LifeToday.Controls.ArcQuickCaptureChip
 type sealed Arc.Avalonia.LifeToday.Controls.ArcReminderItem

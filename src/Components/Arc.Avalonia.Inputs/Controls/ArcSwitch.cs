@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -13,6 +14,8 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A setting that applies immediately. The thumb travels on a spring, the track takes the accent role
 /// when on, and the whole row is the hit target. Space and Enter toggle.
 /// </summary>
+[TemplatePart("PART_Track", typeof(Border))]
+[TemplatePart("PART_Thumb", typeof(Border))]
 public class ArcSwitch : TemplatedControl
 {
     public static readonly StyledProperty<bool> CheckedProperty =
@@ -58,8 +61,8 @@ public class ArcSwitch : TemplatedControl
     {
         base.OnApplyTemplate(e);
 
-        _track = e.NameScope.Find<Border>("Track");
-        _thumb = e.NameScope.Find<Border>("Thumb");
+        _track = e.NameScope.Find<Border>("PART_Track");
+        _thumb = e.NameScope.Find<Border>("PART_Thumb");
         _thumbTransform = _thumb?.RenderTransform as TranslateTransform;
         UpdateState();
         UpdateAutomation();

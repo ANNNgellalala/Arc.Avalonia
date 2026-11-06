@@ -10,17 +10,17 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <Border x:Name="Surface"
+          <Border x:Name="PART_Surface"
                   Width="{TemplateBinding Width}"
                   Height="{TemplateBinding Height}"
                   CornerRadius="{DynamicResource ArcRadiusPill}"
                   ClipToBounds="True">
-            <TextBlock x:Name="Initials"
+            <TextBlock x:Name="PART_Initials"
                        FontWeight="Medium"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center" />
           </Border>
-          <shapes:Ellipse x:Name="Dot"
+          <shapes:Ellipse x:Name="PART_Dot"
                           Width="10"
                           Height="10"
                           IsVisible="False"

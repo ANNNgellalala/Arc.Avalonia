@@ -8,9 +8,11 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Avalonia.Interactivity;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -19,6 +21,13 @@ namespace Arc.Avalonia.Effects.Controls;
 /// when a wider cap is set, the width, so text never stretches. The details fade in once the box has
 /// made room and fade out before it shrinks. The whole header is the toggle, so Enter and Space work.
 /// </summary>
+[TemplatePart("PART_Frame", typeof(Border))]
+[TemplatePart("PART_Header", typeof(ArcButton))]
+[TemplatePart("PART_TitleBlock", typeof(TextBlock))]
+[TemplatePart("PART_DescriptionBlock", typeof(TextBlock))]
+[TemplatePart("PART_Chevron", typeof(ArcIcon))]
+[TemplatePart("PART_PanelClip", typeof(Border))]
+[TemplatePart("PART_Body", typeof(ContentPresenter))]
 public class ArcExpandableCard : ContentControl
 {
     public static readonly StyledProperty<string?> TitleProperty =
@@ -65,6 +74,23 @@ public class ArcExpandableCard : ContentControl
 
     public event EventHandler<bool>? ExpandedChanged;
 
+    /// <summary>Bubbled copy of <see cref="ExpandedChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcExpandableCardExpandedChangedEventArgs> ExpandedChangedEvent =
+        RoutedEvent.Register<ArcExpandableCard, ArcExpandableCardExpandedChangedEventArgs>("ExpandedChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ExpandedChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcExpandableCardExpandedChangedEventArgs>? ExpandedChangedRouted
+    {
+        add => AddHandler(ExpandedChangedEvent, value);
+        remove => RemoveHandler(ExpandedChangedEvent, value);
+    }
+
+    private void RaiseExpandedChanged(bool isExpanded)
+    {
+        ExpandedChanged?.Invoke(this, isExpanded);
+        RaiseEvent(new ArcExpandableCardExpandedChangedEventArgs(ExpandedChangedEvent) { IsExpanded = isExpanded });
+    }
+
     public string? Title
     {
         get => GetValue(TitleProperty);
@@ -102,13 +128,13 @@ public class ArcExpandableCard : ContentControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _frame = e.NameScope.Find<Border>("Frame");
-        _header = e.NameScope.Find<ArcButton>("Header");
-        _title = e.NameScope.Find<TextBlock>("TitleBlock");
-        _description = e.NameScope.Find<TextBlock>("DescriptionBlock");
-        _chevron = e.NameScope.Find<ArcIcon>("Chevron");
-        _panel = e.NameScope.Find<Border>("PanelClip");
-        _body = e.NameScope.Find<ContentPresenter>("Body");
+        _frame = e.NameScope.Find<Border>("PART_Frame");
+        _header = e.NameScope.Find<ArcButton>("PART_Header");
+        _title = e.NameScope.Find<TextBlock>("PART_TitleBlock");
+        _description = e.NameScope.Find<TextBlock>("PART_DescriptionBlock");
+        _chevron = e.NameScope.Find<ArcIcon>("PART_Chevron");
+        _panel = e.NameScope.Find<Border>("PART_PanelClip");
+        _body = e.NameScope.Find<ContentPresenter>("PART_Body");
 
         if (_chevron is not null)
         {
@@ -120,7 +146,7 @@ public class ArcExpandableCard : ContentControl
             _header.Click += (_, _) =>
             {
                 SetCurrentValue(IsExpandedProperty, !IsExpanded);
-                ExpandedChanged?.Invoke(this, IsExpanded);
+                RaiseExpandedChanged(IsExpanded);
             };
         }
 

@@ -5,9 +5,11 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
@@ -26,6 +28,21 @@ public sealed class ArcHeatmapDay
 /// A year of activity as a seven-row calendar: series tints for the levels, month labels, a legend,
 /// a tooltip with the exact count, and keyboard movement across days.
 /// </summary>
+
+    /// <summary>Event data for the bubbling <see cref="SelectedDateChangedRouted"/> event.</summary>
+    public sealed class ArcHeatmapSelectedDateChangedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcHeatmapSelectedDateChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+        /// <summary>The value carried by the event.</summary>
+        public DateOnly Date { get; init; }
+    }
+[TemplatePart("PART_Summary", typeof(TextBlock))]
+[TemplatePart("PART_Detail", typeof(TextBlock))]
+[TemplatePart("PART_Actions", typeof(ContentPresenter))]
+[TemplatePart("PART_Grid", typeof(ArcHeatmapGrid))]
 public class ArcActivityHeatmap : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<ArcHeatmapDay>?> DaysProperty =
@@ -124,14 +141,30 @@ public class ArcActivityHeatmap : TemplatedControl
     }
 
     public event EventHandler<DateOnly>? SelectedDateChanged;
+    /// <summary>Bubbling routed counterpart of <see cref="SelectedDateChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcHeatmapSelectedDateChangedEventArgs> SelectedDateChangedEvent =
+        RoutedEvent.Register<ArcActivityHeatmap, ArcHeatmapSelectedDateChangedEventArgs>("SelectedDateChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcHeatmapSelectedDateChangedEventArgs"/> version of <see cref="SelectedDateChanged"/>.</summary>
+    public event EventHandler<ArcHeatmapSelectedDateChangedEventArgs>? SelectedDateChangedRouted
+    {
+        add => AddHandler(SelectedDateChangedEvent, value);
+        remove => RemoveHandler(SelectedDateChangedEvent, value);
+    }
+
+    private void RaiseSelectedDateChanged(DateOnly date)
+    {
+        SelectedDateChanged?.Invoke(this, date);
+        RaiseEvent(new ArcHeatmapSelectedDateChangedEventArgs(SelectedDateChangedEvent) { Date = date });
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _summary = e.NameScope.Find<TextBlock>("Summary");
-        _detail = e.NameScope.Find<TextBlock>("Detail");
-        _actions = e.NameScope.Find<ContentPresenter>("Actions");
-        _grid = e.NameScope.Find<ArcHeatmapGrid>("Grid");
+        _summary = e.NameScope.Find<TextBlock>("PART_Summary");
+        _detail = e.NameScope.Find<TextBlock>("PART_Detail");
+        _actions = e.NameScope.Find<ContentPresenter>("PART_Actions");
+        _grid = e.NameScope.Find<ArcHeatmapGrid>("PART_Grid");
 
         if (_grid is not null)
         {
@@ -139,7 +172,7 @@ public class ArcActivityHeatmap : TemplatedControl
             _grid.DateSelected += (_, date) =>
             {
                 SetCurrentValue(SelectedDateProperty, date);
-                SelectedDateChanged?.Invoke(this, date);
+                RaiseSelectedDateChanged(date);
                 UpdateDetail(day: null);
             };
         }
@@ -227,6 +260,28 @@ public class ArcActivityHeatmap : TemplatedControl
 }
 
 /// <summary>The drawn calendar. Kept separate so the summary row can stay real text.</summary>
+
+    /// <summary>Event data for the bubbling <see cref="HoverChangedRouted"/> event.</summary>
+    public sealed class ArcHeatmapHoverChangedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcHeatmapHoverChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+        /// <summary>The value carried by the event.</summary>
+        public ArcHeatmapDay? Day { get; init; }
+    }
+
+    /// <summary>Event data for the bubbling <see cref="DateSelectedRouted"/> event.</summary>
+    public sealed class ArcHeatmapDateSelectedEventArgs : RoutedEventArgs
+    {
+        /// <summary>Creates the event data for a routed event.</summary>
+        public ArcHeatmapDateSelectedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+        {
+        }
+        /// <summary>The value carried by the event.</summary>
+        public DateOnly Date { get; init; }
+    }
 public sealed class ArcHeatmapGrid : Control
 {
     public static readonly StyledProperty<IReadOnlyList<ArcHeatmapDay>?> DaysProperty =
@@ -261,8 +316,40 @@ public sealed class ArcHeatmapGrid : Control
     private bool _keyboard;
 
     public event EventHandler<ArcHeatmapDay?>? HoverChanged;
+    /// <summary>Bubbling routed counterpart of <see cref="HoverChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcHeatmapHoverChangedEventArgs> HoverChangedEvent =
+        RoutedEvent.Register<ArcHeatmapGrid, ArcHeatmapHoverChangedEventArgs>("HoverChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcHeatmapHoverChangedEventArgs"/> version of <see cref="HoverChanged"/>.</summary>
+    public event EventHandler<ArcHeatmapHoverChangedEventArgs>? HoverChangedRouted
+    {
+        add => AddHandler(HoverChangedEvent, value);
+        remove => RemoveHandler(HoverChangedEvent, value);
+    }
+
+    private void RaiseHoverChanged(ArcHeatmapDay? day)
+    {
+        HoverChanged?.Invoke(this, day);
+        RaiseEvent(new ArcHeatmapHoverChangedEventArgs(HoverChangedEvent) { Day = day });
+    }
 
     public event EventHandler<DateOnly>? DateSelected;
+    /// <summary>Bubbling routed counterpart of <see cref="DateSelected"/>.</summary>
+    public static readonly RoutedEvent<ArcHeatmapDateSelectedEventArgs> DateSelectedEvent =
+        RoutedEvent.Register<ArcHeatmapGrid, ArcHeatmapDateSelectedEventArgs>("DateSelected", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcHeatmapDateSelectedEventArgs"/> version of <see cref="DateSelected"/>.</summary>
+    public event EventHandler<ArcHeatmapDateSelectedEventArgs>? DateSelectedRouted
+    {
+        add => AddHandler(DateSelectedEvent, value);
+        remove => RemoveHandler(DateSelectedEvent, value);
+    }
+
+    private void RaiseDateSelected(DateOnly date)
+    {
+        DateSelected?.Invoke(this, date);
+        RaiseEvent(new ArcHeatmapDateSelectedEventArgs(DateSelectedEvent) { Date = date });
+    }
 
     static ArcHeatmapGrid()
     {
@@ -536,7 +623,7 @@ public sealed class ArcHeatmapGrid : Control
         {
             _hover = index;
             InvalidateVisual();
-            HoverChanged?.Invoke(this, DayAt(index));
+            RaiseHoverChanged(DayAt(index));
         }
     }
 
@@ -547,7 +634,7 @@ public sealed class ArcHeatmapGrid : Control
         {
             _hover = -1;
             InvalidateVisual();
-            HoverChanged?.Invoke(this, null);
+            RaiseHoverChanged(null);
         }
     }
 
@@ -615,8 +702,8 @@ public sealed class ArcHeatmapGrid : Control
 
         SelectedDate = day.Date;
         InvalidateVisual();
-        DateSelected?.Invoke(this, day.Date);
-        HoverChanged?.Invoke(this, day);
+        RaiseDateSelected(day.Date);
+        RaiseHoverChanged(day);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -673,7 +760,7 @@ public sealed class ArcHeatmapGrid : Control
             case Key.Escape:
                 _hover = -1;
                 InvalidateVisual();
-                HoverChanged?.Invoke(this, null);
+                RaiseHoverChanged(null);
                 e.Handled = true;
                 break;
         }
@@ -683,7 +770,7 @@ public sealed class ArcHeatmapGrid : Control
     {
         _keyboard = true;
         InvalidateVisual();
-        HoverChanged?.Invoke(this, DayAt(_focused));
+        RaiseHoverChanged(DayAt(_focused));
     }
 
     protected override void OnGotFocus(FocusChangedEventArgs e)
@@ -696,7 +783,7 @@ public sealed class ArcHeatmapGrid : Control
         }
 
         InvalidateVisual();
-        HoverChanged?.Invoke(this, DayAt(_focused));
+        RaiseHoverChanged(DayAt(_focused));
     }
 
     protected override void OnLostFocus(FocusChangedEventArgs e)

@@ -3,6 +3,7 @@ using System.IO;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Layout;
@@ -39,6 +40,9 @@ public enum ArcAvatarShape
 /// A compact identity marker. A photo is loaded from a file path or an avares URI and falls back
 /// to the person's initials; the status dot carries presence in addition to its colour.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Initials", typeof(TextBlock))]
+[TemplatePart("PART_Dot", typeof(Ellipse))]
 public class ArcAvatar : TemplatedControl
 {
     public static readonly StyledProperty<string> DisplayNameProperty =
@@ -106,9 +110,9 @@ public class ArcAvatar : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _surface = e.NameScope.Find<Border>("Surface");
-        _initials = e.NameScope.Find<TextBlock>("Initials");
-        _dot = e.NameScope.Find<Ellipse>("Dot");
+        _surface = e.NameScope.Find<Border>("PART_Surface");
+        _initials = e.NameScope.Find<TextBlock>("PART_Initials");
+        _dot = e.NameScope.Find<Ellipse>("PART_Dot");
         UpdateSize();
         UpdateContent();
         UpdateStatus();

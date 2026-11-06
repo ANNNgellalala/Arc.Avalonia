@@ -26,7 +26,7 @@
     "R9": "已实现：主门禁为 Microsoft.CodeAnalysis.BannedApiAnalyzers（RS0030 -> error，见 src/Agent/Arc.Avalonia.Agent + tools/BannedSymbols.txt），tools/check-agent-boundary.ps1 是离线兜底并已接入 check-all 第 8 行；不设 known-red。"
   },
   "notes": [
-    "R1/R2/R3/R4/R6/R8/R9 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。",
+    "R1/R2/R3/R4/R6/R8/R9/R10 的预期状态是 GREEN；R6/R8 的存量例外登记在 tools/token-allow.json、tools/render-allow.json（不算 known-red，属于“已登记豁免”，不阻塞）。R10 的过渡 allowlist 在 tools/contracts-baseline.json（M2-G3a 切片改造中），同样不进入本文件。",
     "known-red 只在“数量不超过基线 + 项目在 permittedProjects 内”时成立；当前无 known-red 条目，-KnownRed 严格模式不会额外失败。",
     "R5 由 check-package 实现，缺失/过期 artifacts 时直接 RED（fail-closed，不属 known-red）；R9 的 build-only analyzer 不进入发布包依赖闭包（见 ADR 0002 §3）。"
   ]

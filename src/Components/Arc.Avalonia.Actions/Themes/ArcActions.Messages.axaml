@@ -9,17 +9,17 @@
     <Setter Property="MaxWidth" Value="416" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Surface" Classes="toast-surface">
+        <Border x:Name="PART_Surface" Classes="toast-surface">
           <Grid ColumnDefinitions="Auto,*,Auto">
-            <c:ArcIcon x:Name="Icon"
+            <c:ArcIcon x:Name="PART_Icon"
                        Icon="circle-check"
                        Size="18"
                        Margin="0,1,12,0"
                        VerticalAlignment="Top"
                        Classes="toast-icon" />
             <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-              <TextBlock x:Name="Title" Classes="arc-label" TextWrapping="NoWrap" />
-              <TextBlock x:Name="Description"
+              <TextBlock x:Name="PART_Title" Classes="arc-label" TextWrapping="NoWrap" />
+              <TextBlock x:Name="PART_Description"
                          Classes="arc-caption"
                          TextWrapping="Wrap" />
             </StackPanel>
@@ -28,12 +28,12 @@
                         Spacing="4"
                         VerticalAlignment="Center"
                         Margin="12,0,0,0">
-              <c:ArcButton x:Name="Action"
+              <c:ArcButton x:Name="PART_Action"
                            Variant="Ghost"
                            Size="Sm"
                            MinHeight="30"
                            Padding="8,0" />
-              <c:ArcButton x:Name="Close"
+              <c:ArcButton x:Name="PART_Close"
                            Variant="Ghost"
                            Size="Sm"
                            Compact="True"
@@ -54,7 +54,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <StackPanel x:Name="Stack"
+          <StackPanel x:Name="PART_Stack"
                       VerticalAlignment="Bottom"
                       HorizontalAlignment="Right"
                       Spacing="8"
@@ -69,17 +69,17 @@
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Surface" Classes="alert-surface">
+        <Border x:Name="PART_Surface" Classes="alert-surface">
           <Grid ColumnDefinitions="Auto,*,Auto">
-            <c:ArcIcon x:Name="Icon"
+            <c:ArcIcon x:Name="PART_Icon"
                        Icon="info"
                        Size="18"
                        Margin="0,1,12,0"
                        VerticalAlignment="Top"
                        Classes="alert-icon" />
             <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-              <TextBlock x:Name="Title" Classes="arc-label" TextWrapping="Wrap" />
-              <ContentPresenter x:Name="Details"
+              <TextBlock x:Name="PART_Title" Classes="arc-label" TextWrapping="Wrap" />
+              <ContentPresenter x:Name="PART_Details"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}" />
             </StackPanel>
@@ -88,12 +88,12 @@
                         Spacing="4"
                         VerticalAlignment="Center"
                         Margin="16,0,0,0">
-              <c:ArcButton x:Name="Action"
+              <c:ArcButton x:Name="PART_Action"
                            Variant="Ghost"
                            Size="Sm"
                            MinHeight="30"
                            Padding="8,0" />
-              <c:ArcButton x:Name="Close"
+              <c:ArcButton x:Name="PART_Close"
                            Variant="Ghost"
                            Size="Sm"
                            Compact="True"
@@ -107,23 +107,23 @@
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^ /template/ Border#Surface">
+    <Style Selector="^ /template/ Border#PART_Surface">
       <Setter Property="Background" Value="{DynamicResource ArcSurfaceMuted}" />
       <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderSubtle}" />
     </Style>
-    <Style Selector="^.info /template/ Border#Surface">
+    <Style Selector="^.info /template/ Border#PART_Surface">
       <Setter Property="Background" Value="{DynamicResource ArcAccentSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
-    <Style Selector="^.success /template/ Border#Surface">
+    <Style Selector="^.success /template/ Border#PART_Surface">
       <Setter Property="Background" Value="{DynamicResource ArcSuccessSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
-    <Style Selector="^.warning /template/ Border#Surface">
+    <Style Selector="^.warning /template/ Border#PART_Surface">
       <Setter Property="Background" Value="{DynamicResource ArcWarningSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
-    <Style Selector="^.danger /template/ Border#Surface">
+    <Style Selector="^.danger /template/ Border#PART_Surface">
       <Setter Property="Background" Value="{DynamicResource ArcDangerSubtle}" />
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>

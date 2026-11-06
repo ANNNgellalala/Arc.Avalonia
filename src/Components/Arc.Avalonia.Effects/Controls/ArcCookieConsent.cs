@@ -8,9 +8,11 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.Interactivity;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
+using Avalonia.Controls.Metadata;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -28,6 +30,23 @@ public enum ArcConsentFace
 /// spring and shrinking on the flat smooth one so it never overshoots. Choices live in memory for the
 /// session; nothing is sent anywhere.
 /// </summary>
+[TemplatePart("PART_Layer", typeof(Panel))]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Faces", typeof(Panel))]
+[TemplatePart("PART_FaceBar", typeof(StackPanel))]
+[TemplatePart("PART_FacePanel", typeof(StackPanel))]
+[TemplatePart("PART_ReopenButton", typeof(ArcButton))]
+[TemplatePart("PART_BarPolicy", typeof(ArcButton))]
+[TemplatePart("PART_CustomizeButton", typeof(ArcButton))]
+[TemplatePart("PART_AcceptButton", typeof(ArcButton))]
+[TemplatePart("PART_RejectButton", typeof(ArcButton))]
+[TemplatePart("PART_PanelReject", typeof(ArcButton))]
+[TemplatePart("PART_PanelSave", typeof(ArcButton))]
+[TemplatePart("PART_PanelPolicy", typeof(ArcButton))]
+[TemplatePart("PART_BarMessage", typeof(TextBlock))]
+[TemplatePart("PART_PanelTitle", typeof(TextBlock))]
+[TemplatePart("PART_PanelDescription", typeof(TextBlock))]
+[TemplatePart("PART_CategoryHost", typeof(StackPanel))]
 public class ArcCookieConsent : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<ArcCookieCategory>?> CategoriesProperty =
@@ -117,6 +136,17 @@ public class ArcCookieConsent : TemplatedControl
 
     public event EventHandler<ArcConsentChangedEventArgs>? Changed;
 
+    /// <summary>Bubbled copy of <see cref="Changed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcConsentChangedEventArgs> ChangedEvent =
+        RoutedEvent.Register<ArcCookieConsent, ArcConsentChangedEventArgs>("Changed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Changed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcConsentChangedEventArgs>? ChangedRouted
+    {
+        add => AddHandler(ChangedEvent, value);
+        remove => RemoveHandler(ChangedEvent, value);
+    }
+
     public event EventHandler<bool>? PreferencesOpenChanged;
 
     public IReadOnlyList<ArcCookieCategory>? Categories
@@ -203,29 +233,31 @@ public class ArcCookieConsent : TemplatedControl
         _draft.Clear();
         SetCurrentValue(ValueProperty, null);
         SetCurrentValue(PreferencesOpenProperty, false);
-        Changed?.Invoke(this, new ArcConsentChangedEventArgs(null, ArcConsentAction.Reset, DateTimeOffset.UtcNow));
+        var resetArgs = new ArcConsentChangedEventArgs(null, ArcConsentAction.Reset, DateTimeOffset.UtcNow) { RoutedEvent = ChangedEvent };
+        Changed?.Invoke(this, resetArgs);
+        RaiseEvent(resetArgs);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _layer = e.NameScope.Find<Panel>("Layer");
-        _surface = e.NameScope.Find<Border>("Surface");
-        _faces = e.NameScope.Find<Panel>("Faces");
-        _faceBar = e.NameScope.Find<StackPanel>("FaceBar");
-        _facePanel = e.NameScope.Find<StackPanel>("FacePanel");
-        _reopen = e.NameScope.Find<ArcButton>("ReopenButton");
-        _barPolicy = e.NameScope.Find<ArcButton>("BarPolicy");
-        _customize = e.NameScope.Find<ArcButton>("CustomizeButton");
-        _accept = e.NameScope.Find<ArcButton>("AcceptButton");
-        _reject = e.NameScope.Find<ArcButton>("RejectButton");
-        _panelReject = e.NameScope.Find<ArcButton>("PanelReject");
-        _panelSave = e.NameScope.Find<ArcButton>("PanelSave");
-        _panelPolicy = e.NameScope.Find<ArcButton>("PanelPolicy");
-        _barMessage = e.NameScope.Find<TextBlock>("BarMessage");
-        _panelTitle = e.NameScope.Find<TextBlock>("PanelTitle");
-        _panelDescription = e.NameScope.Find<TextBlock>("PanelDescription");
-        _categoryHost = e.NameScope.Find<StackPanel>("CategoryHost");
+        _layer = e.NameScope.Find<Panel>("PART_Layer");
+        _surface = e.NameScope.Find<Border>("PART_Surface");
+        _faces = e.NameScope.Find<Panel>("PART_Faces");
+        _faceBar = e.NameScope.Find<StackPanel>("PART_FaceBar");
+        _facePanel = e.NameScope.Find<StackPanel>("PART_FacePanel");
+        _reopen = e.NameScope.Find<ArcButton>("PART_ReopenButton");
+        _barPolicy = e.NameScope.Find<ArcButton>("PART_BarPolicy");
+        _customize = e.NameScope.Find<ArcButton>("PART_CustomizeButton");
+        _accept = e.NameScope.Find<ArcButton>("PART_AcceptButton");
+        _reject = e.NameScope.Find<ArcButton>("PART_RejectButton");
+        _panelReject = e.NameScope.Find<ArcButton>("PART_PanelReject");
+        _panelSave = e.NameScope.Find<ArcButton>("PART_PanelSave");
+        _panelPolicy = e.NameScope.Find<ArcButton>("PART_PanelPolicy");
+        _barMessage = e.NameScope.Find<TextBlock>("PART_BarMessage");
+        _panelTitle = e.NameScope.Find<TextBlock>("PART_PanelTitle");
+        _panelDescription = e.NameScope.Find<TextBlock>("PART_PanelDescription");
+        _categoryHost = e.NameScope.Find<StackPanel>("PART_CategoryHost");
 
         if (_customize is not null)
         {
@@ -560,7 +592,9 @@ public class ArcCookieConsent : TemplatedControl
 
         SetCurrentValue(ValueProperty, value);
         SetCurrentValue(PreferencesOpenProperty, false);
-        Changed?.Invoke(this, new ArcConsentChangedEventArgs(value, action, updatedAt));
+        var changedArgs = new ArcConsentChangedEventArgs(value, action, updatedAt) { RoutedEvent = ChangedEvent };
+        Changed?.Invoke(this, changedArgs);
+        RaiseEvent(changedArgs);
     }
 
     private void Sync()

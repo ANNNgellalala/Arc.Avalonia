@@ -12,14 +12,14 @@
               <ColumnDefinition Width="*" />
               <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="Summary" Classes="arc-label" VerticalAlignment="Center" />
-            <ContentPresenter x:Name="Actions" Grid.Column="1" VerticalAlignment="Center" />
+            <TextBlock x:Name="PART_Summary" Classes="arc-label" VerticalAlignment="Center" />
+            <ContentPresenter x:Name="PART_Actions" Grid.Column="1" VerticalAlignment="Center" />
           </Grid>
           <ScrollViewer HorizontalScrollBarVisibility="Auto"
                         VerticalScrollBarVisibility="Disabled">
-            <c:ArcHeatmapGrid x:Name="Grid" />
+            <c:ArcHeatmapGrid x:Name="PART_Grid" />
           </ScrollViewer>
-          <TextBlock x:Name="Detail" Classes="arc-caption" />
+          <TextBlock x:Name="PART_Detail" Classes="arc-caption" />
         </StackPanel>
       </ControlTemplate>
     </Setter>

@@ -39,7 +39,7 @@ public enum ChartTone
 public sealed record GaugeThreshold(double From, ChartTone Tone, string? Label = null);
 
 /// <summary>Base for the custom drawn charts: deterministic measure plus crisp pixel helpers.</summary>
-public abstract class ArcChartBase : Control
+public abstract partial class ArcChartBase : Control
 {
     protected ArcChartBase()
     {
@@ -103,7 +103,7 @@ internal static class ChartPalette
     public static IBrush BorderStrong => ArcResources.Brush(ArcTokens.BorderStrong);
     public static IBrush Accent => ArcResources.Brush(ArcTokens.Accent);
 
-    public static Pen Pen(IBrush brush, double thickness = 1, bool dashed = false) => new(
+    public static Pen Pen(IBrush brush, double thickness = ChartMetrics.Hairline, bool dashed = false) => new(
         brush,
         thickness,
         dashed ? new DashStyle(new[] { 4.0, 3.0 }, 0) : null,
@@ -465,15 +465,15 @@ internal static class ChartTooltip
         string title,
         IReadOnlyList<(string Label, string Value, IBrush? Brush)> rows)
     {
-        const double padding = 8;
-        const double rowHeight = 16;
-        var titleText = ChartText.Create(title, 12, ChartPalette.Foreground, FontWeight.Medium);
+        var padding = ChartMetrics.TooltipPadding;
+        var rowHeight = ChartMetrics.TooltipRowHeight;
+        var titleText = ChartText.Create(title, ChartMetrics.LabelFontSize, ChartPalette.Foreground, FontWeight.Medium);
         var width = titleText.Width;
         var rowTexts = new List<(FormattedText Label, FormattedText Value, IBrush? Brush)>();
         foreach (var row in rows)
         {
-            var label = ChartText.Create(row.Label, 12, ChartPalette.Muted, maxWidth: 116);
-            var value = ChartText.Create(row.Value, 12, ChartPalette.Foreground, FontWeight.Medium);
+            var label = ChartText.Create(row.Label, ChartMetrics.LabelFontSize, ChartPalette.Muted, maxWidth: 116);
+            var value = ChartText.Create(row.Value, ChartMetrics.LabelFontSize, ChartPalette.Foreground, FontWeight.Medium);
             rowTexts.Add((label, value, row.Brush));
             width = Math.Max(width, label.Width + value.Width + 14);
         }
@@ -493,8 +493,8 @@ internal static class ChartTooltip
             ChartPalette.SurfaceRaised,
             new Pen(ChartPalette.Border),
             rect,
-            8,
-            8);
+            ChartMetrics.SmallCorner,
+            ChartMetrics.SmallCorner);
         context.DrawText(titleText, new Point(rect.X + padding, rect.Y + padding - 2));
 
         var rowY = rect.Y + padding + 14;

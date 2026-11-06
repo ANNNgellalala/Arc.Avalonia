@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -55,6 +56,16 @@ public sealed class ArcShortcutChangedEventArgs : EventArgs
 /// Arc's shortcut recorder: a focusable field that records a key chord into key caps, warns about
 /// conflicts and reserved combinations, and exposes the gesture as "Ctrl+Shift+K".
 /// </summary>
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_Shell", typeof(Border))]
+[TemplatePart("PART_Caps", typeof(StackPanel))]
+[TemplatePart("PART_PlaceholderText", typeof(TextBlock))]
+[TemplatePart("PART_ClearButton", typeof(Button))]
+[TemplatePart("PART_RecordingDot", typeof(Border))]
+[TemplatePart("PART_Message", typeof(TextBlock))]
+[TemplatePart("PART_Hint", typeof(TextBlock))]
+[TemplatePart("PART_UseButton", typeof(Button))]
+[TemplatePart("PART_CancelButton", typeof(Button))]
 public class ArcShortcutRecorder : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -250,16 +261,16 @@ public class ArcShortcutRecorder : TemplatedControl
             _cancelButton.Click -= OnCancelConflict;
         }
 
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _shell = e.NameScope.Find<Border>("Shell");
-        _caps = e.NameScope.Find<StackPanel>("Caps");
-        _placeholderText = e.NameScope.Find<TextBlock>("PlaceholderText");
-        _clearButton = e.NameScope.Find<Button>("ClearButton");
-        _recordingDot = e.NameScope.Find<Border>("RecordingDot");
-        _message = e.NameScope.Find<TextBlock>("Message");
-        _hint = e.NameScope.Find<TextBlock>("Hint");
-        _useButton = e.NameScope.Find<Button>("UseButton");
-        _cancelButton = e.NameScope.Find<Button>("CancelButton");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _shell = e.NameScope.Find<Border>("PART_Shell");
+        _caps = e.NameScope.Find<StackPanel>("PART_Caps");
+        _placeholderText = e.NameScope.Find<TextBlock>("PART_PlaceholderText");
+        _clearButton = e.NameScope.Find<Button>("PART_ClearButton");
+        _recordingDot = e.NameScope.Find<Border>("PART_RecordingDot");
+        _message = e.NameScope.Find<TextBlock>("PART_Message");
+        _hint = e.NameScope.Find<TextBlock>("PART_Hint");
+        _useButton = e.NameScope.Find<Button>("PART_UseButton");
+        _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
 
         if (_clearButton is not null)
         {

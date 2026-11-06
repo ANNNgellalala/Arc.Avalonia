@@ -179,6 +179,20 @@ public class ArcRadarChart : ArcChartBase
                 _hidden.Add(hit.Series.Name);
             }
 
+            var seriesIndex = -1;
+            if (Series is { } seriesList)
+            {
+                for (var s = 0; s < seriesList.Count; s++)
+                {
+                    if (ReferenceEquals(seriesList[s], hit.Series))
+                    {
+                        seriesIndex = s;
+                        break;
+                    }
+                }
+            }
+
+            RaiseLegendClick(seriesIndex, hit.Series.Name, !_hidden.Contains(hit.Series.Name));
             InvalidateVisual();
             e.Handled = true;
             return;
@@ -247,7 +261,7 @@ public class ArcRadarChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -290,7 +304,7 @@ public class ArcRadarChart : ArcChartBase
         }
 
         // Guides sit over the shapes so the web stays readable through three profiles.
-        var guidePen = new Pen(ChartPalette.BorderSubtle, 1);
+        var guidePen = new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline);
         for (var guide = 1; guide <= Guides; guide++)
         {
             var ring = new List<Point>();
@@ -306,7 +320,7 @@ public class ArcRadarChart : ArcChartBase
         {
             var at = PointAt(index, axes.Count, _radius);
             context.DrawLine(
-                new Pen(index == _activeAxis ? ChartPalette.BorderStrong : ChartPalette.BorderSubtle, 1),
+                new Pen(index == _activeAxis ? ChartPalette.BorderStrong : ChartPalette.BorderSubtle, ChartMetrics.Hairline),
                 _center,
                 at);
         }
@@ -325,7 +339,7 @@ public class ArcRadarChart : ArcChartBase
             var y = at.Y + (Math.Sin(angle) switch { > 0.3 => 4, < -0.3 => -4, _ => 0 });
             var label = ChartText.Create(
                 axes[index],
-                11,
+                ChartMetrics.CaptionFontSize,
                 index == _activeAxis ? ChartPalette.Foreground : ChartPalette.Muted,
                 maxWidth: labelRoom);
             ChartText.Draw(context, label, at.X, y, alignment);
@@ -373,7 +387,7 @@ public class ArcRadarChart : ArcChartBase
             var hidden = _hidden.Contains(item.Name);
             var name = ChartText.Create(
                 item.Name,
-                12,
+                ChartMetrics.CaptionFontSize,
                 hidden ? ChartPalette.Muted : ChartPalette.Secondary,
                 string.Equals(item.Name, _hoverSeries, StringComparison.Ordinal) ? FontWeight.Medium : FontWeight.Normal);
             var itemWidth = 18 + 5 + name.Width + 12;

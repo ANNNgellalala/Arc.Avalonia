@@ -86,15 +86,15 @@
                   CornerRadius="{TemplateBinding CornerRadius}"
                   ClipToBounds="True">
             <Grid>
-              <StackPanel x:Name="LeadingHost"
+              <StackPanel x:Name="PART_LeadingHost"
                           Orientation="Horizontal"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Stretch" />
-              <StackPanel x:Name="TrailingHost"
+              <StackPanel x:Name="PART_TrailingHost"
                           Orientation="Horizontal"
                           HorizontalAlignment="Right"
                           VerticalAlignment="Stretch" />
-              <Border x:Name="Surface"
+              <Border x:Name="PART_Surface"
                       Background="{TemplateBinding Background}"
                       RenderTransformOrigin="0.5,0.5">
                 <ContentPresenter x:Name="Content"
@@ -106,7 +106,7 @@
               </Border>
             </Grid>
           </Border>
-          <TextBlock x:Name="Status"
+          <TextBlock x:Name="PART_Status"
                      Height="0"
                      Opacity="0"
                      IsHitTestVisible="False"
@@ -120,3 +120,4 @@
     </Style>
   </ControlTheme>
 </ResourceDictionary>
+

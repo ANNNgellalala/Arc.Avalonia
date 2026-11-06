@@ -4,6 +4,7 @@ using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Arc.Avalonia.Controls;
@@ -48,6 +49,8 @@ public enum ArcChevronPointing
 /// the accessible name and the state. The bell and heart one-shot moments are not ported: the shared icon
 /// set has no filled or burst primitives to animate.
 /// </summary>
+[TemplatePart("PART_From", typeof(ArcIcon))]
+[TemplatePart("PART_To", typeof(ArcIcon))]
 public sealed class ArcIconMorph : TemplatedControl
 {
     public static readonly StyledProperty<ArcIconMorphName> IconProperty =
@@ -136,8 +139,8 @@ public sealed class ArcIconMorph : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _from = e.NameScope.Find<ArcIcon>("From");
-        _to = e.NameScope.Find<ArcIcon>("To");
+        _from = e.NameScope.Find<ArcIcon>("PART_From");
+        _to = e.NameScope.Find<ArcIcon>("PART_To");
         Apply(animate: false);
     }
 

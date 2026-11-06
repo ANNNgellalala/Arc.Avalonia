@@ -9,6 +9,8 @@ using Avalonia.Layout;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 
+using Avalonia.Interactivity;
+
 namespace Arc.Avalonia.Actions.Controls;
 
 /// <summary>
@@ -58,6 +60,16 @@ public sealed class ArcActionSwap : ArcButton
 
     /// <summary>Raised when the control commits to a new state.</summary>
     public event EventHandler<ArcActionSwapState>? ValueChanged;
+    /// <summary>Bubbled copy of <see cref="ValueChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcActionSwapValueChangedEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcActionSwap, ArcActionSwapValueChangedEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ValueChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcActionSwapValueChangedEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     /// <summary>Ordered states; each press moves to the next and wraps around.</summary>
     public IList<ArcActionSwapState>? States
@@ -140,7 +152,9 @@ public sealed class ArcActionSwap : ArcButton
             }
 
             SetCurrentValue(ValueProperty, next.Id);
-            ValueChanged?.Invoke(this, next);
+                    var valueChangedArgs = new ArcActionSwapValueChangedEventArgs(ValueChangedEvent) { State = next };
+        ValueChanged?.Invoke(this, next);
+        RaiseEvent(valueChangedArgs);
         }
         catch
         {

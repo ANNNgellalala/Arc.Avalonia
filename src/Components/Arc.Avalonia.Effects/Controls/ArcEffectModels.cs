@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia.Interactivity;
 
 namespace Arc.Avalonia.Effects.Controls;
 
@@ -171,8 +172,16 @@ public sealed class ArcConsentValue
 }
 
 /// <summary>Raised when the visitor accepts, rejects, saves or resets consent.</summary>
-public sealed class ArcConsentChangedEventArgs : EventArgs
+public sealed class ArcConsentChangedEventArgs : RoutedEventArgs
 {
+    public ArcConsentChangedEventArgs()
+    {
+    }
+
+    public ArcConsentChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
     public ArcConsentChangedEventArgs(ArcConsentValue? value, ArcConsentAction action, DateTimeOffset updatedAt)
     {
         Value = value;

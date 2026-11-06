@@ -6,8 +6,10 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -123,6 +125,12 @@ public sealed class ArcGridCellEdit
 /// rectangular cell range, and a sort reorders once with no row slide (a stable sort, like a
 /// spreadsheet). These are noted on the demo page too.
 /// </remarks>
+[TemplatePart("PART_Toolbar", typeof(Panel))]
+[TemplatePart("PART_HeaderHost", typeof(Border))]
+[TemplatePart("PART_Scroll", typeof(ScrollViewer))]
+[TemplatePart("PART_Body", typeof(Panel))]
+[TemplatePart("PART_FooterHost", typeof(Border))]
+[TemplatePart("PART_ColumnsPopup", typeof(Popup))]
 public class ArcDataGrid : TemplatedControl
 {
     private const double RowHeight = 40;
@@ -301,9 +309,60 @@ public class ArcDataGrid : TemplatedControl
 
     public event EventHandler<ArcGridSort?>? SortChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="SortChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcGridSortChangedEventArgs> SortChangedEvent =
+        RoutedEvent.Register<ArcDataGrid, ArcGridSortChangedEventArgs>("SortChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcGridSortChangedEventArgs"/> version of <see cref="SortChanged"/>.</summary>
+    public event EventHandler<ArcGridSortChangedEventArgs>? SortChangedRouted
+    {
+        add => AddHandler(SortChangedEvent, value);
+        remove => RemoveHandler(SortChangedEvent, value);
+    }
+
+    private void RaiseSortChanged(ArcGridSort? sort)
+    {
+        SortChanged?.Invoke(this, sort);
+        RaiseEvent(new ArcGridSortChangedEventArgs(SortChangedEvent) { Sort = sort });
+    }
+
     public event EventHandler<IReadOnlyList<string>>? SelectionChanged;
 
+    /// <summary>Bubbling routed counterpart of <see cref="SelectionChanged"/>.</summary>
+    public static readonly RoutedEvent<ArcGridSelectionChangedEventArgs> SelectionChangedEvent =
+        RoutedEvent.Register<ArcDataGrid, ArcGridSelectionChangedEventArgs>("SelectionChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcGridSelectionChangedEventArgs"/> version of <see cref="SelectionChanged"/>.</summary>
+    public event EventHandler<ArcGridSelectionChangedEventArgs>? SelectionChangedRouted
+    {
+        add => AddHandler(SelectionChangedEvent, value);
+        remove => RemoveHandler(SelectionChangedEvent, value);
+    }
+
+    private void RaiseSelectionChanged(IReadOnlyList<string> selectedKeys)
+    {
+        SelectionChanged?.Invoke(this, selectedKeys);
+        RaiseEvent(new ArcGridSelectionChangedEventArgs(SelectionChangedEvent) { SelectedKeys = selectedKeys });
+    }
+
     public event EventHandler<ArcGridCellEdit>? CellEdited;
+
+    /// <summary>Bubbling routed counterpart of <see cref="CellEdited"/>.</summary>
+    public static readonly RoutedEvent<ArcGridCellEditedEventArgs> CellEditedEvent =
+        RoutedEvent.Register<ArcDataGrid, ArcGridCellEditedEventArgs>("CellEdited", RoutingStrategies.Bubble);
+
+    /// <summary>Subscribes to the bubbling <see cref="ArcGridCellEditedEventArgs"/> version of <see cref="CellEdited"/>.</summary>
+    public event EventHandler<ArcGridCellEditedEventArgs>? CellEditedRouted
+    {
+        add => AddHandler(CellEditedEvent, value);
+        remove => RemoveHandler(CellEditedEvent, value);
+    }
+
+    private void RaiseCellEdited(ArcGridCellEdit edit)
+    {
+        CellEdited?.Invoke(this, edit);
+        RaiseEvent(new ArcGridCellEditedEventArgs(CellEditedEvent) { Edit = edit });
+    }
 
     /// <summary>Re-reads rows and columns after the lists or a column's cells were changed in place.</summary>
     public void Refresh() => RebuildAll();
@@ -983,7 +1042,7 @@ public class ArcDataGrid : TemplatedControl
         _viewFrozen = false;
         _anchorRow = -1;
         RebuildContent();
-        SortChanged?.Invoke(this, _sortKey is null
+        RaiseSortChanged(_sortKey is null
             ? null
             : new ArcGridSort { Key = _sortKey, Descending = _sortDescending });
         Dispatcher.UIThread.Post(() =>
@@ -1372,7 +1431,7 @@ public class ArcDataGrid : TemplatedControl
         _syncingSelection = true;
         SetCurrentValue(SelectedIdsProperty, ordered);
         _syncingSelection = false;
-        SelectionChanged?.Invoke(this, ordered);
+        RaiseSelectionChanged(ordered);
     }
 
     // ---- Footer -----------------------------------------------------------
@@ -1581,7 +1640,7 @@ public class ArcDataGrid : TemplatedControl
                     row[column.Key] = newValue;
                 }
 
-                CellEdited?.Invoke(this, new ArcGridCellEdit
+                RaiseCellEdited(new ArcGridCellEdit
                 {
                     Row = row,
                     Column = column,
@@ -1853,4 +1912,40 @@ public class ArcDataGrid : TemplatedControl
         ArcGridAlign.Center => HorizontalAlignment.Center,
         _ => HorizontalAlignment.Left
     };
+}
+
+/// <summary>Event data for the bubbling <see cref="SortChangedRouted"/> event.</summary>
+public sealed class ArcGridSortChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcGridSortChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcGridSort? Sort { get; init; }
+}
+
+/// <summary>Event data for the bubbling <see cref="SelectionChangedRouted"/> event.</summary>
+public sealed class ArcGridSelectionChangedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcGridSelectionChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public IReadOnlyList<string> SelectedKeys { get; init; } = null!;
+}
+
+/// <summary>Event data for the bubbling <see cref="CellEditedRouted"/> event.</summary>
+public sealed class ArcGridCellEditedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the event data for a routed event.</summary>
+    public ArcGridCellEditedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The value carried by the event.</summary>
+    public ArcGridCellEdit Edit { get; init; } = null!;
 }

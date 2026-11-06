@@ -161,10 +161,20 @@ public class ArcLineChart : ArcChartBase
                 _hidden.Add(hit.Series.Name);
             }
 
+            RaiseLegendClick(SeriesIndex(hit.Series), hit.Series.Name, !_hidden.Contains(hit.Series.Name));
             _activeIndex = -1;
             InvalidateVisual();
             e.Handled = true;
             return;
+        }
+
+        var hitCount = PointCount();
+        var hitSeries = Series;
+        if (hitCount > 0 && hitSeries is { Count: > 0 } && _plot.Width > 0 && _plot.Contains(point))
+        {
+            var index = Math.Clamp((int)Math.Round((point.X - _plot.Left) / _plot.Width * (hitCount - 1)), 0, hitCount - 1);
+            var visibleSeries = hitSeries.FirstOrDefault(item => !_hidden.Contains(item.Name)) ?? hitSeries[0];
+            RaisePointClick(visibleSeries.Name, SeriesIndex(visibleSeries), index, ValueAt(visibleSeries, index), point);
         }
 
         Focus();
@@ -235,8 +245,8 @@ public class ArcLineChart : ArcChartBase
 
         _plot = new Rect(left, top, right - left, bottom - top);
         var max = NiceMaximum(series);
-        var gridPen = new Pen(ChartPalette.BorderSubtle, 1);
-        var axisPen = new Pen(ChartPalette.Border, 1);
+        var gridPen = new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline);
+        var axisPen = new Pen(ChartPalette.Border, ChartMetrics.Hairline);
 
         if (ShowGrid)
         {
@@ -250,7 +260,7 @@ public class ArcLineChart : ArcChartBase
                     ChartFormat.Compact(value),
                     _plot.Left - 6,
                     y,
-                    12,
+                    ChartMetrics.LabelFontSize,
                     ChartPalette.Muted,
                     alignment: TextAlignment.Right);
             }
@@ -310,7 +320,7 @@ public class ArcLineChart : ArcChartBase
         var centerY = 11.0;
         foreach (var item in series)
         {
-            var name = ChartText.Create(item.Name, 12, _hidden.Contains(item.Name) ? ChartPalette.Muted : ChartPalette.Secondary);
+            var name = ChartText.Create(item.Name, ChartMetrics.LabelFontSize, _hidden.Contains(item.Name) ? ChartPalette.Muted : ChartPalette.Secondary);
             var itemWidth = 18 + 5 + name.Width + 12;
             if (x + itemWidth > Bounds.Width)
             {
@@ -367,7 +377,7 @@ public class ArcLineChart : ArcChartBase
                 return;
             }
 
-            var text = ChartText.Create(labels[index], 12, ChartPalette.Muted, maxWidth: 64);
+            var text = ChartText.Create(labels[index], ChartMetrics.LabelFontSize, ChartPalette.Muted, maxWidth: 64);
             var x = Math.Clamp(
                 PointX(index, count),
                 text.Width / 2 + 2,
@@ -413,7 +423,7 @@ public class ArcLineChart : ArcChartBase
             "No data",
             Bounds.Width / 2,
             Bounds.Height / 2,
-            13,
+            ChartMetrics.TitleFontSize,
             ChartPalette.Muted,
             alignment: TextAlignment.Center);
     }

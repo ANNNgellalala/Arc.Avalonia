@@ -114,6 +114,23 @@ public class ArcWaffleChart : ArcChartBase
     {
         base.OnPointerPressed(e);
         Focus();
+
+        var point = e.GetPosition(this);
+        foreach (var hit in _legendHits)
+        {
+            if (!hit.Bounds.Contains(point))
+            {
+                continue;
+            }
+
+            var items = Visible();
+            if (hit.Index >= 0 && hit.Index < items.Count)
+            {
+                RaiseLegendClick(hit.Index, items[hit.Index].Name, true);
+            }
+
+            break;
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -161,7 +178,7 @@ public class ArcWaffleChart : ArcChartBase
                 "No data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -221,7 +238,7 @@ public class ArcWaffleChart : ArcChartBase
                 segment.Name,
                 x + 14,
                 y + 10,
-                12,
+                ChartMetrics.LabelFontSize,
                 i == _activeIndex ? ChartPalette.Foreground : ChartPalette.Secondary,
                 i == _activeIndex ? FontWeight.Medium : FontWeight.Normal,
                 maxWidth: Math.Max(24, available - 36));
@@ -230,7 +247,7 @@ public class ArcWaffleChart : ArcChartBase
                 ChartFormat.Percent(segment.Value / total, 0),
                 x + available,
                 y + 10,
-                12,
+                ChartMetrics.LabelFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Right);
             _legendHits.Add((row, i));

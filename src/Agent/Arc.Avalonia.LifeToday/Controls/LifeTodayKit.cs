@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -372,6 +373,16 @@ public class ArcDailyBrief : Panel
     }
 
     /// <summary>Raised when the user accepts the suggestion; the host performs the action.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> AcceptSuggestionRequestedEvent =
+        RoutedEvent.Register<ArcDailyBrief, ArcLifeTodayRoutedEventArgs>("AcceptSuggestionRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="AcceptSuggestionRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? AcceptSuggestionRequestedRouted
+    {
+        add => AddHandler(AcceptSuggestionRequestedEvent, value);
+        remove => RemoveHandler(AcceptSuggestionRequestedEvent, value);
+    }
+
     public event Action? AcceptSuggestionRequested;
 
     /// <summary>Raised when the user ignores the suggestion for today.</summary>
@@ -497,7 +508,11 @@ public class ArcDailyBrief : Panel
         {
             var accept = Ui.Button("Accept", ArcButtonVariant.Primary, ArcButtonSize.Sm);
             Ui.Name(accept, "Accept the suggestion");
-            accept.Click += (_, _) => AcceptSuggestionRequested?.Invoke();
+            accept.Click += (_, _) =>
+        {
+            AcceptSuggestionRequested?.Invoke();
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(AcceptSuggestionRequestedEvent));
+        };
 
             var ignore = Ui.Button("Ignore", ArcButtonVariant.Ghost, ArcButtonSize.Sm);
             Ui.Name(ignore, "Ignore the suggestion for today");
@@ -715,6 +730,16 @@ public class ArcDayAgenda : Panel
     public event Action? TodayRequested;
 
     /// <summary>Raised when an item is activated; the argument is the item id.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> ItemActivatedEvent =
+        RoutedEvent.Register<ArcDayAgenda, ArcLifeTodayRoutedEventArgs>("ItemActivated", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ItemActivated"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? ItemActivatedRouted
+    {
+        add => AddHandler(ItemActivatedEvent, value);
+        remove => RemoveHandler(ItemActivatedEvent, value);
+    }
+
     public event Action<string>? ItemActivated;
 
     /// <summary>Raised when the user asks to add the first item of an empty day.</summary>
@@ -1012,7 +1037,11 @@ public class ArcDayAgenda : Panel
         };
         Ui.Name(tile, $"{item.Title}, {visual.Label}, {item.Start} to {item.End}"
             + (item.Conflict ? ", overlaps another item" : string.Empty));
-        tile.Click += (_, _) => ItemActivated?.Invoke(item.Id);
+        tile.Click += (_, _) =>
+        {
+            ItemActivated?.Invoke(item.Id);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(ItemActivatedEvent) { Text = item.Id });
+        };
         return tile;
     }
 
@@ -1407,9 +1436,29 @@ public class ArcReminderCenter : Panel
     }
 
     /// <summary>Raised when a row's completion control is toggled; the host persists the timestamp.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> CompleteRequestedEvent =
+        RoutedEvent.Register<ArcReminderCenter, ArcLifeTodayRoutedEventArgs>("CompleteRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CompleteRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? CompleteRequestedRouted
+    {
+        add => AddHandler(CompleteRequestedEvent, value);
+        remove => RemoveHandler(CompleteRequestedEvent, value);
+    }
+
     public event Action<string, bool>? CompleteRequested;
 
     /// <summary>Raised when a row asks to be delayed by the given span.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> SnoozeRequestedEvent =
+        RoutedEvent.Register<ArcReminderCenter, ArcLifeTodayRoutedEventArgs>("SnoozeRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SnoozeRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? SnoozeRequestedRouted
+    {
+        add => AddHandler(SnoozeRequestedEvent, value);
+        remove => RemoveHandler(SnoozeRequestedEvent, value);
+    }
+
     public event Action<string, TimeSpan>? SnoozeRequested;
 
     /// <summary>Raised when a row asks to be rescheduled.</summary>
@@ -1601,8 +1650,16 @@ public class ArcReminderCenter : Panel
         };
 
         var id = item.Id;
-        row.CompletedChanged += value => CompleteRequested?.Invoke(id, value);
-        row.SnoozeRequested += span => SnoozeRequested?.Invoke(id, span);
+        row.CompletedChanged += value =>
+        {
+            CompleteRequested?.Invoke(id, value);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(CompleteRequestedEvent) { Text = id, Flag = value });
+        };
+        row.SnoozeRequested += span =>
+        {
+            SnoozeRequested?.Invoke(id, span);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(SnoozeRequestedEvent) { Text = id, Span = span });
+        };
         row.RescheduleRequested += () => RescheduleRequested?.Invoke(id);
         row.SkipRequested += () => SkipRequested?.Invoke(id);
         return row;
@@ -1829,18 +1886,58 @@ public class ArcMedicationSchedule : Panel
     }
 
     /// <summary>Raised when a dose is checked off; the host writes the log entry.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> TakeRequestedEvent =
+        RoutedEvent.Register<ArcMedicationSchedule, ArcLifeTodayRoutedEventArgs>("TakeRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="TakeRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? TakeRequestedRouted
+    {
+        add => AddHandler(TakeRequestedEvent, value);
+        remove => RemoveHandler(TakeRequestedEvent, value);
+    }
+
     public event Action<string>? TakeRequested;
 
     /// <summary>Raised when a dose is postponed by the given span.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> SnoozeRequestedEvent =
+        RoutedEvent.Register<ArcMedicationSchedule, ArcLifeTodayRoutedEventArgs>("SnoozeRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SnoozeRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? SnoozeRequestedRouted
+    {
+        add => AddHandler(SnoozeRequestedEvent, value);
+        remove => RemoveHandler(SnoozeRequestedEvent, value);
+    }
+
     public event Action<string, TimeSpan>? SnoozeRequested;
 
     /// <summary>Raised when a dose is skipped for today.</summary>
     public event Action<string>? SkipRequested;
 
     /// <summary>Raised when a taken dose is undone; the host reverses the log entry.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> UndoTakenRequestedEvent =
+        RoutedEvent.Register<ArcMedicationSchedule, ArcLifeTodayRoutedEventArgs>("UndoTakenRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="UndoTakenRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? UndoTakenRequestedRouted
+    {
+        add => AddHandler(UndoTakenRequestedEvent, value);
+        remove => RemoveHandler(UndoTakenRequestedEvent, value);
+    }
+
     public event Action<string>? UndoTakenRequested;
 
     /// <summary>Raised when the user asks to request a refill.</summary>
+    public static readonly RoutedEvent<ArcLifeTodayRoutedEventArgs> RefillRequestedEvent =
+        RoutedEvent.Register<ArcMedicationSchedule, ArcLifeTodayRoutedEventArgs>("RefillRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="RefillRequested"/>.</summary>
+    public event EventHandler<ArcLifeTodayRoutedEventArgs>? RefillRequestedRouted
+    {
+        add => AddHandler(RefillRequestedEvent, value);
+        remove => RemoveHandler(RefillRequestedEvent, value);
+    }
+
     public event Action? RefillRequested;
 
     /// <summary>Raised when the user pauses the plan.</summary>
@@ -1975,7 +2072,11 @@ public class ArcMedicationSchedule : Panel
         grid.Children.Add(text);
 
         var request = LifeUi.Action("Request refill", ArcButtonVariant.Secondary,
-            "Request a medication refill", () => RefillRequested?.Invoke());
+            "Request a medication refill", () =>
+        {
+            RefillRequested?.Invoke();
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(RefillRequestedEvent));
+        });
         Grid.SetColumn(request, 2);
         grid.Children.Add(request);
 
@@ -2077,24 +2178,44 @@ public class ArcMedicationSchedule : Panel
         {
             case ArcMedicationStatus.Pending:
                 row.Children.Add(LifeUi.Action("Take", ArcButtonVariant.Secondary,
-                    $"Mark {item.Name} as taken", () => TakeRequested?.Invoke(item.Id)));
+                    $"Mark {item.Name} as taken", () =>
+        {
+            TakeRequested?.Invoke(item.Id);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(TakeRequestedEvent) { Text = item.Id });
+        }));
                 row.Children.Add(LifeUi.Action("Snooze", ArcButtonVariant.Ghost,
                     $"Delay {item.Name} by 30 minutes",
-                    () => SnoozeRequested?.Invoke(item.Id, TimeSpan.FromMinutes(30))));
+                    () =>
+        {
+            SnoozeRequested?.Invoke(item.Id, TimeSpan.FromMinutes(30));
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(SnoozeRequestedEvent) { Text = item.Id, Span = TimeSpan.FromMinutes(30) });
+        }));
                 row.Children.Add(LifeUi.Action("Skip", ArcButtonVariant.Ghost,
                     $"Skip {item.Name}", () => SkipRequested?.Invoke(item.Id)));
                 break;
             case ArcMedicationStatus.Taken:
                 row.Children.Add(LifeUi.Action("Undo", ArcButtonVariant.Ghost,
-                    $"Undo {item.Name}", () => UndoTakenRequested?.Invoke(item.Id)));
+                    $"Undo {item.Name}", () =>
+        {
+            UndoTakenRequested?.Invoke(item.Id);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(UndoTakenRequestedEvent) { Text = item.Id });
+        }));
                 break;
             case ArcMedicationStatus.Missed:
                 row.Children.Add(LifeUi.Action("Log as taken", ArcButtonVariant.Secondary,
-                    $"Log {item.Name} as taken now", () => TakeRequested?.Invoke(item.Id)));
+                    $"Log {item.Name} as taken now", () =>
+        {
+            TakeRequested?.Invoke(item.Id);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(TakeRequestedEvent) { Text = item.Id });
+        }));
                 break;
             default:
                 row.Children.Add(LifeUi.Action("Take", ArcButtonVariant.Secondary,
-                    $"Mark {item.Name} as taken", () => TakeRequested?.Invoke(item.Id)));
+                    $"Mark {item.Name} as taken", () =>
+        {
+            TakeRequested?.Invoke(item.Id);
+            RaiseEvent(new ArcLifeTodayRoutedEventArgs(TakeRequestedEvent) { Text = item.Id });
+        }));
                 break;
         }
 
@@ -2225,3 +2346,4 @@ public class ArcMedicationSchedule : Panel
 }
 
 #endregion
+

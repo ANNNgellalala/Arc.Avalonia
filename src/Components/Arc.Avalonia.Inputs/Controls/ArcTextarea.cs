@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 
@@ -11,6 +12,8 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A multiline field for notes and descriptions. It keeps Arc's animated helper row, can grow with its
 /// content, and shows a live character counter when a maximum length is set.
 /// </summary>
+[TemplatePart("PART_Counter", typeof(TextBlock))]
+[TemplatePart("PART_MessageRow", typeof(Control))]
 public class ArcTextarea : ArcTextFieldBase
 {
     public static readonly StyledProperty<int> RowsProperty =
@@ -66,8 +69,8 @@ public class ArcTextarea : ArcTextFieldBase
 
     protected override void OnFieldTemplateApplied(TemplateAppliedEventArgs e)
     {
-        _counter = e.NameScope.Find<TextBlock>("Counter");
-        _messageRow = e.NameScope.Find<Control>("MessageRow");
+        _counter = e.NameScope.Find<TextBlock>("PART_Counter");
+        _messageRow = e.NameScope.Find<Control>("PART_MessageRow");
 
         if (InputBox is not null)
         {

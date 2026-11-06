@@ -5,6 +5,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -29,6 +31,7 @@ public sealed record ArcRichTextValue(string Html, string Markdown, string Text,
 /// a selection toolbar, a slash command menu and a styled live preview. It intentionally does not
 /// pretend to be a WYSIWYG contentEditable engine; the document is always the Markdown in the box.
 /// </summary>
+[TemplatePart("PART_Host", typeof(Panel))]
 public class ArcRichTextEditor : TemplatedControl
 {
     public static readonly StyledProperty<string> HtmlProperty =
@@ -181,6 +184,16 @@ public class ArcRichTextEditor : TemplatedControl
     }
 
     /// <summary>Raised after each edit with the clean HTML, Markdown, plain text and empty flag.</summary>
+    public static readonly RoutedEvent<ArcRichTextChangedRoutedEventArgs> TextChangedEvent =
+        RoutedEvent.Register<ArcRichTextEditor, ArcRichTextChangedRoutedEventArgs>("TextChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="TextChanged"/>.</summary>
+    public event EventHandler<ArcRichTextChangedRoutedEventArgs>? TextChangedRouted
+    {
+        add => AddHandler(TextChangedEvent, value);
+        remove => RemoveHandler(TextChangedEvent, value);
+    }
+
     public event EventHandler<ArcRichTextValue>? TextChanged;
 
     public void FocusEditor()
@@ -785,7 +798,9 @@ public class ArcRichTextEditor : TemplatedControl
 
         if (raise)
         {
-            TextChanged?.Invoke(this, new ArcRichTextValue(html, _source, _source, string.IsNullOrWhiteSpace(_source)));
+            var value = new ArcRichTextValue(html, _source, _source, string.IsNullOrWhiteSpace(_source));
+        TextChanged?.Invoke(this, value);
+        RaiseEvent(new ArcRichTextChangedRoutedEventArgs(TextChangedEvent, value));
         }
     }
 
@@ -1424,3 +1439,7 @@ public class ArcRichTextEditor : TemplatedControl
         ApplyText(next, caretPosition, caretPosition);
     }
 }
+
+
+
+

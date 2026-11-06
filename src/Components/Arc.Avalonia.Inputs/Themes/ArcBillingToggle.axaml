@@ -9,14 +9,14 @@
     <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Track"
+        <Border x:Name="PART_Track"
                 Background="{DynamicResource ArcSurfaceMuted}"
                 CornerRadius="{DynamicResource ArcRadiusPill}"
                 Padding="4"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top">
-          <Panel x:Name="Host">
-            <Border x:Name="Thumb"
+          <Panel x:Name="PART_Host">
+            <Border x:Name="PART_Thumb"
                     Width="0"
                     Height="36"
                     HorizontalAlignment="Left"
@@ -28,7 +28,7 @@
                 <TranslateTransform />
               </Border.RenderTransform>
             </Border>
-            <StackPanel x:Name="OptionsHost"
+            <StackPanel x:Name="PART_OptionsHost"
                         Orientation="Horizontal"
                         Spacing="2"
                         VerticalAlignment="Center" />

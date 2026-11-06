@@ -197,10 +197,19 @@ public class ArcRealtimeStream : ArcChartBase
             InvalidateVisual();
         }
 
-        if (_pill.Contains(e.GetPosition(this)))
+        var point = e.GetPosition(this);
+        if (_pill.Contains(point))
         {
             SetCurrentValue(IsLiveProperty, !IsLive);
             e.Handled = true;
+            return;
+        }
+
+        var index = IndexAt(point);
+        if (index >= 0)
+        {
+            var value = _buffers.Count > 0 && index < _buffers[0].Count ? _buffers[0][index] : 0;
+            RaisePointClick(string.Empty, 0, index, value, point);
         }
     }
 
@@ -275,7 +284,7 @@ public class ArcRealtimeStream : ArcChartBase
                 "Waiting for data",
                 Bounds.Width / 2,
                 Bounds.Height / 2,
-                13,
+                ChartMetrics.TitleFontSize,
                 ChartPalette.Muted,
                 alignment: TextAlignment.Center);
             return;
@@ -311,7 +320,7 @@ public class ArcRealtimeStream : ArcChartBase
         high += padding;
 
         // Grid and value labels.
-        var gridPen = new Pen(ChartPalette.BorderSubtle, 1);
+        var gridPen = new Pen(ChartPalette.BorderSubtle, ChartMetrics.Hairline);
         for (var tick = 0; tick <= 3; tick++)
         {
             var value = low + (high - low) * tick / 3;
@@ -322,7 +331,7 @@ public class ArcRealtimeStream : ArcChartBase
                 high - low >= 20 ? ChartFormat.Compact(Math.Round(value)) : ChartFormat.Number(value, 1),
                 _plot.Right + 7,
                 y,
-                11,
+                ChartMetrics.CaptionFontSize,
                 ChartPalette.Muted);
         }
 
@@ -336,7 +345,7 @@ public class ArcRealtimeStream : ArcChartBase
                 FormatOffset(offset),
                 x,
                 _plot.Bottom + 11,
-                11,
+                ChartMetrics.CaptionFontSize,
                 ChartPalette.Muted,
                 alignment: tick == 3 ? TextAlignment.Right : tick == 0 ? TextAlignment.Left : TextAlignment.Center);
         }
@@ -407,8 +416,8 @@ public class ArcRealtimeStream : ArcChartBase
             var brush = BrushFor(series);
             var name = _defs[series].Name;
             var value = FormatValue(_buffers[series][^1]);
-            var nameText = ChartText.Create(name, 11, ChartPalette.Muted, maxWidth: 90);
-            var valueText = ChartText.Create(value, 13, ChartPalette.Foreground, FontWeight.Medium);
+            var nameText = ChartText.Create(name, ChartMetrics.CaptionFontSize, ChartPalette.Muted, maxWidth: 90);
+            var valueText = ChartText.Create(value, ChartMetrics.TitleFontSize, ChartPalette.Foreground, FontWeight.Medium);
             var width = 8 + 5 + nameText.Width + 5 + valueText.Width + 16;
             if (x + width > pillLeft)
             {
@@ -429,7 +438,7 @@ public class ArcRealtimeStream : ArcChartBase
         _pill = new Rect(Bounds.Width - width - 2, 3, width, 20);
         context.DrawRectangle(
             _pillHover ? ChartPalette.Alpha(ChartPalette.BorderSubtle, 0.9) : ChartPalette.Surface,
-            new Pen(ChartPalette.Border, 1),
+            new Pen(ChartPalette.Border, ChartMetrics.Hairline),
             new RoundedRect(_pill, 10));
 
         var centerY = _pill.Center.Y;
@@ -455,7 +464,7 @@ public class ArcRealtimeStream : ArcChartBase
             live ? "Live" : "Paused",
             _pill.X + 20,
             centerY,
-            11,
+            ChartMetrics.CaptionFontSize,
             live ? ChartPalette.Secondary : ChartPalette.Muted,
             FontWeight.Medium);
     }

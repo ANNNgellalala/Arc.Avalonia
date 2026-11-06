@@ -4,6 +4,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -144,6 +146,12 @@ public sealed class ArcCarouselPanel : Panel
 /// with the arrow keys, the arrows and the dot indicators. An optional interval rotates the row with a
 /// visible pause control; rotation pauses on hover and focus and is off entirely under reduced motion.
 /// </summary>
+[TemplatePart("PART_Stage", typeof(ArcCarouselPanel))]
+[TemplatePart("PART_Dots", typeof(StackPanel))]
+[TemplatePart("PART_Prev", typeof(Button))]
+[TemplatePart("PART_Next", typeof(Button))]
+[TemplatePart("PART_Play", typeof(Button))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcCarousel : TemplatedControl
 {
     public static readonly StyledProperty<string> LabelProperty =
@@ -274,6 +282,16 @@ public class ArcCarousel : TemplatedControl
     public int CurrentIndex => _index;
 
     /// <summary>Raised when the active slide changes.</summary>
+    public static readonly RoutedEvent<ArcCarouselIndexChangedRoutedEventArgs> IndexChangedEvent =
+        RoutedEvent.Register<ArcCarousel, ArcCarouselIndexChangedRoutedEventArgs>("IndexChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="IndexChanged"/>.</summary>
+    public event EventHandler<ArcCarouselIndexChangedRoutedEventArgs>? IndexChangedRouted
+    {
+        add => AddHandler(IndexChangedEvent, value);
+        remove => RemoveHandler(IndexChangedEvent, value);
+    }
+
     public event EventHandler<int>? IndexChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -284,7 +302,7 @@ public class ArcCarousel : TemplatedControl
         _previous = e.NameScope.Find<Button>("PART_Prev");
         _next = e.NameScope.Find<Button>("PART_Next");
         _play = e.NameScope.Find<Button>("PART_Play");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
 
         if (_previous is not null)
         {
@@ -540,6 +558,7 @@ public class ArcCarousel : TemplatedControl
         if (changed)
         {
             IndexChanged?.Invoke(this, _index);
+        RaiseEvent(new ArcCarouselIndexChangedRoutedEventArgs(IndexChangedEvent, _index));
         }
     }
 
@@ -682,6 +701,8 @@ public class ArcCarousel : TemplatedControl
         }
     }
 }
+
+
 
 
 

@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -13,6 +14,8 @@ namespace Arc.Avalonia.Inputs.Controls;
 /// A binary choice with a precise check and an indeterminate dash. Space toggles, the whole label row is
 /// the hit target, and null <see cref="Checked"/> renders the mixed state.
 /// </summary>
+[TemplatePart("PART_CheckGlyph", typeof(ArcIcon))]
+[TemplatePart("PART_DashGlyph", typeof(ArcIcon))]
 public class ArcCheckbox : TemplatedControl
 {
     public static readonly StyledProperty<bool?> CheckedProperty =
@@ -65,8 +68,8 @@ public class ArcCheckbox : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _check = e.NameScope.Find<ArcIcon>("CheckGlyph");
-        _dash = e.NameScope.Find<ArcIcon>("DashGlyph");
+        _check = e.NameScope.Find<ArcIcon>("PART_CheckGlyph");
+        _dash = e.NameScope.Find<ArcIcon>("PART_DashGlyph");
         UpdateClasses();
         UpdateAutomation();
     }

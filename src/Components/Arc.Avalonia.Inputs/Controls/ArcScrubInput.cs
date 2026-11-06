@@ -4,6 +4,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -28,7 +29,7 @@ public enum ArcScrubChangeSource
     Reset
 }
 
-public sealed class ArcScrubValueEventArgs : EventArgs
+public sealed class ArcScrubValueEventArgs : RoutedEventArgs
 {
     public ArcScrubValueEventArgs(double value, ArcScrubChangeSource source, string? unit)
     {
@@ -37,9 +38,20 @@ public sealed class ArcScrubValueEventArgs : EventArgs
         Unit = unit;
     }
 
+    /// <summary>Routed payload factory used by <c>ValueChangedRouted</c>.</summary>
+    public ArcScrubValueEventArgs(RoutedEvent routedEvent, double value, ArcScrubChangeSource source, string? unit)
+        : base(routedEvent)
+    {
+        Value = value;
+        Source = source;
+        Unit = unit;
+    }
+
     public double Value { get; }
 
-    public ArcScrubChangeSource Source { get; }
+    /// <summary>Which gesture produced the value. Intentionally hides <see cref="RoutedEventArgs.Source"/>,
+    /// whose meaning here is the originating control.</summary>
+    public new ArcScrubChangeSource Source { get; }
 
     public string? Unit { get; }
 }
@@ -48,6 +60,14 @@ public sealed class ArcScrubValueEventArgs : EventArgs
 /// Arc's scrub input: a compact inspector number field. Drag the label to scrub (Shift is coarse, Alt is
 /// fine), click to type a value with a unit or simple arithmetic, and bounded values show a quiet track.
 /// </summary>
+[TemplatePart("PART_Shell", typeof(Border))]
+[TemplatePart("PART_FillHost", typeof(Panel))]
+[TemplatePart("PART_Handle", typeof(Border))]
+[TemplatePart("PART_TrackFill", typeof(Border))]
+[TemplatePart("PART_Value", typeof(TextBox))]
+[TemplatePart("PART_LabelText", typeof(TextBlock))]
+[TemplatePart("PART_UnitButton", typeof(Button))]
+[TemplatePart("PART_UnitText", typeof(TextBlock))]
 public class ArcScrubInput : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -135,6 +155,16 @@ public class ArcScrubInput : TemplatedControl
 
     /// <summary>Raised for every change, including each scrub step.</summary>
     public event EventHandler<ArcScrubValueEventArgs>? ValueChanged;
+
+    public static readonly RoutedEvent<ArcScrubValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcScrubInput, ArcScrubValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcScrubValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
 
     /// <summary>Raised once a change settles: a scrub release, Enter, blur, a key step or a reset.</summary>
     public event EventHandler<ArcScrubValueEventArgs>? ValueCommitted;
@@ -310,14 +340,14 @@ public class ArcScrubInput : TemplatedControl
             _unitButton.Click -= OnUnitClicked;
         }
 
-        _shell = e.NameScope.Find<Border>("Shell");
-        _fillHost = e.NameScope.Find<Panel>("FillHost");
-        _handle = e.NameScope.Find<Border>("Handle");
-        _trackFill = e.NameScope.Find<Border>("TrackFill");
+        _shell = e.NameScope.Find<Border>("PART_Shell");
+        _fillHost = e.NameScope.Find<Panel>("PART_FillHost");
+        _handle = e.NameScope.Find<Border>("PART_Handle");
+        _trackFill = e.NameScope.Find<Border>("PART_TrackFill");
         _box = e.NameScope.Find<TextBox>("PART_Value");
-        _labelText = e.NameScope.Find<TextBlock>("LabelText");
-        _unitButton = e.NameScope.Find<Button>("UnitButton");
-        _unitText = e.NameScope.Find<TextBlock>("UnitText");
+        _labelText = e.NameScope.Find<TextBlock>("PART_LabelText");
+        _unitButton = e.NameScope.Find<Button>("PART_UnitButton");
+        _unitText = e.NameScope.Find<TextBlock>("PART_UnitText");
         _strain = _shell?.RenderTransform as TranslateTransform;
 
         if (_handle is not null)
@@ -380,6 +410,7 @@ public class ArcScrubInput : TemplatedControl
         UpdateAutomation();
         var args = new ArcScrubValueEventArgs(Value, _lastSource, _activeUnit);
         ValueChanged?.Invoke(this, args);
+        RaiseEvent(new ArcScrubValueEventArgs(ValueChangedEvent, Value, _lastSource, _activeUnit));
     }
 
     private void OnUnitChanged()
@@ -898,6 +929,7 @@ public class ArcScrubInput : TemplatedControl
         {
             SetCurrentValue(ValueProperty, value);
             ValueChanged?.Invoke(this, new ArcScrubValueEventArgs(value, source, _activeUnit));
+            RaiseEvent(new ArcScrubValueEventArgs(ValueChangedEvent, value, source, _activeUnit));
         }
 
         if (commit)

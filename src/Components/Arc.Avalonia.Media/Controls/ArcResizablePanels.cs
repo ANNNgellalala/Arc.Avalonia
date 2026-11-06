@@ -4,6 +4,8 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -240,6 +242,8 @@ public sealed class ArcPanePanel : Panel
 /// collapsed with Enter and reset with a double click. Dividers are real focus stops with an accessible
 /// name that reports the current share.
 /// </summary>
+[TemplatePart("PART_Stage", typeof(ArcPanePanel))]
+[TemplatePart("PART_Status", typeof(TextBlock))]
 public class ArcResizablePanels : TemplatedControl
 {
     public static readonly StyledProperty<IList<ArcResizablePane>?> PanesProperty =
@@ -305,13 +309,23 @@ public class ArcResizablePanels : TemplatedControl
     }
 
     /// <summary>Raised with each pane's share in percent after a resize settles.</summary>
+    public static readonly RoutedEvent<ArcPanelsLayoutChangedRoutedEventArgs> LayoutChangedEvent =
+        RoutedEvent.Register<ArcResizablePanels, ArcPanelsLayoutChangedRoutedEventArgs>("LayoutChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="LayoutChanged"/>.</summary>
+    public event EventHandler<ArcPanelsLayoutChangedRoutedEventArgs>? LayoutChangedRouted
+    {
+        add => AddHandler(LayoutChangedEvent, value);
+        remove => RemoveHandler(LayoutChangedEvent, value);
+    }
+
     public event EventHandler<IReadOnlyList<double>>? LayoutChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
         _stage = e.NameScope.Find<ArcPanePanel>("PART_Stage");
-        _status = e.NameScope.Find<TextBlock>("Status");
+        _status = e.NameScope.Find<TextBlock>("PART_Status");
         Build();
         UpdateAutomation();
     }
@@ -800,6 +814,7 @@ public class ArcResizablePanels : TemplatedControl
             .Select(slot => slot.Collapsed ? 0 : total > 0 ? slot.Share / total * 100 : 0)
             .ToList();
         LayoutChanged?.Invoke(this, shares);
+        RaiseEvent(new ArcPanelsLayoutChangedRoutedEventArgs(LayoutChangedEvent, shares));
     }
 
     private void Announce(string text)
@@ -828,6 +843,8 @@ public class ArcResizablePanels : TemplatedControl
         }
     }
 }
+
+
 
 
 

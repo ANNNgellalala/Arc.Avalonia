@@ -32,7 +32,7 @@
               </Transitions>
             </Border.Transitions>
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" VerticalAlignment="Center">
-              <arc:ArcIcon x:Name="LeadingIcon"
+              <arc:ArcIcon x:Name="PART_LeadingIcon"
                          Grid.Column="0"
                          Size="18"
                          Margin="0,0,10,0"
@@ -53,14 +53,14 @@
                        VerticalContentAlignment="Center"
                        AcceptsReturn="False"
                        TextWrapping="NoWrap" />
-              <arc:ArcIcon x:Name="TrailingIcon"
+              <arc:ArcIcon x:Name="PART_TrailingIcon"
                          Grid.Column="2"
                          Size="18"
                          Margin="10,0,0,0"
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ArcTextMuted}"
                          IsVisible="False" />
-              <Button x:Name="ClearAction"
+              <Button x:Name="PART_ClearAction"
                       Grid.Column="3"
                       Theme="{DynamicResource ArcIconButtonTheme}"
                       Margin="4,0,0,0"
@@ -75,7 +75,7 @@
               </Button>
             </Grid>
           </Border>
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />
@@ -154,12 +154,12 @@
                      TextWrapping="Wrap"
                      VerticalContentAlignment="Top" />
           </Border>
-          <Grid x:Name="MessageRow" ColumnDefinitions="*,Auto" IsVisible="False">
-            <TextBlock x:Name="Message"
+          <Grid x:Name="PART_MessageRow" ColumnDefinitions="*,Auto" IsVisible="False">
+            <TextBlock x:Name="PART_Message"
                        Classes="arc-caption"
                        TextWrapping="Wrap"
                        IsVisible="False" />
-            <TextBlock x:Name="Counter"
+            <TextBlock x:Name="PART_Counter"
                        Grid.Column="1"
                        Classes="arc-caption"
                        Margin="8,0,0,0"
@@ -223,7 +223,7 @@
               </Transitions>
             </Border.Transitions>
             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" VerticalAlignment="Center">
-              <arc:ArcIcon x:Name="LeadingIcon"
+              <arc:ArcIcon x:Name="PART_LeadingIcon"
                          Grid.Column="0"
                          Size="18"
                          Margin="0,0,10,0"
@@ -243,20 +243,20 @@
                        VerticalAlignment="Center"
                        VerticalContentAlignment="Center"
                        AcceptsReturn="False" />
-              <arc:ArcIcon x:Name="TrailingIcon"
+              <arc:ArcIcon x:Name="PART_TrailingIcon"
                          Grid.Column="2"
                          Size="18"
                          Margin="10,0,0,0"
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ArcTextMuted}"
                          IsVisible="False" />
-              <Button x:Name="RevealAction"
+              <Button x:Name="PART_RevealAction"
                       Grid.Column="3"
                       Theme="{DynamicResource ArcIconButtonTheme}"
                       Margin="4,0,0,0">
-                <arc:ArcIcon x:Name="RevealGlyph" Icon="eye" Size="16" Foreground="{DynamicResource ArcTextMuted}" />
+                <arc:ArcIcon x:Name="PART_RevealGlyph" Icon="eye" Size="16" Foreground="{DynamicResource ArcTextMuted}" />
               </Button>
-              <Button x:Name="ClearAction"
+              <Button x:Name="PART_ClearAction"
                       Grid.Column="4"
                       Theme="{DynamicResource ArcIconButtonTheme}"
                       Margin="2,0,0,0"
@@ -272,11 +272,11 @@
             </Grid>
           </Border>
           <StackPanel Spacing="2">
-            <TextBlock x:Name="Message"
+            <TextBlock x:Name="PART_Message"
                        Classes="arc-caption"
                        TextWrapping="Wrap"
                        IsVisible="False" />
-            <TextBlock x:Name="CapsHint"
+            <TextBlock x:Name="PART_CapsHint"
                        Classes="arc-caption"
                        Text="Caps Lock is on"
                        IsVisible="False" />
@@ -368,7 +368,7 @@
                        VerticalContentAlignment="Center"
                        AcceptsReturn="False"
                        TextWrapping="NoWrap" />
-              <Border x:Name="ShortcutPill"
+              <Border x:Name="PART_ShortcutPill"
                       Grid.Column="2"
                       Background="{DynamicResource ArcSurfaceMuted}"
                       CornerRadius="6"
@@ -376,9 +376,9 @@
                       Margin="8,0,4,0"
                       VerticalAlignment="Center"
                       IsVisible="False">
-                <TextBlock x:Name="ShortcutHint" Classes="arc-caption" />
+                <TextBlock x:Name="PART_ShortcutHint" Classes="arc-caption" />
               </Border>
-              <Button x:Name="ClearAction"
+              <Button x:Name="PART_ClearAction"
                       Grid.Column="3"
                       Theme="{DynamicResource ArcIconButtonTheme}"
                       Margin="2,0,0,0"
@@ -393,7 +393,7 @@
               </Button>
             </Grid>
           </Border>
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />

@@ -12,7 +12,7 @@
       <ControlTemplate>
         <StackPanel Spacing="6">
           <Panel>
-            <Border x:Name="Resting"
+            <Border x:Name="PART_Resting"
                     Background="Transparent"
                     CornerRadius="10"
                     Padding="14,10"
@@ -23,7 +23,7 @@
                 </Transitions>
               </Border.Transitions>
               <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                <TextBlock x:Name="RestingText"
+                <TextBlock x:Name="PART_RestingText"
                            TextWrapping="Wrap"
                            VerticalAlignment="Center" />
                 <Panel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
@@ -32,7 +32,7 @@
                                Size="16"
                                IsVisible="False"
                                Foreground="{DynamicResource ArcTextMuted}" />
-                  <arc:ArcIcon x:Name="SavedMark"
+                  <arc:ArcIcon x:Name="PART_SavedMark"
                                Icon="check"
                                Size="16"
                                IsVisible="False"
@@ -49,7 +49,7 @@
                     IsVisible="False"
                     IsHitTestVisible="False" />
 
-            <Border x:Name="Editor"
+            <Border x:Name="PART_EditorShell"
                     MinHeight="44"
                     Padding="14,0"
                     Background="{DynamicResource ArcSurface}"
@@ -78,7 +78,7 @@
                          VerticalAlignment="Center"
                          VerticalContentAlignment="Center"
                          TextWrapping="NoWrap" />
-                <arc:ArcSpinner x:Name="Busy"
+                <arc:ArcSpinner x:Name="PART_Busy"
                                 Grid.Column="1"
                                 Size="16"
                                 StrokeWidth="2"
@@ -86,7 +86,7 @@
                                 IsVisible="False"
                                 Stroke="{DynamicResource ArcAccent}"
                                 VerticalAlignment="Center" />
-                <Button x:Name="SaveButton"
+                <Button x:Name="PART_SaveButton"
                         Grid.Column="2"
                         Theme="{DynamicResource ArcAdvancedIconButton}"
                         AutomationProperties.Name="Save"
@@ -95,7 +95,7 @@
                                Size="16"
                                Foreground="{DynamicResource ArcAccent}" />
                 </Button>
-                <Button x:Name="CancelButton"
+                <Button x:Name="PART_CancelButton"
                         Grid.Column="3"
                         Theme="{DynamicResource ArcAdvancedIconButton}"
                         AutomationProperties.Name="Cancel"
@@ -106,7 +106,7 @@
             </Border>
           </Panel>
 
-          <TextBlock x:Name="Message"
+          <TextBlock x:Name="PART_Message"
                      Classes="arc-caption"
                      TextWrapping="Wrap"
                      IsVisible="False" />
@@ -126,10 +126,10 @@
     <Style Selector="^.editing">
       <Setter Property="Cursor" Value="Ibeam" />
     </Style>
-    <Style Selector="^.editing /template/ Border#Editor">
+    <Style Selector="^.editing /template/ Border#PART_EditorShell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
     </Style>
-    <Style Selector="^.multiline /template/ Border#Editor">
+    <Style Selector="^.multiline /template/ Border#PART_EditorShell">
       <Setter Property="Padding" Value="14,12" />
     </Style>
     <Style Selector="^.multiline /template/ TextBox#PART_Editor">
@@ -137,10 +137,10 @@
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="AcceptsReturn" Value="True" />
     </Style>
-    <Style Selector="^.invalid /template/ Border#Editor">
+    <Style Selector="^.invalid /template/ Border#PART_EditorShell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
-    <Style Selector="^.saving /template/ Border#Editor">
+    <Style Selector="^.saving /template/ Border#PART_EditorShell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcBorderStrong}" />
     </Style>
     <Style Selector="^.disabled">

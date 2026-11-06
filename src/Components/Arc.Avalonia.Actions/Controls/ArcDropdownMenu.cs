@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Arc.Avalonia.Controls;
@@ -14,6 +15,8 @@ namespace Arc.Avalonia.Actions.Controls;
 /// A labelled trigger that opens a focused list of actions, with one highlight gliding between the rows
 /// and a destructive item at the end. The menu is hosted in the page, so it renders without a popup.
 /// </summary>
+[TemplatePart("PART_Trigger", typeof(ArcButton))]
+[TemplatePart("PART_Overlay", typeof(Canvas))]
 public sealed class ArcDropdownMenu : TemplatedControl
 {
     public static readonly StyledProperty<string?> LabelProperty =
@@ -86,8 +89,8 @@ public sealed class ArcDropdownMenu : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _trigger = e.NameScope.Find<ArcButton>("Trigger");
-        _overlay = e.NameScope.Find<Canvas>("Overlay");
+        _trigger = e.NameScope.Find<ArcButton>("PART_Trigger");
+        _overlay = e.NameScope.Find<Canvas>("PART_Overlay");
 
         if (_trigger is not null)
         {

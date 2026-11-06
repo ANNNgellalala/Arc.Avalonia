@@ -5,7 +5,7 @@
   <ControlTheme x:Key="{x:Type c:ArcChipGroup}" TargetType="c:ArcChipGroup">
     <Setter Property="Template">
       <ControlTemplate>
-        <WrapPanel x:Name="ChipPanel" Orientation="Horizontal" />
+        <WrapPanel x:Name="PART_ChipPanel" Orientation="Horizontal" />
       </ControlTemplate>
     </Setter>
     <Style Selector="^.disabled">

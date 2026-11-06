@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -70,6 +71,11 @@ public sealed class PresenceMember
 /// roster instead. <see cref="Fanned"/> exposes the hover state for an always-visible header or a
 /// still image, where a real pointer hover cannot be simulated.
 /// </remarks>
+[TemplatePart("PART_Stage", typeof(Panel))]
+[TemplatePart("PART_Faces", typeof(Canvas))]
+[TemplatePart("PART_Dots", typeof(Canvas))]
+[TemplatePart("PART_Labels", typeof(Canvas))]
+[TemplatePart("PART_Others", typeof(TextBlock))]
 public class ArcPresenceStack : TemplatedControl
 {
     public static readonly StyledProperty<IList<PresenceMember>?> MembersProperty =
