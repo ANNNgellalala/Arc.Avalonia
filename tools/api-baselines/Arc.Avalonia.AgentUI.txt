@@ -20,6 +20,7 @@
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentTranscript[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision[]
+  ctor Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String entryId]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAttentionItem[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcBackgroundRunDock[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcRunControlBar[]
@@ -49,6 +50,8 @@
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRunStopRoutedEventArgs> StopRequestedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRunTakeoverRoutedEventArgs> TakeoverRequestedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision> ApproveRequested
+  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> DismissedRouted
+  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> ItemActionRequestedRouted
   event System.EventHandler<System.String> DenyRequested
   event System.EventHandler<System.String> Dismissed
   event System.EventHandler<System.String> ItemActionRequested
@@ -122,6 +125,8 @@
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunSteerRoutedEventArgs> SteerRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunStopRoutedEventArgs> StopRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunTakeoverRoutedEventArgs> TakeoverRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> DismissedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> ItemActionRequestedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcAgentAskState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus> StatusProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk> RiskProperty
@@ -213,6 +218,7 @@
   property System.String Detail {get;set}
   property System.String EmptyText {get;set}
   property System.String EmptyText {get;set}
+  property System.String EntryId {get}
   property System.String FreeText {get;set}
   property System.String Icon {get;set}
   property System.String Id {get;set}
@@ -270,4 +276,5 @@ type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRunStopRoutedEventArgs : Avalo
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRunTakeoverRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument
 type sealed Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision
+type sealed Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAttentionItem

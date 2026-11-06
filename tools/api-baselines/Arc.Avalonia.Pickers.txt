@@ -8,9 +8,15 @@
   ctor Arc.Avalonia.Pickers.Controls.ArcAvatarCropSurface[]
   ctor Arc.Avalonia.Pickers.Controls.ArcAvatarRing[]
   ctor Arc.Avalonia.Pickers.Controls.ArcAvatarUpload[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcAvatarUploadFailedEventArgs[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcAvatarUploadFailedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Pickers.Controls.ArcAvatarUploadUploadedEventArgs[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcAvatarUploadUploadedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Pickers.Controls.ArcCalendar[]
   ctor Arc.Avalonia.Pickers.Controls.ArcCalendarDateChangedEventArgs[]
   ctor Arc.Avalonia.Pickers.Controls.ArcCalendarDateChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Pickers.Controls.ArcCalendarDisplayMonthChangedEventArgs[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcCalendarDisplayMonthChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Pickers.Controls.ArcCalendarSurface[]
   ctor Arc.Avalonia.Pickers.Controls.ArcColorArea[]
   ctor Arc.Avalonia.Pickers.Controls.ArcColorEditor[]
@@ -43,6 +49,8 @@
   ctor Arc.Avalonia.Pickers.Controls.ArcInkStroke[]
   ctor Arc.Avalonia.Pickers.Controls.ArcInkStroke[Arc.Avalonia.Pickers.Controls.ArcInkColor color, System.Collections.Generic.IEnumerable<Arc.Avalonia.Pickers.Controls.ArcInkPoint> points]
   ctor Arc.Avalonia.Pickers.Controls.ArcSignaturePad[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcSignaturePadPngSavedEventArgs[]
+  ctor Arc.Avalonia.Pickers.Controls.ArcSignaturePadPngSavedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Pickers.Controls.ArcSignatureSurface[]
   ctor Arc.Avalonia.Pickers.Controls.ArcStrokesChangedEventArgs[]
   ctor Arc.Avalonia.Pickers.Controls.ArcStrokesChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
@@ -61,7 +69,10 @@
   event System.EventHandler ViewChanged
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcAvatarCropEventArgs> CropConfirmed
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcAvatarCropEventArgs> CropConfirmedRouted
+  event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcAvatarUploadFailedEventArgs> FailedRouted
+  event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcAvatarUploadUploadedEventArgs> UploadedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcCalendarDateChangedEventArgs> SelectedDateChangedRouted
+  event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcCalendarDisplayMonthChangedEventArgs> DisplayMonthChangedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcColorValueChangedEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcColorValueChangedEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcDatePickerSelectedEventArgs> SelectedDateChangedRouted
@@ -70,6 +81,7 @@
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcEmojiSelectedEventArgs> SelectedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcEmojiSelection> Selected
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcFilesChangedEventArgs> FilesChangedRouted
+  event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcSignaturePadPngSavedEventArgs> PngSavedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcStrokesChangedEventArgs> StrokesChangedRouted
   event System.EventHandler<Arc.Avalonia.Pickers.Controls.ArcTimePickerChangedEventArgs> TimeChangedRouted
   event System.EventHandler<Avalonia.Media.Color> ValueChanged
@@ -128,13 +140,17 @@
   field static Arc.Avalonia.Pickers.Controls.ArcTimeFormat TwelveHour
   field static Arc.Avalonia.Pickers.Controls.ArcTimeFormat TwentyFourHour
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcAvatarCropEventArgs> CropConfirmedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcAvatarUploadFailedEventArgs> FailedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcAvatarUploadUploadedEventArgs> UploadedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcCalendarDateChangedEventArgs> SelectedDateChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcCalendarDisplayMonthChangedEventArgs> DisplayMonthChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcColorValueChangedEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcColorValueChangedEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcDatePickerSelectedEventArgs> SelectedDateChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcDateRangeChangedEventArgs> RangeChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcEmojiSelectedEventArgs> SelectedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcFilesChangedEventArgs> FilesChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcSignaturePadPngSavedEventArgs> PngSavedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcStrokesChangedEventArgs> StrokesChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Pickers.Controls.ArcTimePickerChangedEventArgs> TimeChangedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Pickers.Controls.ArcAvatarShape> ShapeProperty
@@ -435,6 +451,7 @@
   property System.DateTime Date {get;set}
   property System.DateTime End {get;set}
   property System.DateTime Month {get;set}
+  property System.DateTime Month {get;set}
   property System.DateTime Start {get;set}
   property System.DayOfWeek WeekStartsOn {get;set}
   property System.DayOfWeek WeekStartsOn {get;set}
@@ -533,12 +550,14 @@
   property System.String Label {get;set}
   property System.String Label {get;set}
   property System.String Label {get;set}
+  property System.String Message {get;set}
   property System.String Name {get;set}
   property System.String Name {get;set}
   property System.String Name {get}
   property System.String Name {get}
   property System.String Name {get}
   property System.String Note {get;set}
+  property System.String Path {get;set}
   property System.String Placeholder {get;set}
   property System.String Search {get}
   property System.String SearchPlaceholder {get;set}
@@ -546,6 +565,7 @@
   property System.String SelectedEmoji {get;set}
   property System.String Signer {get;set}
   property System.String Signer {get;set}
+  property System.String Url {get;set}
   property System.TimeSpan Time {get;set}
   property System.Uri BaseUri {get;set}
 type abstract Arc.Avalonia.Pickers.Controls.ArcPickerBase : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
@@ -577,7 +597,10 @@ type enum Arc.Avalonia.Pickers.Controls.ArcTimeFormat : System.IComparable, Syst
 type sealed Arc.Avalonia.Pickers.Controls.ArcAvatarCropEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcAvatarCropSurface : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Pickers.Controls.ArcAvatarRing : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type sealed Arc.Avalonia.Pickers.Controls.ArcAvatarUploadFailedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Pickers.Controls.ArcAvatarUploadUploadedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcCalendarDateChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Pickers.Controls.ArcCalendarDisplayMonthChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcCalendarSurface : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Pickers.Controls.ArcColorArea : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Pickers.Controls.ArcColorRamp : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
@@ -596,6 +619,7 @@ type sealed Arc.Avalonia.Pickers.Controls.ArcEmojiToneOption
 type sealed Arc.Avalonia.Pickers.Controls.ArcFileDropzoneItem
 type sealed Arc.Avalonia.Pickers.Controls.ArcFilesChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcInkStroke
+type sealed Arc.Avalonia.Pickers.Controls.ArcSignaturePadPngSavedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcSignatureSurface : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Pickers.Controls.ArcStrokesChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Pickers.Controls.ArcTimePickerChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs

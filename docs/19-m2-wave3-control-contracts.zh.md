@@ -59,13 +59,27 @@
 
 ### 3.4 契约门禁 R10
 
-* `tools/check-contracts.ps1`（228 文件）：`missing-templatepart`、`undeclared-part`、`routedevent-no-wrapper`（两分支命名）、`routedevent-args-base`；`legacy-event-missing-routed` 仅统计（exempt=30，见 §4-1）。
+* `tools/check-contracts.ps1`（230 文件）：`missing-templatepart`、`undeclared-part`、`routedevent-no-wrapper`（两分支命名）、`routedevent-args-base`；`legacy-event-missing-routed` 只统计**可路由类型**（见 §5）。
 * `-Baseline`/`-UpdateBaseline` + `tools/contracts-baseline.json`：本波结束时 **allow=[]**（过渡基线清空，不留"为绿而绿"的豁免）。
 * 已接入 `check-all` 为第 9 道门禁，输出 `green=9/9`。
 
 ## 4. 遗留（进后续波次）
 
-1. **30 个 legacy 事件仍无路由对应物**（R10 以 exempt 统计）：Pickers 14（cropper/upload/color swatches/signature 等长尾）、Effects 4、AgentUI dock/attention 长尾、其余分散在各库；下波按"业务驱动优先"补齐。
+1. ~~**30 个 legacy 事件仍无路由对应物**~~ → **已清零**，见 §5（可路由 legacy 事件 99/99 有路由对应物）。
+2. **无运行时断言**：本轮只做编译/静态门禁 + 渲染抽检，`Verify` 仍 140（未加路由事件冒泡断言）。M3 的测试基线（G3f，24 人日）里补"`RaiseEvent` 冒泡到父容器"的头less 断言。
+3. **`*Size` 枚举统一、`ItemsSource` 迁移、公开面收敛**（C1 剩余部分）未做，仍是 M2 收尾工作。
+4. **键盘/焦点契约文档**已产出（docs/18 + ADR 0005），但无 `AutomationPeer`/`AutomationId`/`TabIndex`（M3 G3d 15 人日）。
+5. **Charts**：Gauge/Sparkline/Ridgeline/Slope/AnimatedCounter 暂无 raise（绘制无可点区域）、键盘激活未发路由事件。
+6. **l10n 最小集（G3d 6 人日）** 已有可执行清单（`docs/analysis/18-l10n-keyboard-rtl-audit.zh.md`：9 文件 / 63 串 / `ArcDateMath` en-US 写死 ≈0.5 人日），可下一波直接开工。
+
+## 5. 补丁：长尾路由事件清零（同日）
+
+R10 首次基线里的 30 条 `legacy-event-missing-routed` 分两类处理：
+
+1. **24 条可路由**（`Interactive` 派生控件）→ 全部补齐，additive 双通知不变：Agent 10（ApprovalTray/Composer/Surface/ToolCallCard/AttentionInbox）、Inputs 6（MentionInput/RangeHistogramSlider/ScrubInput/ShortcutRecorder）、Pickers 4（AvatarUpload×2/Calendar/SignaturePad）、Effects 3（AnnouncementBar×2/CookieConsent）+ Media 1（ScrollArea）。新增 args 复用优先（如 `ArcAnnouncementRoutedEventArgs` 被两个事件共用）。
+2. **6 条不可路由**（非 `Interactive` 的服务/模型/协调器类）→ 不改代码，改门禁口径：`ArcDeltaCoalescer.Flush`、`ArcAgentWorkspace.Changed`、`ArcAgentSessionModel.Changed`、`ArcNavigationService.Changed`、`ArcNotificationService.Shown/Dismissed` 计入新指标 `nonRoutableEvents`（只统计，不计 exempt/red）。R10 现在沿源码继承链（含 partial 合并）判定可路由性；ADR 0005 §4 记录"RoutedEvent 只适用于 `Interactive` 派生类"。
+
+**收尾实测**：`TemplatedControls=108 / WithTemplatePart=108 / RoutedEventFields=139 / WithWrapper=139 / LegacyEventsWithRouted=99 / LegacyEventsMissingRouted=0 / NonRoutableEvents=6 / MissingTemplatePart=0 / allow=[]`；`check-all` 9/9 GREEN、`VERIFY` 140、audit 294/294、smoke 320、pack 31 包、`check-package` 31/31、`check-public-api` 31/31 MATCH（新增 24 个 `XxxEvent` + 24 个 `XxxRouted` + args）。
 2. **无运行时断言**：本轮只做编译/静态门禁 + 渲染抽检，`Verify` 仍 140（未加路由事件冒泡断言）。M3 的测试基线（G3f，24 人日）里补"`RaiseEvent` 冒泡到父容器"的头less 断言。
 3. **`*Size` 枚举统一、`ItemsSource` 迁移、公开面收敛**（C1 剩余部分）未做，仍是 M2 收尾工作。
 4. **键盘/焦点契约文档**已产出（docs/18 + ADR 0005），但无 `AutomationPeer`/`AutomationId`/`TabIndex`（M3 G3d 15 人日）。

@@ -159,6 +159,23 @@ public class ArcCalendar : TemplatedControl
 
     public event EventHandler<DateTime>? DisplayMonthChanged;
 
+    /// <summary>Bubbled copy of <see cref="DisplayMonthChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcCalendarDisplayMonthChangedEventArgs> DisplayMonthChangedEvent =
+        RoutedEvent.Register<ArcCalendar, ArcCalendarDisplayMonthChangedEventArgs>("DisplayMonthChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="DisplayMonthChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcCalendarDisplayMonthChangedEventArgs>? DisplayMonthChangedRouted
+    {
+        add => AddHandler(DisplayMonthChangedEvent, value);
+        remove => RemoveHandler(DisplayMonthChangedEvent, value);
+    }
+
+    private void RaiseDisplayMonthChanged(DateTime month)
+    {
+        DisplayMonthChanged?.Invoke(this, month);
+        RaiseEvent(new ArcCalendarDisplayMonthChangedEventArgs(DisplayMonthChangedEvent) { Month = month });
+    }
+
     /// <summary>Raised while the pointer moves across days, used for a live range preview.</summary>
     internal event EventHandler<DateTime?>? HoverDateChanged;
 
@@ -387,7 +404,7 @@ public class ArcCalendar : TemplatedControl
         }
 
         DisplayMonth = normalized;
-        DisplayMonthChanged?.Invoke(this, normalized);
+        RaiseDisplayMonthChanged(normalized);
     }
 
     private void OnPreviousClick(object? sender, RoutedEventArgs e) => SetMonth(CurrentMonth.AddMonths(-1));

@@ -205,8 +205,28 @@ public class ArcMentionInput : TemplatedControl
     /// <summary>Raised on every edit with the text and the mentions moved to match it.</summary>
     public event EventHandler<ArcMentionValueEventArgs>? ValueChanged;
 
+    public static readonly RoutedEvent<ArcMentionValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcMentionInput, ArcMentionValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcMentionValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
     /// <summary>Raised when a suggestion becomes a mention.</summary>
     public event EventHandler<ArcMentionValueEventArgs>? MentionAdded;
+
+    public static readonly RoutedEvent<ArcMentionValueEventArgs> MentionAddedEvent =
+        RoutedEvent.Register<ArcMentionInput, ArcMentionValueEventArgs>("MentionAdded", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="MentionAdded"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcMentionValueEventArgs>? MentionAddedRouted
+    {
+        add => AddHandler(MentionAddedEvent, value);
+        remove => RemoveHandler(MentionAddedEvent, value);
+    }
 
     /// <summary>Raised on Enter when <see cref="SubmitOnEnter"/> is set and the text is not blank.</summary>
     public event EventHandler<ArcMentionValueEventArgs>? Submitted;
@@ -495,11 +515,23 @@ public class ArcMentionInput : TemplatedControl
         EmitChange();
     }
 
+    private void RaiseValueChanged(ArcMentionValue value)
+    {
+        ValueChanged?.Invoke(this, new ArcMentionValueEventArgs(value));
+        RaiseEvent(new ArcMentionValueEventArgs(ValueChangedEvent, value));
+    }
+
+    private void RaiseMentionAdded(ArcMentionValue value)
+    {
+        MentionAdded?.Invoke(this, new ArcMentionValueEventArgs(value));
+        RaiseEvent(new ArcMentionValueEventArgs(MentionAddedEvent, value));
+    }
+
     private void EmitChange()
     {
         var value = new ArcMentionValue(_text, _mentions.ToList());
         SetCurrentValue(ValueProperty, value);
-        ValueChanged?.Invoke(this, new ArcMentionValueEventArgs(value));
+        RaiseValueChanged(value);
         UpdateAutomation();
     }
 
@@ -857,8 +889,8 @@ public class ArcMentionInput : TemplatedControl
         UpdateMirror();
         var value = new ArcMentionValue(_text, _mentions.ToList());
         SetCurrentValue(ValueProperty, value);
-        ValueChanged?.Invoke(this, new ArcMentionValueEventArgs(value));
-        MentionAdded?.Invoke(this, new ArcMentionValueEventArgs(value));
+        RaiseValueChanged(value);
+        RaiseMentionAdded(value);
     }
 
     private void MoveSuggestion(int delta)

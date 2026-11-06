@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Arc.Avalonia.AgentUI.Controls;
@@ -172,12 +173,32 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
     }
 
     /// <summary>Raised with every command sent to the host (also available through <see cref="CommandRaised"/>).</summary>
+    public static readonly RoutedEvent<ArcAgentCommandRoutedEventArgs> CommandRequestedEvent =
+        RoutedEvent.Register<ArcAgentSurface, ArcAgentCommandRoutedEventArgs>("CommandRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CommandRequested"/>.</summary>
+    public event EventHandler<ArcAgentCommandRoutedEventArgs>? CommandRequestedRouted
+    {
+        add => AddHandler(CommandRequestedEvent, value);
+        remove => RemoveHandler(CommandRequestedEvent, value);
+    }
+
     public event EventHandler<ArcAgentCommand>? CommandRequested;
 
     /// <summary>The command sink leaf controls can use; the surface itself implements it.</summary>
     public IArcAgentCommandSink Commands => this;
 
     /// <inheritdoc />
+    public static readonly RoutedEvent<ArcAgentCommandRoutedEventArgs> CommandRaisedEvent =
+        RoutedEvent.Register<ArcAgentSurface, ArcAgentCommandRoutedEventArgs>("CommandRaised", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="CommandRaised"/>.</summary>
+    public event EventHandler<ArcAgentCommandRoutedEventArgs>? CommandRaisedRouted
+    {
+        add => AddHandler(CommandRaisedEvent, value);
+        remove => RemoveHandler(CommandRaisedEvent, value);
+    }
+
     public event EventHandler<ArcAgentCommand>? CommandRaised;
 
     /// <summary>Attaches a workspace, transport and optional services in one call.</summary>
@@ -207,7 +228,9 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
     public async Task SendAsync(ArcAgentCommand command, CancellationToken cancellationToken = default)
     {
         CommandRaised?.Invoke(this, command);
+        RaiseEvent(new ArcAgentCommandRoutedEventArgs(CommandRaisedEvent, command));
         CommandRequested?.Invoke(this, command);
+        RaiseEvent(new ArcAgentCommandRoutedEventArgs(CommandRequestedEvent, command));
         if (_transport is not null)
         {
             await _transport.SendCommandAsync(command, cancellationToken).ConfigureAwait(false);
@@ -525,5 +548,7 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
         }
     }
 }
+
+
 
 

@@ -37,6 +37,7 @@
   ctor Arc.Avalonia.Media.Controls.ArcResizablePanels[]
   ctor Arc.Avalonia.Media.Controls.ArcScrollArea[]
   ctor Arc.Avalonia.Media.Controls.ArcScrollAreaEdges[System.Boolean Top, System.Boolean Bottom, System.Boolean Left, System.Boolean Right]
+  ctor Arc.Avalonia.Media.Controls.ArcScrollAreaEdgesChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Media.Controls.ArcScrollAreaEdges edges]
   ctor Arc.Avalonia.Media.Controls.ArcScrollOverlay[]
   ctor Arc.Avalonia.Media.Controls.ArcStackResetRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Media.Controls.ArcSwipeAction[]
@@ -61,6 +62,7 @@
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcReactionsChangedEventArgs> ValueChanged
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcReactionsValueChangedRoutedEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcScrollAreaEdges> EdgeChanged
+  event System.EventHandler<Arc.Avalonia.Media.Controls.ArcScrollAreaEdgesChangedRoutedEventArgs> EdgeChangedRouted
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcStackResetRoutedEventArgs> StackResetRouted
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcSwipeAction> ActionInvoked
   event System.EventHandler<Arc.Avalonia.Media.Controls.ArcSwipeActionInvokedRoutedEventArgs> ActionInvokedRouted
@@ -93,6 +95,7 @@
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcImageComparePositionChangedRoutedEventArgs> PositionChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcPanelsLayoutChangedRoutedEventArgs> LayoutChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcReactionsValueChangedRoutedEventArgs> ValueChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcScrollAreaEdgesChangedRoutedEventArgs> EdgeChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcStackResetRoutedEventArgs> StackResetEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Media.Controls.ArcSwipeActionInvokedRoutedEventArgs> ActionInvokedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Media.Controls.ArcHoldToConfirmTone> ToneProperty
@@ -233,6 +236,7 @@
   property Arc.Avalonia.Media.Controls.ArcPanelOrientation Orientation {get;set}
   property Arc.Avalonia.Media.Controls.ArcReactionChange Change {get}
   property Arc.Avalonia.Media.Controls.ArcReactionChange Change {get}
+  property Arc.Avalonia.Media.Controls.ArcScrollAreaEdges Edges {get}
   property Arc.Avalonia.Media.Controls.ArcScrollAreaEdges Edges {get}
   property Arc.Avalonia.Media.Controls.ArcScrollbarsMode Scrollbars {get;set}
   property Arc.Avalonia.Media.Controls.ArcScrollOrientation Orientation {get;set}
@@ -399,6 +403,7 @@ type sealed Arc.Avalonia.Media.Controls.ArcReactionPill : Avalonia.Controls.Butt
 type sealed Arc.Avalonia.Media.Controls.ArcReactionsChangedEventArgs : System.EventArgs
 type sealed Arc.Avalonia.Media.Controls.ArcReactionsValueChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Media.Controls.ArcResizablePane
+type sealed Arc.Avalonia.Media.Controls.ArcScrollAreaEdgesChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Media.Controls.ArcScrollOverlay : Avalonia.Controls.Control, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type sealed Arc.Avalonia.Media.Controls.ArcStackResetRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Media.Controls.ArcSwipeAction

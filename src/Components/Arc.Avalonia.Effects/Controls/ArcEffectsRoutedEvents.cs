@@ -76,3 +76,37 @@ public sealed class ArcAnnouncementBarOpenChangedEventArgs : RoutedEventArgs
     /// <summary>True when the bar is open.</summary>
     public bool IsOpen { get; init; }
 }
+
+/// <summary>
+/// Payload for the bubbled <see cref="ArcAnnouncementBar.ActionInvokedRouted"/> and
+/// <see cref="ArcAnnouncementBar.CountdownEndedRouted"/> events. Both notifications carry the same
+/// <see cref="ArcAnnouncement"/>, so one args type is shared instead of duplicating the shape.
+/// </summary>
+public sealed class ArcAnnouncementRoutedEventArgs : RoutedEventArgs
+{
+    public ArcAnnouncementRoutedEventArgs()
+    {
+    }
+
+    public ArcAnnouncementRoutedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The announcement the bar acted on.</summary>
+    public ArcAnnouncement? Announcement { get; init; }
+}
+
+/// <summary>Payload for the bubbled <see cref="ArcCookieConsent.PreferencesOpenChangedRouted"/> event.</summary>
+public sealed class ArcOpenChangedRoutedEventArgs : RoutedEventArgs
+{
+    public ArcOpenChangedRoutedEventArgs()
+    {
+    }
+
+    public ArcOpenChangedRoutedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>True when the preferences panel is open.</summary>
+    public bool IsOpen { get; init; }
+}

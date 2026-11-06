@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Arc.Avalonia.AgentUI.Controls;
 using Arc.Avalonia.Controls;
@@ -60,6 +61,16 @@ public class ArcAgentApprovalTray : Panel
     }
 
     /// <summary>Raised when the person makes a decision; the host enforces it.</summary>
+    public static readonly RoutedEvent<ArcAgentDecisionRoutedEventArgs> DecisionRequestedEvent =
+        RoutedEvent.Register<ArcAgentApprovalTray, ArcAgentDecisionRoutedEventArgs>("DecisionRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DecisionRequested"/>.</summary>
+    public event EventHandler<ArcAgentDecisionRoutedEventArgs>? DecisionRequestedRouted
+    {
+        add => AddHandler(DecisionRequestedEvent, value);
+        remove => RemoveHandler(DecisionRequestedEvent, value);
+    }
+
     public event EventHandler<Arc.Avalonia.Agent.ArcApprovalDecision>? DecisionRequested;
 
     private void OnQueueChanged(object? sender, EventArgs e) => Refresh();
@@ -102,7 +113,7 @@ public class ArcAgentApprovalTray : Panel
         _sheet.ApproveRequested += (_, decision) =>
         {
             _queue?.MarkSubmitting(request.RequestId);
-            DecisionRequested?.Invoke(this, new Arc.Avalonia.Agent.ArcApprovalDecision(
+            RaiseDecision(new Arc.Avalonia.Agent.ArcApprovalDecision(
                 request.RequestId,
                 Approved: true,
                 Scope: MapScope(decision.Scope),
@@ -113,15 +124,21 @@ public class ArcAgentApprovalTray : Panel
         _sheet.DenyRequested += (_, reason) =>
         {
             _queue?.MarkSubmitting(request.RequestId);
-            DecisionRequested?.Invoke(this, new Arc.Avalonia.Agent.ArcApprovalDecision(request.RequestId, Approved: false, DenyReason: reason));
+            RaiseDecision(new Arc.Avalonia.Agent.ArcApprovalDecision(request.RequestId, Approved: false, DenyReason: reason));
         };
         _sheet.DelegateRequested += (_, _) =>
         {
             _queue?.MarkSubmitting(request.RequestId);
-            DecisionRequested?.Invoke(this, new Arc.Avalonia.Agent.ArcApprovalDecision(request.RequestId, Approved: false, DelegateTo: "host"));
+            RaiseDecision(new Arc.Avalonia.Agent.ArcApprovalDecision(request.RequestId, Approved: false, DelegateTo: "host"));
         };
 
         _root.Children.Add(_sheet);
+    }
+
+    private void RaiseDecision(Arc.Avalonia.Agent.ArcApprovalDecision decision)
+    {
+        DecisionRequested?.Invoke(this, decision);
+        RaiseEvent(new ArcAgentDecisionRoutedEventArgs(DecisionRequestedEvent, decision));
     }
 
     private static AgentApprovalRisk MapRisk(ArcRiskLevel risk) => risk switch
@@ -139,4 +156,6 @@ public class ArcAgentApprovalTray : Panel
         _ => ArcApprovalScope.Once
     };
 }
+
+
 

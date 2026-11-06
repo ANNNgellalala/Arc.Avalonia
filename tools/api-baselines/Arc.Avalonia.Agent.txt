@@ -3,7 +3,9 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.Agent.ArcAgentApprovalTray[]
+  ctor Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Agent.ArcAgentCommand command]
   ctor Arc.Avalonia.Agent.ArcAgentComposer[]
+  ctor Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Agent.ArcApprovalDecision decision]
   ctor Arc.Avalonia.Agent.ArcAgentEventBatch[System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentEvent> Events]
   ctor Arc.Avalonia.Agent.ArcAgentItemViewRegistry[System.Boolean includeDefaults]
   ctor Arc.Avalonia.Agent.ArcAgentMessage[]
@@ -15,6 +17,7 @@
   ctor Arc.Avalonia.Agent.ArcAgentStep[]
   ctor Arc.Avalonia.Agent.ArcAgentStreamingText[]
   ctor Arc.Avalonia.Agent.ArcAgentSurface[]
+  ctor Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String callId]
   ctor Arc.Avalonia.Agent.ArcAgentToolCallCard[]
   ctor Arc.Avalonia.Agent.ArcAgentTurnRequest[System.String Text, System.String Model, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAttachment> Attachments]
   ctor Arc.Avalonia.Agent.ArcAgentWorkspace[]
@@ -35,6 +38,7 @@
   ctor Arc.Avalonia.Agent.ArcAttentionQueue[]
   ctor Arc.Avalonia.Agent.ArcAttentionRaisedEvent[Arc.Avalonia.Agent.ArcEventStamp Stamp, System.DateTimeOffset At, Arc.Avalonia.Agent.ArcAttentionEntry Entry]
   ctor Arc.Avalonia.Agent.ArcComposerSubmit[System.String Text, System.String Model]
+  ctor Arc.Avalonia.Agent.ArcComposerSubmitRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Agent.ArcComposerSubmit submit]
   ctor Arc.Avalonia.Agent.ArcCustomEvent[Arc.Avalonia.Agent.ArcEventStamp Stamp, System.DateTimeOffset At, System.String Kind, System.String Payload]
   ctor Arc.Avalonia.Agent.ArcDeltaCoalescer[Arc.Avalonia.Agent.IArcUiDispatcher dispatcher, System.Int32 maxBatchSize]
   ctor Arc.Avalonia.Agent.ArcEventStamp[System.String RunId, System.Int64 Sequence, System.String EventId]
@@ -71,12 +75,20 @@
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRaised
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRaised
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRequested
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRaisedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs> DecisionRequestedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentEventBatch> Flush
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentSessionChangedEventArgs> Changed
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> ApproveRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DenyRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DetailsRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> RetryRequestedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentWorkspaceChangedEventArgs> Changed
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentWorkspaceChangedEventArgs> Changed
   event System.EventHandler<Arc.Avalonia.Agent.ArcApprovalDecision> DecisionRequested
   event System.EventHandler<Arc.Avalonia.Agent.ArcComposerSubmit> SubmitRequested
+  event System.EventHandler<Arc.Avalonia.Agent.ArcComposerSubmitRoutedEventArgs> SubmitRequestedRouted
   event System.EventHandler<System.String> ApproveRequested
   event System.EventHandler<System.String> DenyRequested
   event System.EventHandler<System.String> DetailsRequested
@@ -178,6 +190,14 @@
   field static Arc.Avalonia.Agent.ArcToolCallStatus Pending
   field static Arc.Avalonia.Agent.ArcToolCallStatus Running
   field static Arc.Avalonia.Agent.ArcToolCallStatus Succeeded
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRaisedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs> DecisionRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> ApproveRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DenyRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DetailsRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> RetryRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcComposerSubmitRoutedEventArgs> SubmitRequestedEvent
   method Arc.Avalonia.Agent.ArcAgentCommand <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentEvent <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentEventBatch <Clone>$[]
@@ -585,6 +605,7 @@
   method System.Void Upsert[Arc.Avalonia.Agent.ArcAttentionEntry entry]
   property Arc.Avalonia.Agent.ArcAgentChangeKind Kind {get}
   property Arc.Avalonia.Agent.ArcAgentChangeKind Kind {get}
+  property Arc.Avalonia.Agent.ArcAgentCommand Command {get}
   property Arc.Avalonia.Agent.ArcAgentEvent Event {get}
   property Arc.Avalonia.Agent.ArcAgentEvent Event {get}
   property Arc.Avalonia.Agent.ArcAgentEventKind EventKind {get}
@@ -620,6 +641,7 @@
   property Arc.Avalonia.Agent.ArcAgentSessionSnapshot Snapshot {get;set}
   property Arc.Avalonia.Agent.ArcApplyResult Result {get}
   property Arc.Avalonia.Agent.ArcApprovalDecision Decision {get;set}
+  property Arc.Avalonia.Agent.ArcApprovalDecision Decision {get}
   property Arc.Avalonia.Agent.ArcApprovalQueue Approvals {get}
   property Arc.Avalonia.Agent.ArcApprovalQueue Approvals {get}
   property Arc.Avalonia.Agent.ArcApprovalQueue Queue {get;set}
@@ -638,6 +660,7 @@
   property Arc.Avalonia.Agent.ArcAttentionQueue Attention {get}
   property Arc.Avalonia.Agent.ArcAttentionQueue Attention {get}
   property Arc.Avalonia.Agent.ArcAttentionState State {get;set}
+  property Arc.Avalonia.Agent.ArcComposerSubmit Submit {get}
   property Arc.Avalonia.Agent.ArcEventStamp Stamp {get;set}
   property Arc.Avalonia.Agent.ArcMessageStatus Status {get;set}
   property Arc.Avalonia.Agent.ArcMessageStatus Status {get;set}
@@ -723,6 +746,7 @@
   property System.String CallId {get;set}
   property System.String CallId {get;set}
   property System.String CallId {get;set}
+  property System.String CallId {get}
   property System.String CurrentStep {get}
   property System.String DelegateTo {get;set}
   property System.String Delta {get;set}
@@ -823,6 +847,8 @@ type interface Arc.Avalonia.Agent.IArcAgentSession
 type interface Arc.Avalonia.Agent.IArcAgentTransport
 type interface Arc.Avalonia.Agent.IArcAgentWorkspace
 type interface Arc.Avalonia.Agent.IArcUiDispatcher
+type sealed Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentEventBatch : System.IEquatable<Arc.Avalonia.Agent.ArcAgentEventBatch>
 type sealed Arc.Avalonia.Agent.ArcAgentItemViewRegistry : Arc.Avalonia.Agent.IArcAgentItemViewRegistry
 type sealed Arc.Avalonia.Agent.ArcAgentMessage
@@ -831,6 +857,7 @@ type sealed Arc.Avalonia.Agent.ArcAgentRunState
 type sealed Arc.Avalonia.Agent.ArcAgentSessionChangedEventArgs : System.EventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentSessionSnapshot
 type sealed Arc.Avalonia.Agent.ArcAgentStep
+type sealed Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentTurnRequest : System.IEquatable<Arc.Avalonia.Agent.ArcAgentTurnRequest>
 type sealed Arc.Avalonia.Agent.ArcAgentWorkspace : Arc.Avalonia.Agent.IArcAgentWorkspace
 type sealed Arc.Avalonia.Agent.ArcAgentWorkspaceChangedEventArgs : System.EventArgs
@@ -850,6 +877,7 @@ type sealed Arc.Avalonia.Agent.ArcAttentionEntry
 type sealed Arc.Avalonia.Agent.ArcAttentionQueue
 type sealed Arc.Avalonia.Agent.ArcAttentionRaisedEvent : Arc.Avalonia.Agent.ArcAgentEvent, System.IEquatable<Arc.Avalonia.Agent.ArcAgentEvent>, System.IEquatable<Arc.Avalonia.Agent.ArcAttentionRaisedEvent>
 type sealed Arc.Avalonia.Agent.ArcComposerSubmit : System.IEquatable<Arc.Avalonia.Agent.ArcComposerSubmit>
+type sealed Arc.Avalonia.Agent.ArcComposerSubmitRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Agent.ArcCustomEvent : Arc.Avalonia.Agent.ArcAgentEvent, System.IEquatable<Arc.Avalonia.Agent.ArcAgentEvent>, System.IEquatable<Arc.Avalonia.Agent.ArcCustomEvent>
 type sealed Arc.Avalonia.Agent.ArcDeltaCoalescer
 type sealed Arc.Avalonia.Agent.ArcMessageDeltaEvent : Arc.Avalonia.Agent.ArcAgentEvent, System.IEquatable<Arc.Avalonia.Agent.ArcAgentEvent>, System.IEquatable<Arc.Avalonia.Agent.ArcMessageDeltaEvent>

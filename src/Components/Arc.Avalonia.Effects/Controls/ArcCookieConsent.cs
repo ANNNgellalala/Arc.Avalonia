@@ -118,7 +118,7 @@ public class ArcCookieConsent : TemplatedControl
         PreferencesOpenProperty.Changed.AddClassHandler<ArcCookieConsent>((consent, _) =>
         {
             consent.Sync();
-            consent.PreferencesOpenChanged?.Invoke(consent, consent.PreferencesOpen);
+            consent.RaisePreferencesOpenChanged(consent.PreferencesOpen);
         });
         PolicyProperty.Changed.AddClassHandler<ArcCookieConsent>((consent, _) => consent.UpdateCopy());
         PositionProperty.Changed.AddClassHandler<ArcCookieConsent>((consent, _) => consent.UpdatePosition());
@@ -148,6 +148,23 @@ public class ArcCookieConsent : TemplatedControl
     }
 
     public event EventHandler<bool>? PreferencesOpenChanged;
+
+    /// <summary>Bubbled copy of <see cref="PreferencesOpenChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcOpenChangedRoutedEventArgs> PreferencesOpenChangedEvent =
+        RoutedEvent.Register<ArcCookieConsent, ArcOpenChangedRoutedEventArgs>("PreferencesOpenChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="PreferencesOpenChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcOpenChangedRoutedEventArgs>? PreferencesOpenChangedRouted
+    {
+        add => AddHandler(PreferencesOpenChangedEvent, value);
+        remove => RemoveHandler(PreferencesOpenChangedEvent, value);
+    }
+
+    private void RaisePreferencesOpenChanged(bool isOpen)
+    {
+        PreferencesOpenChanged?.Invoke(this, isOpen);
+        RaiseEvent(new ArcOpenChangedRoutedEventArgs(PreferencesOpenChangedEvent) { IsOpen = isOpen });
+    }
 
     public IReadOnlyList<ArcCookieCategory>? Categories
     {

@@ -155,7 +155,41 @@ public class ArcAnnouncementBar : TemplatedControl
 
     public event EventHandler<ArcAnnouncement>? ActionInvoked;
 
+    /// <summary>Bubbled copy of <see cref="ActionInvoked"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAnnouncementRoutedEventArgs> ActionInvokedEvent =
+        RoutedEvent.Register<ArcAnnouncementBar, ArcAnnouncementRoutedEventArgs>("ActionInvoked", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="ActionInvoked"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAnnouncementRoutedEventArgs>? ActionInvokedRouted
+    {
+        add => AddHandler(ActionInvokedEvent, value);
+        remove => RemoveHandler(ActionInvokedEvent, value);
+    }
+
+    private void RaiseActionInvoked(ArcAnnouncement announcement)
+    {
+        ActionInvoked?.Invoke(this, announcement);
+        RaiseEvent(new ArcAnnouncementRoutedEventArgs(ActionInvokedEvent) { Announcement = announcement });
+    }
+
     public event EventHandler<ArcAnnouncement>? CountdownEnded;
+
+    /// <summary>Bubbled copy of <see cref="CountdownEnded"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAnnouncementRoutedEventArgs> CountdownEndedEvent =
+        RoutedEvent.Register<ArcAnnouncementBar, ArcAnnouncementRoutedEventArgs>("CountdownEnded", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="CountdownEnded"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAnnouncementRoutedEventArgs>? CountdownEndedRouted
+    {
+        add => AddHandler(CountdownEndedEvent, value);
+        remove => RemoveHandler(CountdownEndedEvent, value);
+    }
+
+    private void RaiseCountdownEnded(ArcAnnouncement announcement)
+    {
+        CountdownEnded?.Invoke(this, announcement);
+        RaiseEvent(new ArcAnnouncementRoutedEventArgs(CountdownEndedEvent) { Announcement = announcement });
+    }
 
     public IReadOnlyList<ArcAnnouncement>? Messages
     {
@@ -665,7 +699,7 @@ public class ArcAnnouncementBar : TemplatedControl
         button.Click += (_, _) =>
         {
             action.OnClick?.Invoke();
-            ActionInvoked?.Invoke(this, announcement);
+            RaiseActionInvoked(announcement);
         };
 
         return button;
@@ -695,7 +729,7 @@ public class ArcAnnouncementBar : TemplatedControl
             }
 
             _countdownEnded = true;
-            CountdownEnded?.Invoke(this, announcement);
+            RaiseCountdownEnded(announcement);
         });
         _countdown.Start();
     }

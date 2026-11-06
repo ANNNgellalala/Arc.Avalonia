@@ -96,6 +96,10 @@ Doc 页面与控件实现之间只有“能跑”的耦合。M2-G3a 对约 76 �
   `pwsh -NoProfile tools/check-contracts.ps1 -UpdateBaseline` 刷新；切片完成后应收敛到 `allow=[]`。
 - **包装命名规则（M2 决策）**：存在同名旧 CLR 事件时加 `Routed` 后缀以免冲突；不存在时直接同名更贴合 Avalonia
   惯例（`Charts` 的 `PointClick/ItemClick/LegendClick/RangeSelect` 4 个即属后者，不再是例外，已从 baseline 移除）。
+- **可路由类型边界**：`RoutedEvent` 只适用于派生自 `Avalonia.Interactivity.Interactive` 的类型（Control /
+  TemplatedControl / ContentControl / …）。服务、模型、协调器类（如 `ArcDeltaCoalescer`、`ArcAgentWorkspace`、
+  `ArcAgentSessionModel`、`ArcNavigationService`、`ArcNotificationService`）没有 UI 继承链、无法 `RaiseEvent`/冒泡，
+  它们的 CLR 事件是合理设计，计入 `nonRoutableEvents` 指标，不做路由迁移。
 - 旧 CLR 事件缺路由对应物（`legacy-event-missing-routed`）只统计，不判红；本波只承诺 Top 5–10 控件。
 
 ## 5. 验证
@@ -107,17 +111,18 @@ pwsh -NoProfile tools/check-contracts.ps1 -NoBaseline        # 审计模式：�
 pwsh -NoProfile tools/check-all.ps1                          # 9 行门禁，R10 GREEN
 ```
 
-2026-11-07 02:55 快照（切片仍在收尾，数字会随改造变化，以最近一次脚本输出为准）：
+2026-11-07 03:15 快照（切片仍在收尾，数字会随改造变化，以最近一次脚本输出为准）：
 
 ```text
-TemplatedControls=112 / WithTemplatePart=106 / RoutedEventFields=115 / WithWrapper=115 /
-LegacyEventsWithRouted=75 / MissingTemplatePart=6
-R10 GREEN new=0 exempt=43（transition allowlist 13 + legacy warning 30）
+TemplatedControls=108 / WithTemplatePart=108 / RoutedEventFields=139 / WithWrapper=139 /
+LegacyEventsWithRouted=99 / LegacyEventsMissingRouted=0 / NonRoutableEvents=6
+R10 GREEN new=0 exempt=0（过渡 allowlist/legacy warning 均已清空；Lead 收尾后统一 -UpdateBaseline）
 check-all: green=9/9 knownRed=0 red=0 => GREEN（exit 0）
 ```
 
-包装命名规则修正后，Charts 的 4 个同名包装不再计入 `routedevent-no-wrapper`，`contracts-baseline.json`
-从 17 项收敛到 13 项（missing-templatepart 6 + undeclared-part 7，均为真实剩余缺口）。
+`nonRoutableEvents=6` 为服务/模型类的 CLR 事件（`ArcDeltaCoalescer.Flush`、`ArcAgentWorkspace.Changed`、
+`ArcAgentSessionModel.Changed`、`ArcNavigationService.Changed`、`ArcNotificationService.Shown/Dismissed`），
+只统计、不进入 legacy 待补、不计 exempt、不计 red。
 
 ## 6. 迁移指引
 

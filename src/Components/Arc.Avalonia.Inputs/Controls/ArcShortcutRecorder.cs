@@ -38,9 +38,17 @@ public sealed class ArcShortcutBinding
     public string Label { get; }
 }
 
-public sealed class ArcShortcutChangedEventArgs : EventArgs
+public sealed class ArcShortcutChangedEventArgs : RoutedEventArgs
 {
     public ArcShortcutChangedEventArgs(string? gesture, ArcShortcutBinding? replaced)
+    {
+        Gesture = gesture;
+        Replaced = replaced;
+    }
+
+    /// <summary>Routed payload factory used by <c>GestureChangedRouted</c>.</summary>
+    public ArcShortcutChangedEventArgs(RoutedEvent routedEvent, string? gesture, ArcShortcutBinding? replaced)
+        : base(routedEvent)
     {
         Gesture = gesture;
         Replaced = replaced;
@@ -132,6 +140,16 @@ public class ArcShortcutRecorder : TemplatedControl
 
     /// <summary>Raised when the recorded gesture changes; null means cleared.</summary>
     public event EventHandler<ArcShortcutChangedEventArgs>? GestureChanged;
+
+    public static readonly RoutedEvent<ArcShortcutChangedEventArgs> GestureChangedEvent =
+        RoutedEvent.Register<ArcShortcutRecorder, ArcShortcutChangedEventArgs>("GestureChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="GestureChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcShortcutChangedEventArgs>? GestureChangedRouted
+    {
+        add => AddHandler(GestureChangedEvent, value);
+        remove => RemoveHandler(GestureChangedEvent, value);
+    }
 
     public string? Label
     {
@@ -239,7 +257,7 @@ public class ArcShortcutRecorder : TemplatedControl
 
         SetCurrentValue(GestureProperty, null);
         UpdateDisplay();
-        GestureChanged?.Invoke(this, new ArcShortcutChangedEventArgs(null, null));
+        RaiseGestureChanged(null, null);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -430,8 +448,14 @@ public class ArcShortcutRecorder : TemplatedControl
         SetCurrentValue(GestureProperty, gesture);
         UpdateDisplay();
         UpdateMessage();
-        GestureChanged?.Invoke(this, new ArcShortcutChangedEventArgs(gesture, replaced));
+        RaiseGestureChanged(gesture, replaced);
         Focus();
+    }
+
+    private void RaiseGestureChanged(string? gesture, ArcShortcutBinding? replaced)
+    {
+        GestureChanged?.Invoke(this, new ArcShortcutChangedEventArgs(gesture, replaced));
+        RaiseEvent(new ArcShortcutChangedEventArgs(GestureChangedEvent, gesture, replaced));
     }
 
     private ArcShortcutBinding? FindConflict(string gesture)

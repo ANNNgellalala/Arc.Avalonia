@@ -293,6 +293,23 @@ public class ArcScrollArea : ContentControl
     /// <summary>Raised when content starts or stops extending past an edge.</summary>
     public event EventHandler<ArcScrollAreaEdges>? EdgeChanged;
 
+    /// <summary>Bubbled copy of <see cref="EdgeChanged"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcScrollAreaEdgesChangedRoutedEventArgs> EdgeChangedEvent =
+        RoutedEvent.Register<ArcScrollArea, ArcScrollAreaEdgesChangedRoutedEventArgs>("EdgeChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="EdgeChanged"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcScrollAreaEdgesChangedRoutedEventArgs>? EdgeChangedRouted
+    {
+        add => AddHandler(EdgeChangedEvent, value);
+        remove => RemoveHandler(EdgeChangedEvent, value);
+    }
+
+    private void RaiseEdgeChanged(ArcScrollAreaEdges edges)
+    {
+        EdgeChanged?.Invoke(this, edges);
+        RaiseEvent(new ArcScrollAreaEdgesChangedRoutedEventArgs(EdgeChangedEvent, edges));
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -394,7 +411,7 @@ public class ArcScrollArea : ContentControl
         if (edges != _edges)
         {
             _edges = edges;
-            EdgeChanged?.Invoke(this, edges);
+            RaiseEdgeChanged(edges);
         }
     }
 

@@ -10,6 +10,8 @@
   ctor Arc.Avalonia.Effects.Controls.ArcAnnouncementBarOpenChangedEventArgs[]
   ctor Arc.Avalonia.Effects.Controls.ArcAnnouncementBarOpenChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Effects.Controls.ArcAnnouncementCountdown[]
+  ctor Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs[]
+  ctor Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Effects.Controls.ArcBottomSheet[]
   ctor Arc.Avalonia.Effects.Controls.ArcBottomSheetDetentChangedEventArgs[]
   ctor Arc.Avalonia.Effects.Controls.ArcBottomSheetDetentChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
@@ -30,6 +32,8 @@
   ctor Arc.Avalonia.Effects.Controls.ArcHoverProfile[]
   ctor Arc.Avalonia.Effects.Controls.ArcHoverStat[]
   ctor Arc.Avalonia.Effects.Controls.ArcInViewTitle[]
+  ctor Arc.Avalonia.Effects.Controls.ArcOpenChangedRoutedEventArgs[]
+  ctor Arc.Avalonia.Effects.Controls.ArcOpenChangedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Effects.Controls.ArcTextMorph[]
   ctor Arc.Avalonia.Effects.Controls.ArcTextReveal[]
   ctor Arc.Avalonia.Effects.Controls.ArcTextShimmer[]
@@ -40,11 +44,14 @@
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcAnnouncement> CountdownEnded
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcAnnouncementBarIndexChangedEventArgs> IndexChangedRouted
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcAnnouncementBarOpenChangedEventArgs> OpenChangedRouted
+  event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs> ActionInvokedRouted
+  event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs> CountdownEndedRouted
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcBottomSheetDetentChangedEventArgs> DetentChangedRouted
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcBottomSheetOpenChangedEventArgs> OpenChangedRouted
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcConsentChangedEventArgs> Changed
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcConsentChangedEventArgs> ChangedRouted
   event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcExpandableCardExpandedChangedEventArgs> ExpandedChangedRouted
+  event System.EventHandler<Arc.Avalonia.Effects.Controls.ArcOpenChangedRoutedEventArgs> PreferencesOpenChangedRouted
   event System.EventHandler<System.Boolean> ExpandedChanged
   event System.EventHandler<System.Boolean> OpenChanged
   event System.EventHandler<System.Boolean> OpenChanged
@@ -89,10 +96,13 @@
   field static Arc.Avalonia.Effects.Controls.ArcTextUnit Word
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcAnnouncementBarIndexChangedEventArgs> IndexChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcAnnouncementBarOpenChangedEventArgs> OpenChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs> ActionInvokedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs> CountdownEndedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcBottomSheetDetentChangedEventArgs> DetentChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcBottomSheetOpenChangedEventArgs> OpenChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcConsentChangedEventArgs> ChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcExpandableCardExpandedChangedEventArgs> ExpandedChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Effects.Controls.ArcOpenChangedRoutedEventArgs> PreferencesOpenChangedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Effects.Controls.ArcAnnouncementTone> ToneProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Effects.Controls.ArcConsentValue> ValueProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Effects.Controls.ArcCookieConsentLabels> LabelsProperty
@@ -192,6 +202,7 @@
   method System.Void Reset[]
   method System.Void set_BaseUri[System.Uri ]
   method System.Void Toggle[]
+  property Arc.Avalonia.Effects.Controls.ArcAnnouncement Announcement {get;set}
   property Arc.Avalonia.Effects.Controls.ArcAnnouncementAction Action {get;set}
   property Arc.Avalonia.Effects.Controls.ArcAnnouncementCountdown Countdown {get;set}
   property Arc.Avalonia.Effects.Controls.ArcAnnouncementTone Tone {get;set}
@@ -221,6 +232,7 @@
   property System.Boolean Dismissible {get;set}
   property System.Boolean IsExpanded {get;set}
   property System.Boolean IsExpanded {get;set}
+  property System.Boolean IsOpen {get;set}
   property System.Boolean IsOpen {get;set}
   property System.Boolean IsOpen {get;set}
   property System.Boolean IsOpen {get;set}
@@ -321,6 +333,7 @@ type sealed Arc.Avalonia.Effects.Controls.ArcAnnouncementAction
 type sealed Arc.Avalonia.Effects.Controls.ArcAnnouncementBarIndexChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcAnnouncementBarOpenChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcAnnouncementCountdown
+type sealed Arc.Avalonia.Effects.Controls.ArcAnnouncementRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcBottomSheetDetentChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcBottomSheetOpenChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcConsentChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
@@ -331,4 +344,5 @@ type sealed Arc.Avalonia.Effects.Controls.ArcCookiePolicy
 type sealed Arc.Avalonia.Effects.Controls.ArcExpandableCardExpandedChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Effects.Controls.ArcHoverProfile
 type sealed Arc.Avalonia.Effects.Controls.ArcHoverStat
+type sealed Arc.Avalonia.Effects.Controls.ArcOpenChangedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type static Arc.Avalonia.Effects.Controls.ArcDefaultCookieCategories

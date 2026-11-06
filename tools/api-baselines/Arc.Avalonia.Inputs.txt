@@ -58,6 +58,7 @@
   ctor Arc.Avalonia.Inputs.Controls.ArcRange[System.Double Start, System.Double End]
   ctor Arc.Avalonia.Inputs.Controls.ArcRangeHistogramSlider[]
   ctor Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs[Arc.Avalonia.Inputs.Controls.ArcRange value]
+  ctor Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Inputs.Controls.ArcRange value]
   ctor Arc.Avalonia.Inputs.Controls.ArcRating[]
   ctor Arc.Avalonia.Inputs.Controls.ArcScrubInput[]
   ctor Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.Double value, Arc.Avalonia.Inputs.Controls.ArcScrubChangeSource source, System.String unit]
@@ -72,6 +73,7 @@
   ctor Arc.Avalonia.Inputs.Controls.ArcSelectOption[]
   ctor Arc.Avalonia.Inputs.Controls.ArcSelectOption[System.String value, System.String label, System.Boolean disabled]
   ctor Arc.Avalonia.Inputs.Controls.ArcShortcutBinding[System.String gesture, System.String label]
+  ctor Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String gesture, Arc.Avalonia.Inputs.Controls.ArcShortcutBinding replaced]
   ctor Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs[System.String gesture, Arc.Avalonia.Inputs.Controls.ArcShortcutBinding replaced]
   ctor Arc.Avalonia.Inputs.Controls.ArcShortcutRecorder[]
   ctor Arc.Avalonia.Inputs.Controls.ArcSlider[]
@@ -109,9 +111,11 @@
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcInlineEditSaveEventArgs> Save
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcInlineEditSaveEventArgs> SaveRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> MentionAdded
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> MentionAddedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> Submitted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> SubmittedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> ValueChanged
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMoneyChangedEventArgs> ValueChanged
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMoneyChangedEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcMorphSelectValueEventArgs> ValueChanged
@@ -123,13 +127,17 @@
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRadioCardsValueEventArgs> ValueChanged
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRadioCardsValueEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueChanged
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueCommitted
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueCommittedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueChanged
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueChangedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueCommitted
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueCommittedRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcSegmentIntentEventArgs> OptionIntent
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcSegmentIntentEventArgs> OptionIntentRouted
   event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs> GestureChanged
+  event System.EventHandler<Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs> GestureChangedRouted
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Inputs.Controls.ArcBillingToggleSize Lg
   field static Arc.Avalonia.Inputs.Controls.ArcBillingToggleSize Md
@@ -159,14 +167,20 @@
   field static Arc.Avalonia.Inputs.Controls.ArcShortcutPlatform Other
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcExpandingSearchSelectedEventArgs> SelectedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcInlineEditSaveEventArgs> SaveEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> MentionAddedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> SubmittedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcMentionValueEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcMoneyChangedEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcMorphSelectValueEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcPasswordStrengthChangedEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcPhoneValueEventArgs> ValueChangedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcRadioCardsValueEventArgs> ValueChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs> ValueCommittedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueChangedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs> ValueCommittedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcSegmentIntentEventArgs> OptionIntentEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs> GestureChangedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Inputs.Controls.ArcBillingToggleSize> SizeProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Inputs.Controls.ArcExpandingSearchAnchor> AnchorProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Inputs.Controls.ArcFieldSize> SizeProperty
@@ -840,13 +854,13 @@ type sealed Arc.Avalonia.Inputs.Controls.ArcPhoneValueEventArgs : Avalonia.Inter
 type sealed Arc.Avalonia.Inputs.Controls.ArcRadioCardOption
 type sealed Arc.Avalonia.Inputs.Controls.ArcRadioCardsValueEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Inputs.Controls.ArcRadioOption
-type sealed Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs : System.EventArgs
+type sealed Arc.Avalonia.Inputs.Controls.ArcRangeValueEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Inputs.Controls.ArcScrubValueEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Inputs.Controls.ArcSegmentIntentEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Inputs.Controls.ArcSegmentOption
 type sealed Arc.Avalonia.Inputs.Controls.ArcSelectOption
 type sealed Arc.Avalonia.Inputs.Controls.ArcShortcutBinding
-type sealed Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs : System.EventArgs
+type sealed Arc.Avalonia.Inputs.Controls.ArcShortcutChangedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Inputs.Controls.ArcSliderMark
 type static Arc.Avalonia.Inputs.Controls.ArcPhoneCountries
 type static Arc.Avalonia.Inputs.Controls.ScrubExpression

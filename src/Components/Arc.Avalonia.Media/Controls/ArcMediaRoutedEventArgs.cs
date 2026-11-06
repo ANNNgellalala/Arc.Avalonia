@@ -118,3 +118,14 @@ public sealed class ArcHoldConfirmedRoutedEventArgs : RoutedEventArgs
     {
     }
 }
+
+/// <summary>Routed args for the scroll area edge change event (additive companion to the CLR event).</summary>
+public sealed class ArcScrollAreaEdgesChangedRoutedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates the args for a routed event.</summary>
+    public ArcScrollAreaEdgesChangedRoutedEventArgs(RoutedEvent routedEvent, ArcScrollAreaEdges edges) : base(routedEvent) =>
+        Edges = edges;
+
+    /// <summary>Which content edges currently extend past the viewport.</summary>
+    public ArcScrollAreaEdges Edges { get; }
+}

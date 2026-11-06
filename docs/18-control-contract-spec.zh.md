@@ -20,7 +20,7 @@
 | 6 | RoutedEvent 声明 | `public static readonly RoutedEvent<TArgs> <Name>Event = RoutedEvent.Register<TOwner, TArgs>("<Name>", RoutingStrategies.Bubble);`；生命周期事件可保持 CLR | R10 解析（结构/命名） |
 | 7 | args 基类 | 新 `*EventArgs` 必须派生自 `Avalonia.Interactivity.RoutedEventArgs`，提供无参 + `RoutedEvent` 构造 | R10 `routedevent-args-base` |
 | 8 | CLR 包装 | 存在同名旧 CLR 事件（`event EventHandler<...> Foo`）→ 包装必须 `<Name>Routed`（冲突时 `<Name>RoutedEvent`）；不存在同名旧事件 → 直接同名 `<Name>` 或 `<Name>Routed` 都合规；自定义 `add/remove` 转发 `AddHandler(<Name>Event, value)` / `RemoveHandler(<Name>Event, value)` | R10 `routedevent-no-wrapper` |
-| 9 | 双通知（additive） | 旧 CLR 事件名/签名零变更：一次交互先 `OldEvent?.Invoke(...)`，再 `args.RoutedEvent = <Name>Event; RaiseEvent(args)`；不允许只加一半 | 人工复核 + `legacy-event-missing-routed` 统计（warning） |
+| 9 | 双通知（additive） | 旧 CLR 事件名/签名零变更：一次交互先 `OldEvent?.Invoke(...)`，再 `args.RoutedEvent = <Name>Event; RaiseEvent(args)`；不允许只加一半 | 人工复核 + `legacy-event-missing-routed` 统计（warning，仅可路由类型） |
 | 10 | 键盘/焦点/自动化 | `Focusable`、`:focus-visible`、Enter/Space、Escape、方向键/Home/End、`AutomationProperties.Name/HelpText/LiveSetting`、禁用态可见 | PR checklist + `--audit/--smoke`（Lead 统一跑） |
 
 ## 2. Top 40 控件抽样清单
@@ -75,16 +75,19 @@
 
 > 这是 **M2 第三波（G3a）** 的中间快照；第四波及后续波次继续补齐剩余控件/事件，最终以
 > `pwsh -NoProfile tools/check-contracts.ps1` 输出为准。
+> **计数口径**：`LegacyEvents*` 只统计可路由类型（继承链含 `Interactive/Control/TemplatedControl/...`）；
+> 服务/模型/协调器类的 CLR 事件（无 UI 继承链、无法 RaiseEvent）计入 `NonRoutableEvents`，只统计、不计 exempt/red。
 
 | 指标 | 数值 | 说明 |
 |---|---:|---|
-| TemplatedControls | 112 | 有 OnApplyTemplate / TemplatePart / 部件查找证据的控件（静态近似） |
-| WithTemplatePart | 106 | 已声明 ≥1 个 `[TemplatePart]` |
-| RoutedEventFields | 115 | `<Name>Event` 字段总数 |
-| WithWrapper | 115 | 通过新包装规则的 CLR 包装（修正前按“必须 `<Name>Routed`”统计为 111，Charts 4 个同名包装现合规） |
-| LegacyEventsWithRouted | 75 | 旧 CLR 事件已有路由对应物 |
-| MissingTemplatePart | 6 | 仍缺 `[TemplatePart]`（过渡 baseline 中） |
-| 待补旧事件 | 30 | 旧 CLR 事件暂无路由对应物（warning/exempt，不阻塞） |
+| TemplatedControls | 108 | 有 OnApplyTemplate / TemplatePart / 部件查找证据的控件（静态近似） |
+| WithTemplatePart | 108 | 已声明 ≥1 个 `[TemplatePart]` |
+| RoutedEventFields | 139 | `<Name>Event` 字段总数 |
+| WithWrapper | 139 | 通过包装规则（`<Name>Routed` 或合法同名）的 CLR 包装 |
+| LegacyEventsWithRouted | 99 | 可路由类型的旧 CLR 事件已有路由对应物 |
+| LegacyEventsMissingRouted | 0 | 可路由类型仍缺路由对应物（warning/exempt，不阻塞） |
+| NonRoutableEvents | 6 | 服务/模型类 CLR 事件：`ArcDeltaCoalescer.Flush`、`ArcAgentWorkspace.Changed`、`ArcAgentSessionModel.Changed`、`ArcNavigationService.Changed`、`ArcNotificationService.Shown/Dismissed`；不需要 RoutedEvent |
+| MissingTemplatePart | 0 | 仍缺 `[TemplatePart]`（过渡 baseline 中；当前波次已完成） |
 
 ## 3. 如何给控件加模板部件
 
@@ -188,8 +191,8 @@ pwsh -NoProfile tools/check-all.ps1                       # 9 行门禁；R10 �
 - `tools/contracts-baseline.json` 只保存**改造进行中**的 allowlist（kind+file+symbol），不是架构豁免；
   新控件/新文件不在 allow 内仍 RED；切片完成后 `allow=[]`。
 - 报告：`.recon/gates/contracts-<timestamp>.md|json`；计数：
-  `TemplatedControls / WithTemplatePart / RoutedEventFields / WithWrapper / LegacyEventsWithRouted / MissingTemplatePart`。
-  `check-all` 汇总表里 R10 行的 `Exempt` 列 = 过渡 allowlist + legacy warning 数。
+  `TemplatedControls / WithTemplatePart / RoutedEventFields / WithWrapper / LegacyEventsWithRouted / MissingTemplatePart / NonRoutableEvents`。
+  `check-all` 汇总表里 R10 行的 `Exempt` 列 = 过渡 allowlist + legacy warning 数；`NonRoutableEvents` 只写报告、不计入 Exempt/red。
 - 当前例外：Charts 自绘 `Control` 的 4 个同名旧包装（`PointClick` 等）由 baseline 放行，待 ADR 0005 §4 决策；
   旧 CLR 事件缺路由对应物只统计（warning），不算 red。
 

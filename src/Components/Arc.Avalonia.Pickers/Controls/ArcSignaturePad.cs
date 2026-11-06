@@ -514,6 +514,23 @@ public class ArcSignaturePad : TemplatedControl
     /// <summary>Raised after <see cref="SavePng"/> wrote a file.</summary>
     public event EventHandler<string>? PngSaved;
 
+    /// <summary>Bubbled copy of <see cref="PngSaved"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcSignaturePadPngSavedEventArgs> PngSavedEvent =
+        RoutedEvent.Register<ArcSignaturePad, ArcSignaturePadPngSavedEventArgs>("PngSaved", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="PngSaved"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcSignaturePadPngSavedEventArgs>? PngSavedRouted
+    {
+        add => AddHandler(PngSavedEvent, value);
+        remove => RemoveHandler(PngSavedEvent, value);
+    }
+
+    private void RaisePngSaved(string path)
+    {
+        PngSaved?.Invoke(this, path);
+        RaiseEvent(new ArcSignaturePadPngSavedEventArgs(PngSavedEvent) { Path = path });
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -660,7 +677,7 @@ public class ArcSignaturePad : TemplatedControl
         }
 
         bitmap.Save(path, new PngBitmapEncoderOptions());
-        PngSaved?.Invoke(this, path);
+        RaisePngSaved(path);
     }
 
     /// <summary>The default export path for this pad, in the user's pictures folder.</summary>

@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Arc.Avalonia.AgentUI.Controls;
 using Arc.Avalonia.Controls;
@@ -45,15 +46,55 @@ public class ArcAgentToolCallCard : Panel
     }
 
     /// <summary>Raised when the person approves the call (the host still performs it).</summary>
+    public static readonly RoutedEvent<ArcAgentToolActionRoutedEventArgs> ApproveRequestedEvent =
+        RoutedEvent.Register<ArcAgentToolCallCard, ArcAgentToolActionRoutedEventArgs>("ApproveRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ApproveRequested"/>.</summary>
+    public event EventHandler<ArcAgentToolActionRoutedEventArgs>? ApproveRequestedRouted
+    {
+        add => AddHandler(ApproveRequestedEvent, value);
+        remove => RemoveHandler(ApproveRequestedEvent, value);
+    }
+
     public event EventHandler<string>? ApproveRequested;
 
     /// <summary>Raised when the person denies the call.</summary>
+    public static readonly RoutedEvent<ArcAgentToolActionRoutedEventArgs> DenyRequestedEvent =
+        RoutedEvent.Register<ArcAgentToolCallCard, ArcAgentToolActionRoutedEventArgs>("DenyRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DenyRequested"/>.</summary>
+    public event EventHandler<ArcAgentToolActionRoutedEventArgs>? DenyRequestedRouted
+    {
+        add => AddHandler(DenyRequestedEvent, value);
+        remove => RemoveHandler(DenyRequestedEvent, value);
+    }
+
     public event EventHandler<string>? DenyRequested;
 
     /// <summary>Raised when the person retries a failed call.</summary>
+    public static readonly RoutedEvent<ArcAgentToolActionRoutedEventArgs> RetryRequestedEvent =
+        RoutedEvent.Register<ArcAgentToolCallCard, ArcAgentToolActionRoutedEventArgs>("RetryRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="RetryRequested"/>.</summary>
+    public event EventHandler<ArcAgentToolActionRoutedEventArgs>? RetryRequestedRouted
+    {
+        add => AddHandler(RetryRequestedEvent, value);
+        remove => RemoveHandler(RetryRequestedEvent, value);
+    }
+
     public event EventHandler<string>? RetryRequested;
 
     /// <summary>Raised when the person asks to open the call details.</summary>
+    public static readonly RoutedEvent<ArcAgentToolActionRoutedEventArgs> DetailsRequestedEvent =
+        RoutedEvent.Register<ArcAgentToolCallCard, ArcAgentToolActionRoutedEventArgs>("DetailsRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="DetailsRequested"/>.</summary>
+    public event EventHandler<ArcAgentToolActionRoutedEventArgs>? DetailsRequestedRouted
+    {
+        add => AddHandler(DetailsRequestedEvent, value);
+        remove => RemoveHandler(DetailsRequestedEvent, value);
+    }
+
     public event EventHandler<string>? DetailsRequested;
 
     private void Rebuild()
@@ -102,8 +143,8 @@ public class ArcAgentToolCallCard : Panel
             var approve = ArcUi.Button("Approve", ArcButtonVariant.Primary, ArcButtonSize.Sm, "check");
             var deny = ArcUi.Button("Deny", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "x");
             var callId = _call.Id;
-            approve.Click += (_, _) => ApproveRequested?.Invoke(this, callId);
-            deny.Click += (_, _) => DenyRequested?.Invoke(this, callId);
+            approve.Click += (_, _) => RaiseToolAction(ApproveRequestedEvent, ApproveRequested, callId);
+            deny.Click += (_, _) => RaiseToolAction(DenyRequestedEvent, DenyRequested, callId);
             ArcUi.Name(approve, $"Approve {_call.ToolName}");
             ArcUi.Name(deny, $"Deny {_call.ToolName}");
             actions.Children.Add(approve);
@@ -113,14 +154,14 @@ public class ArcAgentToolCallCard : Panel
         {
             var retry = ArcUi.Button("Retry", ArcButtonVariant.Secondary, ArcButtonSize.Sm, "refresh-cw");
             var callId = _call.Id;
-            retry.Click += (_, _) => RetryRequested?.Invoke(this, callId);
+            retry.Click += (_, _) => RaiseToolAction(RetryRequestedEvent, RetryRequested, callId);
             ArcUi.Name(retry, $"Retry {_call.ToolName}");
             actions.Children.Add(retry);
         }
 
         var details = ArcUi.Button("Details", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "code");
         var currentId = _call.Id;
-        details.Click += (_, _) => DetailsRequested?.Invoke(this, currentId);
+        details.Click += (_, _) => RaiseToolAction(DetailsRequestedEvent, DetailsRequested, currentId);
         actions.Children.Add(details);
 
         if (actions.Children.Count > 0)
@@ -130,6 +171,12 @@ public class ArcAgentToolCallCard : Panel
 
         AutomationProperties.SetName(this,
             $"{_call.ToolName} tool call, {_call.Status}. {_call.Intent}");
+    }
+
+    private void RaiseToolAction(RoutedEvent<ArcAgentToolActionRoutedEventArgs> routedEvent, EventHandler<string>? handler, string callId)
+    {
+        handler?.Invoke(this, callId);
+        RaiseEvent(new ArcAgentToolActionRoutedEventArgs(routedEvent, callId));
     }
 
     private static ArcBadge StatusBadge(ArcToolCallStatus status) => status switch
@@ -142,3 +189,5 @@ public class ArcAgentToolCallCard : Panel
         _ => ArcUi.Badge("Pending", ArcBadgeTone.Neutral)
     };
 }
+
+

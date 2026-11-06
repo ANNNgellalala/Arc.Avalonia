@@ -341,8 +341,42 @@ public class ArcAvatarUpload : TemplatedControl
     /// <summary>Raised when the upload resolves, with the stored URL when the host returned one.</summary>
     public event EventHandler<string?>? Uploaded;
 
+    /// <summary>Bubbled copy of <see cref="Uploaded"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAvatarUploadUploadedEventArgs> UploadedEvent =
+        RoutedEvent.Register<ArcAvatarUpload, ArcAvatarUploadUploadedEventArgs>("Uploaded", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Uploaded"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAvatarUploadUploadedEventArgs>? UploadedRouted
+    {
+        add => AddHandler(UploadedEvent, value);
+        remove => RemoveHandler(UploadedEvent, value);
+    }
+
+    private void RaiseUploaded(string? url)
+    {
+        Uploaded?.Invoke(this, url);
+        RaiseEvent(new ArcAvatarUploadUploadedEventArgs(UploadedEvent) { Url = url });
+    }
+
     /// <summary>Raised with the message shown on the error state.</summary>
     public event EventHandler<string>? Failed;
+
+    /// <summary>Bubbled copy of <see cref="Failed"/>; additive contract for host containers.</summary>
+    public static readonly RoutedEvent<ArcAvatarUploadFailedEventArgs> FailedEvent =
+        RoutedEvent.Register<ArcAvatarUpload, ArcAvatarUploadFailedEventArgs>("Failed", RoutingStrategies.Bubble);
+
+    /// <summary>Additive routed notification for <see cref="Failed"/>; the CLR event above still fires.</summary>
+    public event EventHandler<ArcAvatarUploadFailedEventArgs>? FailedRouted
+    {
+        add => AddHandler(FailedEvent, value);
+        remove => RemoveHandler(FailedEvent, value);
+    }
+
+    private void RaiseFailed(string message)
+    {
+        Failed?.Invoke(this, message);
+        RaiseEvent(new ArcAvatarUploadFailedEventArgs(FailedEvent) { Message = message });
+    }
 
     /// <summary>Raised after the photo is removed.</summary>
     public event EventHandler? Removed;
@@ -1002,7 +1036,7 @@ public class ArcAvatarUpload : TemplatedControl
             token.ThrowIfCancellationRequested();
             SetCurrentValue(SourceProperty, (IImage?)_pending);
             SetCurrentValue(StatusProperty, ArcAvatarUploadStatus.Success);
-            Uploaded?.Invoke(this, url);
+            RaiseUploaded(url);
             PlaySettle();
         }
         catch (OperationCanceledException)
@@ -1016,7 +1050,7 @@ public class ArcAvatarUpload : TemplatedControl
                 : exception.Message;
             SetCurrentValue(ErrorMessageProperty, message);
             SetCurrentValue(StatusProperty, ArcAvatarUploadStatus.Error);
-            Failed?.Invoke(this, message);
+            RaiseFailed(message);
         }
     }
 
@@ -1150,7 +1184,7 @@ public class ArcAvatarUpload : TemplatedControl
     {
         SetCurrentValue(ErrorMessageProperty, message);
         SetCurrentValue(StatusProperty, ArcAvatarUploadStatus.Error);
-        Failed?.Invoke(this, message);
+        RaiseFailed(message);
     }
 }
 

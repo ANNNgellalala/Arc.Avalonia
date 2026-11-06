@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Arc.Avalonia.Theme;
 
@@ -18,9 +19,12 @@ public readonly record struct ArcRange(double Start, double End)
                                          End.ToString(CultureInfo.InvariantCulture);
 }
 
-public sealed class ArcRangeValueEventArgs : EventArgs
+public sealed class ArcRangeValueEventArgs : RoutedEventArgs
 {
     public ArcRangeValueEventArgs(ArcRange value) => Value = value;
+
+    /// <summary>Routed payload factory used by the matching <c>…Routed</c> wrappers.</summary>
+    public ArcRangeValueEventArgs(RoutedEvent routedEvent, ArcRange value) : base(routedEvent) => Value = value;
 
     public ArcRange Value { get; }
 }
@@ -93,8 +97,28 @@ public class ArcRangeHistogramSlider : Control
     /// <summary>Raised on every change while dragging or pressing keys.</summary>
     public event EventHandler<ArcRangeValueEventArgs>? ValueChanged;
 
+    public static readonly RoutedEvent<ArcRangeValueEventArgs> ValueChangedEvent =
+        RoutedEvent.Register<ArcRangeHistogramSlider, ArcRangeValueEventArgs>("ValueChanged", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueChanged"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcRangeValueEventArgs>? ValueChangedRouted
+    {
+        add => AddHandler(ValueChangedEvent, value);
+        remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
     /// <summary>Raised once a drag is released or a key changes the range.</summary>
     public event EventHandler<ArcRangeValueEventArgs>? ValueCommitted;
+
+    public static readonly RoutedEvent<ArcRangeValueEventArgs> ValueCommittedEvent =
+        RoutedEvent.Register<ArcRangeHistogramSlider, ArcRangeValueEventArgs>("ValueCommitted", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueCommitted"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcRangeValueEventArgs>? ValueCommittedRouted
+    {
+        add => AddHandler(ValueCommittedEvent, value);
+        remove => RemoveHandler(ValueCommittedEvent, value);
+    }
 
     public string? Label
     {
@@ -441,7 +465,7 @@ public class ArcRangeHistogramSlider : Control
 
         _dragging = -1;
         SpringStrain();
-        ValueCommitted?.Invoke(this, new ArcRangeValueEventArgs(Resolve()));
+        RaiseValueCommitted(Resolve());
         InvalidateVisual();
     }
 
@@ -618,13 +642,25 @@ public class ArcRangeHistogramSlider : Control
 
         SetCurrentValue(ValueProperty, next);
         SyncDisplay(animate);
-        ValueChanged?.Invoke(this, new ArcRangeValueEventArgs(next));
+        RaiseValueChanged(next);
         if (announce)
         {
-            ValueCommitted?.Invoke(this, new ArcRangeValueEventArgs(next));
+            RaiseValueCommitted(next);
         }
 
         InvalidateVisual();
+    }
+
+    private void RaiseValueChanged(ArcRange value)
+    {
+        ValueChanged?.Invoke(this, new ArcRangeValueEventArgs(value));
+        RaiseEvent(new ArcRangeValueEventArgs(ValueChangedEvent, value));
+    }
+
+    private void RaiseValueCommitted(ArcRange value)
+    {
+        ValueCommitted?.Invoke(this, new ArcRangeValueEventArgs(value));
+        RaiseEvent(new ArcRangeValueEventArgs(ValueCommittedEvent, value));
     }
 
     private void OnValueChanged()

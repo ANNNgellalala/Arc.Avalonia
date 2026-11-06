@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Controls;
@@ -149,9 +150,29 @@ public class ArcAgentAttentionInbox : Panel
     }
 
     /// <summary>Raised with the item id when the person opens the item's primary action.</summary>
+    public static readonly RoutedEvent<ArcAttentionActionRoutedEventArgs> ItemActionRequestedEvent =
+        RoutedEvent.Register<ArcAgentAttentionInbox, ArcAttentionActionRoutedEventArgs>("ItemActionRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="ItemActionRequested"/>.</summary>
+    public event EventHandler<ArcAttentionActionRoutedEventArgs>? ItemActionRequestedRouted
+    {
+        add => AddHandler(ItemActionRequestedEvent, value);
+        remove => RemoveHandler(ItemActionRequestedEvent, value);
+    }
+
     public event EventHandler<string>? ItemActionRequested;
 
     /// <summary>Raised with the item id when the person dismisses the item.</summary>
+    public static readonly RoutedEvent<ArcAttentionActionRoutedEventArgs> DismissedEvent =
+        RoutedEvent.Register<ArcAgentAttentionInbox, ArcAttentionActionRoutedEventArgs>("Dismissed", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="Dismissed"/>.</summary>
+    public event EventHandler<ArcAttentionActionRoutedEventArgs>? DismissedRouted
+    {
+        add => AddHandler(DismissedEvent, value);
+        remove => RemoveHandler(DismissedEvent, value);
+    }
+
     public event EventHandler<string>? Dismissed;
 
     private void Rebuild()
@@ -253,6 +274,12 @@ public class ArcAgentAttentionInbox : Panel
         return header;
     }
 
+    private void RaiseAttentionAction(RoutedEvent<ArcAttentionActionRoutedEventArgs> routedEvent, EventHandler<string>? handler, string entryId)
+    {
+        handler?.Invoke(this, entryId);
+        RaiseEvent(new ArcAttentionActionRoutedEventArgs(routedEvent, entryId));
+    }
+
     private Control BuildRow(ArcAttentionItem item)
     {
         var resolved = item.Status is ArcAttentionItemStatus.Resolved or ArcAttentionItemStatus.Expired;
@@ -335,7 +362,7 @@ public class ArcAgentAttentionInbox : Panel
         };
         AutomationProperties.SetName(action, $"{item.ActionLabel}: {item.Title}");
         ArcUi.Name(action, $"{item.ActionLabel}: {item.Title}");
-        action.Click += (_, _) => ItemActionRequested?.Invoke(this, item.Id);
+        action.Click += (_, _) => RaiseAttentionAction(ItemActionRequestedEvent, ItemActionRequested, item.Id);
         Grid.SetColumn(action, 2);
         row.Children.Add(action);
 
@@ -349,7 +376,7 @@ public class ArcAgentAttentionInbox : Panel
         };
         AutomationProperties.SetName(dismiss, $"Dismiss: {item.Title}");
         ToolTip.SetTip(dismiss, "Dismiss");
-        dismiss.Click += (_, _) => Dismissed?.Invoke(this, item.Id);
+        dismiss.Click += (_, _) => RaiseAttentionAction(DismissedEvent, Dismissed, item.Id);
         Grid.SetColumn(dismiss, 3);
         row.Children.Add(dismiss);
 
@@ -508,3 +535,4 @@ public class ArcAgentAttentionInbox : Panel
         }
     };
 }
+

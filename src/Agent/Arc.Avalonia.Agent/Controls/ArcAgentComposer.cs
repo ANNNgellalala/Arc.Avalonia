@@ -71,6 +71,16 @@ public class ArcAgentComposer : Panel
     }
 
     /// <summary>Raised when the person submits a non-empty draft.</summary>
+    public static readonly RoutedEvent<ArcComposerSubmitRoutedEventArgs> SubmitRequestedEvent =
+        RoutedEvent.Register<ArcAgentComposer, ArcComposerSubmitRoutedEventArgs>("SubmitRequested", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling companion to <see cref="SubmitRequested"/>.</summary>
+    public event EventHandler<ArcComposerSubmitRoutedEventArgs>? SubmitRequestedRouted
+    {
+        add => AddHandler(SubmitRequestedEvent, value);
+        remove => RemoveHandler(SubmitRequestedEvent, value);
+    }
+
     public event EventHandler<ArcComposerSubmit>? SubmitRequested;
 
     /// <summary>Raised when the person asks to stop the current run.</summary>
@@ -120,7 +130,9 @@ public class ArcAgentComposer : Panel
             return;
         }
 
-        SubmitRequested?.Invoke(this, new ArcComposerSubmit(text));
+        var submit = new ArcComposerSubmit(text);
+        SubmitRequested?.Invoke(this, submit);
+        RaiseEvent(new ArcComposerSubmitRoutedEventArgs(SubmitRequestedEvent, submit));
         Clear();
     }
 
@@ -131,4 +143,6 @@ public class ArcAgentComposer : Panel
         _hint.Text = running ? "The host is streaming events; stop asks it to end the run." : "Enter sends · Shift+Enter adds a line · the host owns execution.";
     }
 }
+
+
 

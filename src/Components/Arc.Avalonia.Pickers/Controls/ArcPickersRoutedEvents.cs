@@ -125,3 +125,63 @@ public sealed class ArcStrokesChangedEventArgs : RoutedEventArgs
     /// <summary>The current ink strokes.</summary>
     public IReadOnlyList<ArcInkStroke> Strokes { get; init; } = null!;
 }
+
+/// <summary>Payload for the bubbled <see cref="ArcAvatarUpload.UploadedRouted"/> event.</summary>
+public sealed class ArcAvatarUploadUploadedEventArgs : RoutedEventArgs
+{
+    public ArcAvatarUploadUploadedEventArgs()
+    {
+    }
+
+    public ArcAvatarUploadUploadedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The stored URL when the host returned one; null for hosts that store the image themselves.</summary>
+    public string? Url { get; init; }
+}
+
+/// <summary>Payload for the bubbled <see cref="ArcAvatarUpload.FailedRouted"/> event.</summary>
+public sealed class ArcAvatarUploadFailedEventArgs : RoutedEventArgs
+{
+    public ArcAvatarUploadFailedEventArgs()
+    {
+    }
+
+    public ArcAvatarUploadFailedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The message shown on the error state.</summary>
+    public string Message { get; init; } = string.Empty;
+}
+
+/// <summary>Payload for the bubbled <see cref="ArcCalendar.DisplayMonthChangedRouted"/> event.</summary>
+public sealed class ArcCalendarDisplayMonthChangedEventArgs : RoutedEventArgs
+{
+    public ArcCalendarDisplayMonthChangedEventArgs()
+    {
+    }
+
+    public ArcCalendarDisplayMonthChangedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>The first day of the displayed month.</summary>
+    public DateTime Month { get; init; }
+}
+
+/// <summary>Payload for the bubbled <see cref="ArcSignaturePad.PngSavedRouted"/> event.</summary>
+public sealed class ArcSignaturePadPngSavedEventArgs : RoutedEventArgs
+{
+    public ArcSignaturePadPngSavedEventArgs()
+    {
+    }
+
+    public ArcSignaturePadPngSavedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>Path the PNG was written to; the value is passed by reference, no buffering.</summary>
+    public string Path { get; init; } = string.Empty;
+}

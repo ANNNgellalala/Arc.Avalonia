@@ -169,6 +169,16 @@ public class ArcScrubInput : TemplatedControl
     /// <summary>Raised once a change settles: a scrub release, Enter, blur, a key step or a reset.</summary>
     public event EventHandler<ArcScrubValueEventArgs>? ValueCommitted;
 
+    public static readonly RoutedEvent<ArcScrubValueEventArgs> ValueCommittedEvent =
+        RoutedEvent.Register<ArcScrubInput, ArcScrubValueEventArgs>("ValueCommitted", RoutingStrategies.Bubble);
+
+    /// <summary>Bubbling form of <see cref="ValueCommitted"/>; the CLR event above keeps firing as before.</summary>
+    public event EventHandler<ArcScrubValueEventArgs>? ValueCommittedRouted
+    {
+        add => AddHandler(ValueCommittedEvent, value);
+        remove => RemoveHandler(ValueCommittedEvent, value);
+    }
+
     /// <summary>Raised when the unit changes, from the unit button or a typed value.</summary>
     public event EventHandler? UnitChanged;
 
@@ -593,7 +603,7 @@ public class ArcScrubInput : TemplatedControl
         }
 
         SpringStrain();
-        ValueCommitted?.Invoke(this, new ArcScrubValueEventArgs(Value, ArcScrubChangeSource.Scrub, _activeUnit));
+        RaiseValueCommitted(ArcScrubChangeSource.Scrub);
     }
 
     private void OnHandleCaptureLost(object? sender, PointerCaptureLostEventArgs e)
@@ -605,7 +615,7 @@ public class ArcScrubInput : TemplatedControl
 
         _scrubbing = false;
         SpringStrain();
-        ValueCommitted?.Invoke(this, new ArcScrubValueEventArgs(Value, ArcScrubChangeSource.Scrub, _activeUnit));
+        RaiseValueCommitted(ArcScrubChangeSource.Scrub);
     }
 
     private void ApplyScrub(double raw)
@@ -921,6 +931,12 @@ public class ArcScrubInput : TemplatedControl
         return -1;
     }
 
+    private void RaiseValueCommitted(ArcScrubChangeSource source)
+    {
+        ValueCommitted?.Invoke(this, new ArcScrubValueEventArgs(Value, source, _activeUnit));
+        RaiseEvent(new ArcScrubValueEventArgs(ValueCommittedEvent, Value, source, _activeUnit));
+    }
+
     private void SetValueInternal(double value, ArcScrubChangeSource source, bool commit)
     {
         value = Snap(Clamp(value));
@@ -934,7 +950,7 @@ public class ArcScrubInput : TemplatedControl
 
         if (commit)
         {
-            ValueCommitted?.Invoke(this, new ArcScrubValueEventArgs(Value, source, _activeUnit));
+            RaiseValueCommitted(source);
         }
     }
 

@@ -14,7 +14,9 @@
          且 accessor 走 AddHandler(<Name>Event)/RemoveHandler(<Name>Event) → routedevent-no-wrapper；
       d. 新 *EventArgs 类型若被 RoutedEvent<…> 引用，必须派生自 RoutedEventArgs → routedevent-args-base；
       e. TemplatePart 名必须是 PART_* 前缀 → invalid-templatepart-name（命名规范，便于主题侧对应）；
-      f. 旧 `EventHandler<T>` 公开事件暂时没有 RoutedEvent 对应物 → legacy-event-missing-routed（**warning/exempt，只统计不判红**）。
+      f. 旧 `EventHandler<T>` 公开事件：只有所属类可路由（继承链含 Interactive/Control/TemplatedControl 等
+         Avalonia 交互类型）时才计入 legacy 待补（warning/exempt，不计 red）；普通服务/模型/协调器类的事件
+         计入 `nonRoutableEvents`，只统计（它们无法 RaiseEvent/冒泡，永不需要 RoutedEvent）。
 
     说明：本门禁采用 **严格 additive + 双通知** 口径（见 ADR 0005）——同一事件既 RaiseEvent 又 Invoke
     是设计要求，不属于违规；旧 CLR 事件与 handler 签名零变更。
@@ -322,9 +324,55 @@ foreach ($file in $files) {
 }
 
 # 旧 CLR 事件（严格 additive 策略下允许暂时没有 RoutedEvent 对应物；本波只覆盖 Top 5–10）。
+# RoutedEvent 只对 Avalonia.Interactivity.Interactive 派生类有意义：Control/TemplatedControl/ContentControl/…；
+# 服务/模型/协调器（无 UI 继承链）的 CLR 事件是合理设计，不纳入“待补路由”统计。
+$interactiveBaseNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+foreach ($n in @(
+        'Interactive', 'InputElement', 'Control', 'TemplatedControl', 'ContentControl', 'ItemsControl',
+        'SelectingItemsControl', 'HeaderedContentControl', 'HeaderedItemsControl', 'Window', 'WindowBase',
+        'UserControl', 'Panel', 'Border', 'TextBlock', 'Decorator', 'Button', 'ToggleButton', 'RadioButton',
+        'CheckBox', 'TextBox', 'ComboBox', 'ComboBoxItem', 'ListBox', 'ListBoxItem', 'TabControl', 'TabItem',
+        'Slider', 'RangeBase', 'ProgressBar', 'ScrollBar', 'ScrollViewer', 'Expander', 'TreeView', 'TreeViewItem',
+        'Menu', 'MenuItem', 'ContextMenu', 'ToolTip', 'Popup', 'StackPanel', 'DockPanel', 'Grid', 'WrapPanel',
+        'Canvas', 'UniformGrid', 'RelativePanel', 'SplitView', 'Carousel', 'NumericUpDown', 'AutoCompleteBox',
+        'DatePicker', 'TimePicker', 'Calendar', 'CalendarDatePicker', 'DataGrid', 'RepeatButton', 'SplitButton',
+        'DropDownButton', 'ToggleSwitch', 'ColorPicker', 'ColorView', 'LayoutTransformControl', 'GridSplitter',
+        'DataPager', 'Shape', 'Rectangle', 'Ellipse', 'Image'
+    )) {
+    [void]$interactiveBaseNames.Add($n)
+}
+
+function Test-ClassIsRoutable {
+    # 沿源码继承链向上直到基类不在本项目/已扫描工程；命中 Avalonia 交互类型集合即可 RaiseEvent/冒泡。
+    param(
+        [Parameter(Mandatory)][object]$Class,
+        [Parameter(Mandatory)][hashtable]$BaseMap,
+        [System.Collections.Generic.HashSet[string]]$Visited = $null,
+        [int]$Depth = 0
+    )
+    if ($Depth -gt 16) { return $false }
+    if ($null -eq $Visited) { $Visited = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase) }
+    foreach ($base in @($Class.Bases)) {
+        if ($interactiveBaseNames.Contains($base)) { return $true }
+        if (-not $BaseMap.ContainsKey($base)) { continue }
+        if (-not $Visited.Add($base)) { continue }
+        foreach ($candidate in @($BaseMap[$base])) {
+            if (Test-ClassIsRoutable -Class $candidate -BaseMap $BaseMap -Visited $Visited -Depth ($Depth + 1)) { return $true }
+        }
+    }
+    return $false
+}
+
 $legacyEvents = [System.Collections.Generic.List[object]]::new()
+$nonRoutableEvents = [System.Collections.Generic.List[object]]::new()
 $legacyEventRegex = [regex]'public\s+event\s+EventHandler\s*<[^>]+>\s*\??\s*([A-Za-z_]\w*)'
 foreach ($c in $allClasses) {
+    # partial class 可能拆成多个声明（有的写基类、有的不写）：按类名合并所有声明再判是否可路由。
+    $classDecls = if ($baseMap.ContainsKey($c.Name)) { @($baseMap[$c.Name]) } else { @($c) }
+    $isRoutable = $false
+    foreach ($decl in $classDecls) {
+        if (Test-ClassIsRoutable -Class $decl -BaseMap $baseMap) { $isRoutable = $true; break }
+    }
     foreach ($m in $legacyEventRegex.Matches($c.Body)) {
         $name = $m.Groups[1].Value
         if ($name -match '(?i)Routed(Event)?$') { continue }   # 新包装事件不算 legacy
@@ -333,6 +381,10 @@ foreach ($c in $allClasses) {
             if ($ev.File -ne $c.File) { continue }
             if ([string]::Equals($ev.BaseName, $name, [System.StringComparison]::OrdinalIgnoreCase) -or
                 [string]::Equals($ev.WrapperName, $name, [System.StringComparison]::OrdinalIgnoreCase)) { $hasRouted = $true; break }
+        }
+        if (-not $isRoutable) {
+            $nonRoutableEvents.Add([pscustomobject]@{ File = $c.File; Symbol = $c.Name; Name = $name })
+            continue
         }
         $legacyEvents.Add([pscustomobject]@{ File = $c.File; Symbol = $c.Name; Name = $name; HasRouted = $hasRouted })
     }
@@ -391,6 +443,7 @@ $metrics = [ordered]@{
     legacyEventsTotal       = $legacyEvents.Count
     legacyEventsWithRouted  = $legacyWithRouted
     legacyEventsMissingRouted = $legacyEvents.Count - $legacyWithRouted
+    nonRoutableEvents       = $nonRoutableEvents.Count
     nonPartLookups          = $nonPartLookups
     missingTemplatePart     = @($violations | Where-Object { $_.Kind -eq 'missing-templatepart' }).Count
     violations              = $violations.Count
@@ -426,7 +479,7 @@ if ($UpdateBaseline) {
     }
     Set-Content -LiteralPath $Baseline -Value ($baselineObject | ConvertTo-Json -Depth 8) -Encoding utf8
     Write-Host "CONTRACTS BASELINE UPDATED: allow=$($allow.Count) file=$([System.IO.Path]::GetRelativePath($root, $Baseline) -replace '\\', '/')"
-    Write-Host "  TemplatedControls=$($metrics.templatedControls) WithTemplatePart=$($metrics.withTemplatePart) RoutedEventFields=$($metrics.routedEventFields) WithWrapper=$($metrics.withWrapper) LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) MissingTemplatePart=$($metrics.missingTemplatePart)"
+    Write-Host "  TemplatedControls=$($metrics.templatedControls) WithTemplatePart=$($metrics.withTemplatePart) RoutedEventFields=$($metrics.routedEventFields) WithWrapper=$($metrics.withWrapper) LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) MissingTemplatePart=$($metrics.missingTemplatePart) NonRoutableEvents=$($metrics.nonRoutableEvents)"
     exit 0
 }
 
@@ -503,8 +556,11 @@ foreach ($legacy in @($legacyEvents | Where-Object { -not $_.HasRouted })) {
         })
 }
 $rule.checked = $files.Count
-$rule.notes.Add("TemplatedControls=$($metrics.templatedControls) / WithTemplatePart=$($metrics.withTemplatePart) / RoutedEventFields=$($metrics.routedEventFields) / WithWrapper=$($metrics.withWrapper) / LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) / MissingTemplatePart=$($metrics.missingTemplatePart)")
-$rule.notes.Add("LegacyEvents=$($metrics.legacyEventsTotal)（withRouted=$($metrics.legacyEventsWithRouted), missingRouted=$($metrics.legacyEventsMissingRouted)，后者只统计/不阻塞）；non-PART 部件查询=$($metrics.nonPartLookups)（命名债，单列统计，不计 red）")
+$rule.notes.Add("TemplatedControls=$($metrics.templatedControls) / WithTemplatePart=$($metrics.withTemplatePart) / RoutedEventFields=$($metrics.routedEventFields) / WithWrapper=$($metrics.withWrapper) / LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) / MissingTemplatePart=$($metrics.missingTemplatePart) / NonRoutableEvents=$($metrics.nonRoutableEvents)")
+$rule.notes.Add("LegacyEvents(可路由)=$($metrics.legacyEventsTotal)（withRouted=$($metrics.legacyEventsWithRouted), missingRouted=$($metrics.legacyEventsMissingRouted)，后者只统计/不阻塞）；NonRoutableEvents=$($metrics.nonRoutableEvents)（非 Interactive 派生类：服务/模型/协调器，不需要 RoutedEvent，只统计）；non-PART 部件查询=$($metrics.nonPartLookups)（命名债，单列统计，不计 red）")
+if ($nonRoutableEvents.Count -gt 0) {
+    $rule.notes.Add('NonRoutableEvents 明细（不计 exempt/red）: ' + (($nonRoutableEvents | ForEach-Object { "$($_.Symbol).$($_.Name)" }) -join ', '))
+}
 $rule.notes.Add("violations=$($violations.Count)（missing-templatepart=$($metrics['missing-templatepart']), undeclared-part=$($metrics['undeclared-part']), routedevent-no-wrapper=$($metrics['routedevent-no-wrapper']), routedevent-args-base=$($metrics['routedevent-args-base'])）；baseline-exempt=$exemptCount, new=$newCount")
 if ($baselineLoaded) {
     $rule.notes.Add("基线已清/失效项: $staleAllow（切片完成后用 -UpdateBaseline 刷新可缩小 allowlist）")
