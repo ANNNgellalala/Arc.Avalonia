@@ -12,33 +12,9 @@
   </Styles.Resources>
 
   <!--
-    Fluent's TextBox paints its own accent focus border and leave it on top of the Arc framing border.
-    These controls use the arc-bare class and own their focus treatment; the selection brush is also
-    copied to the TextPresenter from ArcContentUi because Fluent's presenter style outranks the
-    template binding.
+    Bare native TextBoxes (rich text editor, inline editors, composer fields) mark themselves with the
+    `arc-bare` class. The shared suppression of Fluent's TextBox frame and the TextPresenter colours live
+    in the Foundation layer (Arc.Avalonia.Theme/ArcBaseStyles.axaml) so every Arc package, including the
+    text-field family in Arc.Avalonia.Inputs, gets the same behaviour from one definition.
   -->
-  <Style Selector="TextBox.arc-bare /template/ Border#PART_BorderElement">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
-  </Style>
-  <Style Selector="TextBox.arc-bare:pointerover /template/ Border#PART_BorderElement">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
-  </Style>
-  <Style Selector="TextBox.arc-bare:focus /template/ Border#PART_BorderElement">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
-  </Style>
-  <Style Selector="TextBox.arc-bare:disabled /template/ Border#PART_BorderElement">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
-  </Style>
-
-  <Style Selector="TextBox.arc-bare /template/ TextPresenter">
-    <Setter Property="SelectionBrush" Value="{DynamicResource ArcAccentSubtle}" />
-    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource ArcForeground}" />
-    <Setter Property="CaretBrush" Value="{DynamicResource ArcAccentStrong}" />
-  </Style>
 </Styles>

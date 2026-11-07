@@ -180,7 +180,7 @@
                           Margin="2,0,8,0"
                           VerticalAlignment="Center"
                           Foreground="{DynamicResource ArcTextMuted}" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"
@@ -244,26 +244,26 @@
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^.sm /template/ Border#Trigger">
+    <Style Selector="^.sm /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
     </Style>
     <Style Selector="^.sm">
       <Setter Property="FontSize" Value="13" />
     </Style>
-    <Style Selector="^.lg /template/ Border#Trigger">
+    <Style Selector="^.lg /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
     </Style>
     <Style Selector="^.lg">
       <Setter Property="FontSize" Value="15" />
     </Style>
 
-    <Style Selector="^:pointerover /template/ Border#Trigger">
+    <Style Selector="^:pointerover /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
     </Style>
-    <Style Selector="^.focus /template/ Border#Trigger">
+    <Style Selector="^.focus /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
     </Style>
-    <Style Selector="^.invalid /template/ Border#Trigger">
+    <Style Selector="^.invalid /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
     <Style Selector="^.invalid /template/ TextBlock#Message">

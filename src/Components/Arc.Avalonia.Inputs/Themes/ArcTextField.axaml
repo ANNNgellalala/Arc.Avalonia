@@ -39,7 +39,7 @@
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ArcTextMuted}"
                          IsVisible="False" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"
@@ -141,7 +141,7 @@
                 <BrushTransition Property="Background" Duration="0:0:0.16" />
               </Transitions>
             </Border.Transitions>
-            <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+            <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                      Background="Transparent"
                      BorderThickness="0"
                      Padding="0"
@@ -230,7 +230,7 @@
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ArcTextMuted}"
                          IsVisible="False" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"
@@ -354,7 +354,7 @@
                          Margin="2,0,10,0"
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ArcTextMuted}" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"

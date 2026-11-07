@@ -29,6 +29,44 @@
     <Setter Property="Foreground" Value="{Binding $parent[Button].Foreground}" />
   </Style>
 
+  <!--
+    Fluent's TextBox theme owns the field chrome: its focused state repaints the template part
+    Border#PART_BorderElement with a 2 px border, a filled background and the accent border brush
+    (TextControlBorderBrushFocused, which Arc maps to ArcForeground). A native TextBox embedded in an
+    Arc shell must not draw that second frame: the Arc field owns the framing border and its own focus
+    treatment (the shell border turns ArcForeground; the caret carries the editing affordance).
+    Templates that embed a bare native TextBox add Classes="arc-bare"; the pointerover/focus/disabled
+    states are reset too because Fluent re-applies them on every pseudo class. TextPresenter colours
+    are set here as well because Fluent's presenter styles outrank the template bindings.
+  -->
+  <Style Selector="TextBox.arc-bare /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="TextBox.arc-bare:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="TextBox.arc-bare:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="TextBox.arc-bare:disabled /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="TextBox.arc-bare /template/ TextPresenter">
+    <Setter Property="SelectionBrush" Value="{DynamicResource ArcAccentSubtle}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource ArcAccentStrong}" />
+  </Style>
+
   <!-- Type scale. Display face from 28px up, body face below; hierarchy comes from size and colour. -->
   <Style Selector="TextBlock.arc-display">
     <Setter Property="FontFamily" Value="{DynamicResource ArcFontDisplay}" />

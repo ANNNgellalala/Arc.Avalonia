@@ -813,6 +813,8 @@ public sealed class ArcShareAccess : TemplatedControl
             VerticalContentAlignment = VerticalAlignment.Center
         };
         _textBox.Classes.Add("share-input");
+        // The sa-field shell owns the framing and the focus treatment; keep Fluent's TextBox frame off it.
+        _textBox.Classes.Add("arc-bare");
         AutomationProperties.SetName(_textBox, "Invite people by name or email");
         AutomationProperties.SetHelpText(_textBox, "Type a name or email, then press Enter to add a chip");
 

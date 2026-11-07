@@ -44,7 +44,7 @@
                          VerticalAlignment="Center"
                          Margin="0,0,2,0"
                          IsVisible="False" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"
@@ -142,7 +142,7 @@
                          FontWeight="Medium"
                          VerticalAlignment="Center"
                          Margin="0,0,2,0" />
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Grid.Column="1"
                        Background="Transparent"
                        BorderThickness="0"
@@ -222,7 +222,7 @@
               </Transitions>
             </Border.Transitions>
             <WrapPanel x:Name="PART_TagPanel" Orientation="Horizontal">
-              <TextBox FocusAdorner="{x:Null}" x:Name="PART_Input"
+              <TextBox FocusAdorner="{x:Null}" Classes="arc-bare" x:Name="PART_Input"
                        Background="Transparent"
                        BorderThickness="0"
                        Padding="2,0"
@@ -244,13 +244,13 @@
         </StackPanel>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:pointerover /template/ Border#Shell">
+    <Style Selector="^:pointerover /template/ Border#PART_Shell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
     </Style>
-    <Style Selector="^.focus /template/ Border#Shell">
+    <Style Selector="^.focus /template/ Border#PART_Shell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
     </Style>
-    <Style Selector="^.invalid /template/ Border#Shell">
+    <Style Selector="^.invalid /template/ Border#PART_Shell">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
     <Style Selector="^.invalid /template/ TextBlock#Message">
