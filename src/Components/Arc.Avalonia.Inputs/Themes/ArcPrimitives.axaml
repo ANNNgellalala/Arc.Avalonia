@@ -241,7 +241,13 @@
     </Style>
   </ControlTheme>
 
-  <!-- Popup list chrome shared by select, combobox and multi-select. -->
+  <!--
+    Popup list chrome shared by select, combobox and multi-select. This theme is assigned through the
+    ListBox's Theme property, and an explicit Theme replaces the implicit Fluent ControlTheme instead of
+    merging into it - so the theme has to carry the Template itself. Without it the ListBox keeps
+    Template = null, realizes no item containers, measures to 0 and the popup collapses to the surface
+    Border's 6 px padding (the "dropdown opens but is empty" bug).
+  -->
   <ControlTheme x:Key="ArcMenuListTheme" TargetType="ListBox">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
@@ -250,6 +256,17 @@
     <Setter Property="ItemContainerTheme" Value="{DynamicResource ArcMenuItemTheme}" />
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer Name="PART_ScrollViewer"
+                      Background="{TemplateBinding Background}"
+                      Padding="{TemplateBinding Padding}"
+                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+          <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 
   <ControlTheme x:Key="ArcMenuItemTheme" TargetType="ListBoxItem">

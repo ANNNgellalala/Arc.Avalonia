@@ -115,35 +115,35 @@
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^.sm /template/ Border#Trigger">
+    <Style Selector="^.sm /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
     </Style>
     <Style Selector="^.sm">
       <Setter Property="FontSize" Value="13" />
     </Style>
-    <Style Selector="^.lg /template/ Border#Trigger">
+    <Style Selector="^.lg /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
     </Style>
     <Style Selector="^.lg">
       <Setter Property="FontSize" Value="15" />
     </Style>
 
-    <Style Selector="^.empty /template/ TextBlock#ValueText">
+    <Style Selector="^.empty /template/ TextBlock#PART_ValueText">
       <Setter Property="Foreground" Value="{DynamicResource ArcTextMuted}" />
     </Style>
-    <Style Selector="^:pointerover /template/ Border#Trigger">
+    <Style Selector="^:pointerover /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
     </Style>
-    <Style Selector="^.open /template/ Border#Trigger">
+    <Style Selector="^.open /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
     </Style>
     <Style Selector="^:focus-visible /template/ Border#Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="^.invalid /template/ Border#Trigger">
+    <Style Selector="^.invalid /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
-    <Style Selector="^.invalid /template/ TextBlock#Message">
+    <Style Selector="^.invalid /template/ TextBlock#PART_Message">
       <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
     </Style>
     <Style Selector="^.disabled">
@@ -266,7 +266,7 @@
     <Style Selector="^.invalid /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
-    <Style Selector="^.invalid /template/ TextBlock#Message">
+    <Style Selector="^.invalid /template/ TextBlock#PART_Message">
       <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
     </Style>
     <Style Selector="^.disabled">
@@ -363,32 +363,32 @@
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^.sm /template/ Border#Trigger">
+    <Style Selector="^.sm /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightSm}" />
     </Style>
     <Style Selector="^.sm">
       <Setter Property="FontSize" Value="13" />
     </Style>
-    <Style Selector="^.lg /template/ Border#Trigger">
+    <Style Selector="^.lg /template/ Border#PART_Trigger">
       <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightLg}" />
     </Style>
     <Style Selector="^.lg">
       <Setter Property="FontSize" Value="15" />
     </Style>
 
-    <Style Selector="^:pointerover /template/ Border#Trigger">
+    <Style Selector="^:pointerover /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcTextMuted}" />
     </Style>
-    <Style Selector="^.open /template/ Border#Trigger">
+    <Style Selector="^.open /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcForeground}" />
     </Style>
-    <Style Selector="^:focus-visible /template/ Border#Ring">
+    <Style Selector="^:focus-visible /template/ Border#PART_Ring">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="^.invalid /template/ Border#Trigger">
+    <Style Selector="^.invalid /template/ Border#PART_Trigger">
       <Setter Property="BorderBrush" Value="{DynamicResource ArcDanger}" />
     </Style>
-    <Style Selector="^.invalid /template/ TextBlock#Message">
+    <Style Selector="^.invalid /template/ TextBlock#PART_Message">
       <Setter Property="Foreground" Value="{DynamicResource ArcDanger}" />
     </Style>
     <Style Selector="^.disabled">
