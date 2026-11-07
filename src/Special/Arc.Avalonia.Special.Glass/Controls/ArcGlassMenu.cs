@@ -407,6 +407,7 @@ public sealed class ArcGlassMenu : Panel
         _tween?.Stop();
         _overlay.Children.Clear();
         _overlay.Children.Add(_panel);
+        ArcOverlayOrder.SetRaised(this, true);
         _level = Flatten(Groups);
         _submenuParent = null;
         BuildRows(_level, direction: 0, animate: false);
@@ -477,6 +478,7 @@ public sealed class ArcGlassMenu : Panel
             _panel.Opacity = 0;
             _submenuParent = null;
             _level = Flatten(Groups);
+            ArcOverlayOrder.SetRaised(this, false);
             OpenChanged?.Invoke(this, false);
             return;
         }
@@ -497,6 +499,7 @@ public sealed class ArcGlassMenu : Panel
             _bodyPanel.Opacity = 1;
             _submenuParent = null;
             _level = Flatten(Groups);
+            ArcOverlayOrder.SetRaised(this, false);
             OpenChanged?.Invoke(this, false);
         });
     }

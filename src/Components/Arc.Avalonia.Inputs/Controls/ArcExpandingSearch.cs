@@ -513,6 +513,16 @@ public class ArcExpandingSearch : TemplatedControl
         SetCurrentValue(IsExpandedProperty, expanded);
         Classes.Set("expanded", expanded);
         Classes.Set("collapsed", !expanded);
+        if (expanded)
+        {
+            // The results panel drops below the field inside this template; lift the owner branch so the
+            // panel is not painted under the content that follows it.
+            ArcOverlayOrder.SetRaised(this, true);
+        }
+        else
+        {
+            ArcOverlayOrder.SetRaised(this, false);
+        }
         if (_query is not null)
         {
             _query.IsVisible = true;

@@ -740,6 +740,9 @@ public class ArcMentionInput : TemplatedControl
 
         _panel.IsVisible = true;
         _panelOpen = true;
+        // The suggestion panel is hosted inside this template; lift the owner branch so it is painted
+        // above the content that follows it.
+        ArcOverlayOrder.SetRaised(this, true);
         PositionPanel();
         UpdateAutomation();
     }
@@ -847,6 +850,7 @@ public class ArcMentionInput : TemplatedControl
             _panel.IsVisible = false;
         }
 
+        ArcOverlayOrder.SetRaised(this, false);
         _panelOpen = false;
         _suggestions.Clear();
         _triggerIndex = -1;

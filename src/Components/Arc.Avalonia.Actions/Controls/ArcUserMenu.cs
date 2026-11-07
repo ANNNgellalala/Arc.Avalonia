@@ -417,6 +417,9 @@ public sealed class ArcUserMenu : TemplatedControl
         _dismiss = ArcAdvancedDismiss.Attach(this, CloseFromOutside, outsidePress: true, escape: CloseWithFocus);
         ConfigurePanelMotion();
         _panel.IsVisible = true;
+        // The panel is hosted in this template's canvas instead of a popup window, so lift the owner branch
+        // above the content that follows it.
+        ArcOverlayOrder.SetRaised(this, true);
         Position();
         _trigger?.Classes.Set("open", true);
         if (_chevron is not null)
@@ -493,6 +496,7 @@ public sealed class ArcUserMenu : TemplatedControl
         _dismiss?.Dispose();
         _dismiss = null;
         _hideTimer.Stop();
+        ArcOverlayOrder.SetRaised(this, false);
         _trigger?.Classes.Set("open", false);
         if (_chevron is not null)
         {

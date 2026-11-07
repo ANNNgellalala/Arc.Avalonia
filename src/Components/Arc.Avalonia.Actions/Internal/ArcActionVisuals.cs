@@ -196,6 +196,9 @@ internal sealed class ArcMenuPresenter
         Reposition();
         surface.Open(focus);
         Reposition();
+        // The surface is hosted in the owner's template canvas rather than a popup window, so lift the
+        // owner branch above the content that follows it.
+        ArcOverlayOrder.SetRaised(_owner, true);
     }
 
     public void Close()
@@ -209,6 +212,7 @@ internal sealed class ArcMenuPresenter
         _surface = null;
         surface.Closed -= OnSurfaceClosed;
         ArcActionVisuals.SetOverlay(_canvas, null);
+        ArcOverlayOrder.SetRaised(_owner, false);
         Closed?.Invoke(this, EventArgs.Empty);
     }
 

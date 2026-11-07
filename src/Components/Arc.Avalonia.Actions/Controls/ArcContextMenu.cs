@@ -8,6 +8,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
+using Arc.Avalonia.Controls;
 
 namespace Arc.Avalonia.Actions.Controls;
 
@@ -192,6 +193,9 @@ public sealed class ArcContextMenu : ContentControl
         ArcActionVisuals.SetOverlay(_overlay, surface);
         surface.Open(_openedByUser);
         PositionSurface();
+        // The menu is hosted in this template's canvas instead of a popup window, so lift the owner branch
+        // above the content that follows it.
+        ArcOverlayOrder.SetRaised(this, true);
     }
 
     private void OnSurfaceClosed(object? sender, EventArgs e)
@@ -211,6 +215,7 @@ public sealed class ArcContextMenu : ContentControl
         _surface = null;
         surface.Closed -= OnSurfaceClosed;
         ArcActionVisuals.SetOverlay(_overlay, null);
+        ArcOverlayOrder.SetRaised(this, false);
 
         if (focusTarget)
         {

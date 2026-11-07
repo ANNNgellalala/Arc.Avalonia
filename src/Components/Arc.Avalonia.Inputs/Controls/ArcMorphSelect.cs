@@ -514,6 +514,11 @@ public class ArcMorphSelect : TemplatedControl
         if (_surface is null || _listHost is null)
         {
             _open = open;
+            if (!open)
+            {
+                ArcOverlayOrder.SetRaised(this, false);
+            }
+
             return;
         }
 
@@ -521,6 +526,12 @@ public class ArcMorphSelect : TemplatedControl
         SetCurrentValue(IsOpenProperty, open);
         Classes.Set("open", open);
         _listHost.IsVisible = open;
+        if (open)
+        {
+            // The surface grows inside this control's template, so lift the owner branch above the
+            // content that follows it (the board's paint order would otherwise cover the option list).
+            ArcOverlayOrder.SetRaised(this, true);
+        }
         UpdateSearchVisibility();
 
         if (open)
@@ -615,6 +626,11 @@ public class ArcMorphSelect : TemplatedControl
                 UpdateHighlight(animate: false);
             }
 
+            if (!open)
+            {
+                ArcOverlayOrder.SetRaised(this, false);
+            }
+
             return;
         }
 
@@ -631,7 +647,16 @@ public class ArcMorphSelect : TemplatedControl
             _surface.Height = fromHeight + (toHeight - fromHeight) * value;
             var radius = fromRadius + (toRadius - fromRadius) * value;
             _surface.CornerRadius = new CornerRadius(radius);
-        }, () => UpdateHighlight(animate: true));
+        }, () =>
+        {
+            UpdateHighlight(animate: true);
+            if (!open)
+            {
+                // Keep the branch raised for the whole collapse animation so the shrinking list is not
+                // painted underneath the following content.
+                ArcOverlayOrder.SetRaised(this, false);
+            }
+        });
     }
 
     private void ApplyClosedSize()

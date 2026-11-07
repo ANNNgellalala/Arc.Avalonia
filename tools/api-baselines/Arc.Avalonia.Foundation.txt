@@ -250,6 +250,7 @@
   method System.Void set_BaseUri[System.Uri ]
   method System.Void SetAccent[Avalonia.Application app, Arc.Avalonia.Theme.ArcAccent accent]
   method System.Void SetAccent[Avalonia.Application app, Avalonia.Media.Color accentColor]
+  method System.Void SetRaised[Avalonia.Controls.Control owner, System.Boolean raised]
   method System.Void SetScheme[Avalonia.Application app, Arc.Avalonia.Theme.ArcColorScheme scheme]
   method System.Void ToggleScheme[Avalonia.Application app]
   method System.Void UseHost[Arc.Avalonia.Theme.IArcResourceHost host]
@@ -315,6 +316,7 @@ type interface Arc.Avalonia.Icons.IArcIconProvider
 type interface Arc.Avalonia.Theme.IArcResourceHost
 type sealed Arc.Avalonia.Motion.ArcSpringEasing : Avalonia.Animation.Easings.Easing, Avalonia.Animation.Easings.IEasing
 type sealed Arc.Avalonia.Theme.ArcThemeOptions : System.IEquatable<Arc.Avalonia.Theme.ArcThemeOptions>
+type static Arc.Avalonia.Controls.ArcOverlayOrder
 type static Arc.Avalonia.Controls.ArcUi
 type static Arc.Avalonia.Icons.ArcIconData
 type static Arc.Avalonia.Icons.ArcIconRegistry

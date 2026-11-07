@@ -1202,6 +1202,7 @@ public sealed class ArcShareAccess : TemplatedControl
             _suggestionRows = new StackPanel { Orientation = Orientation.Vertical, Spacing = 2 };
             _suggestions.Child = _suggestionRows;
             _overlay.Children.Add(_suggestions);
+            ArcOverlayOrder.SetRaised(this, true);
         }
 
         _suggestionRows!.Children.Clear();
@@ -1355,6 +1356,7 @@ public sealed class ArcShareAccess : TemplatedControl
         _suggestionRows = null;
         _suggestionButtons.Clear();
         _suggestionIndex = -1;
+        ArcOverlayOrder.SetRaised(this, _menu is not null);
     }
 
     private void OnOverlayPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -1920,6 +1922,7 @@ public sealed class ArcShareAccess : TemplatedControl
         _menuTrigger = trigger;
 
         _overlay.Children.Add(surface);
+        ArcOverlayOrder.SetRaised(this, true);
         surface.Measure(Size.Infinity);
         var size = surface.DesiredSize;
         surface.Width = Math.Max(188, size.Width);
@@ -2020,6 +2023,7 @@ public sealed class ArcShareAccess : TemplatedControl
         }
 
         _overlay?.Children.Remove(surface);
+        ArcOverlayOrder.SetRaised(this, _suggestions is not null);
         _lastClosedTrigger = trigger;
         _menuClosedAt = DateTime.UtcNow;
         if (returnFocus && trigger is not null && trigger.IsEffectivelyEnabled)

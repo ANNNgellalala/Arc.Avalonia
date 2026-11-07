@@ -172,6 +172,7 @@ public sealed class ArcPopover : ContentControl
         _surface = surface;
         ArcActionVisuals.SetOverlay(_overlay, surface);
         PositionSurface();
+        ArcOverlayOrder.SetRaised(this, true);
         if (!string.IsNullOrWhiteSpace(Label))
         {
             AutomationProperties.SetName(surface, Label!);
@@ -196,6 +197,7 @@ public sealed class ArcPopover : ContentControl
         _dismiss?.Dispose();
         _dismiss = null;
         ArcActionVisuals.SetOverlay(_overlay, null);
+        ArcOverlayOrder.SetRaised(this, false);
         _surface = null;
         _contentHost = null;
         _triggerHost?.Focus();

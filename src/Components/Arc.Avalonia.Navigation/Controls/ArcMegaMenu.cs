@@ -1094,6 +1094,7 @@ public sealed class ArcMegaMenu : TemplatedControl
 
         _hideTimer.Stop();
         _panel.IsVisible = true;
+        ArcOverlayOrder.SetRaised(this, true);
         _panelScale = 1;
         _panelLift = 0;
         PositionPanel();
@@ -1163,6 +1164,7 @@ public sealed class ArcMegaMenu : TemplatedControl
         _closeTimer.Stop();
         _openTimer.Stop();
         _hideTimer.Stop();
+        ArcOverlayOrder.SetRaised(this, false);
 
         if (ArcThemeManager.ReducedMotion)
         {
@@ -2124,6 +2126,7 @@ public sealed class ArcMegaMenu : TemplatedControl
         Canvas.SetLeft(_sheet, PanelInset);
         Canvas.SetTop(_sheet, (_bar?.Bounds.Height ?? 56) + PanelGap);
         _sheet.IsVisible = true;
+        ArcOverlayOrder.SetRaised(this, true);
         _sheet.Opacity = 1;
         _sheet.RenderTransform = TransformOperations.Parse("translateY(0px)");
 
@@ -2179,6 +2182,7 @@ public sealed class ArcMegaMenu : TemplatedControl
 
         _dismiss?.Dispose();
         _dismiss = null;
+        ArcOverlayOrder.SetRaised(this, false);
 
         if (ArcThemeManager.ReducedMotion)
         {

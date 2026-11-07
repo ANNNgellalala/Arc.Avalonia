@@ -13,6 +13,7 @@ using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Arc.Avalonia.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 using Avalonia.Controls.Metadata;
@@ -387,6 +388,7 @@ public class ArcHoverCard : ContentControl
         _surface = surface;
         _overlay.Children.Clear();
         _overlay.Children.Add(surface);
+        ArcOverlayOrder.SetRaised(this, true);
         _lastPlacement = default;
         UpdateContent();
         Position();
@@ -453,6 +455,7 @@ public class ArcHoverCard : ContentControl
         _overlay?.Children.Clear();
         _surface = null;
         _contentHost = null;
+        ArcOverlayOrder.SetRaised(this, false);
         _hoveringCard = false;
         if (ReferenceEquals(_openCard, this))
         {

@@ -986,6 +986,7 @@ public sealed class ArcShareSheet : Panel
     {
         _overlay.Children.Clear();
         _overlay.Children.Add(_panel);
+        ArcOverlayOrder.SetRaised(this, true);
         BuildPanel();
         _panel.IsVisible = true;
         _panel.Opacity = 1;
@@ -1047,6 +1048,7 @@ public sealed class ArcShareSheet : Panel
         DetachDismiss();
         _overlay.Children.Clear();
         _panel.IsVisible = false;
+        ArcOverlayOrder.SetRaised(this, false);
         _panel.Transitions = null;
         _panel.RenderTransform = TransformOperations.Parse("translate(0px, 0px) scale(1, 1)");
         _panel.Opacity = 0;

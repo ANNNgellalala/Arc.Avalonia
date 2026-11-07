@@ -924,6 +924,8 @@ public class ArcPhoneInput : TemplatedControl
         _picker.Width = Math.Clamp(Math.Max(240, _shell.Bounds.Width), 240, 340);
         _picker.IsVisible = true;
         _picker.Opacity = 1;
+        // The country picker grows inside this template; lift the owner branch above the following content.
+        ArcOverlayOrder.SetRaised(this, true);
 
         if (!ArcThemeManager.ReducedMotion)
         {
@@ -970,6 +972,7 @@ public class ArcPhoneInput : TemplatedControl
 
         _pickerOpen = false;
         _picker.IsVisible = false;
+        ArcOverlayOrder.SetRaised(this, false);
         _countryButton?.Focus();
     }
 

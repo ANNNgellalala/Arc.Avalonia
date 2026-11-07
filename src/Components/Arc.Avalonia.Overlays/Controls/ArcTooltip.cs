@@ -201,6 +201,7 @@ public sealed class ArcTooltip : ContentControl
 
         _bubble = bubble;
         ArcActionVisuals.SetOverlay(_overlay, bubble);
+        ArcOverlayOrder.SetRaised(this, true);
         AutomationProperties.SetName(bubble, Text);
         _lastPlacement = default;
         PositionBubble();
@@ -215,6 +216,7 @@ public sealed class ArcTooltip : ContentControl
 
         ArcActionVisuals.SetOverlay(_overlay, null);
         _bubble = null;
+        ArcOverlayOrder.SetRaised(this, false);
     }
 
     private void PositionBubble()
