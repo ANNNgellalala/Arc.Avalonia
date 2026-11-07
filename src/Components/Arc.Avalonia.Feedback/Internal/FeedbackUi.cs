@@ -50,8 +50,7 @@ internal static class FeedbackUi
 
     public static Color Color(string token) => ArcResources.Color(token);
 
-    public static FontFamily Font(string token) =>
-        Application.Current?.FindResource(token) as FontFamily ?? FontFamily.Default;
+    public static FontFamily Font(string token) => ArcResources.Font(token);
 
     public static CornerRadius Radius(string token) => ArcResources.Radius(token);
 

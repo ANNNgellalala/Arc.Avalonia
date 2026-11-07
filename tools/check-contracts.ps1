@@ -16,7 +16,11 @@
       e. TemplatePart 名必须是 PART_* 前缀 → invalid-templatepart-name（命名规范，便于主题侧对应）；
       f. 旧 `EventHandler<T>` 公开事件：只有所属类可路由（继承链含 Interactive/Control/TemplatedControl 等
          Avalonia 交互类型）时才计入 legacy 待补（warning/exempt，不计 red）；普通服务/模型/协调器类的事件
-         计入 `nonRoutableEvents`，只统计（它们无法 RaiseEvent/冒泡，永不需要 RoutedEvent）。
+         计入 `nonRoutableEvents`，只统计（它们无法 RaiseEvent/冒泡，永不需要 RoutedEvent）；
+      g. 禁止无变体资源查找：src/{Foundation,Components,Agent,Feature,Special,Blocks,Docs}/**/*.cs 中
+         `Application.Current?.FindResource(` / `.FindResource(` → untargeted-resource-lookup（红项）：
+         token 在 ThemeDictionaries 中，无变体查找会退化为透明/默认字体，应改用 ArcResources.TryFind/Font
+         或 axaml 的 DynamicResource。
 
     说明：本门禁采用 **严格 additive + 双通知** 口径（见 ADR 0005）——同一事件既 RaiseEvent 又 Invoke
     是设计要求，不属于违规；旧 CLR 事件与 handler 签名零变更。
@@ -432,6 +436,35 @@ foreach ($ev in $routedEvents) {
         }
     }
 }
+# R10 扩展：禁止无变体资源查找。token 在 ThemeDictionaries 中，无变体 Application.FindResource/.FindResource
+# 只查顶层字典 → UnsetValue → 回退透明/默认字体（ADR 0003 §4.2 的透明窗口事故）。
+$lookupRoots = @('src/Foundation', 'src/Components', 'src/Agent', 'src/Feature', 'src/Special', 'src/Blocks', 'src/Docs')
+$lookupFindRegex = [regex]'Application\.Current\s*(?:\?\.|\.)\s*FindResource\s*\(|\.\s*FindResource\s*\('
+$untargetedLookups = [System.Collections.Generic.List[object]]::new()
+foreach ($lookupRoot in $lookupRoots) {
+    $lookupDir = Join-Path $root $lookupRoot
+    if (-not (Test-Path -LiteralPath $lookupDir)) { continue }
+    foreach ($lookupFile in Get-GatesSourceFiles -Root $lookupDir -Extensions @('.cs')) {
+        $lookupRel = ConvertTo-GatesRelPath -Path $lookupFile.FullName -Base $root
+        $lookupRaw = Get-Content -LiteralPath $lookupFile.FullName -Raw -Encoding utf8
+        if ([string]::IsNullOrEmpty($lookupRaw)) { continue }
+        $lookupMasked = Get-CodeMaskedText -Text $lookupRaw
+        $rawLines = $lookupRaw -split "`n"
+        $maskedLines = $lookupMasked -split "`n"
+        for ($i = 0; $i -lt $maskedLines.Count; $i++) {
+            if (-not $lookupFindRegex.IsMatch($maskedLines[$i])) { continue }
+            $lineText = if ($i -lt $rawLines.Count) { $rawLines[$i].Trim() } else { '' }
+            $untargetedLookups.Add([pscustomobject]@{ File = $lookupRel; Line = $i + 1; Text = $lineText })
+            $violations.Add([pscustomobject]@{
+                    Kind   = 'untargeted-resource-lookup'
+                    File   = $lookupRel
+                    Symbol = 'FindResource'
+                    Line   = $i + 1
+                    Detail = "无变体资源查找（$lineText）：token 在 ThemeDictionaries 中，改用 ArcResources.TryFind/Font（C#）或 DynamicResource（axaml）"
+                })
+        }
+    }
+}
 $violations = @($violations | Sort-Object File, Kind, Symbol, Detail)
 
 $metrics = [ordered]@{
@@ -445,10 +478,11 @@ $metrics = [ordered]@{
     legacyEventsMissingRouted = $legacyEvents.Count - $legacyWithRouted
     nonRoutableEvents       = $nonRoutableEvents.Count
     nonPartLookups          = $nonPartLookups
+    untargetedLookups       = $untargetedLookups.Count
     missingTemplatePart     = @($violations | Where-Object { $_.Kind -eq 'missing-templatepart' }).Count
     violations              = $violations.Count
 }
-foreach ($kind in @('missing-templatepart', 'undeclared-part', 'invalid-templatepart-name', 'routedevent-no-wrapper', 'routedevent-args-base')) {
+foreach ($kind in @('missing-templatepart', 'undeclared-part', 'invalid-templatepart-name', 'routedevent-no-wrapper', 'routedevent-args-base', 'untargeted-resource-lookup')) {
     $metrics[$kind] = @($violations | Where-Object { $_.Kind -eq $kind }).Count
 }
 
@@ -479,7 +513,7 @@ if ($UpdateBaseline) {
     }
     Set-Content -LiteralPath $Baseline -Value ($baselineObject | ConvertTo-Json -Depth 8) -Encoding utf8
     Write-Host "CONTRACTS BASELINE UPDATED: allow=$($allow.Count) file=$([System.IO.Path]::GetRelativePath($root, $Baseline) -replace '\\', '/')"
-    Write-Host "  TemplatedControls=$($metrics.templatedControls) WithTemplatePart=$($metrics.withTemplatePart) RoutedEventFields=$($metrics.routedEventFields) WithWrapper=$($metrics.withWrapper) LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) MissingTemplatePart=$($metrics.missingTemplatePart) NonRoutableEvents=$($metrics.nonRoutableEvents)"
+    Write-Host "  TemplatedControls=$($metrics.templatedControls) WithTemplatePart=$($metrics.withTemplatePart) RoutedEventFields=$($metrics.routedEventFields) WithWrapper=$($metrics.withWrapper) LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) MissingTemplatePart=$($metrics.missingTemplatePart) NonRoutableEvents=$($metrics.nonRoutableEvents) UntargetedLookups=$($metrics.untargetedLookups)"
     exit 0
 }
 
@@ -556,12 +590,12 @@ foreach ($legacy in @($legacyEvents | Where-Object { -not $_.HasRouted })) {
         })
 }
 $rule.checked = $files.Count
-$rule.notes.Add("TemplatedControls=$($metrics.templatedControls) / WithTemplatePart=$($metrics.withTemplatePart) / RoutedEventFields=$($metrics.routedEventFields) / WithWrapper=$($metrics.withWrapper) / LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) / MissingTemplatePart=$($metrics.missingTemplatePart) / NonRoutableEvents=$($metrics.nonRoutableEvents)")
+$rule.notes.Add("TemplatedControls=$($metrics.templatedControls) / WithTemplatePart=$($metrics.withTemplatePart) / RoutedEventFields=$($metrics.routedEventFields) / WithWrapper=$($metrics.withWrapper) / LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) / MissingTemplatePart=$($metrics.missingTemplatePart) / NonRoutableEvents=$($metrics.nonRoutableEvents) / UntargetedLookups=$($metrics.untargetedLookups)")
 $rule.notes.Add("LegacyEvents(可路由)=$($metrics.legacyEventsTotal)（withRouted=$($metrics.legacyEventsWithRouted), missingRouted=$($metrics.legacyEventsMissingRouted)，后者只统计/不阻塞）；NonRoutableEvents=$($metrics.nonRoutableEvents)（非 Interactive 派生类：服务/模型/协调器，不需要 RoutedEvent，只统计）；non-PART 部件查询=$($metrics.nonPartLookups)（命名债，单列统计，不计 red）")
 if ($nonRoutableEvents.Count -gt 0) {
     $rule.notes.Add('NonRoutableEvents 明细（不计 exempt/red）: ' + (($nonRoutableEvents | ForEach-Object { "$($_.Symbol).$($_.Name)" }) -join ', '))
 }
-$rule.notes.Add("violations=$($violations.Count)（missing-templatepart=$($metrics['missing-templatepart']), undeclared-part=$($metrics['undeclared-part']), routedevent-no-wrapper=$($metrics['routedevent-no-wrapper']), routedevent-args-base=$($metrics['routedevent-args-base'])）；baseline-exempt=$exemptCount, new=$newCount")
+$rule.notes.Add("violations=$($violations.Count)（missing-templatepart=$($metrics['missing-templatepart']), undeclared-part=$($metrics['undeclared-part']), routedevent-no-wrapper=$($metrics['routedevent-no-wrapper']), routedevent-args-base=$($metrics['routedevent-args-base']), untargeted-resource-lookup=$($metrics['untargeted-resource-lookup'])）；baseline-exempt=$exemptCount, new=$newCount")
 if ($baselineLoaded) {
     $rule.notes.Add("基线已清/失效项: $staleAllow（切片完成后用 -UpdateBaseline 刷新可缩小 allowlist）")
 }
@@ -571,4 +605,7 @@ if ($scanErrors.Count -gt 0) {
 Update-GatesRuleStatus -Rule $rule | Out-Null
 $report | Add-Member -NotePropertyName metrics -NotePropertyValue $metrics
 if ($scanErrors.Count -gt 0) { $rule.status = 'ERROR' }
+if (-not $Quiet) {
+    Write-Host "  metrics: TemplatedControls=$($metrics.templatedControls) WithTemplatePart=$($metrics.withTemplatePart) RoutedEventFields=$($metrics.routedEventFields) WithWrapper=$($metrics.withWrapper) LegacyEventsWithRouted=$($metrics.legacyEventsWithRouted) MissingTemplatePart=$($metrics.missingTemplatePart) NonRoutableEvents=$($metrics.nonRoutableEvents) UntargetedLookups=$($metrics.untargetedLookups)"
+}
 exit (Complete-GatesReport -Report $report -OutDir $OutDir -Stamp $stamp -Quiet:$Quiet)

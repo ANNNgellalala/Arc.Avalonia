@@ -26,8 +26,7 @@ internal static class Sv
     public static readonly FontFamily MonoFamily = new("Consolas, Menlo, monospace");
 
     /// <summary>The body face from the token set, so drawn text matches the page's typography.</summary>
-    public static FontFamily BodyFamily =>
-        Application.Current?.FindResource(ArcTokens.FontBody) as FontFamily ?? FontFamily.Default;
+    public static FontFamily BodyFamily => ArcResources.Font(ArcTokens.FontBody);
 
     private static FontFeatureCollection CreateTabular()
     {

@@ -34,8 +34,7 @@ internal static class SpecialUi
 
     public static bool Dark => ArcThemeManager.Scheme == ArcColorScheme.Dark;
 
-    public static FontFamily Font(string token) =>
-        Application.Current?.FindResource(token) as FontFamily ?? FontFamily.Default;
+    public static FontFamily Font(string token) => ArcResources.Font(token);
 
     public static IBrush Solid(Color color) => new SolidColorBrush(color);
 

@@ -442,7 +442,7 @@ public class ArcRichTextEditor : TemplatedControl
             Padding = new Thickness(0),
             MinHeight = 238,
             FontSize = ArcResources.Double(ArcTokens.TextBase),
-            FontFamily = Application.Current?.FindResource(ArcTokens.FontBody) as FontFamily ?? FontFamily.Default,
+            FontFamily = ArcResources.Font(ArcTokens.FontBody),
             VerticalContentAlignment = VerticalAlignment.Top,
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             PlaceholderText = Placeholder,

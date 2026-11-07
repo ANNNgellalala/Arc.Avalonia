@@ -225,3 +225,22 @@ Fluent 输入内边距/下拉/选项卡高度同步取 density 值；`CornerRadi
 ### 10.4 遗留
 * TextBox/ComboBox 的**字号**仍不受 `ControlContentThemeFontSize` 影响，需局部 `ControlTheme`（ADR 0004 §3.1/3.2）；
 * 组件内部仍有硬编码尺寸（图标 size、部分 padding），未全部随 `Density` 缩放；8 accent × density 截图矩阵未补。
+
+## 11. M2 修复：token 查找路径（"透明窗口"事故）
+
+### 11.1 事故
+`Arc.Avalonia.Gallery` 启动后窗口背景完全透明，桌面/其它窗口透出来，内容不可读。
+### 11.2 根因
+Token 自 §4.2 起存放在 `ThemeDictionaries`（Light/Dark 两套）。而 `DemoUi.Resource/Brush`（Docs/Gallery 所有页面与窗口背景的取色入口）与 8 处 C# 字体查找仍用**无变体**的 `Application.FindResource(key)`：它对 `ThemeDictionaries` 内的条目返回 `UnsetValue`。
+* `DemoUi.Brush(...) as IBrush` → `null` → 回退 `Brushes.Transparent`；`GalleryWindow` 构造器随后写入 `Background`，覆盖了 `ArcWindow` 构造器已正确设置的白色背景 → 整窗透明（Win32/DWM 直接透出下层窗口）。
+* 同一原因让 `FeedbackUi/ArcMediaUi/SpecialUi/SpecialMotionUi/SpecialVisuals/ArcRichTextEditor/ArcAnimatedCounter/ArcCohortChart` 的字体查询回退 `FontFamily.Default`，Inter 未生效。
+### 11.3 为什么门禁没抓到
+* `--shot`（ShotRunner）在离屏渲染前用 `ArcResources.Brush` 重新涂了一层窗口背景，**掩盖**了透明；截图因此看起来正常。
+* `--audit`/`--smoke` 只验证页面构造与导航，不校验颜色/透明度。
+* R6 token-only 只查硬编码色，查不出"取不到 token 而回退透明"。
+### 11.4 修复
+* `ArcResources` 公开变体感知的 `TryFind(key, out value)` / `TryFind(key, variant, out value)` / `Font(key)`；`DemoUi.Resource` 与全部 9 处字体查找改走该路径（`src` 内已无变体 `FindResource` 为 0）。
+* 规则固化：**C# 取 token 一律 `ArcResources.*`，axaml 用 `DynamicResource`；禁止无变体 `Application.FindResource`**（R10 规则 `untargeted-resource-lookup`）。
+* 回归护栏：`--theme-report` 新增 `renderPath` 段，断言 `DemoUi.Brush(Background/Surface/SurfaceMuted/Border/Foreground/TextSecondary)` 的 alpha 均为 **255**，且 `ArcResources.Font(ArcFontBody)` 解析为 **Inter**（修复前实测 `demo=Transparent`，修复后 `alpha=255`）。
+### 11.5 证据
+`Arc.Avalonia.Gallery.dll --theme-report`：`renderPath ArcBackground=White alpha=255 … ArcFontBody=avares://Avalonia.Fonts.Inter/Assets#Inter` → `THEME REPORT OK`；实机窗口（PrintWindow 捕获）不透明、三栏与内容正常。

@@ -38,8 +38,7 @@ internal static class ArcMediaUi
 
     public static TimeSpan Duration(string token) => ArcResources.Duration(token);
 
-    public static FontFamily Font(string token) =>
-        Application.Current?.FindResource(token) as FontFamily ?? FontFamily.Default;
+    public static FontFamily Font(string token) => ArcResources.Font(token);
 
     /// <summary>Binds a brush property to a semantic token so it tracks theme and accent swaps.</summary>
     public static T Paint<T>(this T control, AvaloniaProperty property, string token) where T : AvaloniaObject

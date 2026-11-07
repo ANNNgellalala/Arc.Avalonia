@@ -132,7 +132,22 @@ public static class ArcResources
     public static TimeSpan Duration(string key, ThemeVariant? variant) =>
         TryFind(key, variant, out var value) && value is TimeSpan time ? time : TimeSpan.Zero;
 
-    private static bool TryFind(string key, ThemeVariant? variant, out object? value)
+    /// <summary>Resolves a font-family token (Inter), falling back to the platform default.</summary>
+    public static FontFamily Font(string key) => Font(key, null);
+
+    /// <summary>Variant-aware font-family token lookup.</summary>
+    public static FontFamily Font(string key, ThemeVariant? variant) =>
+        TryFind(key, variant, out var value) && value is FontFamily family ? family : FontFamily.Default;
+
+    /// <summary>
+    /// Variant-aware untyped lookup, for callers that need whatever the token is. Use this instead of
+    /// <c>Application.FindResource</c>: tokens live in <c>ThemeDictionaries</c>, which an untargeted lookup
+    /// cannot see, so the untargeted path silently misses every token (ADR 0003 §4.2).
+    /// </summary>
+    public static bool TryFind(string key, out object? value) => TryFind(key, null, out value);
+
+    /// <summary>Variant-aware untyped lookup against an explicit theme variant.</summary>
+    public static bool TryFind(string key, ThemeVariant? variant, out object? value)
     {
         // ThemeDictionaries entries are only visible to a variant-targeted lookup, so default to the
         // host's active variant before falling back to the legacy untargeted probe.

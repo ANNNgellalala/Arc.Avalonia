@@ -86,8 +86,9 @@ Doc 页面与控件实现之间只有“能跑”的耦合。M2-G3a 对约 76 �
 | R10.8 | 双通知：旧事件 `Invoke` + `RaiseEvent` 成对出现（不做“只加一半”） | 人工复核 / PR checklist |
 | R10.9 | 模板 `x:Name` 与 `[TemplatePart]` 一致 | 人工/主题 owner 复核（`grep PART_`） |
 | R10.10 | 键盘/焦点/自动化契约 | PR checklist + `--audit/--smoke`（Lead 统一跑） |
+| R10.11 | C# 取 token 必须用 `ArcResources.TryFind/Font`；axaml 用 `DynamicResource`；禁止无变体 `Application.FindResource`/`.FindResource`（token 在 ThemeDictionaries 中，会退化为透明/默认字体） | `untargeted-resource-lookup` |
 
-门禁只做**可静态判定**的 1/2/3/5/6；4/8/9/10 属评审项，避免误报。
+门禁做**可静态判定**的 1/2/3/5/6/11；4/8/9/10 属评审项，避免误报。
 
 ## 4. 例外与过渡基线
 
@@ -115,7 +116,7 @@ pwsh -NoProfile tools/check-all.ps1                          # 9 行门禁，R10
 
 ```text
 TemplatedControls=108 / WithTemplatePart=108 / RoutedEventFields=139 / WithWrapper=139 /
-LegacyEventsWithRouted=99 / LegacyEventsMissingRouted=0 / NonRoutableEvents=6
+LegacyEventsWithRouted=99 / LegacyEventsMissingRouted=0 / NonRoutableEvents=6 / UntargetedLookups=0
 R10 GREEN new=0 exempt=0（过渡 allowlist/legacy warning 均已清空；Lead 收尾后统一 -UpdateBaseline）
 check-all: green=9/9 knownRed=0 red=0 => GREEN（exit 0）
 ```

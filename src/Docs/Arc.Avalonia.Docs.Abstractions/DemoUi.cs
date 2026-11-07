@@ -14,10 +14,16 @@ namespace Arc.Avalonia.Demo;
 /// </summary>
 public static class DemoUi
 {
-    /// <summary>Resolves a token from the current application palette.</summary>
-    public static object Resource(string key) =>
-        Application.Current?.FindResource(key) ?? Brushes.Transparent;
+    /// <summary>
+    /// Resolves a token from the current application palette. Delegates to
+    /// <see cref="ArcResources.TryFind(string, out object?)"/> because the tokens live in
+    /// <c>ThemeDictionaries</c>: an untargeted <c>Application.FindResource</c> returns
+    /// <c>UnsetValue</c> for every token, which silently turned page and window backgrounds into
+    /// <see cref="Brushes.Transparent"/> (transparent Gallery window).
+    /// </summary>
+    public static object? Resource(string key) => ArcResources.TryFind(key, out var value) ? value : null;
 
+    /// <summary>Resolves a colour token, falling back to transparent only for genuinely missing keys.</summary>
     public static IBrush Brush(string key) => Resource(key) as IBrush ?? Brushes.Transparent;
 
     /// <summary>A page section: heading, optional description, content, then a 48px break.</summary>

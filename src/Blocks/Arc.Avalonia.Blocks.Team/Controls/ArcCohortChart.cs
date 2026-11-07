@@ -328,7 +328,7 @@ public sealed class ArcCohortChart : Control
 
     private static Typeface ChartTypeface()
     {
-        var family = Application.Current?.FindResource(ArcTokens.FontBody) as FontFamily;
+        var family = ArcResources.Font(ArcTokens.FontBody);
         return new Typeface(family ?? FontFamily.Default);
     }
 

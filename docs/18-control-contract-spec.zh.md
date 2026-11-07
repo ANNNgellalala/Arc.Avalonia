@@ -6,9 +6,9 @@
 > 适用范围：`src/{Foundation,Components,Agent}` 的 TemplatedControl 与公开交互事件；`Charts` 自绘 `Control` 见 §1 规则 1 例外。
 
 本规范写给**第三方控件作者与主题作者**：它把 Arc 的模板/事件/键盘契约写成可执行规则，并给出可直接复制的
-示例。工具只静态检查可判定项（R10.1/2/3/5/6）；其余通过 PR checklist 与运行时验证补齐。
+示例。工具只静态检查可判定项（R10.1/2/3/5/6/11）；其余通过 PR checklist 与运行时验证补齐。
 
-## 1. 十条规则（可执行版）
+## 1. 十一条规则（可执行版）
 
 | # | 规则 | 要求 | 如何验证 |
 |---|---|---|---|
@@ -22,6 +22,7 @@
 | 8 | CLR 包装 | 存在同名旧 CLR 事件（`event EventHandler<...> Foo`）→ 包装必须 `<Name>Routed`（冲突时 `<Name>RoutedEvent`）；不存在同名旧事件 → 直接同名 `<Name>` 或 `<Name>Routed` 都合规；自定义 `add/remove` 转发 `AddHandler(<Name>Event, value)` / `RemoveHandler(<Name>Event, value)` | R10 `routedevent-no-wrapper` |
 | 9 | 双通知（additive） | 旧 CLR 事件名/签名零变更：一次交互先 `OldEvent?.Invoke(...)`，再 `args.RoutedEvent = <Name>Event; RaiseEvent(args)`；不允许只加一半 | 人工复核 + `legacy-event-missing-routed` 统计（warning，仅可路由类型） |
 | 10 | 键盘/焦点/自动化 | `Focusable`、`:focus-visible`、Enter/Space、Escape、方向键/Home/End、`AutomationProperties.Name/HelpText/LiveSetting`、禁用态可见 | PR checklist + `--audit/--smoke`（Lead 统一跑） |
+| 11 | 资源查找（token） | C# 取 token 必须用 `ArcResources.TryFind(...)` / `ArcResources.Font(...)`；axaml 用 `DynamicResource`；**禁止无变体 `Application.FindResource` / `.FindResource`**（token 在 `ThemeDictionaries`，无变体查找退化为透明/默认字体） | R10 `untargeted-resource-lookup` |
 
 ## 2. Top 40 控件抽样清单
 
@@ -88,6 +89,7 @@
 | LegacyEventsMissingRouted | 0 | 可路由类型仍缺路由对应物（warning/exempt，不阻塞） |
 | NonRoutableEvents | 6 | 服务/模型类 CLR 事件：`ArcDeltaCoalescer.Flush`、`ArcAgentWorkspace.Changed`、`ArcAgentSessionModel.Changed`、`ArcNavigationService.Changed`、`ArcNotificationService.Shown/Dismissed`；不需要 RoutedEvent |
 | MissingTemplatePart | 0 | 仍缺 `[TemplatePart]`（过渡 baseline 中；当前波次已完成） |
+| UntargetedLookups | 0 | 无变体 `FindResource` 命中数（必须为 0；R10.11 红项） |
 
 ## 3. 如何给控件加模板部件
 
@@ -191,7 +193,7 @@ pwsh -NoProfile tools/check-all.ps1                       # 9 行门禁；R10 �
 - `tools/contracts-baseline.json` 只保存**改造进行中**的 allowlist（kind+file+symbol），不是架构豁免；
   新控件/新文件不在 allow 内仍 RED；切片完成后 `allow=[]`。
 - 报告：`.recon/gates/contracts-<timestamp>.md|json`；计数：
-  `TemplatedControls / WithTemplatePart / RoutedEventFields / WithWrapper / LegacyEventsWithRouted / MissingTemplatePart / NonRoutableEvents`。
+  `TemplatedControls / WithTemplatePart / RoutedEventFields / WithWrapper / LegacyEventsWithRouted / MissingTemplatePart / NonRoutableEvents / UntargetedLookups`。
   `check-all` 汇总表里 R10 行的 `Exempt` 列 = 过渡 allowlist + legacy warning 数；`NonRoutableEvents` 只写报告、不计入 Exempt/red。
 - 当前例外：Charts 自绘 `Control` 的 4 个同名旧包装（`PointClick` 等）由 baseline 放行，待 ADR 0005 §4 决策；
   旧 CLR 事件缺路由对应物只统计（warning），不算 red。

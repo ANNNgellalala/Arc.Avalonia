@@ -37,8 +37,7 @@ internal static class Sm
 
     public static readonly FontFamily Mono = new("Consolas, Menlo, monospace");
 
-    public static FontFamily Font(string token) =>
-        Application.Current?.FindResource(token) as FontFamily ?? FontFamily.Default;
+    public static FontFamily Font(string token) => ArcResources.Font(token);
 
     public static IBrush Solid(Color color) => new SolidColorBrush(color);
 

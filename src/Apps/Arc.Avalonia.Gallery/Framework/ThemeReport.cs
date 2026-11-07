@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Arc.Avalonia.Demo;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Gallery;
@@ -129,6 +130,32 @@ public static class ThemeReport
         }
 
         ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral);
+
+        // Regression guard for the "transparent Gallery window" bug (M2): the Docs/Gallery render path used
+        // to resolve tokens with an untargeted Application.FindResource, which cannot see ThemeDictionaries
+        // entries and silently produced Brushes.Transparent for every token - the window and page
+        // backgrounds disappeared. Assert the live shell path resolves opaque brushes and real fonts.
+        foreach (var key in new[]
+                 {
+                     ArcTokens.Background, ArcTokens.Surface, ArcTokens.SurfaceMuted, ArcTokens.Border,
+                     ArcTokens.Foreground, ArcTokens.TextSecondary
+                 })
+        {
+            var brush = DemoUi.Brush(key);
+            var alpha = brush is ISolidColorBrush solid ? solid.Color.A : (byte)0;
+            Console.WriteLine($"THEME REPORT renderPath {key}={Describe(brush)} alpha={alpha}");
+            if (alpha == 0)
+            {
+                failures.Add($"DemoUi.Brush({key}) resolved to a fully transparent brush - token lookup missed ThemeDictionaries");
+            }
+        }
+
+        var bodyFamily = ArcResources.Font(ArcTokens.FontBody);
+        Console.WriteLine($"THEME REPORT renderPath {ArcTokens.FontBody}={bodyFamily}");
+        if (!bodyFamily.Name.Contains("Inter", StringComparison.OrdinalIgnoreCase))
+        {
+            failures.Add($"ArcResources.Font({ArcTokens.FontBody}) resolved to '{bodyFamily.Name}' instead of Inter");
+        }
 
         if (failures.Count == 0)
         {

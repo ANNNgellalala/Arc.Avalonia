@@ -209,7 +209,7 @@ public class ArcAnimatedCounter : TemplatedControl
     {
         try
         {
-            var family = Application.Current?.FindResource(ArcTokens.FontDisplay) as FontFamily ?? FontFamily.Default;
+            var family = ArcResources.Font(ArcTokens.FontDisplay);
             var typeface = new Typeface(family, FontStyle.Normal, FontWeight.Medium);
             var size = _valueText?.FontSize ?? 36;
             var formatted = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, size, Brushes.White);
