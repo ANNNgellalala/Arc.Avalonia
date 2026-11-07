@@ -110,7 +110,11 @@
                     IsVisible="False"
                     IsHitTestVisible="False" />
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <StackPanel x:Name="PART_Stars" Orientation="Horizontal" VerticalAlignment="Center" />
+              <!-- Transparent background makes the star strip hit-testable: Avalonia hit-tests drawn
+                   content, and the ArcStars are IsHitTestVisible=false, so without this the pointer
+                   handlers wired in ArcRating.OnApplyTemplate would never fire (no hover/scrub). -->
+              <StackPanel x:Name="PART_Stars" Orientation="Horizontal" VerticalAlignment="Center"
+                          Background="Transparent" />
               <TextBlock x:Name="PART_ValueText"
                          Classes="arc-body-sm"
                          Foreground="{DynamicResource ArcTextSecondary}"
