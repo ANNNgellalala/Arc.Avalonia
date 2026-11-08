@@ -20,6 +20,7 @@
     <Project Path="src/Components/Arc.Avalonia.Effects/Arc.Avalonia.Effects.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
+    <Project Path="src/Components/Arc.Avalonia.Markdown/Arc.Avalonia.Markdown.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Services/Arc.Avalonia.Services.csproj" />
   </Folder>
   <Folder Name="/Agent/">

@@ -2,20 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using Avalonia;
 using Avalonia.Animation.Easings;
+using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feature.DataGrid;
 using Arc.Avalonia.Icons;
+using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
+using Markdig.Extensions.Tables;
+using Markdig.Syntax;
+using PuraMarkdown.Security;
 using Agent = Arc.Avalonia.Agent;
 using AgentUi = Arc.Avalonia.AgentUI.Controls;
 
@@ -41,6 +50,7 @@ public static class Program
         ThemeOptionChecks();
         ListChecks();
         AgentChecks();
+        MarkdownChecks();
 
         Console.WriteLine($"VERIFY: checks={_checks} failures={Failures.Count}");
         foreach (var failure in Failures)
@@ -954,6 +964,643 @@ public static class Program
         Check("sample workspace has a pending approval and attention entry",
             sample.PendingApprovals.Count == 1 && sample.Attention.Entries.Count == 1 && sample.Artifacts.Items.Count == 1);
     }
+
+    /// <summary>
+    /// Markdown family (docs/21): PuraMarkdown parse → ArcMarkdownView render, the block/inline node matrix,
+    /// fence-plugin dispatch with the code-block fallback, streaming stable boundaries plus the
+    /// complete-equals-one-shot guarantee, and the chat list contracts. Runs headless through
+    /// <see cref="ArcResources.UseHost"/> for tokens and <see cref="Dispatcher.RunJobs"/> for the queued
+    /// streaming/chat UI work (no Application, no window).
+    /// </summary>
+    private static void MarkdownChecks()
+    {
+        var palette = ArcPalette.Build(ArcColorScheme.Light, ArcAccent.Neutral);
+        ArcResources.UseHost(new MarkdownResourceHost(palette));
+        var previousStyle = ArcMarkdownStyle.Current;
+        try
+        {
+            ArcMarkdownStyle.Current = new ArcMarkdownStyle();
+
+            var pipeline = ArcMarkdownPipeline.Default;
+            Check("markdown default pipeline is commonmark + gfm",
+                pipeline.PluginNames.Count == 0 && pipeline.Highlighter.CanHighlight("csharp"));
+
+            // --- node matrix ----------------------------------------------------------
+            var document = pipeline.Syntax.ParseDocument(MarkdownSample);
+            var blocks = document.Markdown.ToArray();
+            Check("markdown parses the node matrix",
+                blocks.OfType<HeadingBlock>().Count() == 4 &&
+                blocks.OfType<ParagraphBlock>().Any() &&
+                blocks.OfType<ListBlock>().Count() >= 2 &&
+                blocks.OfType<QuoteBlock>().Any() &&
+                blocks.OfType<Table>().Any() &&
+                blocks.OfType<CodeBlock>().Any() &&
+                blocks.OfType<ThematicBreakBlock>().Any());
+
+            var options = new ArcMarkdownOptions { Pipeline = pipeline };
+            var context = new ArcMarkdownRenderContext
+            {
+                Options = options,
+                Renderers = pipeline.Renderers,
+                Sanitized = document.Sanitized ?? new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            var rendered = blocks.ToDictionary(block => block, block => context.RenderBlock(block));
+
+            var headings = blocks.OfType<HeadingBlock>().ToArray();
+            var headingLevels = headings
+                .Select(heading => rendered[heading] is TextBlock text ? AutomationProperties.GetHeadingLevel(text) : -1)
+                .ToArray();
+            Check("markdown headings render with automation heading levels",
+                headingLevels.SequenceEqual(new[] { 1, 2, 3, 4 }));
+            Check("markdown heading text renders", TextOf(rendered[headings[0]]).Contains("一级标题"));
+
+            var paragraph = rendered[blocks.OfType<ParagraphBlock>().First()];
+            var paragraphText = TextOf(paragraph);
+            var runs = AllRuns(paragraph).ToArray();
+            Check("markdown paragraph renders emphasis, strong, strike and inline code",
+                paragraphText.Contains("粗体") && paragraphText.Contains("斜体") &&
+                paragraphText.Contains("删除线") && paragraphText.Contains("code") &&
+                runs.Any(run => !run.FontWeight.Equals(FontWeight.Normal)) &&
+                runs.Any(run => run.FontStyle == FontStyle.Italic) &&
+                runs.Any(run => run.TextDecorations is { Count: > 0 }));
+            Check("markdown paragraph renders link and image placeholder",
+                Walk(paragraph).OfType<HyperlinkButton>().Any() &&
+                Walk(paragraph).OfType<Image>().Any() &&
+                paragraphText.Contains("图片"));
+
+            var lists = blocks.OfType<ListBlock>().ToArray();
+            var listControls = lists.Select(list => rendered[list]).ToArray();
+            var listText = string.Concat(listControls.Select(TextOf));
+            Check("markdown lists render bullets, numbers, nesting and task checkboxes",
+                listText.Contains('•') && listText.Contains("1.") && listText.Contains("嵌套项") &&
+                lists.Any(list => !list.IsOrdered) && lists.Any(list => list.IsOrdered) &&
+                listControls.Sum(control => Walk(control).OfType<CheckBox>().Count()) >= 2);
+
+            var quote = rendered[blocks.OfType<QuoteBlock>().First()];
+            Check("markdown quote renders a rail and its text",
+                TextOf(quote).Contains("引用文本") &&
+                Walk(quote).OfType<Border>().Any(border => border.BorderThickness.Left > 0));
+
+            var table = rendered[blocks.OfType<Table>().First()];
+            var tableText = TextOf(table);
+            Check("markdown GFM table renders header, cells and aligned columns",
+                tableText.Contains("左列") && tableText.Contains("中列") && tableText.Contains("右列") &&
+                tableText.Contains('A') && tableText.Contains('C') &&
+                Walk(table).OfType<TextBlock>().Any(text => text.TextAlignment is TextAlignment.Center or TextAlignment.Right) &&
+                table is ScrollViewer);
+
+            var code = rendered[blocks.OfType<CodeBlock>().First()];
+            Check("markdown fenced code renders ArcMarkdownCodeBlock with its language",
+                code is ArcMarkdownCodeBlock codeBlock &&
+                codeBlock.Language == "csharp" && codeBlock.Code.Contains("var x = 1;"));
+
+            Check("markdown thematic break renders a divider control",
+                rendered[blocks.OfType<ThematicBreakBlock>().First()] is Border);
+
+            // --- document surface, outline and blocks ---------------------------------
+            var fullView = new ArcMarkdownView();
+            fullView.RenderDocument(document);
+            // Blocks is populated by the visual render pass (OnApplyTemplate); headless we verify the parsed
+            // document surface: plain text and outline are derived from the AST and available without a host.
+            Check("markdown document view exposes plain text and outline",
+                fullView.GetPlainText().Contains("收尾段落") &&
+                fullView.GetOutline().Select(heading => heading.Level).SequenceEqual(new[] { 1, 2, 3, 4 }));
+
+            // --- fence dispatch and plugin registry -----------------------------------
+            var pluginPipeline = new ArcMarkdownPipelineBuilder()
+                .UseCommonMark()
+                .UseGfm()
+                .UsePlugin(new MarkdownTestFencePlugin())
+                .Build();
+            var agentDocument = pluginPipeline.Syntax.ParseDocument("```pura-agent\n{\"type\":\"confirm\"}\n```");
+            var agentContext = new ArcMarkdownRenderContext
+            {
+                Options = new ArcMarkdownOptions { Pipeline = pluginPipeline },
+                Renderers = pluginPipeline.Renderers,
+                Sanitized = agentDocument.Sanitized ?? new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            Check("markdown fence plugin takes over a registered language",
+                pluginPipeline.PluginNames.Contains(MarkdownTestFencePlugin.PluginName) &&
+                agentContext.RenderBlock(agentDocument.Markdown[0]) is Border { Tag: "test-fence" });
+
+            var fallbackDocument = pipeline.Syntax.ParseDocument("```pura-agent\n{\"type\":\"confirm\"}\n```");
+            var fallbackContext = new ArcMarkdownRenderContext
+            {
+                Options = options,
+                Renderers = pipeline.Renderers,
+                Sanitized = fallbackDocument.Sanitized ?? new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            Check("markdown unregistered fence falls back to a code block",
+                fallbackContext.RenderBlock(fallbackDocument.Markdown[0]) is ArcMarkdownCodeBlock);
+
+            var duplicatePluginRejected = false;
+            try
+            {
+                new ArcMarkdownPipelineBuilder()
+                    .UsePlugin(new MarkdownTestFencePlugin())
+                    .UsePlugin(new MarkdownTestFencePlugin())
+                    .Build();
+            }
+            catch (InvalidOperationException)
+            {
+                duplicatePluginRejected = true;
+            }
+
+            Check("markdown duplicate plugin names fail fast", duplicatePluginRejected);
+
+            // --- highlighter ----------------------------------------------------------
+            var highlighter = pipeline.Highlighter;
+            var spans = highlighter.Highlight("var answer = 42; // note", "csharp");
+            Check("markdown highlighter orders spans and rejects unknown languages",
+                highlighter.CanHighlight("csharp") && highlighter.CanHighlight("json") &&
+                !highlighter.CanHighlight("no-such-language") &&
+                spans.Count > 0 &&
+                spans.Zip(spans.Skip(1)).All(pair => pair.First.Start <= pair.Second.Start));
+
+            // --- streaming: append, stable boundary, completion equals one-shot ------
+            var streamingView = new ArcMarkdownView();
+            var session = streamingView.BeginStreaming(new ArcMarkdownStreamingOptions { Synchronous = true });
+            foreach (var chunk in Chunks(MarkdownSample, 41))
+            {
+                session.Append(chunk);
+            }
+
+            Check("markdown streaming accumulates every appended chunk", session.CurrentText == MarkdownSample);
+
+            var completeTask = session.CompleteAsync();
+            var completed = PumpDispatcher(completeTask, TimeSpan.FromSeconds(20));
+            var oneShot = new ArcMarkdownView();
+            oneShot.RenderDocument(pipeline.Syntax.ParseDocument(MarkdownSample));
+            Check("markdown streaming completion equals the one-shot render",
+                completed &&
+                session.State == ArcMarkdownStreamingState.Completed &&
+                streamingView.GetPlainText() == oneShot.GetPlainText() &&
+                OutlineSignature(streamingView) == OutlineSignature(oneShot));
+
+            var boundaryView = new ArcMarkdownView();
+            var boundarySession = boundaryView.BeginStreaming(new ArcMarkdownStreamingOptions { Synchronous = true });
+            const string openFence = "# 标题\n\n```csharp\nvar x = 1;\n";
+            boundarySession.Append(openFence);
+            var partialStatistics = boundarySession.Statistics;
+            Check("markdown streaming keeps an open fence in the tail window",
+                partialStatistics.CommittedChars < openFence.Length && partialStatistics.TailChars > 0 &&
+                !openFence[..partialStatistics.CommittedChars].Contains("```", StringComparison.Ordinal));
+            boundarySession.Append("```\n\n");
+            var closedStatistics = boundarySession.Statistics;
+            Check("markdown streaming commits once the fence closes",
+                closedStatistics.TailChars == 0 &&
+                closedStatistics.CommittedChars == boundarySession.CurrentText.Length);
+
+            var abortView = new ArcMarkdownView();
+            var abortSession = abortView.BeginStreaming(new ArcMarkdownStreamingOptions { Synchronous = true });
+            abortSession.Append("# 已收到\n\n部分内容");
+            var abortTask = abortSession.AbortAsync();
+            var aborted = PumpDispatcher(abortTask, TimeSpan.FromSeconds(20));
+            Check("markdown streaming abort keeps the partial document",
+                aborted &&
+                abortSession.State == ArcMarkdownStreamingState.Aborted &&
+                abortView.GetPlainText().Contains("部分内容"));
+
+            // --- chat list ------------------------------------------------------------
+            var chat = new ArcMarkdownChatView();
+            var added = 0;
+            var updated = 0;
+            var removed = 0;
+            chat.MessageAdded += (_, _) => added++;
+            chat.MessageUpdated += (_, _) => updated++;
+            chat.MessageRemoved += (_, _) => removed++;
+
+            var firstMessage = new ArcMarkdownChatMessage
+            {
+                Role = ArcMarkdownChatRole.User,
+                Markdown = "**你好**"
+            };
+            chat.AddMessage(firstMessage);
+            chat.InsertMessage(0, new ArcMarkdownChatMessage
+            {
+                Id = "system-1",
+                Role = ArcMarkdownChatRole.System,
+                Markdown = "系统消息"
+            });
+            firstMessage.Markdown = "**你好**，Markdown";
+            chat.UpdateMessage(firstMessage);
+            Check("markdown chat add/insert/update contracts",
+                chat.Messages.Count == 2 && added == 2 && updated == 1 &&
+                ReferenceEquals(chat.FindMessage(firstMessage.Id), firstMessage) &&
+                chat.Messages[0].Id == "system-1");
+            Check("markdown chat remove/clear/replace contracts",
+                chat.RemoveMessage(firstMessage.Id) && removed == 1 &&
+                chat.Messages.Count == 1 && !chat.RemoveMessage("missing") &&
+                ReplaceChatMessages(chat) == 2);
+
+            var streamingMessage = new ArcMarkdownChatMessage { Role = ArcMarkdownChatRole.Assistant };
+            var chatSession = chat.BeginStreamingMessage(streamingMessage);
+            chatSession.Append("## 流式回复\n\n第一段");
+            Dispatcher.UIThread.RunJobs();
+            Check("markdown chat streams into one message slot",
+                chat.IsStreaming && chatSession.CurrentText.Contains("第一段") &&
+                streamingMessage.Status == ArcMarkdownChatMessageStatus.Streaming);
+            var chatCompleteTask = chatSession.CompleteAsync();
+            var chatCompleted = PumpDispatcher(chatCompleteTask, TimeSpan.FromSeconds(20));
+            Check("markdown chat completes the streaming slot",
+                chatCompleted && chatSession.State == ArcMarkdownStreamingState.Completed && !chat.IsStreaming);
+
+            var abortChat = new ArcMarkdownChatView();
+            var abortMessage = new ArcMarkdownChatMessage { Role = ArcMarkdownChatRole.Assistant };
+            var abortChatSession = abortChat.BeginStreamingMessage(abortMessage);
+            abortChatSession.Append("部分回复");
+            Dispatcher.UIThread.RunJobs();
+            var abortChatTask = abortChat.AbortStreamingAsync();
+            var abortFinished = PumpDispatcher(abortChatTask, TimeSpan.FromSeconds(20));
+            Check("markdown chat abort keeps the partial content and marks the message",
+                abortFinished &&
+                abortMessage.Status == ArcMarkdownChatMessageStatus.Aborted &&
+                abortChat.Messages.Contains(abortMessage));
+
+            // --- pura-agent plugin (owned by md-agent; checked when it has landed) ----
+            MarkdownAgentChecks();
+        }
+        finally
+        {
+            ArcMarkdownStyle.Current = previousStyle;
+            ArcResources.UseHost(null);
+        }
+    }
+
+    private static int ReplaceChatMessages(ArcMarkdownChatView chat)
+    {
+        chat.ReplaceMessages(new[]
+        {
+            new ArcMarkdownChatMessage { Id = "replace-a", Markdown = "a" },
+            new ArcMarkdownChatMessage { Id = "replace-b", Markdown = "b" }
+        });
+        return chat.Messages.Count;
+    }
+
+    /// <summary>
+    /// Agent integration (md-agent): the <c>pura-agent</c> fence plugin parses choice/confirm JSON into Arc
+    /// cards, reports interactions through <see cref="ArcMarkdownRenderContext.InteractionSink"/> and restores
+    /// a persisted state through <see cref="ArcMarkdownRenderContext.ComponentStates"/>.
+    /// </summary>
+    private static void MarkdownAgentChecks()
+    {
+        var pipeline = Agent.ArcAgentMarkdown.DefaultPipeline;
+        Check("markdown agent plugin registers choice and confirm",
+            pipeline.PluginNames.Contains("arc.agent") &&
+            Agent.ArcAgentMarkdown.DefaultOptions.InteractionEnabled &&
+            new Agent.ArcAgentMarkdownPlugin().ComponentTypes.SequenceEqual(new[] { "choice", "confirm" }));
+
+        var interactions = new List<ArcMarkdownInteraction>();
+        var document = pipeline.Syntax.ParseDocument(AgentChoiceFence + "\n\n" + AgentConfirmFence);
+        var context = new ArcMarkdownRenderContext
+        {
+            Options = Agent.ArcAgentMarkdown.DefaultOptions,
+            Renderers = pipeline.Renderers,
+            Sanitized = document.Sanitized ?? new SanitizeResult(),
+            Dispatcher = Dispatcher.UIThread,
+            InteractionSink = interaction => interactions.Add(interaction),
+        };
+        var fences = document.Markdown.Where(block => block is FencedCodeBlock).ToArray();
+        var choiceCard = context.RenderBlock(fences[0]) as Agent.ArcAgentChoiceCard;
+        var confirmCard = context.RenderBlock(fences[1]) as Agent.ArcAgentConfirmCard;
+        Check("markdown agent plugin renders choice and confirm cards",
+            choiceCard is { ComponentId: "release-channel" } &&
+            confirmCard is { ComponentId: "publish-confirm" } &&
+            choiceCard.Model is { Question: "发布到哪个通道？" } &&
+            confirmCard.Model is { Question: "确认写入发布说明？" });
+
+        var selected = choiceCard!.ToggleOption("stable");
+        var confirmed = confirmCard!.TryDecide(true);
+        Check("markdown agent interactions report through the interaction sink",
+            selected && confirmed && interactions.Count == 2 &&
+            interactions[0] is { ComponentType: "choice", Confirmed: true } choiceInteraction &&
+            choiceInteraction.SelectedIds.SequenceEqual(new[] { "stable" }) &&
+            interactions[1] is { ComponentType: "confirm", Confirmed: true } confirmInteraction &&
+            confirmInteraction.SelectedIds.Count == 0);
+
+        var restoredContext = new ArcMarkdownRenderContext
+        {
+            Options = Agent.ArcAgentMarkdown.DefaultOptions,
+            Renderers = pipeline.Renderers,
+            Sanitized = document.Sanitized ?? new SanitizeResult(),
+            Dispatcher = Dispatcher.UIThread,
+            ComponentStates = new Dictionary<string, ArcMarkdownInteraction>(StringComparer.Ordinal)
+            {
+                ["release-channel"] = interactions[0]
+            },
+        };
+        var restoredCard = restoredContext.RenderBlock(fences[0]) as Agent.ArcAgentChoiceCard;
+        Check("markdown agent restores a persisted choice state",
+            restoredCard is { IsSubmitted: true } &&
+            restoredCard.SelectedIds.SequenceEqual(new[] { "stable" }));
+    }
+
+    private const string AgentChoiceFence = """
+        ```pura-agent
+        { "type": "choice", "version": "1.0", "id": "release-channel", "question": "发布到哪个通道？",
+          "options": [ { "id": "stable", "label": "stable" }, { "id": "beta", "label": "beta" } ] }
+        ```
+        """;
+
+    private const string AgentConfirmFence = """
+        ```pura-agent
+        { "type": "confirm", "version": "1.0", "id": "publish-confirm", "question": "确认写入发布说明？", "confirmLabel": "确认发布" }
+        ```
+        """;
+
+    /// <summary>Walks a rendered node tree and appends every visible text fragment (inlines included).</summary>
+    private static string TextOf(Control control)
+    {
+        var builder = new StringBuilder();
+        AppendControlText(control, builder);
+        return builder.ToString();
+    }
+
+    private static void AppendControlText(Control control, StringBuilder builder)
+    {
+        switch (control)
+        {
+            case TextBlock text:
+                if (!string.IsNullOrEmpty(text.Text))
+                {
+                    builder.Append(text.Text);
+                }
+
+                if (text.Inlines is { } inlines)
+                {
+                    foreach (var inline in inlines)
+                    {
+                        AppendInlineText(inline, builder);
+                    }
+                }
+
+                builder.Append('\n');
+                break;
+            case ArcMarkdownCodeBlock code:
+                builder.Append(code.Code).Append('\n');
+                break;
+            case Image:
+                builder.Append("[image]");
+                break;
+            case Panel panel:
+                foreach (var child in panel.Children)
+                {
+                    AppendControlText(child, builder);
+                }
+
+                break;
+            case Decorator { Child: { } decorated }:
+                AppendControlText(decorated, builder);
+                break;
+            case ContentControl { Content: Control content }:
+                AppendControlText(content, builder);
+                break;
+            case ContentControl { Content: string textContent }:
+                builder.Append(textContent);
+                break;
+            case ContentControl { Content: { } other }:
+                builder.Append(other);
+                break;
+        }
+    }
+
+    private static void AppendInlineText(Inline inline, StringBuilder builder)
+    {
+        switch (inline)
+        {
+            case Run run:
+                builder.Append(run.Text);
+                break;
+            case LineBreak:
+                builder.Append('\n');
+                break;
+            case InlineUIContainer { Child: { } child }:
+                AppendControlText(child, builder);
+                break;
+            case Span span when span.Inlines is { } spanInlines:
+                foreach (var nested in spanInlines)
+                {
+                    AppendInlineText(nested, builder);
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>Every control under the rendered node, including inline-hosted controls.</summary>
+    private static IEnumerable<Control> Walk(Control root)
+    {
+        yield return root;
+        switch (root)
+        {
+            case TextBlock { Inlines: { } inlines }:
+                foreach (var inline in inlines)
+                {
+                    foreach (var nested in ControlsInInline(inline))
+                    {
+                        foreach (var control in Walk(nested))
+                        {
+                            yield return control;
+                        }
+                    }
+                }
+
+                break;
+            case Panel panel:
+                foreach (var child in panel.Children)
+                {
+                    foreach (var control in Walk(child))
+                    {
+                        yield return control;
+                    }
+                }
+
+                break;
+            case Decorator { Child: { } decorated }:
+                foreach (var control in Walk(decorated))
+                {
+                    yield return control;
+                }
+
+                break;
+            case ContentControl { Content: Control content }:
+                foreach (var control in Walk(content))
+                {
+                    yield return control;
+                }
+
+                break;
+        }
+    }
+
+    private static IEnumerable<Control> ControlsInInline(Inline inline)
+    {
+        switch (inline)
+        {
+            case InlineUIContainer { Child: { } child }:
+                yield return child;
+                break;
+            case Span { Inlines: { } inlines }:
+                foreach (var nested in inlines)
+                {
+                    foreach (var control in ControlsInInline(nested))
+                    {
+                        yield return control;
+                    }
+                }
+
+                break;
+        }
+    }
+
+    private static IEnumerable<Run> AllRuns(Control control)
+    {
+        foreach (var candidate in Walk(control))
+        {
+            if (candidate is not TextBlock { Inlines: { } inlines })
+            {
+                continue;
+            }
+
+            foreach (var inline in inlines)
+            {
+                foreach (var run in RunsInInline(inline))
+                {
+                    yield return run;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<Run> RunsInInline(Inline inline)
+    {
+        switch (inline)
+        {
+            case Run run:
+                yield return run;
+                break;
+            case Span { Inlines: { } inlines }:
+                foreach (var nested in inlines)
+                {
+                    foreach (var run in RunsInInline(nested))
+                    {
+                        yield return run;
+                    }
+                }
+
+                break;
+            case InlineUIContainer { Child: { } child }:
+                foreach (var run in AllRuns(child))
+                {
+                    yield return run;
+                }
+
+                break;
+        }
+    }
+
+    private static string OutlineSignature(ArcMarkdownView view)
+        => string.Join("|", view.GetOutline().Select(heading => $"{heading.Level}:{heading.Text}:{heading.Anchor}"));
+
+    private static IEnumerable<string> Chunks(string text, int size)
+    {
+        for (var offset = 0; offset < text.Length; offset += size)
+        {
+            yield return text.Substring(offset, Math.Min(size, text.Length - offset));
+        }
+    }
+
+    /// <summary>
+    /// Pumps the Avalonia dispatcher until an async Markdown operation completes. Streaming completion parses on
+    /// a worker thread and hops back to the UI thread; without a desktop event loop the queued continuation never
+    /// runs, so a plain Wait would time out even though the document is correct.
+    /// </summary>
+    private static bool PumpDispatcher(Task task, TimeSpan timeout)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        while (!task.IsCompleted && stopwatch.Elapsed < timeout)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(5);
+        }
+
+        Dispatcher.UIThread.RunJobs();
+        return task.IsCompleted && !task.IsFaulted && !task.IsCanceled;
+    }
+
+    /// <summary>Slice a palette into the resource host contract the Markdown style reads at construction.</summary>
+    private sealed class MarkdownResourceHost(ResourceDictionary palette) : IArcResourceHost
+    {
+        public ThemeVariant? ActualThemeVariant => ThemeVariant.Light;
+
+        public bool TryFindResource(string key, out object? value) => palette.TryGetValue(key, out value);
+
+        public bool TryFindResource(string key, ThemeVariant variant, out object? value)
+            => palette.TryGetValue(key, out value);
+    }
+
+    /// <summary>Minimal fence plugin used to prove IArcMarkdownPlugin/IArcMarkdownFenceRenderer dispatch.</summary>
+    private sealed class MarkdownTestFencePlugin : IArcMarkdownPlugin
+    {
+        public const string PluginName = "docs-qa.test-fence-plugin";
+
+        public string Name => PluginName;
+
+        public string Version => "1.0.0";
+
+        public void Configure(ArcMarkdownPipelineBuilder builder)
+            => builder.UseFenceRenderer(new MarkdownTestFenceRenderer());
+    }
+
+    private sealed class MarkdownTestFenceRenderer : IArcMarkdownFenceRenderer
+    {
+        public string Name => "docs-qa.test-fence";
+
+        public bool CanRender(string language, string source, bool isClosed, ArcMarkdownRenderContext context)
+            => string.Equals(language, "pura-agent", StringComparison.OrdinalIgnoreCase);
+
+        public Control Render(string language, string source, bool isClosed, ArcMarkdownRenderContext context)
+            => new Border { Tag = "test-fence", Child = new TextBlock { Text = source } };
+    }
+
+    private const string MarkdownSample = """
+        # 一级标题
+
+        ## 二级标题
+
+        ### 三级标题
+
+        #### 四级标题
+
+        正文 **粗体**、*斜体*、~~删除线~~、行内 `code`、[链接](https://uiarc.dev) 与 ![图](https://example.com/a.png) 占位。
+
+        - 项目一
+        - 项目二
+          - 嵌套项
+
+        1. 有序一
+        2. 有序二
+
+        - [x] 已完成
+        - [ ] 未完成
+
+        > 引用文本
+
+        | 左列 | 中列 | 右列 |
+        | :--- | :---: | ---: |
+        | A | B | C |
+
+        ```csharp
+        var x = 1;
+        ```
+
+        ---
+
+        收尾段落。
+        """;
 
     private static void Check(string name, bool passed)
     {

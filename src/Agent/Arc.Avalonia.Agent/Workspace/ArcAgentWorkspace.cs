@@ -336,9 +336,32 @@ public sealed class ArcAgentWorkspace : IArcAgentWorkspace
             new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-user", "Draft a migration plan for the agent layer."),
             new ArcMessageEndedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-user"),
             new ArcMessageStartedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant", ArcAgentRole.Assistant),
-            new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant", "I'll start by "),
-            new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant", "mapping the services, "),
-            new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant", "then I'll propose the surface changes."),
+            new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant",
+                """
+                Here is the migration scope. The transcript surface can move first because it already renders Markdown.
+
+                ```pura-agent
+                {
+                  "type": "choice",
+                  "version": "1.0",
+                  "id": "migration-scope",
+                  "question": "Which surfaces should move to the new Markdown renderer?",
+                  "description": "Choose up to two. The approval sheet stays on the old path until the risk model lands.",
+                  "multi": true,
+                  "options": [
+                    { "id": "transcript", "label": "Chat transcript", "description": "Highest traffic, lowest risk." },
+                    { "id": "approval", "label": "Approval sheet", "description": "Waits on the new risk model.", "disabled": true },
+                    { "id": "composer", "label": "Composer", "description": "Small surface, mostly text." }
+                  ],
+                  "defaultSelected": ["transcript"],
+                  "min": 1,
+                  "max": 2,
+                  "submitLabel": "Start migration"
+                }
+                ```
+                """),
+            new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant",
+                "\n\nI'll start as soon as you confirm the scope."),
             new ArcToolCallStartedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "call-1", "repo.search", "Find every call site of ArcWindow.", ArcRiskLevel.Low),
             new ArcToolArgsDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "call-1", "{\"query\":\"ArcWindow\"}"),
             new ArcToolCallEndedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "call-1", ArcToolCallStatus.Succeeded, "6 matches"),

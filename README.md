@@ -15,7 +15,7 @@ contrasts with similar entries, copy-pasteable examples, and an API table genera
 dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll            # browse the docs
 dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --page button
 dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --audit    # 294/294, 0 errors
-dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke    # 315 pages, 0 failures
+dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke    # 323 pages, 0 failures
 ```
 
 Read the analysis first:
@@ -58,6 +58,9 @@ Read the analysis first:
 * [`docs/16-m2-wave1-services-and-lists.zh.md`](docs/16-m2-wave1-services-and-lists.zh.md) — M2 wave 1: the window-scoped
   service layer (`ArcWindow`, dialog/notification/navigation/file-picker), the windowed tree table and the
   `Feature.DataGrid` package for large data sets.
+* [`docs/21-markdown-components.zh.md`](docs/21-markdown-components.zh.md) — the Markdown component family: PuraMarkdown
+  syntax (Markdig AST, diagnostics, stable-boundary streaming) rendered with Arc controls, plus code highlighting,
+  AI chat and the `pura-agent` choice/confirm components.
 
 ## Install
 
@@ -82,11 +85,12 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 
 | Package | Contents | Install when |
 | --- | --- | --- |
-| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 11 component families + `Arc.Avalonia.Agent` + `AgentUI` + `LifeToday` | normal application |
+| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 12 component families + `Arc.Avalonia.Markdown` + `Arc.Avalonia.Agent` + `AgentUI` + `LifeToday` | normal application |
 | `Arc.Avalonia.All` | `Arc.Avalonia` + 5 Special + 6 Blocks packages | you want every surface |
 | `Arc.Avalonia.Theme` | L2.5 aggregate theme (Fluent baseline, tokens, component themes) | you already reference individual component packages |
 | `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
 | `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media}` | L2 component families | you prefer component-level dependencies |
+| `Arc.Avalonia.Markdown` | L2 Markdown family: PuraMarkdown syntax + Arc renderers (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownChatView`, `ArcMarkdownCodeBlock`), streaming, highlighter, plugin/fence contracts | you render Markdown, AI answers or agent transcripts |
 | `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` | building an agent UI on your own runtime |
 | `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent and life surfaces (UI contracts only) | agent / daily-planning UI |
 | `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
@@ -96,6 +100,15 @@ Every package depends only on Avalonia's official packages (`Avalonia`, `Avaloni
 other dependency or any page/doc/demo asset is found.
 
 ### Build the packages locally
+
+`Arc.Avalonia.Markdown` consumes `PuraMarkdown.Syntax` from the sibling PuraMarkdown checkout. The local
+feed is configured in `NuGet.config` (`../PuraMarkdown/artifacts/nuget`); produce it once with:
+
+```powershell
+dotnet pack ../PuraMarkdown/src/PuraMarkdown.Syntax -c Release -o ../PuraMarkdown/artifacts/nuget
+```
+
+Then build the solution:
 
 ```powershell
 # offline; single-node MSBuild is required on this machine
@@ -142,6 +155,14 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | --- | --- |
 | ![Chat thread](docs/images/docs/chat-thread-light.png) | ![Voice orb](docs/images/docs/voice-orb-light.png) |
 
+| Markdown document | Markdown extended (GFM tables, code) |
+| --- | --- |
+| ![Markdown](docs/images/docs/markdown-light.png) | ![Markdown extended](docs/images/docs/markdown-extended-light.png) |
+
+| Markdown chat with `pura-agent` components | Markdown dark theme |
+| --- | --- |
+| ![Markdown chat](docs/images/docs/markdown-chat-light.png) | ![Markdown dark](docs/images/docs/markdown-dark.png) |
+
 | Dark theme | Dark theme, shell |
 | --- | --- |
 | ![Button dark](docs/images/docs/button-dark.png) | ![Shell dark](docs/images/docs/shell-dark.png) |
@@ -151,10 +172,10 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | Project | Contents |
 | --- | --- |
 | `src/Foundation/Arc.Avalonia` | Foundation (assembly/package `Arc.Avalonia.Foundation`): OKLCH colour engine, palette/theme manager, typography, motion, 264 Lucide icons (extensible via `ArcIcon.Register`), `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, `ArcUi` |
-| `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 11 component theme families behind one `<arc:ArcTheme/>` element |
-| `src/Docs/Arc.Avalonia.Docs` | Documentation leaf project (`Arc.Avalonia.Docs`): 320 pages, 294 embedded `Docs/<slug>.json` documents and the demo portraits, discovered by reflection |
+| `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 12 component theme families behind one `<arc:ArcTheme/>` element |
+| `src/Docs/Arc.Avalonia.Docs` | Documentation leaf project (`Arc.Avalonia.Docs`): 323 pages, 294 embedded `Docs/<slug>.json` documents and the demo portraits, discovered by reflection |
 | `src/Docs/Arc.Avalonia.Docs.Abstractions` | Contract assembly (`Arc.Avalonia.Docs.Abstractions`, namespace `Arc.Avalonia.Demo`): `ArcPage`/`ArcItemPage`, the `ArcDoc` model, doc store and validator, `DemoUi` layout helpers, `ArcCatalog`, reflection discovery |
-| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 11 component families, the agent top layer and the two agent surface packages |
+| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 12 component families, the agent top layer and the two agent surface packages |
 | `src/Meta/Arc.Avalonia.All` | Aggregate package `Arc.Avalonia.All`: `Arc.Avalonia` plus the Special and Blocks packages |
 | `src/Apps/Arc.Avalonia.Gallery` | The documentation platform: three-column shell, search, outline, coverage report, API-table generator, `--audit`/`--smoke`/`--shot` harnesses |
 | `src/Agent/Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, approval/attention/artifact queues, Dispatcher-batched delta coalescer, item view registry) plus `ArcAgentSurface` and its composer/card controls. Hosts implement `IArcAgentTransport`; the layer never does I/O, timers or model calls |
@@ -171,6 +192,7 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | `src/Components/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
 | `src/Components/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, chat thread, onboarding checklist |
 | `src/Components/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
+| `src/Components/Arc.Avalonia.Markdown` | Markdown family: `ArcMarkdownView`/`ArcMarkdownDocumentView`/`ArcMarkdownChatView`/`ArcMarkdownCodeBlock`, the full CommonMark+GFM node renderer set, built-in code highlighter, streaming session (stable boundary + tail window), image/link/clipboard platform contracts, localization and the `pura-agent` fence extensibility point |
 | `src/Special/Arc.Avalonia.Special.*` | 55 Special components in five projects: glass and surfaces, motion and interaction, media and input, AI widgets, AI explainers |
 | `src/Blocks/Arc.Avalonia.Blocks.*` | 111 page-level blocks in six projects: marketing, commerce, app shell, team and collaboration, data and charts, AI |
 | `samples/` | Three ProjectReference-based apps (login, settings, data) that show the one-line `<arc:ArcTheme/>` setup end to end |
@@ -299,7 +321,7 @@ dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll 
 dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --shot shots --shell --page button
 ```
 
-The registry currently renders **315 pages** (294 documentation entries, 5 guides, the home and status
+The registry currently renders **323 pages** (294 documentation entries, 5 guides, 3 Markdown component pages, the home and status
 pages, and 14 agent/life scene pages) at up to 1400 px per slice.
 
 ## Notes on fidelity
@@ -327,8 +349,10 @@ pages, and 14 agent/life scene pages) at up to 1400 px per slice.
 ## Dependencies
 
 No commercial or third-party UI/component library is used. The only NuGet packages across the solution are
-**Avalonia**, **Avalonia.Desktop**, **Avalonia.Themes.Fluent** and **Avalonia.Fonts.Inter** (all MIT); every
-control, chart and surface in this repository is our own XAML/C#. Pro components are implemented independently
+**Avalonia**, **Avalonia.Desktop**, **Avalonia.Themes.Fluent** and **Avalonia.Fonts.Inter** (all MIT), plus —
+confined to `Arc.Avalonia.Markdown` — **PuraMarkdown.Syntax** (MIT) and its **Markdig** parser (BSD-2-Clause),
+which supply the Markdown syntax layer while every control, theme and interaction stays Arc code (ADR 0006).
+Every control, chart and surface in this repository is our own XAML/C#. Pro components are implemented independently
 from Arc's public documentation and visual descriptions, without using or copying Pro source code.
 
 Package versions are centralised in `Directory.Packages.props` (NuGet central package management); the
@@ -359,3 +383,6 @@ the root of every NuGet package.
 * Fonts: **Inter** (SIL Open Font License) via `Avalonia.Fonts.Inter`.
 * The full third-party list (runtime packages, SkiaSharp/HarfBuzzSharp, fonts, icons, Arc UI, and the
   AG-UI semantic-only reference) is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
+
+

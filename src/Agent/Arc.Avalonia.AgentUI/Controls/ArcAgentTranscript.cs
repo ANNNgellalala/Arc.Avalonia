@@ -11,6 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.AgentUI.Controls;
@@ -108,6 +109,12 @@ public sealed class ArcAgentEvent
 
     /// <summary>When the event happened. A default value hides the timestamp column.</summary>
     public DateTimeOffset Timestamp { get; set; }
+
+    /// <summary>
+    /// True when the message came from the person. User messages keep the compact plain-text row; every other
+    /// message body is rendered as Markdown so headings, lists, code and pura-agent components work.
+    /// </summary>
+    public bool IsUserMessage { get; set; }
 }
 
 /// <summary>
@@ -141,6 +148,10 @@ public class ArcAgentTranscript : Panel
         AvaloniaProperty.Register<ArcAgentTranscript, string>(
             nameof(EmptyText), "No events yet. Start the agent to see its work here.");
 
+    /// <summary>Optional Markdown environment for assistant message bodies; null uses the default pipeline.</summary>
+    public static readonly StyledProperty<ArcMarkdownOptions?> MarkdownOptionsProperty =
+        AvaloniaProperty.Register<ArcAgentTranscript, ArcMarkdownOptions?>(nameof(MarkdownOptions));
+
     private static readonly CultureInfo DisplayCulture = CultureInfo.GetCultureInfo("en-US");
 
     private readonly HashSet<string> _expanded = new(StringComparer.Ordinal);
@@ -148,7 +159,9 @@ public class ArcAgentTranscript : Panel
     private readonly Dictionary<string, Control> _rowContainers = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ArcAgentEvent> _rowEvents = new(StringComparer.Ordinal);
     private readonly Dictionary<string, TextBlock> _rowTitles = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ArcMarkdownView> _rowBodies = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ArcAgentEventStatus> _rowStatuses = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ArcMarkdownInteraction> _interactions = new(StringComparer.Ordinal);
     private bool _seedExpanded = true;
     private string? _pendingFocus;
     private StackPanel? _rowHost;
@@ -163,6 +176,15 @@ public class ArcAgentTranscript : Panel
     private bool _autoScroll = true;
     private bool _scrollScheduled;
 
+    /// <summary>
+    /// Optional factory for the Markdown environment used by assistant message bodies. The
+    /// <c>Arc.Avalonia.Agent</c> composition root registers a pipeline with the <c>pura-agent</c> plugin here;
+    /// a host may set it too, or assign <see cref="MarkdownOptions"/> on one transcript. When no factory is
+    /// set the transcript falls back to <see cref="ArcMarkdownOptions.Default"/> (plain Markdown, no agent
+    /// components), which keeps this leaf package independent from the Agent top layer.
+    /// </summary>
+    public static Func<ArcMarkdownOptions>? DefaultMarkdownOptionsFactory { get; set; }
+
     static ArcAgentTranscript()
     {
         EventsProperty.Changed.AddClassHandler<ArcAgentTranscript>((transcript, _) =>
@@ -173,6 +195,7 @@ public class ArcAgentTranscript : Panel
         StatusProperty.Changed.AddClassHandler<ArcAgentTranscript>((transcript, _) => transcript.Rebuild());
         IsStreamingProperty.Changed.AddClassHandler<ArcAgentTranscript>((transcript, _) => transcript.Rebuild());
         EmptyTextProperty.Changed.AddClassHandler<ArcAgentTranscript>((transcript, _) => transcript.Rebuild());
+        MarkdownOptionsProperty.Changed.AddClassHandler<ArcAgentTranscript>((transcript, _) => transcript.Rebuild());
     }
 
     public ArcAgentTranscript()
@@ -207,6 +230,44 @@ public class ArcAgentTranscript : Panel
     {
         get => GetValue(EmptyTextProperty);
         set => SetValue(EmptyTextProperty, value);
+    }
+
+    /// <summary>Markdown environment for assistant message bodies; null uses the static default factory.</summary>
+    public ArcMarkdownOptions? MarkdownOptions
+    {
+        get => GetValue(MarkdownOptionsProperty);
+        set => SetValue(MarkdownOptionsProperty, value);
+    }
+
+    /// <summary>
+    /// Persisted pura-agent interactions reported by message bodies, keyed by component id. The transcript
+    /// applies them when a row is rebuilt, so virtualization and status updates keep the chosen state.
+    /// </summary>
+    public IReadOnlyDictionary<string, ArcMarkdownInteraction> InteractionStates => _interactions;
+
+    /// <summary>Raised when an interactive component inside an assistant message reports an interaction.</summary>
+    public event EventHandler<ArcMarkdownInteractionEventArgs>? InteractionOccurred;
+
+    /// <summary>Stores one interaction for later row rebuilds (the host may also persist it).</summary>
+    /// <param name="interaction">Recorded interaction.</param>
+    public void SetInteractionState(ArcMarkdownInteraction interaction)
+    {
+        ArgumentNullException.ThrowIfNull(interaction);
+        _interactions[interaction.ComponentId] = interaction;
+        ApplyInteractionToBodies();
+    }
+
+    /// <summary>Restores a set of persisted interactions and re-applies them to the realized message bodies.</summary>
+    /// <param name="states">Interactions keyed by component id.</param>
+    public void ApplyInteractionStates(IEnumerable<ArcMarkdownInteraction> states)
+    {
+        ArgumentNullException.ThrowIfNull(states);
+        foreach (var state in states)
+        {
+            _interactions[state.ComponentId] = state;
+        }
+
+        ApplyInteractionToBodies();
     }
 
     /// <summary>Raised when a failed event's Retry action is pressed; the host decides whether to re-run it.</summary>
@@ -295,22 +356,35 @@ public class ArcAgentTranscript : Panel
 
         if (_rowEvents.TryGetValue(evt.Id, out _) && _rowContainers.TryGetValue(evt.Id, out var existing))
         {
-            if (_rowStatuses.TryGetValue(evt.Id, out var previousStatus) &&
-                previousStatus == evt.Status &&
-                _rowTitles.TryGetValue(evt.Id, out var titleBlock))
+            if (_rowStatuses.TryGetValue(evt.Id, out var previousStatus) && previousStatus == evt.Status)
             {
-                // Streaming deltas only change the text: mutate the existing TextBlock instead of rebuilding.
-                titleBlock.Text = string.IsNullOrWhiteSpace(evt.Title) ? "(no title)" : evt.Title;
-                _rowEvents[evt.Id] = evt;
-                _incrementalTotal++;
-                UpdateHeader();
-                AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
-                return;
+                if (_rowBodies.TryGetValue(evt.Id, out var bodyView))
+                {
+                    // Streaming deltas of a Markdown message only change the source: re-set it in place.
+                    bodyView.Markdown = MarkdownBody(evt);
+                    _rowEvents[evt.Id] = evt;
+                    _incrementalTotal++;
+                    UpdateHeader();
+                    AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
+                    return;
+                }
+
+                if (_rowTitles.TryGetValue(evt.Id, out var titleBlock))
+                {
+                    // Streaming deltas only change the text: mutate the existing TextBlock instead of rebuilding.
+                    titleBlock.Text = string.IsNullOrWhiteSpace(evt.Title) ? "(no title)" : evt.Title;
+                    _rowEvents[evt.Id] = evt;
+                    _incrementalTotal++;
+                    UpdateHeader();
+                    AutomationProperties.SetName(this, $"Agent transcript, {_incrementalTotal} events, {StatusWord(Status)}");
+                    return;
+                }
             }
 
             var index = _rowHost.Children.IndexOf(existing);
             if (index >= 0)
             {
+                _rowBodies.Remove(evt.Id);
                 var replacement = BuildRow(evt);
                 _rowHost.Children[index] = replacement;
                 _rowContainers[evt.Id] = replacement;
@@ -349,6 +423,7 @@ public class ArcAgentTranscript : Panel
         _rowEvents.Clear();
         _rowContainers.Clear();
         _rowTitles.Clear();
+        _rowBodies.Clear();
         _rowStatuses.Clear();
         _rowButtons.Clear();
         _rowHost?.Children.Clear();
@@ -379,6 +454,7 @@ public class ArcAgentTranscript : Panel
                     _rowContainers.Remove(pair.Key);
                     _rowEvents.Remove(pair.Key);
                     _rowTitles.Remove(pair.Key);
+                    _rowBodies.Remove(pair.Key);
                     _rowStatuses.Remove(pair.Key);
                     _rowButtons.Remove(pair.Key);
                     break;
@@ -439,6 +515,7 @@ public class ArcAgentTranscript : Panel
         _rowContainers.Clear();
         _rowEvents.Clear();
         _rowTitles.Clear();
+        _rowBodies.Clear();
         _rowStatuses.Clear();
         _rowHost = null;
         _scroll = null;
@@ -561,6 +638,13 @@ public class ArcAgentTranscript : Panel
 
     private Control BuildRow(ArcAgentEvent evt)
     {
+        // Assistant/system messages are the transcript "body": render them as Markdown so headings, lists,
+        // code and pura-agent components work. User messages keep the compact plain-text row.
+        if (evt.Kind == ArcAgentEventKind.Message && !evt.IsUserMessage && !string.IsNullOrWhiteSpace(MarkdownBody(evt)))
+        {
+            return BuildMessageRow(evt);
+        }
+
         var expanded = _expanded.Contains(evt.Id);
 
         var headerContent = new Grid
@@ -637,6 +721,135 @@ public class ArcAgentTranscript : Panel
             Padding = new Thickness(2),
             Child = stack
         };
+    }
+
+    /// <summary>
+    /// Markdown body row for assistant messages: a type icon, the rendered document and a quiet metadata line.
+    /// Interactive agent components inside the document report through <see cref="InteractionOccurred"/> and are
+    /// re-applied from <see cref="InteractionStates"/> whenever the row is rebuilt.
+    /// </summary>
+    private Control BuildMessageRow(ArcAgentEvent evt)
+    {
+        var expanded = _expanded.Contains(evt.Id);
+
+        var body = new ArcMarkdownView
+        {
+            Markdown = MarkdownBody(evt),
+            Options = ResolveMarkdownOptions(),
+            Margin = new Thickness(0, 0, 0, 2)
+        };
+        foreach (var state in _interactions.Values)
+        {
+            body.SetInteractionState(state);
+        }
+
+        body.InteractionOccurred += (_, args) => OnMarkdownInteraction(args);
+        AutomationProperties.SetName(
+            body,
+            $"Message: {Shorten(evt.Title, 240)}. {StatusWord(evt.Status)}.");
+        _rowBodies[evt.Id] = body;
+
+        var right = new StackPanel { Spacing = 4 };
+        right.Children.Add(body);
+
+        var meta = ArcUi.HStack(8);
+        meta.Children.Add(StatusBadge(evt.Status));
+        if (evt.Timestamp != default)
+        {
+            meta.Children.Add(ArcUi.Caption(evt.Timestamp.ToLocalTime().ToString("MMM d, h:mm tt", DisplayCulture)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(evt.Detail))
+        {
+            var detailToggle = ArcUi.Button(
+                expanded ? "Hide detail" : "Detail",
+                ArcButtonVariant.Ghost,
+                ArcButtonSize.Sm,
+                expanded ? "chevron-up" : "chevron-down");
+            AutomationProperties.SetName(detailToggle,
+                expanded ? "Collapse the extra detail" : "Show the extra detail");
+            detailToggle.Click += (_, _) => ToggleMessageDetail(evt.Id);
+            meta.Children.Add(detailToggle);
+            _rowButtons[evt.Id] = detailToggle;
+        }
+
+        right.Children.Add(meta);
+        if (expanded && !string.IsNullOrWhiteSpace(evt.Detail))
+        {
+            right.Children.Add(ArcUi.Body(evt.Detail, 640));
+        }
+
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("26,*"),
+            ColumnSpacing = 8
+        };
+        grid.Children.Add(KindIcon(evt.Kind));
+        Grid.SetColumn(right, 1);
+        grid.Children.Add(right);
+
+        return new Border
+        {
+            Background = expanded ? ArcUi.Brush(ArcTokens.SurfaceMuted) : null,
+            CornerRadius = ArcResources.Radius(ArcTokens.RadiusControl),
+            Padding = new Thickness(2),
+            Child = grid
+        };
+    }
+
+    private ArcMarkdownOptions ResolveMarkdownOptions()
+        => MarkdownOptions ?? DefaultMarkdownOptionsFactory?.Invoke() ?? ArcMarkdownOptions.Default;
+
+    private static string MarkdownBody(ArcAgentEvent evt)
+        => string.IsNullOrWhiteSpace(evt.Title) ? evt.Detail : evt.Title;
+
+    private static string Shorten(string text, int max)
+        => string.IsNullOrEmpty(text) ? string.Empty : text.Length <= max ? text : text[..max] + "…";
+
+    private void ToggleMessageDetail(string id)
+    {
+        if (!_expanded.Remove(id))
+        {
+            _expanded.Add(id);
+        }
+
+        if (_rowHost is null ||
+            !_rowEvents.TryGetValue(id, out var evt) ||
+            !_rowContainers.TryGetValue(id, out var existing))
+        {
+            return;
+        }
+
+        var index = _rowHost.Children.IndexOf(existing);
+        if (index < 0)
+        {
+            return;
+        }
+
+        _rowBodies.Remove(id);
+        var replacement = BuildRow(evt);
+        _rowHost.Children[index] = replacement;
+        _rowContainers[id] = replacement;
+    }
+
+    private void OnMarkdownInteraction(ArcMarkdownInteractionEventArgs args)
+    {
+        var interaction = new ArcMarkdownInteraction(
+            args.ComponentType,
+            args.ComponentId,
+            args.SelectedIds,
+            args.Confirmed,
+            args.Value);
+        _interactions[interaction.ComponentId] = interaction;
+        InteractionOccurred?.Invoke(this, args);
+    }
+
+    private void ApplyInteractionToBodies()
+    {
+        foreach (var body in _rowBodies.Values)
+        {
+            body.ApplyInteractionStates(_interactions.Values);
+        }
     }
 
     private Control BuildDetail(ArcAgentEvent evt)
@@ -799,7 +1012,8 @@ public class ArcAgentTranscript : Panel
                 Kind = ArcAgentEventKind.Message,
                 Title = "Add rate limiting to the public API, then show me the diff.",
                 Status = ArcAgentEventStatus.Done,
-                Timestamp = now.AddMinutes(-3)
+                Timestamp = now.AddMinutes(-3),
+                IsUserMessage = true
             },
             new ArcAgentEvent
             {

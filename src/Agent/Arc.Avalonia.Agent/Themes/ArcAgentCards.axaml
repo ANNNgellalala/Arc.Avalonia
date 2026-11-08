@@ -1,0 +1,135 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:agent="using:Arc.Avalonia.Agent"
+                    xmlns:arc="using:Arc.Avalonia.Controls">
+
+  <!--
+    pura-agent component cards. Both themes keep the anatomy the renderer fills in code: the shell, title,
+    description and footer are template parts, while the option rows are built by the control (the payload
+    owns the option list). Every colour, radius and font size resolves through an Arc token, so light/dark
+    and the eight accents follow the app theme.
+  -->
+  <ControlTheme x:Key="{x:Type agent:ArcAgentChoiceCard}" TargetType="agent:ArcAgentChoiceCard">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Surface"
+                Background="{DynamicResource ArcSurface}"
+                BorderBrush="{DynamicResource ArcBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusPanel}"
+                Padding="16">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+              <Border Width="30"
+                      Height="30"
+                      CornerRadius="10"
+                      Background="{DynamicResource ArcAccentSubtle}"
+                      VerticalAlignment="Top">
+                <arc:ArcIcon Icon="list-ordered"
+                             Size="15"
+                             Foreground="{DynamicResource ArcAccent}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center" />
+              </Border>
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock x:Name="PART_Title"
+                           FontFamily="{DynamicResource ArcFontBody}"
+                           FontSize="{DynamicResource ArcTextLg}"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource ArcForeground}"
+                           TextWrapping="Wrap" />
+                <TextBlock x:Name="PART_Description"
+                           FontFamily="{DynamicResource ArcFontBody}"
+                           FontSize="{DynamicResource ArcTextSm}"
+                           Foreground="{DynamicResource ArcTextSecondary}"
+                           TextWrapping="Wrap"
+                           IsVisible="False" />
+              </StackPanel>
+            </Grid>
+
+            <StackPanel x:Name="PART_Options" Spacing="6" />
+
+            <TextBlock x:Name="PART_Error"
+                       FontFamily="{DynamicResource ArcFontBody}"
+                       FontSize="{DynamicResource ArcTextSm}"
+                       Foreground="{DynamicResource ArcDanger}"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+
+            <StackPanel x:Name="PART_Footer"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center"
+                        IsVisible="False">
+              <arc:ArcButton x:Name="PART_Submit" Variant="Primary" Size="Sm" />
+              <TextBlock x:Name="PART_Hint"
+                         FontFamily="{DynamicResource ArcFontBody}"
+                         FontSize="{DynamicResource ArcTextXs}"
+                         Foreground="{DynamicResource ArcTextMuted}"
+                         VerticalAlignment="Center"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type agent:ArcAgentConfirmCard}" TargetType="agent:ArcAgentConfirmCard">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Surface"
+                Background="{DynamicResource ArcSurface}"
+                BorderBrush="{DynamicResource ArcBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusPanel}"
+                Padding="16">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+              <Border Width="30"
+                      Height="30"
+                      CornerRadius="10"
+                      Background="{DynamicResource ArcSurfaceMuted}"
+                      VerticalAlignment="Top">
+                <arc:ArcIcon Icon="circle-help"
+                             Size="15"
+                             Foreground="{DynamicResource ArcTextSecondary}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center" />
+              </Border>
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock x:Name="PART_Title"
+                           FontFamily="{DynamicResource ArcFontBody}"
+                           FontSize="{DynamicResource ArcTextLg}"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource ArcForeground}"
+                           TextWrapping="Wrap" />
+                <TextBlock x:Name="PART_Description"
+                           FontFamily="{DynamicResource ArcFontBody}"
+                           FontSize="{DynamicResource ArcTextSm}"
+                           Foreground="{DynamicResource ArcTextSecondary}"
+                           TextWrapping="Wrap"
+                           IsVisible="False" />
+              </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="PART_State"
+                       FontFamily="{DynamicResource ArcFontBody}"
+                       FontSize="{DynamicResource ArcTextSm}"
+                       Foreground="{DynamicResource ArcTextSecondary}"
+                       TextWrapping="Wrap"
+                       IsVisible="False" />
+
+            <StackPanel x:Name="PART_Footer"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center">
+              <arc:ArcButton x:Name="PART_Confirm" Variant="Primary" Size="Sm" />
+              <arc:ArcButton x:Name="PART_Cancel" Variant="Secondary" Size="Sm" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

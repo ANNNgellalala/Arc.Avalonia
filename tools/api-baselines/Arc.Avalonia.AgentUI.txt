@@ -52,6 +52,7 @@
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision> ApproveRequested
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> DismissedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> ItemActionRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
   event System.EventHandler<System.String> DenyRequested
   event System.EventHandler<System.String> Dismissed
   event System.EventHandler<System.String> ItemActionRequested
@@ -134,6 +135,7 @@
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcApprovalSheetState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcDockStatus> StatusProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus> StatusProperty
+  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> MarkdownOptionsProperty
   field static Avalonia.StyledProperty<System.Boolean> AllowFreeTextProperty
   field static Avalonia.StyledProperty<System.Boolean> AllowMultipleProperty
   field static Avalonia.StyledProperty<System.Boolean> IsStreamingProperty
@@ -168,11 +170,13 @@
   method System.Void Append[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
   method System.Void AppendOrUpdate[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
   method System.Void AppendRange[System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> events]
+  method System.Void ApplyInteractionStates[System.Collections.Generic.IEnumerable<Arc.Avalonia.Markdown.ArcMarkdownInteraction> states]
   method System.Void PopParent[]
   method System.Void Populate:/Themes/ArcAgentUITheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void PushParent[System.Object ]
   method System.Void ResetIncremental[]
   method System.Void set_BaseUri[System.Uri ]
+  method System.Void SetInteractionState[Arc.Avalonia.Markdown.ArcMarkdownInteraction interaction]
   property Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer Answer {get}
   property Arc.Avalonia.AgentUI.Controls.ArcAgentAskState State {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcAgentEvent Event {get}
@@ -189,21 +193,25 @@
   property Arc.Avalonia.AgentUI.Controls.ArcAttentionRisk Risk {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcDockStatus Status {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus Status {get;set}
+  property Arc.Avalonia.Markdown.ArcMarkdownOptions MarkdownOptions {get;set}
   property System.Boolean AllowFreeText {get;set}
   property System.Boolean AllowMultiple {get;set}
   property System.Boolean Editable {get;set}
   property System.Boolean IsStreaming {get;set}
+  property System.Boolean IsUserMessage {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentAskOption> Options {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> Events {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument> Arguments {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAttentionItem> Items {get;set}
   property System.Collections.Generic.IEnumerable<System.String> PreviewLines {get;set}
+  property System.Collections.Generic.IReadOnlyDictionary<System.String, Arc.Avalonia.Markdown.ArcMarkdownInteraction> InteractionStates {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument> ModifiedArguments {get;set}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
   property System.DateTimeOffset Timestamp {get;set}
   property System.Double ElapsedSeconds {get;set}
   property System.Double ExpiresInSeconds {get;set}
   property System.Double Progress {get;set}
+  property System.Func<Arc.Avalonia.Markdown.ArcMarkdownOptions> DefaultMarkdownOptionsFactory {get;set}
   property System.Int32 DroppedRowCount {get}
   property System.Int32 FullRebuildCount {get}
   property System.Int32 MaxRenderedRows {get;set}

@@ -3,13 +3,25 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.Agent.ArcAgentApprovalTray[]
+  ctor Arc.Avalonia.Agent.ArcAgentChoiceCard[]
+  ctor Arc.Avalonia.Agent.ArcAgentChoiceModel[]
+  ctor Arc.Avalonia.Agent.ArcAgentChoiceOption[System.String Id, System.String Label, System.String Description, System.Boolean Disabled]
+  ctor Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs[]
+  ctor Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Agent.ArcAgentCommand command]
   ctor Arc.Avalonia.Agent.ArcAgentComposer[]
+  ctor Arc.Avalonia.Agent.ArcAgentConfirmCard[]
+  ctor Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs[]
+  ctor Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
+  ctor Arc.Avalonia.Agent.ArcAgentConfirmModel[]
   ctor Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.Agent.ArcApprovalDecision decision]
   ctor Arc.Avalonia.Agent.ArcAgentEventBatch[System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentEvent> Events]
   ctor Arc.Avalonia.Agent.ArcAgentItemViewRegistry[System.Boolean includeDefaults]
+  ctor Arc.Avalonia.Agent.ArcAgentMarkdownPlugin[]
   ctor Arc.Avalonia.Agent.ArcAgentMessage[]
   ctor Arc.Avalonia.Agent.ArcAgentNullServices[]
+  ctor Arc.Avalonia.Agent.ArcAgentPayloadError[System.String Message, System.String Path]
+  ctor Arc.Avalonia.Agent.ArcAgentPayloadResult[]
   ctor Arc.Avalonia.Agent.ArcAgentRunRef[System.String RunId, System.String SessionId, Arc.Avalonia.Agent.ArcAgentRunKind Kind, System.String ParentRunId, System.String Label]
   ctor Arc.Avalonia.Agent.ArcAgentRunState[]
   ctor Arc.Avalonia.Agent.ArcAgentSessionChangedEventArgs[Arc.Avalonia.Agent.ArcAgentChangeKind kind, Arc.Avalonia.Agent.ArcAgentEvent event, System.String itemId]
@@ -68,15 +80,21 @@
   ctor Arc.Avalonia.Agent.ArcToolCallStartedEvent[Arc.Avalonia.Agent.ArcEventStamp Stamp, System.DateTimeOffset At, System.String CallId, System.String ToolName, System.String Intent, Arc.Avalonia.Agent.ArcRiskLevel Risk]
   ctor Arc.Avalonia.Agent.DispatcherUiDispatcher[]
   ctor Arc.Avalonia.Agent.QueuedUiDispatcher[]
+  ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
+  ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
   event System.EventHandler Changed
   event System.EventHandler Changed
   event System.EventHandler Changed
   event System.EventHandler StopRequested
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs> Submitted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs> SubmittedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRaised
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRaised
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommand> CommandRequested
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRaisedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRequestedRouted
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs> Decided
+  event System.EventHandler<Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs> DecidedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs> DecisionRequestedRouted
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentEventBatch> Flush
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentSessionChangedEventArgs> Changed
@@ -93,6 +111,7 @@
   event System.EventHandler<System.String> DenyRequested
   event System.EventHandler<System.String> DetailsRequested
   event System.EventHandler<System.String> RetryRequested
+  field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Agent.ArcAgentChangeKind EventApplied
   field static Arc.Avalonia.Agent.ArcAgentChangeKind PhaseChanged
   field static Arc.Avalonia.Agent.ArcAgentChangeKind QueueChanged
@@ -117,6 +136,9 @@
   field static Arc.Avalonia.Agent.ArcAgentEventKind ToolArgsDelta
   field static Arc.Avalonia.Agent.ArcAgentEventKind ToolCallEnded
   field static Arc.Avalonia.Agent.ArcAgentEventKind ToolCallStarted
+  field static Arc.Avalonia.Agent.ArcAgentPayloadStatus Invalid
+  field static Arc.Avalonia.Agent.ArcAgentPayloadStatus Success
+  field static Arc.Avalonia.Agent.ArcAgentPayloadStatus Unsupported
   field static Arc.Avalonia.Agent.ArcAgentRole Assistant
   field static Arc.Avalonia.Agent.ArcAgentRole Reasoning
   field static Arc.Avalonia.Agent.ArcAgentRole SubAgent
@@ -190,17 +212,40 @@
   field static Arc.Avalonia.Agent.ArcToolCallStatus Pending
   field static Arc.Avalonia.Agent.ArcToolCallStatus Running
   field static Arc.Avalonia.Agent.ArcToolCallStatus Succeeded
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs> SubmittedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRaisedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs> CommandRequestedEvent
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs> DecidedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs> DecisionRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> ApproveRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DenyRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> DetailsRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolActionRoutedEventArgs> RetryRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcComposerSubmitRoutedEventArgs> SubmitRequestedEvent
+  field static Avalonia.StyledProperty<Arc.Avalonia.Agent.ArcAgentChoiceModel> ModelProperty
+  field static Avalonia.StyledProperty<Arc.Avalonia.Agent.ArcAgentConfirmModel> ModelProperty
+  field static Avalonia.StyledProperty<System.Boolean> IsInteractiveProperty
+  field static Avalonia.StyledProperty<System.Boolean> IsInteractiveProperty
+  field static System.Int32 MaxDepth
+  field static System.Int32 MaxOptionCount
+  field static System.Int32 MaxPayloadChars
+  field System.Collections.Generic.List<System.Object> ParentsStack
+  field System.Object IntermediateRoot
+  field System.Object ProvideTargetObject
+  field System.Object ProvideTargetProperty
+  field TTarget RootObject
+  method Arc.Avalonia.Agent.ArcAgentChoiceModel <Clone>$[]
+  method Arc.Avalonia.Agent.ArcAgentChoiceOption <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentCommand <Clone>$[]
+  method Arc.Avalonia.Agent.ArcAgentComponentModel <Clone>$[]
+  method Arc.Avalonia.Agent.ArcAgentConfirmModel <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentEvent <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentEventBatch <Clone>$[]
+  method Arc.Avalonia.Agent.ArcAgentPayloadError <Clone>$[]
+  method Arc.Avalonia.Agent.ArcAgentPayloadResult Invalid[System.String raw, Arc.Avalonia.Agent.ArcAgentPayloadError error]
+  method Arc.Avalonia.Agent.ArcAgentPayloadResult Parse[System.String source]
+  method Arc.Avalonia.Agent.ArcAgentPayloadResult Parsed[Arc.Avalonia.Agent.ArcAgentComponentModel component, System.String raw]
+  method Arc.Avalonia.Agent.ArcAgentPayloadResult Unsupported[System.String raw, System.String type]
   method Arc.Avalonia.Agent.ArcAgentSessionSnapshot Snapshot[]
   method Arc.Avalonia.Agent.ArcAgentTurnRequest <Clone>$[]
   method Arc.Avalonia.Agent.ArcAgentWorkspace CreateSample[]
@@ -243,10 +288,13 @@
   method Arc.Avalonia.Agent.ArcToolCallStartedEvent <Clone>$[]
   method Arc.Avalonia.Agent.IArcAgentSession GetSession[System.String sessionOrRunId]
   method Arc.Avalonia.Agent.IArcAgentSession GetSession[System.String sessionOrRunId]
+  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseAgentComponents[Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder builder]
   method Avalonia.Controls.Control Resolve[System.Object value]
   method Avalonia.Controls.Control Resolve[System.Object value]
+  method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcAgentCards.axaml[System.IServiceProvider ]
   method Avalonia.Controls.Templates.IDataTemplate CreateTemplate[]
   method Avalonia.Controls.Templates.IDataTemplate CreateTemplate[]
+  method Avalonia.Styling.Styles Build:/Themes/ArcAgentTheme.axaml[System.IServiceProvider ]
   method System.Boolean Activate[System.String sessionOrRunId]
   method System.Boolean Activate[System.String sessionOrRunId]
   method System.Boolean Add[Arc.Avalonia.Agent.ArcArtifact artifact]
@@ -254,6 +302,8 @@
   method System.Boolean CheckAccess[]
   method System.Boolean CheckAccess[]
   method System.Boolean Enqueue[Arc.Avalonia.Agent.ArcApprovalRequest request]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentChoiceModel other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentChoiceOption other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
@@ -264,6 +314,10 @@
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentCommand other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentComponentModel other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentComponentModel other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentComponentModel other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentConfirmModel other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEvent other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEvent other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEvent other]
@@ -285,6 +339,7 @@
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEvent other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEvent other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentEventBatch other]
+  method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentPayloadError other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentRunRef other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAgentTurnRequest other]
   method System.Boolean Equals[Arc.Avalonia.Agent.ArcAnswerCommand other]
@@ -360,12 +415,22 @@
   method System.Boolean Equals[System.Object obj]
   method System.Boolean Equals[System.Object obj]
   method System.Boolean Equals[System.Object obj]
+  method System.Boolean Equals[System.Object obj]
+  method System.Boolean Equals[System.Object obj]
+  method System.Boolean Equals[System.Object obj]
+  method System.Boolean Equals[System.Object obj]
+  method System.Boolean Equals[System.Object obj]
   method System.Boolean Expire[System.String requestId]
   method System.Boolean IsSubmitting[System.String requestId]
   method System.Boolean MarkSeen[System.String entryId]
+  method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentChoiceModel left, Arc.Avalonia.Agent.ArcAgentChoiceModel right]
+  method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentChoiceOption left, Arc.Avalonia.Agent.ArcAgentChoiceOption right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentCommand left, Arc.Avalonia.Agent.ArcAgentCommand right]
+  method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentComponentModel left, Arc.Avalonia.Agent.ArcAgentComponentModel right]
+  method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentConfirmModel left, Arc.Avalonia.Agent.ArcAgentConfirmModel right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentEvent left, Arc.Avalonia.Agent.ArcAgentEvent right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentEventBatch left, Arc.Avalonia.Agent.ArcAgentEventBatch right]
+  method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentPayloadError left, Arc.Avalonia.Agent.ArcAgentPayloadError right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentRunRef left, Arc.Avalonia.Agent.ArcAgentRunRef right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAgentTurnRequest left, Arc.Avalonia.Agent.ArcAgentTurnRequest right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcAnswerCommand left, Arc.Avalonia.Agent.ArcAnswerCommand right]
@@ -402,9 +467,14 @@
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcToolArgsDeltaEvent left, Arc.Avalonia.Agent.ArcToolArgsDeltaEvent right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcToolCallEndedEvent left, Arc.Avalonia.Agent.ArcToolCallEndedEvent right]
   method System.Boolean op_Equality[Arc.Avalonia.Agent.ArcToolCallStartedEvent left, Arc.Avalonia.Agent.ArcToolCallStartedEvent right]
+  method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentChoiceModel left, Arc.Avalonia.Agent.ArcAgentChoiceModel right]
+  method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentChoiceOption left, Arc.Avalonia.Agent.ArcAgentChoiceOption right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentCommand left, Arc.Avalonia.Agent.ArcAgentCommand right]
+  method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentComponentModel left, Arc.Avalonia.Agent.ArcAgentComponentModel right]
+  method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentConfirmModel left, Arc.Avalonia.Agent.ArcAgentConfirmModel right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentEvent left, Arc.Avalonia.Agent.ArcAgentEvent right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentEventBatch left, Arc.Avalonia.Agent.ArcAgentEventBatch right]
+  method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentPayloadError left, Arc.Avalonia.Agent.ArcAgentPayloadError right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentRunRef left, Arc.Avalonia.Agent.ArcAgentRunRef right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAgentTurnRequest left, Arc.Avalonia.Agent.ArcAgentTurnRequest right]
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcAnswerCommand left, Arc.Avalonia.Agent.ArcAnswerCommand right]
@@ -443,10 +513,18 @@
   method System.Boolean op_Inequality[Arc.Avalonia.Agent.ArcToolCallStartedEvent left, Arc.Avalonia.Agent.ArcToolCallStartedEvent right]
   method System.Boolean Resolve[System.String entryId]
   method System.Boolean Resolve[System.String requestId]
+  method System.Boolean ToggleOption[System.String optionId]
+  method System.Boolean TryDecide[System.Boolean confirmed]
+  method System.Boolean TrySubmit[]
   method System.Int32 ApplyRange[System.Collections.Generic.IEnumerable<Arc.Avalonia.Agent.ArcAgentEvent> events]
   method System.Int32 ApplyRange[System.Collections.Generic.IEnumerable<Arc.Avalonia.Agent.ArcAgentEvent> events]
   method System.Int32 ExpireRun[System.String runId]
   method System.Int32 ExpireRun[System.String runId]
+  method System.Int32 GetHashCode[]
+  method System.Int32 GetHashCode[]
+  method System.Int32 GetHashCode[]
+  method System.Int32 GetHashCode[]
+  method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
@@ -487,6 +565,17 @@
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
   method System.Int32 RunPending[]
+  method System.Object get_Current[]
+  method System.Object GetService[System.Type ]
+  method System.Object TryLoad[System.IServiceProvider , System.String ]
+  method System.Object TryLoad[System.String ]
+  method System.String CreateComponentId[System.String raw]
+  method System.String Normalize[System.String source]
+  method System.String ToString[]
+  method System.String ToString[]
+  method System.String ToString[]
+  method System.String ToString[]
+  method System.String ToString[]
   method System.String ToString[]
   method System.String ToString[]
   method System.String ToString[]
@@ -537,13 +626,17 @@
   method System.Threading.Tasks.Task<System.Boolean> ConfirmAsync[System.String title, System.String message, System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.Task<System.String> StartTurnAsync[Arc.Avalonia.Agent.ArcAgentTurnRequest request, Arc.Avalonia.Agent.IArcAgentEventSink sink, System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.Task<System.String> StartTurnAsync[System.String text, System.String model]
+  method System.Uri get_BaseUri[]
   method System.Void Append[System.String delta]
+  method System.Void ApplyInteractionState[Arc.Avalonia.Markdown.ArcMarkdownInteraction interaction]
+  method System.Void ApplyInteractionState[Arc.Avalonia.Markdown.ArcMarkdownInteraction interaction]
   method System.Void Attach[Arc.Avalonia.Agent.IArcAgentWorkspace workspace, Arc.Avalonia.Agent.IArcAgentTransport transport, Arc.Avalonia.Agent.IArcAgentServices services]
   method System.Void Clear[]
   method System.Void Clear[]
   method System.Void Clear[]
   method System.Void Clear[]
   method System.Void Complete[System.String runId, Arc.Avalonia.Agent.ArcRunPhase phase]
+  method System.Void Configure[Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder builder]
   method System.Void Deconstruct[out Arc.Avalonia.Agent.ArcEventStamp Stamp, out System.DateTimeOffset At, out Arc.Avalonia.Agent.ArcAgentRunRef Run]
   method System.Void Deconstruct[out Arc.Avalonia.Agent.ArcEventStamp Stamp, out System.DateTimeOffset At, out Arc.Avalonia.Agent.ArcAgentSessionSnapshot Snapshot]
   method System.Void Deconstruct[out Arc.Avalonia.Agent.ArcEventStamp Stamp, out System.DateTimeOffset At, out Arc.Avalonia.Agent.ArcApprovalRequest Request]
@@ -565,7 +658,9 @@
   method System.Void Deconstruct[out Arc.Avalonia.Agent.ArcEventStamp Stamp, out System.DateTimeOffset At, out System.String StepId, out System.String Title]
   method System.Void Deconstruct[out Arc.Avalonia.Agent.ArcEventStamp Stamp, out System.DateTimeOffset At]
   method System.Void Deconstruct[out System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentEvent> Events]
+  method System.Void Deconstruct[out System.String Id, out System.String Label, out System.String Description, out System.Boolean Disabled]
   method System.Void Deconstruct[out System.String Id, out System.String Name, out System.Int64 SizeBytes, out System.String MimeType]
+  method System.Void Deconstruct[out System.String Message, out System.String Path]
   method System.Void Deconstruct[out System.String Name, out System.String Value, out System.Boolean Editable]
   method System.Void Deconstruct[out System.String RequestId, out System.Boolean Approved, out Arc.Avalonia.Agent.ArcApprovalScope Scope, out System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcApprovalArgument> ModifiedArguments, out System.String DenyReason, out System.String DelegateTo]
   method System.Void Deconstruct[out System.String RequestId, out System.Collections.Generic.IReadOnlyList<System.String> SelectedOptions, out System.String FreeText, out System.Boolean Deferred]
@@ -589,10 +684,14 @@
   method System.Void FlushNow[]
   method System.Void FocusInput[]
   method System.Void MarkSubmitting[System.String requestId]
+  method System.Void PopParent[]
+  method System.Void Populate:/Themes/ArcAgentCards.axaml[System.IServiceProvider , Avalonia.Controls.ResourceDictionary ]
+  method System.Void Populate:/Themes/ArcAgentTheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void Post[System.Action action]
   method System.Void Post[System.Action action]
   method System.Void Post[System.Action action]
   method System.Void Push[Arc.Avalonia.Agent.ArcAgentEvent event]
+  method System.Void PushParent[System.Object ]
   method System.Void Register[System.Type type, System.Func<System.Object, Avalonia.Controls.Control> factory]
   method System.Void Register[System.Type type, System.Func<System.Object, Avalonia.Controls.Control> factory]
   method System.Void Register<T>[System.Func<T, Avalonia.Controls.Control> factory]
@@ -601,11 +700,15 @@
   method System.Void Reset[]
   method System.Void Reset[]
   method System.Void Select[Arc.Avalonia.Agent.ArcArtifact artifact]
+  method System.Void set_BaseUri[System.Uri ]
   method System.Void SetText[System.String text]
   method System.Void Upsert[Arc.Avalonia.Agent.ArcAttentionEntry entry]
   property Arc.Avalonia.Agent.ArcAgentChangeKind Kind {get}
   property Arc.Avalonia.Agent.ArcAgentChangeKind Kind {get}
+  property Arc.Avalonia.Agent.ArcAgentChoiceModel Model {get;set}
   property Arc.Avalonia.Agent.ArcAgentCommand Command {get}
+  property Arc.Avalonia.Agent.ArcAgentComponentModel Component {get;set}
+  property Arc.Avalonia.Agent.ArcAgentConfirmModel Model {get;set}
   property Arc.Avalonia.Agent.ArcAgentEvent Event {get}
   property Arc.Avalonia.Agent.ArcAgentEvent Event {get}
   property Arc.Avalonia.Agent.ArcAgentEventKind EventKind {get}
@@ -630,6 +733,8 @@
   property Arc.Avalonia.Agent.ArcAgentEventKind EventKind {get}
   property Arc.Avalonia.Agent.ArcAgentItemViewRegistry ViewRegistry {get}
   property Arc.Avalonia.Agent.ArcAgentNullServices Instance {get}
+  property Arc.Avalonia.Agent.ArcAgentPayloadError Error {get;set}
+  property Arc.Avalonia.Agent.ArcAgentPayloadStatus Status {get;set}
   property Arc.Avalonia.Agent.ArcAgentRole Role {get;set}
   property Arc.Avalonia.Agent.ArcAgentRole Role {get;set}
   property Arc.Avalonia.Agent.ArcAgentRunKind Kind {get;set}
@@ -685,18 +790,32 @@
   property Arc.Avalonia.Agent.IArcAgentSession Session {get}
   property Arc.Avalonia.Agent.IArcAgentTransport Transport {get;set}
   property Arc.Avalonia.Agent.IArcAgentWorkspace Workspace {get;set}
+  property Arc.Avalonia.Markdown.ArcMarkdownOptions DefaultOptions {get}
+  property Arc.Avalonia.Markdown.ArcMarkdownPipeline DefaultPipeline {get}
   property System.Boolean AfterCurrentStep {get;set}
   property System.Boolean AllowFreeText {get;set}
   property System.Boolean Approved {get;set}
+  property System.Boolean Confirmed {get;set}
+  property System.Boolean Confirmed {get}
+  property System.Boolean Danger {get;set}
   property System.Boolean Deferred {get;set}
+  property System.Boolean Disabled {get;set}
+  property System.Boolean Disabled {get;set}
   property System.Boolean Editable {get;set}
   property System.Boolean IsBackground {get}
+  property System.Boolean IsDecided {get}
+  property System.Boolean IsInteractive {get;set}
+  property System.Boolean IsInteractive {get;set}
   property System.Boolean IsRunning {get;set}
   property System.Boolean IsStreaming {get;set}
   property System.Boolean IsStreaming {get}
   property System.Boolean IsSubAgent {get}
+  property System.Boolean IsSubmitted {get}
+  property System.Boolean Multi {get;set}
   property System.Boolean ShowAttentionInbox {get;set}
   property System.Boolean ShowBackgroundDock {get;set}
+  property System.Boolean Success {get}
+  property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentChoiceOption> Options {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentEvent> Events {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentEvent> Timeline {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcAgentMessage> Messages {get;set}
@@ -719,7 +838,11 @@
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.ArcToolCall> ToolCalls {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.IArcAgentSession> Sessions {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Agent.IArcAgentSession> Sessions {get}
+  property System.Collections.Generic.IReadOnlyList<System.String> ComponentTypes {get}
+  property System.Collections.Generic.IReadOnlyList<System.String> DefaultSelected {get;set}
   property System.Collections.Generic.IReadOnlyList<System.String> Options {get;set}
+  property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
+  property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedOptions {get;set}
   property System.Collections.Generic.IReadOnlyList<System.String> SideEffects {get;set}
   property System.DateTimeOffset At {get;set}
@@ -731,6 +854,7 @@
   property System.Int32 BlockingCount {get}
   property System.Int32 Count {get}
   property System.Int32 FlushCount {get}
+  property System.Int32 Min {get;set}
   property System.Int32 OpenCount {get}
   property System.Int32 Pending {get}
   property System.Int32 PendingCount {get}
@@ -739,7 +863,9 @@
   property System.Int64 SizeBytes {get;set}
   property System.Nullable<System.DateTimeOffset> ExpiresAt {get;set}
   property System.Nullable<System.DateTimeOffset> ExpiresAt {get;set}
+  property System.Nullable<System.Int32> Max {get;set}
   property System.Nullable<System.Int64> SizeBytes {get;set}
+  property System.Object Current {get}
   property System.String Arguments {get}
   property System.String ArtifactId {get;set}
   property System.String CallId {get;set}
@@ -747,6 +873,12 @@
   property System.String CallId {get;set}
   property System.String CallId {get;set}
   property System.String CallId {get}
+  property System.String CancelLabel {get;set}
+  property System.String ComponentId {get;set}
+  property System.String ComponentId {get;set}
+  property System.String ComponentId {get}
+  property System.String ComponentId {get}
+  property System.String ConfirmLabel {get;set}
   property System.String CurrentStep {get}
   property System.String DelegateTo {get;set}
   property System.String Delta {get;set}
@@ -754,12 +886,16 @@
   property System.String DeltaJson {get;set}
   property System.String DeltaJson {get;set}
   property System.String DenyReason {get;set}
+  property System.String Description {get;set}
+  property System.String Description {get;set}
   property System.String Detail {get;set}
   property System.String DisplayText {get;set}
   property System.String EntryId {get;set}
   property System.String EventId {get;set}
   property System.String EventId {get;set}
   property System.String FreeText {get;set}
+  property System.String Id {get;set}
+  property System.String Id {get;set}
   property System.String Id {get;set}
   property System.String Id {get;set}
   property System.String Id {get;set}
@@ -772,6 +908,8 @@
   property System.String ItemId {get}
   property System.String Kind {get;set}
   property System.String Label {get;set}
+  property System.String Label {get;set}
+  property System.String Message {get;set}
   property System.String MessageId {get;set}
   property System.String MessageId {get;set}
   property System.String MessageId {get;set}
@@ -781,9 +919,14 @@
   property System.String Model {get;set}
   property System.String Name {get;set}
   property System.String Name {get;set}
+  property System.String Name {get}
   property System.String ParentRunId {get;set}
+  property System.String Path {get;set}
   property System.String Payload {get;set}
   property System.String Question {get;set}
+  property System.String Question {get;set}
+  property System.String Raw {get;set}
+  property System.String Raw {get;set}
   property System.String ReasoningId {get;set}
   property System.String RequestId {get;set}
   property System.String RequestId {get;set}
@@ -802,6 +945,7 @@
   property System.String SessionId {get}
   property System.String StepId {get;set}
   property System.String StepId {get;set}
+  property System.String SubmitLabel {get;set}
   property System.String Subtitle {get;set}
   property System.String Text {get;set}
   property System.String Text {get;set}
@@ -815,16 +959,30 @@
   property System.String ToolName {get;set}
   property System.String ToolName {get;set}
   property System.String ToolName {get;set}
+  property System.String Type {get;set}
+  property System.String Type {get;set}
   property System.String Value {get;set}
+  property System.String Value {get;set}
+  property System.String Version {get;set}
+  property System.String Version {get}
+  property System.Uri BaseUri {get;set}
 type abstract Arc.Avalonia.Agent.ArcAgentCommand : System.IEquatable<Arc.Avalonia.Agent.ArcAgentCommand>
+type abstract Arc.Avalonia.Agent.ArcAgentComponentModel : System.IEquatable<Arc.Avalonia.Agent.ArcAgentComponentModel>
 type abstract Arc.Avalonia.Agent.ArcAgentEvent : System.IEquatable<Arc.Avalonia.Agent.ArcAgentEvent>
 type class Arc.Avalonia.Agent.ArcAgentApprovalTray : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type class Arc.Avalonia.Agent.ArcAgentChoiceCard : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Agent.ArcAgentComposer : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type class Arc.Avalonia.Agent.ArcAgentConfirmCard : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Agent.ArcAgentStreamingText : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Agent.ArcAgentSurface : Avalonia.Controls.Panel, Arc.Avalonia.Agent.IArcAgentCommandSink, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Agent.ArcAgentToolCallCard : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type class CompiledAvaloniaXaml.!AvaloniaResources
+type class CompiledAvaloniaXaml.!XamlLoader
+type class CompiledAvaloniaXaml.XamlIlContext.Context`1 : Avalonia.Markup.Xaml.IProvideValueTarget, Avalonia.Markup.Xaml.IRootObjectProvider, Avalonia.Markup.Xaml.IUriContext, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlEagerParentStackProvider, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlParentStackProvider, System.ComponentModel.ITypeDescriptorContext, System.IServiceProvider
+type class CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator : System.Collections.Generic.IEnumerator<System.Object>, System.Collections.IEnumerator, System.IDisposable
 type enum Arc.Avalonia.Agent.ArcAgentChangeKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Agent.ArcAgentEventKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+type enum Arc.Avalonia.Agent.ArcAgentPayloadStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Agent.ArcAgentRole : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Agent.ArcAgentRunKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Agent.ArcApplyResult : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
@@ -847,12 +1005,20 @@ type interface Arc.Avalonia.Agent.IArcAgentSession
 type interface Arc.Avalonia.Agent.IArcAgentTransport
 type interface Arc.Avalonia.Agent.IArcAgentWorkspace
 type interface Arc.Avalonia.Agent.IArcUiDispatcher
+type sealed Arc.Avalonia.Agent.ArcAgentChoiceModel : Arc.Avalonia.Agent.ArcAgentComponentModel, System.IEquatable<Arc.Avalonia.Agent.ArcAgentChoiceModel>, System.IEquatable<Arc.Avalonia.Agent.ArcAgentComponentModel>
+type sealed Arc.Avalonia.Agent.ArcAgentChoiceOption : System.IEquatable<Arc.Avalonia.Agent.ArcAgentChoiceOption>
+type sealed Arc.Avalonia.Agent.ArcAgentChoiceSubmittedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentCommandRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Agent.ArcAgentConfirmDecidedEventArgs : Avalonia.Interactivity.RoutedEventArgs
+type sealed Arc.Avalonia.Agent.ArcAgentConfirmModel : Arc.Avalonia.Agent.ArcAgentComponentModel, System.IEquatable<Arc.Avalonia.Agent.ArcAgentComponentModel>, System.IEquatable<Arc.Avalonia.Agent.ArcAgentConfirmModel>
 type sealed Arc.Avalonia.Agent.ArcAgentDecisionRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentEventBatch : System.IEquatable<Arc.Avalonia.Agent.ArcAgentEventBatch>
 type sealed Arc.Avalonia.Agent.ArcAgentItemViewRegistry : Arc.Avalonia.Agent.IArcAgentItemViewRegistry
+type sealed Arc.Avalonia.Agent.ArcAgentMarkdownPlugin : Arc.Avalonia.Markdown.IArcMarkdownPlugin
 type sealed Arc.Avalonia.Agent.ArcAgentMessage
 type sealed Arc.Avalonia.Agent.ArcAgentNullServices : Arc.Avalonia.Agent.IArcAgentServices
+type sealed Arc.Avalonia.Agent.ArcAgentPayloadError : System.IEquatable<Arc.Avalonia.Agent.ArcAgentPayloadError>
+type sealed Arc.Avalonia.Agent.ArcAgentPayloadResult
 type sealed Arc.Avalonia.Agent.ArcAgentRunState
 type sealed Arc.Avalonia.Agent.ArcAgentSessionChangedEventArgs : System.EventArgs
 type sealed Arc.Avalonia.Agent.ArcAgentSessionSnapshot
@@ -906,5 +1072,7 @@ type sealed Arc.Avalonia.Agent.ArcToolCallEndedEvent : Arc.Avalonia.Agent.ArcAge
 type sealed Arc.Avalonia.Agent.ArcToolCallStartedEvent : Arc.Avalonia.Agent.ArcAgentEvent, System.IEquatable<Arc.Avalonia.Agent.ArcAgentEvent>, System.IEquatable<Arc.Avalonia.Agent.ArcToolCallStartedEvent>
 type sealed Arc.Avalonia.Agent.DispatcherUiDispatcher : Arc.Avalonia.Agent.IArcUiDispatcher
 type sealed Arc.Avalonia.Agent.QueuedUiDispatcher : Arc.Avalonia.Agent.IArcUiDispatcher
+type static Arc.Avalonia.Agent.ArcAgentJson
+type static Arc.Avalonia.Agent.ArcAgentMarkdown
 type struct Arc.Avalonia.Agent.ArcAgentRunRef : System.ValueType, System.IEquatable<Arc.Avalonia.Agent.ArcAgentRunRef>
 type struct Arc.Avalonia.Agent.ArcEventStamp : System.ValueType, System.IEquatable<Arc.Avalonia.Agent.ArcEventStamp>

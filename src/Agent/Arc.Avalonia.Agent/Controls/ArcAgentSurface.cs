@@ -52,6 +52,13 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
     private bool _showBackgroundDock = true;
     private string? _lastRunId;
 
+    static ArcAgentSurface()
+    {
+        // The transcript leaf package cannot reference the Agent layer (it is referenced by it), so the
+        // composition root registers the Markdown environment that includes the pura-agent fence plugin.
+        ArcAgentTranscript.DefaultMarkdownOptionsFactory ??= () => ArcAgentMarkdown.DefaultOptions;
+    }
+
     /// <summary>Creates the surface with the sample workspace so it renders without a host.</summary>
     public ArcAgentSurface()
     {
@@ -353,13 +360,15 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
             MapStepStatus(step.Status), step.At),
         ArcMessageStartedEvent message => New(
             $"message-{message.MessageId}", UiEventKind.Message, RoleLabel(message.Role),
-            string.Empty, UiEventStatus.Running, message.At),
+            string.Empty, UiEventStatus.Running, message.At, message.Role == ArcAgentRole.User),
         ArcMessageDeltaEvent delta => New(
             $"message-{delta.MessageId}", UiEventKind.Message, MessageText(session, delta.MessageId),
-            string.Empty, UiEventStatus.Running, delta.At),
+            string.Empty, UiEventStatus.Running, delta.At,
+            MessageRole(session, delta.MessageId) == ArcAgentRole.User),
         ArcMessageEndedEvent ended => New(
             $"message-{ended.MessageId}", UiEventKind.Message, MessageText(session, ended.MessageId),
-            string.Empty, MapMessageStatus(ended.Status), ended.At),
+            string.Empty, MapMessageStatus(ended.Status), ended.At,
+            MessageRole(session, ended.MessageId) == ArcAgentRole.User),
         ArcReasoningDeltaEvent reasoning => New(
             $"reasoning-{reasoning.ReasoningId}", UiEventKind.Thinking, ReasoningText(session, reasoning.ReasoningId),
             string.Empty, UiEventStatus.Running, reasoning.At),
@@ -399,15 +408,20 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
         string title,
         string detail,
         UiEventStatus status,
-        DateTimeOffset at) => new()
+        DateTimeOffset at,
+        bool userMessage = false) => new()
     {
         Id = id,
         Kind = kind,
         Title = string.IsNullOrWhiteSpace(title) ? "(no title)" : title,
         Detail = detail,
         Status = status,
-        Timestamp = at
+        Timestamp = at,
+        IsUserMessage = userMessage
     };
+
+    private static ArcAgentRole? MessageRole(IArcAgentSession session, string id) =>
+        session.Messages.FirstOrDefault(message => message.Id == id)?.Role;
 
     private static string MessageText(IArcAgentSession session, string id) =>
         session.Messages.FirstOrDefault(message => message.Id == id)?.Text ?? string.Empty;

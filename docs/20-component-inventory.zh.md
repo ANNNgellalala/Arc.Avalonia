@@ -1,8 +1,8 @@
 # 20 · 组件清单（当前实现清点）
 
 > **口径**：本文件由仓库实际产物统计（`tools/api-baselines/*.txt` 的公开类型与基类链 + `src/**` 源码 + `src/Docs/**` 页面与文档），不是设计规划。
-> **快照**：M2 第三波之后（commit `ff9ad27`）。统计脚本口径见文末 §9。
-> **一句话**：31 个 NuGet 包、**256 个公开 UI 控件**、907 个公开类型、≈1213 个属性注册、139 个路由事件、158 个 ControlTheme、320 个文档页面（294 篇目录文档）、111 个页面级 block。
+> **快照**：M2 第三波之后（commit `ff9ad27`），M3 Markdown 波次后增补（见 §10）。
+> **一句话**：**32 个 NuGet 包**、**262 个公开 UI 控件**、973 个公开类型、144 个路由事件、164 个 ControlTheme、323 个文档页面（294 篇目录文档）、111 个页面级 block。
 
 ---
 
@@ -147,3 +147,27 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 * 页面/文档 = `src/Docs/Arc.Avalonia.Docs/**/Pages/*Page.cs` 与 `Docs/*.json`；block 数 = Blocks 分组下页面数（111）。
 * LOC = `src/**` 下 31 个发布工程（排除 Docs/Gallery/samples/POC）的 C# 行数。
 * 可复算：`.recon/component-controls.json`（控件清单）、`.recon/component-stats.json`（每包统计）。
+
+---
+
+## 10. M3 Markdown 波次增量（2026-11-08）
+
+新增 `Arc.Avalonia.Markdown`（L2，32 个包）与 `pura-agent` 组件；PuraMarkdown 的解析层作为唯一外部依赖特例
+（`PuraMarkdown.Syntax` + `Markdig`，仅该包，ADR 0006）。
+
+| 维度 | 增量 | 现在 |
+|---|---|---|
+| 可发布包 | +1 `Arc.Avalonia.Markdown` | **32** |
+| 公开 UI 控件 | +4 Markdown（View/DocumentView/ChatView/CodeBlock）+2 Agent（ChoiceCard/ConfirmCard） | **262** |
+| 公开类型（API baseline 统计） | +66 | **973** |
+| 路由事件 | +5 | **144** |
+| ControlTheme | +6 | **164** |
+| 文档页面 | +3（Markdown / Markdown Extended / Markdown Chat） | **323**（gallery smoke pageShows） |
+| Public API baseline | 32/32（新增 Markdown，Agent/AgentUI 更新） | GREEN |
+| 仓库门禁 | 9/9 | GREEN（R5 32/32 包） |
+
+Markdown 能力：CommonMark+GFM 全节点矩阵、代码高亮（17 语言族、无第三方库）、GFM 表格、图片/链接/剪贴板
+平台契约、稳定边界流式（committed/tail 两窗口 + 增量控件复用）、消息级虚拟化（1000 条消息约 12 个 realized 行）、
+`pura-agent` choice/confirm 与交互状态恢复、中文默认本地化、主题/浅深色 token 化。**块级虚拟化不在本波次范围**
+（单篇超长文档请拆页或使用 Chat 的消息级虚拟化）。
+

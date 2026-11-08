@@ -48,6 +48,7 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />

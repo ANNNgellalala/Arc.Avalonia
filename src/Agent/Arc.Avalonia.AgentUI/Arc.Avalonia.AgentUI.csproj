@@ -11,6 +11,8 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <!-- L4 -> L2: the transcript renders message bodies with the Arc Markdown document view. -->
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
   </ItemGroup>
 
   <ItemGroup>

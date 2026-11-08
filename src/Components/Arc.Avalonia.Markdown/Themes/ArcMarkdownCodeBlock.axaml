@@ -1,0 +1,20 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Markdown">
+
+  <ControlTheme x:Key="{x:Type c:ArcMarkdownCodeBlock}" TargetType="c:ArcMarkdownCodeBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource ArcSurfaceMuted}"
+                BorderBrush="{DynamicResource ArcBorder}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ArcRadiusPanel}"
+                Padding="16">
+          <Panel x:Name="PART_Host" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

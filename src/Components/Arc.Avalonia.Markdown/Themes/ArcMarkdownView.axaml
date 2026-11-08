@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Markdown">
+
+  <!--
+    The Markdown document view is a scroll host: the renderer builds Arc controls into PART_Host.
+    Keeping the template this thin means every block is an Arc control that resolves DynamicResource
+    tokens itself, so light/dark and accent switches restyle without rebuilding the document.
+  -->
+  <ControlTheme x:Key="{x:Type c:ArcMarkdownView}" TargetType="c:ArcMarkdownView">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer x:Name="PART_Scroll"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="{TemplateBinding Background}">
+          <StackPanel x:Name="PART_Host" Spacing="0" Margin="0" />
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

@@ -56,13 +56,13 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 # package therefore never requires editing this script. The two meta packages keep an explicit dependency
 # shape check below; they are not expected to aggregate the Feature packages.
 # ---------------------------------------------------------------------------
-$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid')
+$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid', 'PuraMarkdown.Syntax', 'Markdig')
 
 # Layer families the meta packages must aggregate (dependency-shape contract for Arc.Avalonia / .All).
 $components = @(
     'Arc.Avalonia.Inputs', 'Arc.Avalonia.Actions', 'Arc.Avalonia.Navigation', 'Arc.Avalonia.Overlays',
     'Arc.Avalonia.Feedback', 'Arc.Avalonia.DataDisplay', 'Arc.Avalonia.Charts', 'Arc.Avalonia.Pickers',
-    'Arc.Avalonia.Effects', 'Arc.Avalonia.Content', 'Arc.Avalonia.Media'
+    'Arc.Avalonia.Effects', 'Arc.Avalonia.Content', 'Arc.Avalonia.Media', 'Arc.Avalonia.Markdown'
 )
 # L4 agent layer (top composition) + the two leaf agent surface packages.
 $agents = @('Arc.Avalonia.Agent', 'Arc.Avalonia.AgentUI', 'Arc.Avalonia.LifeToday')

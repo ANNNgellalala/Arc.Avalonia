@@ -3,6 +3,8 @@
     M1-T4: NuGet central package management (CPM). Versions live here, csproj files only declare
     <PackageReference Include="..." />. Keep this list to Avalonia's official packages - the dependency
     policy (tools/deps-policy.json) and tools/check-package.ps1 fail the build on anything else.
+    The only exception is the Markdown family: PuraMarkdown.Syntax (parser facade, no Avalonia) and its
+    Markdig dependency are allowed in src/Components/Arc.Avalonia.Markdown only (ADR 0006).
 
     POC projects pin their own experiment versions, so poc/Directory.Packages.props opts them out.
   -->
@@ -19,5 +21,9 @@
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
     <!-- M2-G4: Agent 边界检查（仅 analyzer，PrivateAssets=all）。本地缓存有 3.3.2 / 5.4.0-beta。 -->
     <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.2" />
+    <!-- Markdown 组件族：PuraMarkdown 语法层 + 其 Markdig 解析依赖（ADR 0006）。
+         PuraMarkdown.Syntax 只依赖 Markdig、不依赖 Avalonia；渲染全部由 Arc 实现。 -->
+    <PackageVersion Include="PuraMarkdown.Syntax" Version="0.1.0-alpha.1" />
+    <PackageVersion Include="Markdig" Version="1.5.1" />
   </ItemGroup>
 </Project>

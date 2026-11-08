@@ -6,7 +6,7 @@
 
   <!--
     M1-T3: the design-system baseline is a single element. <arc:ArcTheme/> brings in the Fluent baseline,
-    Foundation's ArcBaseStyles and the 11 L2 component theme families; ArcThemeManager.Apply (App.axaml.cs)
+    Foundation's ArcBaseStyles and the 12 L2 component theme families; ArcThemeManager.Apply (App.axaml.cs)
     injects the Arc tokens, the 47 Fluent resource-key overrides and the accent palette.
 
     L3/L4 composite layers stay opt-in here: the L2.5 theme package must not depend on Agent/Special/Blocks
@@ -30,3 +30,4 @@
     <StyleInclude Source="avares://Arc.Avalonia.Blocks.AI/Themes/ArcBlocksAITheme.axaml" />
   </Application.Styles>
 </Application>
+
