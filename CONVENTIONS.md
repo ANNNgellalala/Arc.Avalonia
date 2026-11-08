@@ -10,7 +10,7 @@ type, colour, motion intent) matters more than API-name parity.
 | Path | Owner | Contents |
 | --- | --- | --- |
 | `src/Foundation/Arc.Avalonia` | Lead | tokens/palette/theme manager, motion, icons, `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, typography styles; assembly/package `Arc.Avalonia.Foundation` |
-| `src/Theme/Arc.Avalonia.Theme` | Lead | L2.5 aggregate theme: `<arc:ArcTheme/>` = Fluent baseline + tokens + 47 key overrides + the 12 component theme families |
+| `src/Theme/Arc.Avalonia.Theme` | Lead | L2.5 aggregate theme: `<arc:ArcTheme/>` = Fluent baseline + tokens + 47 key overrides + the 13 component theme families |
 | `src/Docs/Arc.Avalonia.Docs` | Lead | documentation leaf project: 320 pages, 294 `Docs/<slug>.json`, demo portraits; never published |
 | `src/Docs/Arc.Avalonia.Docs.Abstractions` | Lead | `ArcPage` contract, `DemoUi` layout helpers, `ArcDoc` model/store/validator, `ArcCatalog`, page discovery (namespace stays `Arc.Avalonia.Demo`); never published |
 | `src/Meta/Arc.Avalonia.Meta` | Lead | meta package `Arc.Avalonia` (no lib; dependency-only) |
@@ -30,6 +30,7 @@ type, colour, motion intent) matters more than API-name parity.
 | `src/Components/Arc.Avalonia.Content` | content agent | rich text editor, reorderable list, chat thread, onboarding checklist |
 | `src/Components/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
 | `src/Components/Arc.Avalonia.Markdown` | markdown team | PuraMarkdown syntax consumption, full CommonMark+GFM renderers, streaming, code highlighter, AI chat, `pura-agent` fence contracts; the only project allowed to reference `PuraMarkdown.Syntax`/`Markdig` (ADR 0006) |
+| `src/Components/Arc.Avalonia.Chat` | chat team | unified `ArcChatMessage` model, `ArcChatView` bubble surface (virtualized, streaming), `ArcChatComposer`; `ArcChatThread` is the obsolete alias; Agent conversation composes Chat bubbles with event cards |
 
 **Never edit files outside your project** (except adding your `ResourceInclude` lines inside your own
 project theme file). In particular do not touch `Directory.Build.*`, `Directory.Packages.props`, `ArcUI.slnx`,
@@ -329,4 +330,5 @@ These rules keep `dotnet pack` reproducible and R5-clean; `tools/check-package.p
 * **Local release verification** (offline): `dotnet pack ArcUI.slnx -c Release -o artifacts -m:1
   -nodeReuse:false` then `pwsh tools/check-package.ps1` (exit 0 = 28 packages, clean dependency closure,
   xml + license + readme present, no Pages/Docs/demo entries).
+
 

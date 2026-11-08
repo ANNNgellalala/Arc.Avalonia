@@ -145,7 +145,7 @@ public sealed class AiChatPage : ArcItemPage
             head.Children.Add(reasoningButton);
 
             var body = new StackPanel { Spacing = 8 };
-            body.Children.Add(K.Markdown(turn.Text, maxWidth: 660));
+            body.Children.Add(AiBlockUi.Markdown(turn.Text, 660));
 
             var tools = K.Row(6,
                 K.Chip("Searched 6 sites", icon: "globe"),

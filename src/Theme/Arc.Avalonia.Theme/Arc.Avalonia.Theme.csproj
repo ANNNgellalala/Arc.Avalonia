@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
     L2.5 aggregate theme (docs/13 §2.3): the single package a consumer references to get the whole Arc
-    design system. It owns official-Fluent assembly (ArcTheme) and aggregates the 12 L2 component themes;
+    design system. It owns official-Fluent assembly (ArcTheme) and aggregates the 13 L2 component themes;
     it must stay a pure aggregator - no control implementations, no business logic (docs/13 §2.4).
   -->
   <PropertyGroup>
@@ -10,7 +10,7 @@
     <PackageId>Arc.Avalonia.Theme</PackageId>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>Arc Avalonia aggregate theme: Fluent baseline, Arc tokens and the 12 component theme families behind a single &lt;arc:ArcTheme/&gt; element.</Description>
+    <Description>Arc Avalonia aggregate theme: Fluent baseline, Arc tokens and the 13 component theme families behind a single &lt;arc:ArcTheme/&gt; element.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- L1 first, then the 12 L2 component families (order matters: later themes win on ties). -->
+    <!-- L1 first, then the 13 L2 component families (order matters: later themes win on ties). -->
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
@@ -34,6 +34,9 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Chat\Arc.Avalonia.Chat.csproj" />
   </ItemGroup>
 </Project>
+
+
 

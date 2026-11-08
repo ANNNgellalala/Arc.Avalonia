@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Arc.Avalonia.Chat;
 
 namespace Arc.Avalonia.Agent;
 
@@ -38,16 +39,6 @@ public enum ArcAgentRole
     Tool,
     System,
     SubAgent
-}
-
-/// <summary>Delivery state of one message.</summary>
-public enum ArcMessageStatus
-{
-    Pending,
-    Streaming,
-    Done,
-    Failed,
-    Skipped
 }
 
 /// <summary>Lifecycle of one tool call.</summary>
@@ -268,14 +259,18 @@ public sealed record ArcMessageDeltaEvent(ArcEventStamp Stamp, DateTimeOffset At
 }
 
 /// <summary>A message finished streaming (successfully or with a failure status).</summary>
-public sealed record ArcMessageEndedEvent(ArcEventStamp Stamp, DateTimeOffset At, string MessageId, ArcMessageStatus Status = ArcMessageStatus.Done)
+public sealed record ArcMessageEndedEvent(
+    ArcEventStamp Stamp,
+    DateTimeOffset At,
+    string MessageId,
+    ArcChatMessageStatus Status = ArcChatMessageStatus.Complete)
     : ArcAgentEvent(Stamp, At)
 {
     /// <inheritdoc />
     public override ArcAgentEventKind EventKind => ArcAgentEventKind.MessageEnded;
 }
 
-/// <summary>Reasoning/thinking delta; rendered as a collapsible thinking row.</summary>
+/// <summary>Reasoning/thinking delta; rendered by the conversation as a collapsible reasoning card.</summary>
 public sealed record ArcReasoningDeltaEvent(ArcEventStamp Stamp, DateTimeOffset At, string ReasoningId, string Delta)
     : ArcAgentEvent(Stamp, At)
 {
@@ -384,50 +379,6 @@ public sealed record ArcCustomEvent(ArcEventStamp Stamp, DateTimeOffset At, stri
 {
     /// <inheritdoc />
     public override ArcAgentEventKind EventKind => ArcAgentEventKind.Custom;
-}
-
-/// <summary>One streamed message. Text is append-only so a token delta costs O(1); the string is cached
-/// only when a view asks for it (once per flush, not once per delta).</summary>
-public sealed class ArcAgentMessage
-{
-    private readonly StringBuilder _text = new();
-    private string? _cached;
-
-    /// <summary>Stable id used by the transcript row and the view registry.</summary>
-    public required string Id { get; init; }
-
-    /// <summary>Who produced the message.</summary>
-    public ArcAgentRole Role { get; init; }
-
-    /// <summary>Delivery state.</summary>
-    public ArcMessageStatus Status { get; set; }
-
-    /// <summary>When the message started.</summary>
-    public DateTimeOffset At { get; init; }
-
-    /// <summary>The accumulated text.</summary>
-    public string Text => _cached ??= _text.ToString();
-
-    /// <summary>True while deltas are still arriving.</summary>
-    public bool IsStreaming => Status == ArcMessageStatus.Streaming;
-
-    internal void Append(string delta)
-    {
-        if (string.IsNullOrEmpty(delta))
-        {
-            return;
-        }
-
-        _text.Append(delta);
-        _cached = null;
-    }
-
-    internal void SetText(string text)
-    {
-        _text.Clear();
-        _text.Append(text);
-        _cached = null;
-    }
 }
 
 /// <summary>One tool call in a session.</summary>
@@ -619,8 +570,8 @@ public sealed class ArcAgentSessionSnapshot
     /// <summary>The run phase at snapshot time.</summary>
     public ArcRunPhase Phase { get; init; }
 
-    /// <summary>Messages at snapshot time.</summary>
-    public IReadOnlyList<ArcAgentMessage> Messages { get; init; } = Array.Empty<ArcAgentMessage>();
+    /// <summary>Messages at snapshot time (the design system's single chat message model).</summary>
+    public IReadOnlyList<ArcChatMessage> Messages { get; init; } = Array.Empty<ArcChatMessage>();
 
     /// <summary>Tool calls at snapshot time.</summary>
     public IReadOnlyList<ArcToolCall> ToolCalls { get; init; } = Array.Empty<ArcToolCall>();

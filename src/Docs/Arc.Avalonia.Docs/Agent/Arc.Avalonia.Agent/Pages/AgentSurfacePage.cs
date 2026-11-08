@@ -24,7 +24,7 @@ public sealed class AgentSurfacePage : ArcPage
     public override string Group => "P0 · Agent";
 
     public override string? Description =>
-        "The top-layer composition root: transcript, run controls, approval tray, background dock and attention inbox over one host-injected workspace.";
+        "The top-layer composition root: conversation, run controls, approval tray, background dock and attention inbox over one host-injected workspace.";
 
     public override int Order => 20100;
 
@@ -32,7 +32,8 @@ public sealed class AgentSurfacePage : ArcPage
     {
         var workspace = ArcAgentWorkspace.CreateSample();
         var transport = new DemoTransport();
-        var surface = new ArcAgentSurface { Height = 900 };
+        // The surface fills its parent (run bar / conversation / bottom docks); the page owns the fixed stage.
+        var surface = new ArcAgentSurface();
         surface.Attach(workspace, transport);
 
         var log = DemoUi.Caption("Commands and host events are printed here. The Agent library performs no I/O.");
@@ -79,12 +80,13 @@ public sealed class AgentSurfacePage : ArcPage
                 ArcEventStamp.Create("run-fg", sequence, $"stop-{sequence}"),
                 DateTimeOffset.UtcNow,
                 ArcRunPhase.Stopped));
-            log.Text = "RunPhaseChanged(Stopped) · the host stopped the run; the transcript keeps the partial result.";
+            log.Text = "RunPhaseChanged(Stopped) · the host stopped the run; the conversation keeps the partial result.";
         };
 
         var buttons = DemoUi.Row(stream, approve, background, stop);
+        var stage = new Border { Height = 840, Child = surface };
         var content = new StackPanel { Spacing = 12 };
-        content.Children.Add(surface);
+        content.Children.Add(stage);
         content.Children.Add(buttons);
         content.Children.Add(log);
 

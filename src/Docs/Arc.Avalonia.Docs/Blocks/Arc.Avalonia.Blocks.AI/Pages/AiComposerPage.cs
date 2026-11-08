@@ -148,7 +148,7 @@ public sealed class AiComposerPage : ArcItemPage
                 K.Caption("Claude Opus 5.5"));
 
             var body = new StackPanel { Spacing = 8 };
-            body.Children.Add(K.Markdown(turn.Text, maxWidth: 700));
+            body.Children.Add(AiBlockUi.Markdown(turn.Text, 700));
 
             return K.Stack(6, header, body);
         }

@@ -1,15 +1,15 @@
 {
   "slug": "chat-thread",
   "nameZh": "聊天线程",
-  "summary": "实时对话流：同作者连续消息合并成组、自己的消息靠右，支持附件、发送状态、输入提示与输入框。",
+  "summary": "实时对话流：同作者连续消息合并成组、自己的消息靠右，支持附件、送达回执、输入提示与输入框。",
   "purpose": [
-    "按时间顺序铺开一段对话：Participants 提供姓名与头像，CurrentUserId 决定哪些消息靠右并以强调色显示，连续同作者且在 GroupWindow 内的消息合并成一组只显示一次头像。",
-    "消息可以带附件、发送状态（Sending / Sent / Delivered / Read / Failed）；Typing 里的参与者会在消息流底部显示「正在输入」提示，自己不会被提示。",
-    "ShowComposer 控制底部输入框是否出现，AllowAttachments 控制加号按钮；按 Enter 发送、Shift+Enter 换行，发送后通过 Send 事件把 ArcChatDraft 交给调用方。"
+    "按时间顺序铺开一段对话：Participants 提供姓名与头像，CurrentUserId 决定哪些消息靠右，连续同作者且在 GroupWindow 内的消息合并成一组，只在组开头显示一次头像与时间。",
+    "消息正文统一是 Markdown，由 ArcMarkdownView 渲染；ArcdChatMessage 同时带附件、生成状态（Draft / Streaming / Complete / Failed / Aborted）与送达回执（Sent / Delivered / Read）。",
+    "Typing 里的参与者会在消息流底部显示「正在输入」提示，自己不会被提示；ShowComposer 控制底部输入框是否出现，Enter 发送、Shift+Enter 换行，发送后通过 Send 事件把 ArcChatDraft 交给调用方。"
   ],
   "whenToUse": [
     "客服会话、私信、团队频道等需要连续追加消息的界面。",
-    "需要区分自己与他人的消息、并展示已送达状态的一对一聊天。",
+    "需要区分自己与他人的消息、并展示送达回执的一对一聊天。",
     "会话里可能出现文件、图片等附件时。"
   ],
   "whenNotToUse": [
@@ -21,7 +21,7 @@
     { "key": "variant-grouped", "label": "Grouped", "note": "同作者连续消息合并，只显示一次头像与姓名" },
     { "key": "variant-attachments", "label": "Attachments", "note": "消息里带文件或图片" },
     { "key": "variant-typing", "label": "Typing", "note": "底部显示他人正在输入" },
-    { "key": "state-status-delivered", "label": "Delivered", "note": "自己消息旁的状态标记" },
+    { "key": "state-status-delivered", "label": "Delivered", "note": "自己消息旁的回执标记" },
     { "key": "variant-composer", "label": "Composer", "note": "底部输入框与附件按钮" }
   ],
   "relations": [
@@ -36,7 +36,7 @@
       "rows": [
         { "dimension": "组织方式", "self": "按时间流动的单层消息", "other": "围绕一个对象的树状讨论" },
         { "dimension": "身份方向", "self": "自己的消息靠右，他人靠左", "other": "所有评论同列，用缩进表达回复" },
-        { "dimension": "状态", "self": "发送、送达、已读与失败", "other": "解决与重新打开" }
+        { "dimension": "状态", "self": "生成状态与送达回执分开", "other": "解决与重新打开" }
       ]
     },
     {
@@ -53,29 +53,52 @@
     {
       "title": "一段带附件与输入提示的对话",
       "language": "csharp",
-      "code": "var now = DateTimeOffset.Now;\nvar chat = new ArcChatThread\n{\n    Width = 680,\n    Height = 480,\n    CurrentUserId = \"me\",\n    Label = \"Release team conversation\",\n    Placeholder = \"Message the team\",\n    Participants = new List<ArcChatParticipant>\n    {\n        new() { Id = \"me\", Name = \"Alex Rivera\" },\n        new() { Id = \"sam\", Name = \"Sam Lee\" }\n    },\n    Messages = new List<ArcChatMessage>\n    {\n        new() { Id = \"m1\", AuthorId = \"sam\", Text = \"Can you add the new screenshots?\", CreatedAt = now.AddMinutes(-9) },\n        new()\n        {\n            Id = \"m2\",\n            AuthorId = \"me\",\n            Text = \"On it. The release notes draft is attached.\",\n            CreatedAt = now.AddMinutes(-2),\n            Status = ArcChatMessageStatus.Delivered,\n            Attachments = new List<ArcChatAttachment>\n            {\n                new() { Name = \"release-notes.md\", Size = 18_432 }\n            }\n        }\n    },\n    Typing = new List<string> { \"sam\" }\n};\n\nchat.Send += (_, draft) => SendMessage(draft.Text, draft.Attachments);"
+      "code": "var now = DateTimeOffset.Now;\nvar people = new List<ArcChatParticipant>\n{\n    new() { Id = \"me\", Name = \"Alex Rivera\" },\n    new() { Id = \"sam\", Name = \"Sam Lee\" },\n};\n\nvar chat = new ArcChatView\n{\n    Width = 680,\n    Height = 420,\n    CurrentUserId = \"me\",\n    Label = \"Release team conversation\",\n    Placeholder = \"Message the team\",\n    Participants = people,\n};\n\nchat.AddMessage(new ArcChatMessage\n{\n    Role = ArcChatRole.User,\n    Author = people[1],\n    Markdown = \"Can you add the new screenshots?\",\n    CreatedAt = now.AddMinutes(-9),\n});\nchat.AddMessage(new ArcChatMessage\n{\n    Role = ArcChatRole.Assistant,\n    Author = people[0],\n    Markdown = \"On it. The release notes draft is attached.\",\n    Delivery = ArcChatDeliveryState.Delivered,\n    Attachments = new List<ArcChatAttachment> { new() { Name = \"release-notes.md\", Size = 18_432 } },\n});\nchat.Typing = new List<string> { \"sam\" };\nchat.Send += (_, draft) => SendMessage(draft.Text, draft.Attachments);"
     },
     {
       "title": "隐藏输入框的只读会话",
       "language": "xaml",
-      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:cn=\"clr-namespace:Arc.Avalonia.Content.Controls;assembly=Arc.Avalonia.Content\">\n  <cn:ArcChatThread Label=\"Archived conversation\"\n                    CurrentUserId=\"me\"\n                    ShowComposer=\"False\"\n                    Messages=\"{Binding ArchivedMessages}\"\n                    Participants=\"{Binding Participants}\" />\n</Window>"
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:chat=\"clr-namespace:Arc.Avalonia.Chat;assembly=Arc.Avalonia.Chat\">\n  <chat:ArcChatView Label=\"Archived conversation\"\n                    CurrentUserId=\"me\"\n                    ShowComposer=\"False\"\n                    Participants=\"{Binding Participants}\" />\n</Window>"
     }
   ],
   "api": {
-    "type": "Arc.Avalonia.Content.Controls.ArcChatThread",
+    "type": "Arc.Avalonia.Chat.ArcChatView",
     "exclude": ["TemplatedParent"],
     "descriptions": {
+      "Messages": "消息集合，按时间从旧到新；气泡正文由 ArcMarkdownView 渲染",
+      "AddMessage": "追加消息，同 id 时原地更新",
+      "InsertMessage": "在指定位置插入消息，同 id 时原地更新",
+      "UpdateMessage": "按 id 替换消息并触发更新",
+      "RemoveMessage": "按 id 删除消息",
+      "ClearMessages": "清空消息",
+      "ReplaceMessages": "整体替换消息集合",
+      "FindMessage": "按 id 查找消息",
+      "BeginStreamingMessage": "开始流式消息，返回 ArcMarkdownStreamingSession",
+      "AbortStreaming": "中断当前流式消息并保留部分内容",
+      "ScrollToEnd": "滚到最新消息并恢复跟随",
+      "ScrollToMessage": "把指定 id 的消息滚动到视口",
       "Participants": "参与者集合，元素是 ArcChatParticipant（Id / Name / Avatar）",
       "CurrentUserId": "当前用户 id，决定哪些消息靠右显示，默认 me",
-      "Messages": "受控消息列表，按时间从旧到新；发送会追加到这里",
-      "DefaultMessages": "未提供 Messages 时使用的初始消息",
       "Typing": "正在输入的参与者 id；自己的 id 会被忽略",
-      "Placeholder": "输入框占位文案，默认 Message",
+      "Placeholder": "输入框占位文案",
       "ShowComposer": "是否显示底部输入框，默认 true",
       "AllowAttachments": "是否显示附件按钮，默认 true",
-      "Label": "消息日志的无障碍名称，默认 Conversation",
+      "MarkdownOptions": "气泡正文使用的 ArcMarkdownOptions（pipeline / 平台契约 / 本地化）",
+      "AutoScrollMode": "自动滚动策略：Never / NearBottom / Always",
+      "Label": "消息日志的无障碍名称",
       "GroupWindow": "连续同作者消息合并的时间窗口，默认 5 分钟",
-      "Send": "发送时触发，参数是文本与附件的 ArcChatDraft"
+      "ShowAvatars": "是否显示头像列",
+      "ShowTimestamps": "是否显示姓名与时间头",
+      "Composer": "模板创建的 ArcChatComposer",
+      "DefaultMessages": "未提供 Messages 时使用的初始消息（兼容旧 API）",
+      "MessageAdded": "追加消息时触发",
+      "MessageUpdated": "消息正文或状态变化时触发",
+      "MessageRemoved": "删除消息时触发",
+      "Send": "输入框发送时触发，参数是文本与附件的 ArcChatDraft",
+      "StopRequested": "用户点击停止时触发，宿主负责中断生成",
+      "InteractionOccurred": "气泡内 pura-agent 交互上报",
+      "Warning": "气泡内 Markdown 渲染警告",
+      "Announced": "无障碍播报文本"
     }
   }
 }

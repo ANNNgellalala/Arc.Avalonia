@@ -123,7 +123,7 @@ public sealed class ResearchRunPage : ArcItemPage
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(8, 4, 8, 4),
                 Margin = new Thickness(-8, 0, 0, 0),
-                Child = K.Paragraph(text, Select, maxWidth: 640)
+                Child = AiBlockUi.Markdown(text, 640)
             };
             paragraphs.Add(border);
             return border;
@@ -255,9 +255,9 @@ public sealed class ResearchRunPage : ArcItemPage
                     + "reply. It is only comparable when the definition of a resolved conversation is published "
                     + "with it. [1]", 1),
                 K.Stack(3,
-                    K.Markdown("- AI-only resolution: no agent ever joined\n"
+                    AiBlockUi.Markdown("- AI-only resolution: no agent ever joined\n"
                         + "- Assisted resolution: an agent reviewed and sent the answer\n"
-                        + "- Containment: the user did not reopen the issue within seven days", Select, 640)),
+                        + "- Containment: the user did not reopen the issue within seven days", 640)),
                 Sentence("Across the three benchmarks we read, AI-only deflection lands between 22 and 41 percent, "
                     + "while containment is 9 points lower on average because reopened tickets are counted back. [2]", 2),
                 K.Row(6, copy, rerun, K.Caption("286 words")),

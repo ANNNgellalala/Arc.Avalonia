@@ -4,15 +4,6 @@ using Avalonia.Interactivity;
 
 namespace Arc.Avalonia.Content.Controls;
 
-/// <summary>Routed args for the chat send event (additive companion to the CLR event).</summary>
-public sealed class ArcChatSendRoutedEventArgs : RoutedEventArgs
-{
-    /// <summary>Creates the args for a routed event.</summary>
-    public ArcChatSendRoutedEventArgs(RoutedEvent routedEvent, ArcChatDraft draft) : base(routedEvent) => Draft = draft;
-
-    /// <summary>The text and attachments the person sent.</summary>
-    public ArcChatDraft Draft { get; }
-}
 
 /// <summary>Routed args for the onboarding step invoke event.</summary>
 public sealed class ArcChecklistStepInvokedRoutedEventArgs : RoutedEventArgs

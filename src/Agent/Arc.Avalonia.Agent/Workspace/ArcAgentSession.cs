@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arc.Avalonia.Chat;
 
 namespace Arc.Avalonia.Agent;
 
@@ -41,8 +42,8 @@ public interface IArcAgentSession
     /// <summary>Curated run state bound by the run bar and transcript.</summary>
     ArcAgentRunState Run { get; }
 
-    /// <summary>Messages in arrival order.</summary>
-    IReadOnlyList<ArcAgentMessage> Messages { get; }
+    /// <summary>Messages in arrival order (the design system's single chat message model).</summary>
+    IReadOnlyList<ArcChatMessage> Messages { get; }
 
     /// <summary>Tool calls in arrival order.</summary>
     IReadOnlyList<ArcToolCall> ToolCalls { get; }
@@ -69,8 +70,8 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
 {
     private const int MaxPendingEvents = 256;
 
-    private readonly List<ArcAgentMessage> _messages = new();
-    private readonly Dictionary<string, ArcAgentMessage> _messageIndex = new(StringComparer.Ordinal);
+    private readonly List<ArcChatMessage> _messages = new();
+    private readonly Dictionary<string, ArcChatMessage> _messageIndex = new(StringComparer.Ordinal);
     private readonly List<ArcToolCall> _toolCalls = new();
     private readonly Dictionary<string, ArcToolCall> _toolIndex = new(StringComparer.Ordinal);
     private readonly List<ArcAgentStep> _steps = new();
@@ -97,7 +98,7 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
     public ArcAgentRunState Run { get; }
 
     /// <inheritdoc />
-    public IReadOnlyList<ArcAgentMessage> Messages => _messages;
+    public IReadOnlyList<ArcChatMessage> Messages => _messages;
 
     /// <inheritdoc />
     public IReadOnlyList<ArcToolCall> ToolCalls => _toolCalls;
@@ -164,8 +165,7 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
     }
 
     private void Fold(ArcAgentEvent @event)
-    {
-        _timeline.Add(@event);
+    {        _timeline.Add(@event);
 
         switch (@event)
         {
@@ -201,17 +201,21 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
                 break;
 
             case ArcMessageStartedEvent messageStart:
-                if (!_messageIndex.ContainsKey(messageStart.MessageId))
+                if (!_messageIndex.TryGetValue(messageStart.MessageId, out var startedMessage))
                 {
-                    var message = new ArcAgentMessage
+                    startedMessage = new ArcChatMessage
                     {
                         Id = messageStart.MessageId,
-                        Role = messageStart.Role,
-                        Status = ArcMessageStatus.Streaming,
-                        At = messageStart.At
+                        Role = MapRole(messageStart.Role),
+                        Status = ArcChatMessageStatus.Streaming,
+                        CreatedAt = messageStart.At,
                     };
-                    _messages.Add(message);
-                    _messageIndex[messageStart.MessageId] = message;
+                    _messages.Add(startedMessage);
+                    _messageIndex[messageStart.MessageId] = startedMessage;
+                }
+                else
+                {
+                    startedMessage.Status = ArcChatMessageStatus.Streaming;
                 }
 
                 break;
@@ -220,6 +224,10 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
                 if (_messageIndex.TryGetValue(delta.MessageId, out var streaming))
                 {
                     streaming.Append(delta.Delta);
+                    if (streaming.Status == ArcChatMessageStatus.Draft)
+                    {
+                        streaming.Status = ArcChatMessageStatus.Streaming;
+                    }
                 }
 
                 break;
@@ -232,21 +240,9 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
 
                 break;
 
-            case ArcReasoningDeltaEvent reasoning:
-                if (!_messageIndex.TryGetValue(reasoning.ReasoningId, out var thinking))
-                {
-                    thinking = new ArcAgentMessage
-                    {
-                        Id = reasoning.ReasoningId,
-                        Role = ArcAgentRole.Reasoning,
-                        Status = ArcMessageStatus.Streaming,
-                        At = reasoning.At
-                    };
-                    _messages.Add(thinking);
-                    _messageIndex[reasoning.ReasoningId] = thinking;
-                }
-
-                thinking.Append(reasoning.Delta);
+            case ArcReasoningDeltaEvent:
+                // Reasoning no longer lives in Messages: the timeline keeps the deltas and the agent
+                // conversation renders them as a collapsible reasoning card.
                 break;
 
             case ArcToolCallStartedEvent toolStart:
@@ -315,4 +311,12 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
                 break;
         }
     }
+
+    /// <summary>Maps the event protocol's role to the design system chat role.</summary>
+    internal static ArcChatRole MapRole(ArcAgentRole role) => role switch
+    {
+        ArcAgentRole.User => ArcChatRole.User,
+        ArcAgentRole.System => ArcChatRole.System,
+        _ => ArcChatRole.Assistant,
+    };
 }

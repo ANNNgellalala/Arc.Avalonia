@@ -62,7 +62,7 @@ $allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter
 $components = @(
     'Arc.Avalonia.Inputs', 'Arc.Avalonia.Actions', 'Arc.Avalonia.Navigation', 'Arc.Avalonia.Overlays',
     'Arc.Avalonia.Feedback', 'Arc.Avalonia.DataDisplay', 'Arc.Avalonia.Charts', 'Arc.Avalonia.Pickers',
-    'Arc.Avalonia.Effects', 'Arc.Avalonia.Content', 'Arc.Avalonia.Media', 'Arc.Avalonia.Markdown'
+    'Arc.Avalonia.Effects', 'Arc.Avalonia.Content', 'Arc.Avalonia.Media', 'Arc.Avalonia.Markdown', 'Arc.Avalonia.Chat'
 )
 # L4 agent layer (top composition) + the two leaf agent surface packages.
 $agents = @('Arc.Avalonia.Agent', 'Arc.Avalonia.AgentUI', 'Arc.Avalonia.LifeToday')
@@ -392,3 +392,4 @@ if (-not $Quiet) {
 
 if ($issues.Count -gt 0) { exit 1 }
 exit 0
+

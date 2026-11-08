@@ -32,4 +32,6 @@
   <StyleInclude Source="avares://Arc.Avalonia.Content/Themes/ArcContentTheme.axaml" />
   <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />
   <StyleInclude Source="avares://Arc.Avalonia.Markdown/Themes/ArcMarkdownTheme.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Chat/Themes/ArcChatTheme.axaml" />
 </Styles>
+

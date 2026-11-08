@@ -9,10 +9,12 @@ using Avalonia.Animation.Easings;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.DataDisplay.Controls;
 using Arc.Avalonia.Demo;
@@ -51,6 +53,7 @@ public static class Program
         ListChecks();
         AgentChecks();
         MarkdownChecks();
+        ChatChecks();
 
         Console.WriteLine($"VERIFY: checks={_checks} failures={Failures.Count}");
         foreach (var failure in Failures)
@@ -828,7 +831,7 @@ public static class Program
         Check("agent replay is deterministic",
             left is not null && right is not null &&
             left.Messages.Count == right.Messages.Count &&
-            left.Messages[0].Text == right.Messages[0].Text &&
+            left.Messages[0].Markdown == right.Messages[0].Markdown &&
             left.ToolCalls.Count == right.ToolCalls.Count &&
             left.Run.Phase == right.Run.Phase);
 
@@ -839,14 +842,14 @@ public static class Program
         Check("agent runner accepts seq 2", gapped.Apply(new Agent.ArcMessageStartedEvent(Agent.ArcEventStamp.Create("run-o", 2), at, "m", Agent.ArcAgentRole.Assistant)) == Agent.ArcApplyResult.Accepted);
         Check("agent runner buffers a gap", gapped.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-o", 4), at, "m", "d4")) == Agent.ArcApplyResult.OutOfOrder);
         Check("agent runner fills the gap and drains the buffer", gapped.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-o", 3), at, "m", "d3")) == Agent.ArcApplyResult.Accepted);
-        Check("agent runner applied both deltas in order", gapped.GetSession("run-o")!.Messages[0].Text == "d3d4");
+        Check("agent runner applied both deltas in order", gapped.GetSession("run-o")!.Messages[0].Markdown == "d3d4");
 
         // Unknown-run buffering (a host may push session events before RunStarted).
         var orphaned = new Agent.ArcAgentWorkspace();
         Check("agent runner buffers unknown-run events", orphaned.Apply(new Agent.ArcMessageStartedEvent(Agent.ArcEventStamp.Create("run-x", 2), at, "m", Agent.ArcAgentRole.Assistant)) == Agent.ArcApplyResult.UnknownRun);
         orphaned.Apply(new Agent.ArcRunStartedEvent(Agent.ArcEventStamp.Create("run-x", 1), at, new Agent.ArcAgentRunRef("run-x", "sess-x")));
         orphaned.Apply(new Agent.ArcMessageDeltaEvent(Agent.ArcEventStamp.Create("run-x", 3), at, "m", "orphan"));
-        Check("agent runner drains orphan events when the run starts", orphaned.GetSession("run-x")!.Messages.Count == 1 && orphaned.GetSession("run-x")!.Messages[0].Text == "orphan");
+        Check("agent runner drains orphan events when the run starts", orphaned.GetSession("run-x")!.Messages.Count == 1 && orphaned.GetSession("run-x")!.Messages[0].Markdown == "orphan");
 
         // Multi-run routing and background dock data.
         var multi = new Agent.ArcAgentWorkspace();
@@ -896,60 +899,43 @@ public static class Program
         dispatcher.RunPending();
         Check("coalescer flushes a batch once", flushes == 1 && batched == 5 && coalescer.FlushCount == 1);
 
-        // Incremental transcript: 10k appends, no full rebuild, bounded realized window.
-        var transcript = new AgentUi.ArcAgentTranscript();
-        transcript.ResetIncremental();
-        var rebuildsBefore = transcript.FullRebuildCount;
-        var allocationsBefore = GC.GetAllocatedBytesForCurrentThread();
-        var stopwatch = Stopwatch.StartNew();
-        for (var index = 0; index < 10_000; index++)
+        // Unified message model + conversation projection (Chat message model is the only one now).
+        var sessionA = first.GetSession("run-a");
+        Check("agent session messages use the unified chat message model",
+            sessionA is not null &&
+            sessionA.Messages.Count == 1 &&
+            sessionA.Messages[0] is ArcChatMessage { Markdown: "hello world" } &&
+            sessionA.Messages[0].Role == ArcChatRole.Assistant);
+
+        var conversation = new Agent.ArcAgentConversation { Session = sessionA };
+        var conversationControls = Walk(conversation).ToArray();
+        var bubbles = conversationControls.OfType<ArcChatBubble>().ToArray();
+        var toolCards = conversationControls.OfType<Agent.ArcAgentToolCallCard>().ToArray();
+        Check("agent conversation interleaves message bubbles and event cards",
+            conversation.Timeline.Count == 14 &&
+            bubbles.Length == 1 &&
+            toolCards.Length == 1 &&
+            Array.IndexOf(conversationControls, bubbles[0]) < Array.IndexOf(conversationControls, toolCards[0]));
+
+        var approvalDecision = (string?)null;
+        conversation.ApprovalDecisionRequested += (_, args) =>
         {
-            // 200 live messages, each receiving 50 streaming deltas: realistic high-frequency updates.
-            transcript.Append(new AgentUi.ArcAgentEvent
+            if (args.Approved)
             {
-                Id = $"message-{index / 50}",
-                Kind = AgentUi.ArcAgentEventKind.Message,
-                Title = $"streamed delta {index}",
-                Status = AgentUi.ArcAgentEventStatus.Running,
-                Timestamp = at
-            });
-        }
-
-        stopwatch.Stop();
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - allocationsBefore;
-        Check("agent transcript never rebuilds while appending", transcript.FullRebuildCount == rebuildsBefore);
-        Check("agent transcript bounds realized rows to the viewport window",
-            transcript.RenderedRowCount <= transcript.MaxRenderedRows &&
-            transcript.RenderedRowCount <= transcript.ViewportRows * 2);
-        Check("agent transcript counts all events", transcript.TotalEventCount == 10_000);
-        Check("agent transcript drops old rows", transcript.DroppedRowCount > 0);
-        Check("agent transcript allocation stays bounded", allocated < 256L * 1024 * 1024);
-        Check("agent transcript append is fast enough for a headless guard", stopwatch.Elapsed < TimeSpan.FromSeconds(30));
-
-        var rowsBeforeUpdate = transcript.RenderedRowCount;
-        var totalBeforeUpdate = transcript.TotalEventCount;
-        var update = new AgentUi.ArcAgentEvent
-        {
-            Id = "message-199",
-            Kind = AgentUi.ArcAgentEventKind.Message,
-            Title = "updated",
-            Status = AgentUi.ArcAgentEventStatus.Done,
-            Timestamp = at
+                approvalDecision = args.RequestId;
+            }
         };
-        for (var updateIndex = 0; updateIndex < 5; updateIndex++)
-        {
-            transcript.Append(update);
-        }
-
-        Check("agent transcript updates a streaming row in place",
-            transcript.TotalEventCount == totalBeforeUpdate + 5 &&
-            transcript.RenderedRowCount == rowsBeforeUpdate &&
-            transcript.FullRebuildCount == rebuildsBefore);
+        var approveButton = conversationControls
+            .OfType<ArcButton>()
+            .FirstOrDefault(button => (AutomationProperties.GetName(button) ?? string.Empty)
+                .StartsWith("Approve", StringComparison.Ordinal));
+        approveButton?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, approveButton));
+        Check("agent conversation raises approval decisions", approvalDecision == "approval-1");
 
         // View registry defaults + override.
         var registry = new Agent.ArcAgentItemViewRegistry();
         Check("view registry resolves a message view",
-            registry.Resolve(new Agent.ArcAgentMessage { Id = "m", Role = Agent.ArcAgentRole.Assistant }) is Control);
+            registry.Resolve(new ArcChatMessage { Id = "m", Role = ArcChatRole.Assistant }) is Control);
         Check("view registry resolves a tool view",
             registry.Resolve(new Agent.ArcToolCall { Id = "c", ToolName = "t" }) is Control);
         Check("view registry resolves an approval view",
@@ -1164,62 +1150,6 @@ public static class Program
                 abortSession.State == ArcMarkdownStreamingState.Aborted &&
                 abortView.GetPlainText().Contains("部分内容"));
 
-            // --- chat list ------------------------------------------------------------
-            var chat = new ArcMarkdownChatView();
-            var added = 0;
-            var updated = 0;
-            var removed = 0;
-            chat.MessageAdded += (_, _) => added++;
-            chat.MessageUpdated += (_, _) => updated++;
-            chat.MessageRemoved += (_, _) => removed++;
-
-            var firstMessage = new ArcMarkdownChatMessage
-            {
-                Role = ArcMarkdownChatRole.User,
-                Markdown = "**你好**"
-            };
-            chat.AddMessage(firstMessage);
-            chat.InsertMessage(0, new ArcMarkdownChatMessage
-            {
-                Id = "system-1",
-                Role = ArcMarkdownChatRole.System,
-                Markdown = "系统消息"
-            });
-            firstMessage.Markdown = "**你好**，Markdown";
-            chat.UpdateMessage(firstMessage);
-            Check("markdown chat add/insert/update contracts",
-                chat.Messages.Count == 2 && added == 2 && updated == 1 &&
-                ReferenceEquals(chat.FindMessage(firstMessage.Id), firstMessage) &&
-                chat.Messages[0].Id == "system-1");
-            Check("markdown chat remove/clear/replace contracts",
-                chat.RemoveMessage(firstMessage.Id) && removed == 1 &&
-                chat.Messages.Count == 1 && !chat.RemoveMessage("missing") &&
-                ReplaceChatMessages(chat) == 2);
-
-            var streamingMessage = new ArcMarkdownChatMessage { Role = ArcMarkdownChatRole.Assistant };
-            var chatSession = chat.BeginStreamingMessage(streamingMessage);
-            chatSession.Append("## 流式回复\n\n第一段");
-            Dispatcher.UIThread.RunJobs();
-            Check("markdown chat streams into one message slot",
-                chat.IsStreaming && chatSession.CurrentText.Contains("第一段") &&
-                streamingMessage.Status == ArcMarkdownChatMessageStatus.Streaming);
-            var chatCompleteTask = chatSession.CompleteAsync();
-            var chatCompleted = PumpDispatcher(chatCompleteTask, TimeSpan.FromSeconds(20));
-            Check("markdown chat completes the streaming slot",
-                chatCompleted && chatSession.State == ArcMarkdownStreamingState.Completed && !chat.IsStreaming);
-
-            var abortChat = new ArcMarkdownChatView();
-            var abortMessage = new ArcMarkdownChatMessage { Role = ArcMarkdownChatRole.Assistant };
-            var abortChatSession = abortChat.BeginStreamingMessage(abortMessage);
-            abortChatSession.Append("部分回复");
-            Dispatcher.UIThread.RunJobs();
-            var abortChatTask = abortChat.AbortStreamingAsync();
-            var abortFinished = PumpDispatcher(abortChatTask, TimeSpan.FromSeconds(20));
-            Check("markdown chat abort keeps the partial content and marks the message",
-                abortFinished &&
-                abortMessage.Status == ArcMarkdownChatMessageStatus.Aborted &&
-                abortChat.Messages.Contains(abortMessage));
-
             // --- pura-agent plugin (owned by md-agent; checked when it has landed) ----
             MarkdownAgentChecks();
         }
@@ -1230,12 +1160,146 @@ public static class Program
         }
     }
 
-    private static int ReplaceChatMessages(ArcMarkdownChatView chat)
+    /// <summary>
+    /// Chat package after the Chat/Agent refactor: the single message model, bubble grouping flags, list
+    /// CRUD/events, streaming writeback (complete keeps the appended Markdown, abort keeps the partial body) and
+    /// the composer send/attachment-tray contract. Realized-window counts need a visual tree and are covered by
+    /// the Chat package's headless probe (1000 messages → 10 realized rows); this console harness verifies the
+    /// model and view contracts without a desktop.
+    /// </summary>
+    private static void ChatChecks()
+    {
+        var message = new ArcChatMessage
+        {
+            Role = ArcChatRole.Assistant,
+            Status = ArcChatMessageStatus.Streaming
+        };
+        message.Append("hello ");
+        message.Append("world");
+        Check("chat message appends streaming markdown",
+            message.Markdown == "hello world" &&
+            message.Status == ArcChatMessageStatus.Streaming &&
+            message.IsStreaming);
+        message.Complete();
+        Check("chat message completes",
+            message.Status == ArcChatMessageStatus.Complete && !message.IsStreaming);
+
+        var ownMessage = new ArcChatMessage { Role = ArcChatRole.User };
+        ownMessage.Append("hi");
+        ownMessage.Complete();
+        Check("chat user complete sets a delivery receipt",
+            ownMessage.Delivery == ArcChatDeliveryState.Sent &&
+            ownMessage.Status == ArcChatMessageStatus.Complete);
+
+        var bubble = new ArcChatBubble
+        {
+            Message = message,
+            IsOwn = true,
+            FirstInGroup = true,
+            LastInGroup = false,
+            ShowHeader = true,
+            ShowStatus = true
+        };
+        Check("chat bubble exposes grouping and ownership flags",
+            ReferenceEquals(bubble.Message, message) &&
+            bubble.IsOwn && bubble.FirstInGroup && !bubble.LastInGroup && bubble.ShowHeader);
+
+        var chat = new ArcChatView();
+        var added = 0;
+        var updated = 0;
+        var removed = 0;
+        chat.MessageAdded += (_, _) => added++;
+        chat.MessageUpdated += (_, _) => updated++;
+        chat.MessageRemoved += (_, _) => removed++;
+
+        var firstMessage = new ArcChatMessage
+        {
+            Role = ArcChatRole.User,
+            Markdown = "**你好**"
+        };
+        chat.AddMessage(firstMessage);
+        chat.InsertMessage(0, new ArcChatMessage
+        {
+            Id = "system-1",
+            Role = ArcChatRole.System,
+            Markdown = "系统消息"
+        });
+        firstMessage.Markdown = "**你好**，Markdown";
+        chat.UpdateMessage(firstMessage);
+        Check("chat view add/insert/update contracts",
+            chat.Messages.Count == 2 && added == 2 && updated == 1 &&
+            ReferenceEquals(chat.FindMessage(firstMessage.Id), firstMessage) &&
+            chat.Messages[0].Id == "system-1");
+        Check("chat view remove/replace contracts",
+            chat.RemoveMessage(firstMessage.Id) && removed == 1 &&
+            chat.Messages.Count == 1 && !chat.RemoveMessage("missing") &&
+            ReplaceChatMessages(chat) == 2);
+
+        // 1000 messages must be accepted by the model without a template; message-level virtualization
+        // (realized rows) is measured by the Chat package headless probe, not by this console harness.
+        var bulk = new ArcChatView();
+        for (var index = 0; index < 1000; index++)
+        {
+            bulk.AddMessage(new ArcChatMessage { Id = $"bulk-{index}", Markdown = $"message {index}" });
+        }
+
+        Check("chat view accepts 1000 messages headless", bulk.Messages.Count == 1000 && !bulk.IsStreaming);
+
+        var streamingMessage = new ArcChatMessage { Role = ArcChatRole.Assistant };
+        var session = chat.BeginStreamingMessage(streamingMessage);
+        session.Append("## 流式回复\n\n第一段");
+        PumpDispatcher(session.FlushAsync(), TimeSpan.FromSeconds(20));
+        Check("chat streaming writes deltas back into the message",
+            chat.IsStreaming &&
+            session.CurrentText.Contains("第一段") &&
+            streamingMessage.Status == ArcChatMessageStatus.Streaming &&
+            streamingMessage.Markdown.Contains("第一段"));
+        var chatCompleteTask = session.CompleteAsync();
+        var chatCompleted = PumpDispatcher(chatCompleteTask, TimeSpan.FromSeconds(20));
+        Check("chat streaming completion keeps the full markdown and upserts the message",
+            chatCompleted &&
+            session.State == ArcMarkdownStreamingState.Completed &&
+            !chat.IsStreaming &&
+            streamingMessage.Status == ArcChatMessageStatus.Complete &&
+            streamingMessage.Markdown == "## 流式回复\n\n第一段" &&
+            chat.Messages.Contains(streamingMessage));
+
+        var abortChat = new ArcChatView();
+        var abortMessage = new ArcChatMessage { Role = ArcChatRole.Assistant };
+        var abortSession = abortChat.BeginStreamingMessage(abortMessage);
+        abortSession.Append("部分回复");
+        PumpDispatcher(abortSession.FlushAsync(), TimeSpan.FromSeconds(20));
+        var abortTask = abortChat.AbortStreamingAsync();
+        var abortFinished = PumpDispatcher(abortTask, TimeSpan.FromSeconds(20));
+        Check("chat streaming abort keeps the partial body and marks the message",
+            abortFinished &&
+            abortMessage.Status == ArcChatMessageStatus.Aborted &&
+            abortMessage.Markdown.Contains("部分回复") &&
+            abortChat.Messages.Contains(abortMessage));
+
+        var composer = new ArcChatComposer { MaxAttachments = 2 };
+        ArcChatDraft? draft = null;
+        composer.Send += (_, args) => draft = args;
+        composer.Text = "ping";
+        composer.AddAttachment(new ArcChatAttachment { Name = "a.txt", Size = 1 });
+        composer.AddAttachment(new ArcChatAttachment { Name = "b.txt", Size = 2 });
+        composer.AddAttachment(new ArcChatAttachment { Name = "c.txt", Size = 3 });
+        Check("chat composer caps the attachment tray",
+            composer.PendingAttachments.Count == 2 && composer.MaxAttachments == 2);
+        composer.Submit();
+        Check("chat composer submits a draft and clears the tray",
+            draft is { Text: "ping" } &&
+            draft.Attachments.Count == 2 &&
+            composer.Text.Length == 0 &&
+            composer.PendingAttachments.Count == 0);
+    }
+
+    private static int ReplaceChatMessages(ArcChatView chat)
     {
         chat.ReplaceMessages(new[]
         {
-            new ArcMarkdownChatMessage { Id = "replace-a", Markdown = "a" },
-            new ArcMarkdownChatMessage { Id = "replace-b", Markdown = "b" }
+            new ArcChatMessage { Id = "replace-a", Markdown = "a" },
+            new ArcChatMessage { Id = "replace-b", Markdown = "b" }
         });
         return chat.Messages.Count;
     }

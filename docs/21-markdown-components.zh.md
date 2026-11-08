@@ -15,12 +15,12 @@ PuraMarkdown.Syntax (独立包，Markdig 1.5.1，无 Avalonia)
         │ Markdig AST + 诊断/大纲
         ▼
 Arc.Avalonia.Markdown (L2 组件族)
-  ArcMarkdownView / ArcMarkdownDocumentView / ArcMarkdownChatView / ArcMarkdownCodeBlock
+  ArcMarkdownView / ArcMarkdownDocumentView / ArcMarkdownCodeBlock
   Arc 节点渲染器（块/行内/围栏）+ 代码高亮 + 流式会话 + 本地化 + 图片/链接平台契约
         │
         ▼
-Arc.Avalonia.Agent (L4)
-  pura-agent 围栏的 choice / confirm 组件 → Arc 控件；顺带把 Agent transcript 接上 Markdown
+Arc.Avalonia.Chat (L2)  /  Arc.Avalonia.Agent (L4)
+  Chat 用 ArcMarkdownView 渲染气泡正文；Agent 用 pura-agent 围栏渲染 choice/confirm，并按 Timeline 组合气泡与事件卡
 ```
 
 * **解析/诊断/大纲/流式边界**归 PuraMarkdown.Syntax；Arc 不复制 Markdig 节点，也不重新实现解析。
@@ -37,10 +37,9 @@ Arc.Avalonia.Agent (L4)
 |---|---|
 | `ArcMarkdownView` | 文档渲染宿主：Markdown → 解析 → Arc 控件树；流式、大纲、锚点、选择/复制、交互状态 |
 | `ArcMarkdownDocumentView` | 已解析 `PuraDocument` 的渲染宿主（宿主自己解析/缓存 AST 时使用） |
-| `ArcMarkdownChatView` | AI Chat 消息列表：消息级虚拟化、流式槽、自动滚动、状态/错误 |
 | `ArcMarkdownCodeBlock` | 围栏代码：语言标签、行号、token 高亮、复制、长代码折叠 |
 | 节点渲染器 | CommonMark + GFM 全节点矩阵：heading/paragraph/quote/list/task list/table/code/thematic break/html 回退/强调/行内代码/链接/图片/自动链接/换行 |
-| `pura-agent` 组件 | `Arc.Avalonia.Agent` 提供 choice/confirm 控件与 JSON 解析，作为 `IArcMarkdownFenceRenderer` 注册 |
+| `pura-agent` 组件 | `Arc.Avalonia.Agent` 提供 choice/confirm 控件与 JSON 解析，作为 `IArcMarkdownFenceRenderer` 注册；消息气泡/聊天输入在 `Arc.Avalonia.Chat`（见 [docs/22](22-chat-agent-refactor.zh.md)） |
 | 平台契约 | 图片加载、链接打开、剪贴板、本地化都可注入；默认离线安全 |
 | 主题 | `<arc:ArcTheme/>` 已聚合 `ArcMarkdownTheme.axaml`；所有颜色/字号/圆角走 token |
 
@@ -109,7 +108,7 @@ view.SetInteractionState(...);    // 持久化/虚拟化恢复
 
 * `dotnet build ArcUI.slnx` 0 error；
 * gallery `--audit` / `--smoke` 通过，新增 Markdown 页面在 light/dark 下可渲染；
-* `Arc.Avalonia.Verify` 覆盖：全节点矩阵、流式完成=全量、边界切分、Agent 组件交互、Chat 增删改流式；
+* `Arc.Avalonia.Verify` 覆盖：全节点矩阵、流式完成=全量、边界切分、Agent 组件交互；Chat 断言见 docs/22；
 * 9 个仓库门禁（`tools/check-all.ps1`）绿，`check-package` 依赖闭包包含 `PuraMarkdown.Syntax` / `Markdig` 且无其它第三方 UI 库。
 
 ## 7. 已知限制
@@ -117,5 +116,6 @@ view.SetInteractionState(...);    // 持久化/虚拟化恢复
 * HTML 不执行（Markdig `DisableHtml`）：按纯文本回退；
 * 未安装自定义围栏插件时，`pura-agent` / 图表等围栏回退为代码块（与 PuraMarkdown 行为一致）；
 * 图片默认离线拒绝，宿主必须注入 `ImageLoader` 才会加载；
-* **块级虚拟化不在本包范围**：`ArcMarkdownView` 一次性实例化整篇文档的块；超长内容请拆页或使用
-  `ArcMarkdownChatView` 的消息级虚拟化（L1 `ArcVirtualList`，1000 条消息只实例化约 12 行）。
+* **块级虚拟化不在本包范围**：`ArcMarkdownView` 一次性实例化整篇文档的块；超长内容请拆页，或使用
+  `Arc.Avalonia.Chat.ArcChatView` 的消息级虚拟化（L1 `ArcVirtualList`，1000 条消息只实例化约 10 行）。
+

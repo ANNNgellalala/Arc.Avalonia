@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    L2 Chat family: one message model, one bubble surface and one composer for human chat, AI answers and
+    agent conversations. The body of every bubble is ArcMarkdownView (Arc.Avalonia.Markdown is the single
+    Markdown renderer in the solution); the agent layer composes bubbles with full-width event cards
+    instead of inventing a second chat control.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Arc.Avalonia.Chat</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Chat</AssemblyName>
+    <PackageId>Arc.Avalonia.Chat</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>Chat family for Arc for Avalonia: unified message model, bubble conversation surface, composer, streaming and virtualization. Used by human chat, AI answers and the agent conversation layer.</Description>
+    <PackageTags>avalonia;chat;ai;agent;streaming;design-system</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
+    <ProjectReference Include="..\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Tests" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Agent" />
+    <InternalsVisibleTo Include="Arc.Avalonia.AgentUI" />
+  </ItemGroup>
+</Project>

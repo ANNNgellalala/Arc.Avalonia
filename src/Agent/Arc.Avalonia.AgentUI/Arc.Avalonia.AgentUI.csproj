@@ -5,14 +5,12 @@
     <PackageId>Arc.Avalonia.AgentUI</PackageId>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>Agent transcript, run bar, tool approval sheet, question card, background dock and attention inbox UI contracts for Arc for Avalonia.</Description>
+    <Description>Agent leaf controls for Arc for Avalonia: run control bar, tool approval sheet, background run dock and attention inbox. Conversations, bubbles and the composer live in Arc.Avalonia.Chat and are composed by Arc.Avalonia.Agent.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
-    <!-- L4 -> L2: the transcript renders message bodies with the Arc Markdown document view. -->
-    <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,21 +3,13 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentApprovalRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision decision]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer[]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAskCard[]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAskDeferredRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAskOption[]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAskSubmittedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer answer]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentAttentionInbox[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentDenyRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String reason]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentEvent[]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRetryRequestedRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, Arc.Avalonia.AgentUI.Controls.ArcAgentEvent event]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRunPauseRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRunResumeRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRunSteerRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String instruction]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRunStopRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAgentRunTakeoverRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
-  ctor Arc.Avalonia.AgentUI.Controls.ArcAgentTranscript[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision[]
   ctor Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String entryId]
@@ -27,7 +19,6 @@
   ctor Arc.Avalonia.AgentUI.Controls.ArcToolApprovalSheet[]
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
-  event System.EventHandler DeferredRequested
   event System.EventHandler DelegateRequested
   event System.EventHandler ExpandRequested
   event System.EventHandler PauseRequested
@@ -38,12 +29,7 @@
   event System.EventHandler StopRequested
   event System.EventHandler TakeoverRequested
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentApprovalRoutedEventArgs> ApproveRequestedRouted
-  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer> Submitted
-  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentAskDeferredRoutedEventArgs> DeferredRequestedRouted
-  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentAskSubmittedRoutedEventArgs> SubmittedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentDenyRoutedEventArgs> DenyRequestedRouted
-  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> RetryRequested
-  event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRetryRequestedRoutedEventArgs> RetryRequestedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRunPauseRoutedEventArgs> PauseRequestedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRunResumeRoutedEventArgs> ResumeRequestedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAgentRunSteerRoutedEventArgs> SteerRequestedRouted
@@ -52,36 +38,11 @@
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision> ApproveRequested
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> DismissedRouted
   event System.EventHandler<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> ItemActionRequestedRouted
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
   event System.EventHandler<System.String> DenyRequested
   event System.EventHandler<System.String> Dismissed
   event System.EventHandler<System.String> ItemActionRequested
   event System.EventHandler<System.String> SteerRequested
   field Avalonia.Controls.INameScope AvaloniaNameScope
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentAskState Answered
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentAskState Deferred
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentAskState Expired
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentAskState Question
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentAskState Skipped
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Approval
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Ask
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Error
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Message
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Plan
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Result
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Thinking
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Tool
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Done
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Failed
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Pending
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Running
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Skipped
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus AwaitingInput
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Done
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Failed
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Idle
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Running
-  field static Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Stopped
   field static Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk High
   field static Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk Low
   field static Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk Medium
@@ -117,10 +78,7 @@
   field static Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus Stopped
   field static Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus TakenOver
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentApprovalRoutedEventArgs> ApproveRequestedEvent
-  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentAskDeferredRoutedEventArgs> DeferredRequestedEvent
-  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentAskSubmittedRoutedEventArgs> SubmittedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentDenyRoutedEventArgs> DenyRequestedEvent
-  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRetryRequestedRoutedEventArgs> RetryRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunPauseRoutedEventArgs> PauseRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunResumeRoutedEventArgs> ResumeRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunSteerRoutedEventArgs> SteerRequestedEvent
@@ -128,19 +86,11 @@
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAgentRunTakeoverRoutedEventArgs> TakeoverRequestedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> DismissedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.AgentUI.Controls.ArcAttentionActionRoutedEventArgs> ItemActionRequestedEvent
-  field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcAgentAskState> StateProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus> StatusProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk> RiskProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcApprovalScope> ScopeProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcApprovalSheetState> StateProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcDockStatus> StatusProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus> StatusProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> MarkdownOptionsProperty
-  field static Avalonia.StyledProperty<System.Boolean> AllowFreeTextProperty
-  field static Avalonia.StyledProperty<System.Boolean> AllowMultipleProperty
-  field static Avalonia.StyledProperty<System.Boolean> IsStreamingProperty
-  field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentAskOption>> OptionsProperty
-  field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent>> EventsProperty
   field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument>> ArgumentsProperty
   field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAttentionItem>> ItemsProperty
   field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<System.String>> PreviewLinesProperty
@@ -149,9 +99,7 @@
   field static Avalonia.StyledProperty<System.Double> ProgressProperty
   field static Avalonia.StyledProperty<System.String> CurrentStepProperty
   field static Avalonia.StyledProperty<System.String> EmptyTextProperty
-  field static Avalonia.StyledProperty<System.String> EmptyTextProperty
   field static Avalonia.StyledProperty<System.String> IntentProperty
-  field static Avalonia.StyledProperty<System.String> QuestionProperty
   field static Avalonia.StyledProperty<System.String> StepLabelProperty
   field static Avalonia.StyledProperty<System.String> TaskLabelProperty
   field static Avalonia.StyledProperty<System.String> TitleProperty
@@ -167,22 +115,10 @@
   method System.Object TryLoad[System.IServiceProvider , System.String ]
   method System.Object TryLoad[System.String ]
   method System.Uri get_BaseUri[]
-  method System.Void Append[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
-  method System.Void AppendOrUpdate[Arc.Avalonia.AgentUI.Controls.ArcAgentEvent evt]
-  method System.Void AppendRange[System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> events]
-  method System.Void ApplyInteractionStates[System.Collections.Generic.IEnumerable<Arc.Avalonia.Markdown.ArcMarkdownInteraction> states]
   method System.Void PopParent[]
   method System.Void Populate:/Themes/ArcAgentUITheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void PushParent[System.Object ]
-  method System.Void ResetIncremental[]
   method System.Void set_BaseUri[System.Uri ]
-  method System.Void SetInteractionState[Arc.Avalonia.Markdown.ArcMarkdownInteraction interaction]
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer Answer {get}
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentAskState State {get;set}
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentEvent Event {get}
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind Kind {get;set}
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus Status {get;set}
-  property Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus Status {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcApprovalDecision Decision {get}
   property Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk Risk {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcApprovalScope Scope {get;set}
@@ -193,63 +129,34 @@
   property Arc.Avalonia.AgentUI.Controls.ArcAttentionRisk Risk {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcDockStatus Status {get;set}
   property Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus Status {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownOptions MarkdownOptions {get;set}
-  property System.Boolean AllowFreeText {get;set}
-  property System.Boolean AllowMultiple {get;set}
   property System.Boolean Editable {get;set}
-  property System.Boolean IsStreaming {get;set}
-  property System.Boolean IsUserMessage {get;set}
-  property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentAskOption> Options {get;set}
-  property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAgentEvent> Events {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument> Arguments {get;set}
   property System.Collections.Generic.IEnumerable<Arc.Avalonia.AgentUI.Controls.ArcAttentionItem> Items {get;set}
   property System.Collections.Generic.IEnumerable<System.String> PreviewLines {get;set}
-  property System.Collections.Generic.IReadOnlyDictionary<System.String, Arc.Avalonia.Markdown.ArcMarkdownInteraction> InteractionStates {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.AgentUI.Controls.ArcApprovalArgument> ModifiedArguments {get;set}
-  property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
-  property System.DateTimeOffset Timestamp {get;set}
   property System.Double ElapsedSeconds {get;set}
   property System.Double ExpiresInSeconds {get;set}
   property System.Double Progress {get;set}
-  property System.Func<Arc.Avalonia.Markdown.ArcMarkdownOptions> DefaultMarkdownOptionsFactory {get;set}
-  property System.Int32 DroppedRowCount {get}
-  property System.Int32 FullRebuildCount {get}
-  property System.Int32 MaxRenderedRows {get;set}
-  property System.Int32 RenderedRowCount {get}
-  property System.Int32 TotalEventCount {get}
-  property System.Int32 ViewportRows {get;set}
   property System.Object Current {get}
   property System.String ActionLabel {get;set}
   property System.String Age {get;set}
   property System.String CurrentStep {get;set}
-  property System.String Description {get;set}
-  property System.String Detail {get;set}
-  property System.String EmptyText {get;set}
   property System.String EmptyText {get;set}
   property System.String EntryId {get}
-  property System.String FreeText {get;set}
-  property System.String Icon {get;set}
-  property System.String Id {get;set}
-  property System.String Id {get;set}
   property System.String Id {get;set}
   property System.String Instruction {get}
   property System.String Intent {get;set}
-  property System.String Label {get;set}
   property System.String Name {get;set}
-  property System.String Question {get;set}
   property System.String Reason {get}
   property System.String StepLabel {get;set}
   property System.String Summary {get;set}
   property System.String TaskLabel {get;set}
   property System.String Title {get;set}
   property System.String Title {get;set}
-  property System.String Title {get;set}
   property System.String ToolName {get;set}
   property System.String Value {get;set}
   property System.Uri BaseUri {get;set}
-type class Arc.Avalonia.AgentUI.Controls.ArcAgentAskCard : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.AgentUI.Controls.ArcAgentAttentionInbox : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
-type class Arc.Avalonia.AgentUI.Controls.ArcAgentTranscript : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.AgentUI.Controls.ArcBackgroundRunDock : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.AgentUI.Controls.ArcRunControlBar : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.AgentUI.Controls.ArcToolApprovalSheet : Avalonia.Controls.Panel, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.IChildIndexProvider, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
@@ -257,10 +164,6 @@ type class CompiledAvaloniaXaml.!AvaloniaResources
 type class CompiledAvaloniaXaml.!XamlLoader
 type class CompiledAvaloniaXaml.XamlIlContext.Context`1 : Avalonia.Markup.Xaml.IProvideValueTarget, Avalonia.Markup.Xaml.IRootObjectProvider, Avalonia.Markup.Xaml.IUriContext, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlEagerParentStackProvider, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlParentStackProvider, System.ComponentModel.ITypeDescriptorContext, System.IServiceProvider
 type class CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator : System.Collections.Generic.IEnumerator<System.Object>, System.Collections.IEnumerator, System.IDisposable
-type enum Arc.Avalonia.AgentUI.Controls.ArcAgentAskState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.AgentUI.Controls.ArcAgentEventKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.AgentUI.Controls.ArcAgentEventStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.AgentUI.Controls.ArcAgentTranscriptStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.AgentUI.Controls.ArcApprovalRisk : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.AgentUI.Controls.ArcApprovalScope : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.AgentUI.Controls.ArcApprovalSheetState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
@@ -270,13 +173,7 @@ type enum Arc.Avalonia.AgentUI.Controls.ArcAttentionRisk : System.IComparable, S
 type enum Arc.Avalonia.AgentUI.Controls.ArcDockStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.AgentUI.Controls.ArcRunBarStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentApprovalRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentAskAnswer
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentAskDeferredRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentAskOption
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentAskSubmittedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentDenyRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentEvent
-type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRetryRequestedRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRunPauseRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRunResumeRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type sealed Arc.Avalonia.AgentUI.Controls.ArcAgentRunSteerRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs

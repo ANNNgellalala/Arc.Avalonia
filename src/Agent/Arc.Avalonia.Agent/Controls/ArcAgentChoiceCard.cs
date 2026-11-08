@@ -27,9 +27,11 @@ namespace Arc.Avalonia.Agent;
 [TemplatePart("PART_Title", typeof(TextBlock))]
 [TemplatePart("PART_Description", typeof(TextBlock))]
 [TemplatePart("PART_Options", typeof(StackPanel))]
+[TemplatePart("PART_FreeText", typeof(TextBox))]
 [TemplatePart("PART_Error", typeof(TextBlock))]
 [TemplatePart("PART_Footer", typeof(StackPanel))]
 [TemplatePart("PART_Submit", typeof(ArcButton))]
+[TemplatePart("PART_Defer", typeof(ArcButton))]
 [TemplatePart("PART_Hint", typeof(TextBlock))]
 public class ArcAgentChoiceCard : TemplatedControl
 {
@@ -41,9 +43,25 @@ public class ArcAgentChoiceCard : TemplatedControl
     public static readonly StyledProperty<bool> IsInteractiveProperty =
         AvaloniaProperty.Register<ArcAgentChoiceCard, bool>(nameof(IsInteractive), true);
 
+    /// <summary>Shows an optional free-text answer field (absorbed from the old ask card).</summary>
+    public static readonly StyledProperty<bool> AllowFreeTextProperty =
+        AvaloniaProperty.Register<ArcAgentChoiceCard, bool>(nameof(AllowFreeText));
+
+    /// <summary>Current free-text answer; kept in sync with the field.</summary>
+    public static readonly StyledProperty<string> FreeTextProperty =
+        AvaloniaProperty.Register<ArcAgentChoiceCard, string>(nameof(FreeText), string.Empty);
+
+    /// <summary>Shows an "answer later" action; the deferred intent is reported to the host.</summary>
+    public static readonly StyledProperty<bool> AllowDeferProperty =
+        AvaloniaProperty.Register<ArcAgentChoiceCard, bool>(nameof(AllowDefer));
+
     /// <summary>Raised when a single choice is made or a multi selection is submitted (CLR companion).</summary>
     public static readonly RoutedEvent<ArcAgentChoiceSubmittedEventArgs> SubmittedEvent =
         RoutedEvent.Register<ArcAgentChoiceCard, ArcAgentChoiceSubmittedEventArgs>("Submitted", RoutingStrategies.Bubble);
+
+    /// <summary>Raised when the person asks to answer the question later (CLR companion).</summary>
+    public static readonly RoutedEvent<ArcAgentDeferredRequestedEventArgs> DeferredRequestedEvent =
+        RoutedEvent.Register<ArcAgentChoiceCard, ArcAgentDeferredRequestedEventArgs>("DeferredRequested", RoutingStrategies.Bubble);
 
     private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ArcButton> _optionButtons = new(StringComparer.Ordinal);
@@ -51,11 +69,15 @@ public class ArcAgentChoiceCard : TemplatedControl
     private TextBlock? _title;
     private TextBlock? _description;
     private StackPanel? _optionsHost;
+    private TextBox? _freeTextBox;
     private TextBlock? _error;
     private StackPanel? _footer;
     private ArcButton? _submit;
+    private ArcButton? _defer;
     private TextBlock? _hint;
     private bool _submitted;
+    private bool _deferred;
+    private bool _syncingFreeText;
     private string? _errorText;
     private string? _pendingFocus;
     private ArcMarkdownInteraction? _pendingState;
@@ -64,6 +86,9 @@ public class ArcAgentChoiceCard : TemplatedControl
     {
         ModelProperty.Changed.AddClassHandler<ArcAgentChoiceCard>((card, _) => card.OnModelChanged());
         IsInteractiveProperty.Changed.AddClassHandler<ArcAgentChoiceCard>((card, _) => card.RebuildContent());
+        AllowFreeTextProperty.Changed.AddClassHandler<ArcAgentChoiceCard>((card, _) => card.RebuildContent());
+        AllowDeferProperty.Changed.AddClassHandler<ArcAgentChoiceCard>((card, _) => card.RebuildContent());
+        FreeTextProperty.Changed.AddClassHandler<ArcAgentChoiceCard>((card, _) => card.SyncFreeText());
     }
 
     /// <summary>Creates the card; the ControlTheme is applied by the first attached instance.</summary>
@@ -83,6 +108,27 @@ public class ArcAgentChoiceCard : TemplatedControl
         set => SetValue(IsInteractiveProperty, value);
     }
 
+    /// <summary>Shows the optional free-text answer field (absorbed from the retired ask card).</summary>
+    public bool AllowFreeText
+    {
+        get => GetValue(AllowFreeTextProperty);
+        set => SetValue(AllowFreeTextProperty, value);
+    }
+
+    /// <summary>Current free-text answer.</summary>
+    public string FreeText
+    {
+        get => GetValue(FreeTextProperty);
+        set => SetValue(FreeTextProperty, value);
+    }
+
+    /// <summary>Shows the "answer later" action.</summary>
+    public bool AllowDefer
+    {
+        get => GetValue(AllowDeferProperty);
+        set => SetValue(AllowDeferProperty, value);
+    }
+
     /// <summary>Component id used by <see cref="InteractionOccurred"/> persistence.</summary>
     public string ComponentId => Model?.Id ?? string.Empty;
 
@@ -94,6 +140,9 @@ public class ArcAgentChoiceCard : TemplatedControl
     /// <summary>True once the choice was submitted (a restored interaction also sets it).</summary>
     public bool IsSubmitted => _submitted;
 
+    /// <summary>True once the person asked to answer later.</summary>
+    public bool IsDeferred => _deferred;
+
     /// <summary>CLR companion of <see cref="SubmittedEvent"/>; both are raised for one interaction.</summary>
     public event EventHandler<ArcAgentChoiceSubmittedEventArgs>? Submitted;
 
@@ -104,21 +153,41 @@ public class ArcAgentChoiceCard : TemplatedControl
         remove => RemoveHandler(SubmittedEvent, value);
     }
 
+    /// <summary>CLR companion of <see cref="DeferredRequestedEvent"/>; both are raised for one intent.</summary>
+    public event EventHandler<ArcAgentDeferredRequestedEventArgs>? DeferredRequested;
+
+    /// <summary>Bubbling routed companion of <see cref="DeferredRequested"/>.</summary>
+    public event EventHandler<ArcAgentDeferredRequestedEventArgs>? DeferredRequestedRouted
+    {
+        add => AddHandler(DeferredRequestedEvent, value);
+        remove => RemoveHandler(DeferredRequestedEvent, value);
+    }
+
+    /// <summary>True when the card waits for an explicit submit (multi select or a free-text answer).</summary>
+    public bool IsFormMode => Model is { Multi: true } || AllowFreeText;
+
     /// <summary>
-    /// Submits the current multi selection, validating <c>min</c>/<c>max</c>. Also usable from code and
-    /// tests without a visual tree. Returns false when the card is not interactive or the selection fails
-    /// validation (the inline error is shown instead).
+    /// Submits the current selection (and free text when allowed), validating <c>min</c>/<c>max</c>. Also
+    /// usable from code and tests without a visual tree. Returns false when the card is not interactive or
+    /// the selection fails validation (the inline error is shown instead).
     /// </summary>
     public bool TrySubmit()
     {
-        if (Model is not { Multi: true } model || !EffectiveInteractive)
+        if (Model is not { } model || !EffectiveInteractive || !IsFormMode)
         {
             return false;
         }
 
         var selected = SelectedIds;
+        var freeText = (FreeText ?? string.Empty).Trim();
+        if (selected.Count == 0 && freeText.Length == 0)
+        {
+            ShowError("Choose an option or type an answer.");
+            return false;
+        }
+
         var minimum = Math.Max(1, model.Min);
-        if (selected.Count < minimum)
+        if (selected.Count < minimum && freeText.Length == 0)
         {
             ShowError($"Select at least {minimum} option{(minimum == 1 ? string.Empty : "s")}.");
             return false;
@@ -134,6 +203,20 @@ public class ArcAgentChoiceCard : TemplatedControl
         _submitted = true;
         RebuildContent();
         RaiseSubmitted();
+        return true;
+    }
+
+    /// <summary>Reports the "answer later" intent (also usable from code and tests without a visual tree).</summary>
+    public bool TryDefer()
+    {
+        if (!EffectiveInteractive || !AllowDefer)
+        {
+            return false;
+        }
+
+        _deferred = true;
+        RebuildContent();
+        RaiseDeferred();
         return true;
     }
 
@@ -161,9 +244,16 @@ public class ArcAgentChoiceCard : TemplatedControl
             _selected.Clear();
             _selected.Add(option.Id);
             _errorText = null;
-            _submitted = true;
+            if (!IsFormMode)
+            {
+                // Pure single select reports the moment an option is chosen (docs/03 §4.3).
+                _submitted = true;
+                RebuildContent();
+                RaiseSubmitted();
+                return true;
+            }
+
             RebuildContent();
-            RaiseSubmitted();
             return true;
         }
 
@@ -214,6 +304,11 @@ public class ArcAgentChoiceCard : TemplatedControl
         _submitted = interaction.Confirmed;
         _errorText = null;
         _pendingState = null;
+        if (AllowFreeText && !string.IsNullOrWhiteSpace(interaction.Value))
+        {
+            FreeText = interaction.Value!;
+        }
+
         RebuildContent();
     }
 
@@ -224,14 +319,35 @@ public class ArcAgentChoiceCard : TemplatedControl
         _title = e.NameScope.Find<TextBlock>("PART_Title");
         _description = e.NameScope.Find<TextBlock>("PART_Description");
         _optionsHost = e.NameScope.Find<StackPanel>("PART_Options");
+        _freeTextBox = e.NameScope.Find<TextBox>("PART_FreeText");
         _error = e.NameScope.Find<TextBlock>("PART_Error");
         _footer = e.NameScope.Find<StackPanel>("PART_Footer");
         _submit = e.NameScope.Find<ArcButton>("PART_Submit");
+        _defer = e.NameScope.Find<ArcButton>("PART_Defer");
         _hint = e.NameScope.Find<TextBlock>("PART_Hint");
 
         if (_submit is not null)
         {
             _submit.Click += (_, _) => TrySubmit();
+        }
+
+        if (_defer is not null)
+        {
+            _defer.Click += (_, _) => TryDefer();
+        }
+
+        if (_freeTextBox is not null)
+        {
+            AutomationProperties.SetName(_freeTextBox, "Free-text answer");
+            _freeTextBox.TextChanged += (_, _) =>
+            {
+                if (_syncingFreeText)
+                {
+                    return;
+                }
+
+                FreeText = _freeTextBox.Text ?? string.Empty;
+            };
         }
 
         if (_error is not null)
@@ -249,12 +365,13 @@ public class ArcAgentChoiceCard : TemplatedControl
         ArcAgentCardTheme.EnsureApplied(this, typeof(ArcAgentChoiceCard));
     }
 
-    private bool EffectiveInteractive => IsInteractive && Model is { Disabled: false } && !_submitted;
+    private bool EffectiveInteractive => IsInteractive && Model is { Disabled: false } && !_submitted && !_deferred;
 
     private void OnModelChanged()
     {
         _selected.Clear();
         _submitted = false;
+        _deferred = false;
         _errorText = null;
         _pendingFocus = null;
         if (Model is { } model)
@@ -305,6 +422,16 @@ public class ArcAgentChoiceCard : TemplatedControl
             _optionsHost.Children.Add(button);
         }
 
+        if (_freeTextBox is not null)
+        {
+            _freeTextBox.IsVisible = AllowFreeText;
+            _freeTextBox.IsEnabled = EffectiveInteractive;
+            _freeTextBox.PlaceholderText = AllowFreeText && model.Multi
+                ? "Add a note (optional)"
+                : "Or type an answer";
+            SyncFreeText();
+        }
+
         if (_error is not null)
         {
             _error.Text = _errorText ?? string.Empty;
@@ -330,6 +457,16 @@ public class ArcAgentChoiceCard : TemplatedControl
         content.Children.Add(BuildSelectionMark(selected, model.Multi));
 
         var labels = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
+        if (!string.IsNullOrWhiteSpace(option.Icon))
+        {
+            labels.Children.Add(new ArcIcon
+            {
+                Icon = option.Icon!,
+                Size = 14,
+                Foreground = ArcUi.Brush(selected ? ArcTokens.Accent : ArcTokens.TextSecondary)
+            });
+        }
+
         var label = ArcUi.Text(option.Label, selected ? "arc-body-sm arc-medium" : "arc-body-sm");
         if (option.Disabled)
         {
@@ -364,7 +501,7 @@ public class ArcAgentChoiceCard : TemplatedControl
         AutomationProperties.SetName(
             button,
             $"{option.Label}. {(selected ? "Selected" : "Not selected")}. " +
-            (option.Disabled ? "Disabled." : model.Multi ? "Toggle this option." : "Choose this option."));
+            (option.Disabled ? "Disabled." : model.Multi || IsFormMode ? "Toggle this option." : "Choose this option."));
         if (!string.IsNullOrWhiteSpace(option.Description))
         {
             AutomationProperties.SetHelpText(button, option.Description);
@@ -410,18 +547,45 @@ public class ArcAgentChoiceCard : TemplatedControl
         }
 
         var submitted = _submitted;
-        _submit.IsVisible = model.Multi && !submitted;
+        var deferred = _deferred;
+        var form = IsFormMode;
+        _submit.IsVisible = form && !submitted && !deferred;
         _submit.Content = model.SubmitLabel;
         _submit.IsEnabled = EffectiveInteractive;
+        if (_defer is not null)
+        {
+            _defer.IsVisible = AllowDefer && !submitted && !deferred;
+            _defer.IsEnabled = EffectiveInteractive;
+            _defer.Content = "Answer later";
+        }
 
         _hint.Text = submitted
-            ? $"Selection sent: {string.Join(", ", SelectedIds)}"
-            : model.Multi
-                ? SelectionHint(model)
-                : string.Empty;
-        _hint.IsVisible = submitted || model.Multi;
+            ? SubmittedSummary()
+            : deferred
+                ? "Deferred. The agent will ask again later."
+                : form
+                    ? SelectionHint(model)
+                    : string.Empty;
+        _hint.IsVisible = submitted || deferred || form;
 
-        _footer.IsVisible = model.Multi || submitted;
+        _footer.IsVisible = form || AllowDefer || submitted || deferred;
+    }
+
+    private string SubmittedSummary()
+    {
+        var parts = new List<string>();
+        if (SelectedIds.Count > 0)
+        {
+            parts.Add(string.Join(", ", SelectedIds));
+        }
+
+        var freeText = (FreeText ?? string.Empty).Trim();
+        if (freeText.Length > 0)
+        {
+            parts.Add($"\"{freeText}\"");
+        }
+
+        return parts.Count == 0 ? "Answer sent." : $"Answer sent: {string.Join(" · ", parts)}";
     }
 
     private static string SelectionHint(ArcAgentChoiceModel model)
@@ -441,7 +605,7 @@ public class ArcAgentChoiceCard : TemplatedControl
     {
         ArcUi.Name(
             this,
-            $"{model.Question}. {(_submitted ? "Selection submitted." : model.Multi ? "Multiple choice." : "Single choice.")}",
+            $"{model.Question}. {(_submitted ? "Answer submitted." : _deferred ? "Deferred." : model.Multi ? "Multiple choice." : "Single choice.")}",
             "Choose an option with the keyboard: Tab moves between options, Enter or Space selects.");
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
     }
@@ -459,6 +623,10 @@ public class ArcAgentChoiceCard : TemplatedControl
         {
             _pendingFocus = _optionButtons.Keys.First();
             RestoreFocus();
+        }
+        else
+        {
+            _freeTextBox?.Focus();
         }
     }
 
@@ -486,10 +654,43 @@ public class ArcAgentChoiceCard : TemplatedControl
         var args = new ArcAgentChoiceSubmittedEventArgs
         {
             ComponentId = ComponentId,
-            SelectedIds = SelectedIds
+            SelectedIds = SelectedIds,
+            FreeText = string.IsNullOrWhiteSpace(FreeText) ? null : FreeText.Trim()
         };
         Submitted?.Invoke(this, args);
         args.RoutedEvent = SubmittedEvent;
         RaiseEvent(args);
+    }
+
+    private void RaiseDeferred()
+    {
+        var args = new ArcAgentDeferredRequestedEventArgs
+        {
+            ComponentId = ComponentId
+        };
+        DeferredRequested?.Invoke(this, args);
+        args.RoutedEvent = DeferredRequestedEvent;
+        RaiseEvent(args);
+    }
+
+    private void SyncFreeText()
+    {
+        if (_freeTextBox is null || _syncingFreeText)
+        {
+            return;
+        }
+
+        _syncingFreeText = true;
+        try
+        {
+            if (!string.Equals(_freeTextBox.Text, FreeText, StringComparison.Ordinal))
+            {
+                _freeTextBox.Text = FreeText;
+            }
+        }
+        finally
+        {
+            _syncingFreeText = false;
+        }
     }
 }

@@ -1,0 +1,87 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Arc.Avalonia.Chat"
+                    xmlns:arc="using:Arc.Avalonia.Controls">
+
+  <!--
+    Chat family theme. The conversation surface is a virtualized ArcVirtualList (L1) plus a fixed streaming
+    slot below it, a typing row and an optional composer; every message row is an ArcChatBubble whose body is
+    ArcMarkdownView. Item containers are stripped of Fluent selection chrome: a transcript is read, not
+    selected. All colours come from Arc token resources.
+  -->
+  <ControlTheme x:Key="ArcChatMessageItem" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter x:Name="PART_ContentPresenter"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcChatBubble}" TargetType="c:ArcChatBubble">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="PART_Host" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcChatComposer}" TargetType="c:ArcChatComposer">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="PART_Host" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:ArcChatView}" TargetType="c:ArcChatView">
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="*,Auto,Auto,Auto"
+              Background="{TemplateBinding Background}">
+          <Grid Grid.Row="0">
+            <arc:ArcVirtualList x:Name="PART_List"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                Margin="0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ItemContainerTheme="{StaticResource ArcChatMessageItem}" />
+            <ContentControl x:Name="PART_Empty"
+                            IsVisible="False"
+                            IsHitTestVisible="False"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+          </Grid>
+          <ContentControl x:Name="PART_StreamingSlot"
+                          Grid.Row="1"
+                          IsVisible="False"
+                          Margin="0,8,0,0" />
+          <ContentControl x:Name="PART_Typing"
+                          Grid.Row="2"
+                          IsVisible="False"
+                          Margin="12,0,12,0" />
+          <ContentControl x:Name="PART_ComposerHost"
+                          Grid.Row="3"
+                          Margin="0,8,0,0"
+                          HorizontalContentAlignment="Stretch" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

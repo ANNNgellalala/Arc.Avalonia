@@ -160,7 +160,8 @@ internal sealed class ArcAgentFenceRenderer : IArcMarkdownFenceRenderer
                     "choice",
                     args.ComponentId,
                     args.SelectedIds,
-                    Confirmed: true)
+                    Confirmed: true,
+                    args.FreeText)
                 {
                     Raw = raw
                 });

@@ -47,7 +47,13 @@ public abstract record ArcAgentComponentModel
 /// <param name="Label">Visible label; rendered as plain text.</param>
 /// <param name="Description">Optional secondary line.</param>
 /// <param name="Disabled">Disabled options are shown but cannot be selected.</param>
-public sealed record ArcAgentChoiceOption(string Id, string Label, string? Description = null, bool Disabled = false);
+/// <param name="Icon">Optional Lucide icon name shown before the label (hosts may set it; the fence protocol does not carry icons).</param>
+public sealed record ArcAgentChoiceOption(
+    string Id,
+    string Label,
+    string? Description = null,
+    bool Disabled = false,
+    string? Icon = null);
 
 /// <summary>A parsed <c>choice</c> payload: single or multi select.</summary>
 public sealed record ArcAgentChoiceModel : ArcAgentComponentModel

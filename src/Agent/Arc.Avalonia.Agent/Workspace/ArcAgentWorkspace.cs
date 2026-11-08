@@ -335,6 +335,8 @@ public sealed class ArcAgentWorkspace : IArcAgentWorkspace
             new ArcMessageStartedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-user", ArcAgentRole.User),
             new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-user", "Draft a migration plan for the agent layer."),
             new ArcMessageEndedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-user"),
+            new ArcReasoningDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "reasoning-1",
+                "The transcript and the composer already share the Markdown renderer, so the scope question is about order, not risk."),
             new ArcMessageStartedEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant", ArcAgentRole.Assistant),
             new ArcMessageDeltaEvent(Next("run-fg"), DateTimeOffset.UtcNow, "m-assistant",
                 """

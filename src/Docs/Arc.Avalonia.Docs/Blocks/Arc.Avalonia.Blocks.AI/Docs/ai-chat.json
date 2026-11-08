@@ -4,7 +4,7 @@
   "summary": "完整的会话卡：用户与助手交替的消息线程、可折叠的推理行、工具调用 chip、引用来源卡与消息操作（复制、评分、版本），底部固定输入区。",
   "purpose": [
     "它是产品里「一段真实对话」的样子：线程在固定高度里滚动，用户消息靠右、助手回复靠左，头部给出会话名、轮数与模型 chip，输入区固定在底部。",
-    "助手回复不是一段纯文本：顶部一行是模型名、Thought for 4s 与展开按钮，正文走 Markdown 子集（加粗、行内代码、列表），接着是工具调用 chip（Searched 6 sites / Read 3 files / 2 sources）与引用来源卡。",
+    "助手回复不是一段纯文本：顶部一行是模型名、Thought for 4s 与展开按钮，正文用 ArcMarkdownView 渲染完整 Markdown（标题、加粗、列表、代码块、表格），接着是工具调用 chip（Searched 6 sites / Read 3 files / 2 sources）与引用来源卡。",
     "消息操作放在回复底部：复制、重试、好评、差评，加一个 2 / 2 的版本切换；这些动作只改变页面状态，不会真的调用模型。",
     "底部输入区用同一个发送逻辑：Enter 发送、Shift+Enter 换行，发送后把自己的消息与一段脚本化回复追加到线程并滚到底部，状态行说明「回复 6 秒完成」这类事实。"
   ],
@@ -52,7 +52,7 @@
     {
       "title": "一条带推理、工具与来源的助手回复",
       "language": "csharp",
-      "code": "var reasoningBody = new Border\n{\n    IsVisible = false, // 由「Show reasoning」按钮展开\n    Child = K.Text(\"I checked the queue depth, the timeout configuration and the deploy log.\", \"arc-caption\", 640)\n};\n\nvar reply = K.Stack(8,\n    K.Row(7,\n        K.Disc(\"sparkles\", 22, true, 12),\n        K.Text(\"Claude Sonnet 5.5\", \"arc-caption\"),\n        K.Dot(ArcTokens.BorderStrong, 3),\n        K.Caption(\"Thought for 4s\"),\n        K.IconBtn(\"chevron-right\", \"Show reasoning\", size: 12)),\n    reasoningBody,\n    K.Markdown(\"The retry queue was capped too low for the slow **authorization** call. [1]\", maxWidth: 660),\n    K.Row(6,\n        K.Chip(\"Searched 6 sites\", icon: \"globe\"),\n        K.Chip(\"Read 3 files\", icon: \"file\"),\n        K.Chip(\"2 sources\", icon: \"link\")),\n    K.RowWrap(6,\n        K.SourceCard(1, \"Queue depth dashboard\", \"grafana.acme.dev\", \"G\"),\n        K.SourceCard(2, \"Payment retry policy\", \"docs.acme.dev\", \"D\")),\n    K.Row(4,\n        K.IconBtn(\"copy\", \"Copy answer\"),\n        K.IconBtn(\"refresh-cw\", \"Retry answer\"),\n        K.IconBtn(\"thumbs-up\", \"Good response\"),\n        K.Caption(\"2 / 2\")));"
+      "code": "var reasoningBody = new Border\n{\n    IsVisible = false, // 由「Show reasoning」按钮展开\n    Child = K.Text(\"I checked the queue depth, the timeout configuration and the deploy log.\", \"arc-caption\", 640)\n};\n\nvar reply = K.Stack(8,\n    K.Row(7,\n        K.Disc(\"sparkles\", 22, true, 12),\n        K.Text(\"Claude Sonnet 5.5\", \"arc-caption\"),\n        K.Dot(ArcTokens.BorderStrong, 3),\n        K.Caption(\"Thought for 4s\"),\n        K.IconBtn(\"chevron-right\", \"Show reasoning\", size: 12)),\n    reasoningBody,\n    K.Markdown(\"The retry queue was capped too low for the slow **authorization** call. [1]\", 660),\n    K.Row(6,\n        K.Chip(\"Searched 6 sites\", icon: \"globe\"),\n        K.Chip(\"Read 3 files\", icon: \"file\"),\n        K.Chip(\"2 sources\", icon: \"link\")),\n    K.RowWrap(6,\n        K.SourceCard(1, \"Queue depth dashboard\", \"grafana.acme.dev\", \"G\"),\n        K.SourceCard(2, \"Payment retry policy\", \"docs.acme.dev\", \"D\")),\n    K.Row(4,\n        K.IconBtn(\"copy\", \"Copy answer\"),\n        K.IconBtn(\"refresh-cw\", \"Retry answer\"),\n        K.IconBtn(\"thumbs-up\", \"Good response\"),\n        K.Caption(\"2 / 2\")));"
     }
   ]
 }

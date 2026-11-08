@@ -18,8 +18,12 @@
     <ProjectReference Include="..\..\src\Feature\Arc.Avalonia.Feature.DataGrid\Arc.Avalonia.Feature.DataGrid.csproj" />
     <!-- Markdown family: PuraMarkdown syntax pipeline, renderer registry, streaming and chat surfaces. -->
     <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
+    <!-- Chat family: the single bubble/message/composer surface shared by human chat and the agent layer. -->
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Chat\Arc.Avalonia.Chat.csproj" />
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Chat\Arc.Avalonia.Chat.csproj" />
     <!-- M2-G4: Agent top layer (reducer, queues, coalescer, incremental transcript) and its leaf controls. -->
     <ProjectReference Include="..\..\src\Agent\Arc.Avalonia.Agent\Arc.Avalonia.Agent.csproj" />
     <ProjectReference Include="..\..\src\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
   </ItemGroup>
 </Project>
+

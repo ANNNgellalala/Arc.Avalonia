@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
+using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 
@@ -43,7 +44,7 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
             return;
         }
 
-        Register<ArcAgentMessage>(message => MessageView(message));
+        Register<ArcChatMessage>(message => MessageView(message));
         Register<ArcToolCall>(call => new ArcAgentToolCallCard { Call = call, Margin = new Thickness(0, 2, 0, 2) });
         Register<ArcApprovalRequest>(request => ApprovalView(request));
         Register<ArcArtifact>(artifact => ArtifactView(artifact));
@@ -100,19 +101,16 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
         return ArcUi.Text(value.ToString() ?? string.Empty, "arc-body-sm");
     }
 
-    private static Control MessageView(ArcAgentMessage message)
+    private static Control MessageView(ArcChatMessage message)
     {
         var stack = ArcUi.Stack(2);
         stack.Children.Add(ArcUi.Caption(message.Role switch
         {
-            ArcAgentRole.User => "You",
-            ArcAgentRole.Assistant => "Assistant",
-            ArcAgentRole.Reasoning => "Thinking",
-            ArcAgentRole.Tool => "Tool",
-            ArcAgentRole.SubAgent => "Sub-agent",
-            _ => "System"
+            ArcChatRole.User => "You",
+            ArcChatRole.System => "System",
+            _ => "Assistant"
         }));
-        var text = ArcUi.Text(message.Text, "arc-body-sm", 680);
+        var text = ArcUi.Text(message.Markdown, "arc-body-sm", 680);
         text.TextWrapping = TextWrapping.Wrap;
         stack.Children.Add(text);
         return new Border

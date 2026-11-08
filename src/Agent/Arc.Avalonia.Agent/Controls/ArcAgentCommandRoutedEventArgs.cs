@@ -14,17 +14,6 @@ public sealed class ArcAgentDecisionRoutedEventArgs : RoutedEventArgs
     public ArcApprovalDecision Decision { get; }
 }
 
-/// <summary>Routed args for the composer submit event.</summary>
-public sealed class ArcComposerSubmitRoutedEventArgs : RoutedEventArgs
-{
-    /// <summary>Creates the args for a routed event.</summary>
-    public ArcComposerSubmitRoutedEventArgs(RoutedEvent routedEvent, ArcComposerSubmit submit) : base(routedEvent) =>
-        Submit = submit;
-
-    /// <summary>The submitted draft and optional model.</summary>
-    public ArcComposerSubmit Submit { get; }
-}
-
 /// <summary>Routed args for the surface command events (both CommandRequested and CommandRaised).</summary>
 public sealed class ArcAgentCommandRoutedEventArgs : RoutedEventArgs
 {

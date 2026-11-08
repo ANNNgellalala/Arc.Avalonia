@@ -13,6 +13,7 @@ using Arc.Avalonia.Charts.Controls;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Feedback.Controls;
 using Arc.Avalonia.Inputs.Controls;
+using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Theme;
 
 namespace Arc.Avalonia.Blocks.AI;
@@ -654,211 +655,32 @@ internal static class AiKit
         }
     }
 
-    // ------------------------------------------------------------------ markdown and inline text
+    // ------------------------------------------------------------------ markdown text
 
     /// <summary>
-    /// A small Markdown-subset paragraph: **bold**, `inline code` and [n] citation chips. Citations become
-    /// focusable chips that call <paramref name="onCitation"/>, so a page can light the sentence they support.
+    /// Renders Markdown with the shared <c>ArcMarkdownView</c>. The Blocks kit does not carry a
+    /// second Markdown implementation: parsing and rendering live in Arc.Avalonia.Markdown, so a
+    /// fragment here behaves exactly like the rest of the product.
     /// </summary>
-    public static TextBlock Paragraph(string text, Action<int>? onCitation = null, string classes = "arc-body-sm",
-        double maxWidth = 0, double lineHeight = 21)
+    /// <param name="markdown">Markdown source.</param>
+    /// <param name="maxWidth">Optional maximum width in device-independent pixels (0 = unconstrained).</param>
+    /// <remarks>
+    /// Answer interactions (citation chips, choices, confirmations) belong to the Arc.Avalonia.Agent
+    /// components registered as Markdown fence renderers; this helper is a plain document surface.
+    /// </remarks>
+    public static Control Markdown(string markdown, double maxWidth = 0)
     {
-        var block = Text(string.Empty, classes, maxWidth);
-        block.LineHeight = lineHeight;
-        AddInline(block, text, onCitation);
-        return block;
-    }
-
-    /// <summary>A body block: a paragraph, a bulleted list, a short heading or a fenced code block.</summary>
-    public static Control Markdown(string markdown, Action<int>? onCitation = null, double maxWidth = 0)
-    {
-        var stack = new StackPanel { Spacing = 7, HorizontalAlignment = HorizontalAlignment.Stretch };
-        var lines = (markdown ?? string.Empty).Replace("\r\n", "\n").Split('\n');
-        for (var i = 0; i < lines.Length; i++)
+        var view = new ArcMarkdownView
         {
-            var line = lines[i].TrimEnd();
-            var trimmed = line.Trim();
-            if (trimmed.Length == 0)
-            {
-                continue;
-            }
-
-            if (trimmed.StartsWith("```", StringComparison.Ordinal))
-            {
-                var code = new List<string>();
-                i++;
-                while (i < lines.Length && !lines[i].TrimStart().StartsWith("```", StringComparison.Ordinal))
-                {
-                    code.Add(lines[i]);
-                    i++;
-                }
-
-                stack.Children.Add(new ArcCodeBlock
-                {
-                    Code = string.Join("\n", code),
-                    Language = trimmed.Length > 3 ? trimmed[3..].Trim() : "text",
-                    MaxLines = 8
-                });
-                continue;
-            }
-
-            if (trimmed.StartsWith("### ", StringComparison.Ordinal))
-            {
-                stack.Children.Add(Text(trimmed[4..], "arc-body arc-medium", maxWidth));
-                continue;
-            }
-
-            if (trimmed.StartsWith("## ", StringComparison.Ordinal))
-            {
-                stack.Children.Add(Text(trimmed[3..], "arc-heading", maxWidth));
-                continue;
-            }
-
-            if (trimmed.StartsWith("- ", StringComparison.Ordinal))
-            {
-                stack.Children.Add(Bullet("•", trimmed[2..], onCitation, maxWidth));
-                continue;
-            }
-
-            var numbered = System.Text.RegularExpressions.Regex.Match(trimmed, @"^(\d+)\.\s+(.*)$");
-            if (numbered.Success)
-            {
-                stack.Children.Add(Bullet(numbered.Groups[1].Value + ".", numbered.Groups[2].Value, onCitation, maxWidth));
-                continue;
-            }
-
-            stack.Children.Add(Paragraph(trimmed, onCitation, "arc-body-sm", maxWidth));
-        }
-
-        return stack;
-    }
-
-    private static Control Bullet(string marker, string text, Action<int>? onCitation, double maxWidth)
-    {
-        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("18,*") };
-        var bullet = Text(marker, "arc-body-sm arc-muted");
-        bullet.VerticalAlignment = VerticalAlignment.Top;
-        row.Children.Add(bullet);
-        var paragraph = Paragraph(text, onCitation, "arc-body-sm", maxWidth);
-        Grid.SetColumn(paragraph, 1);
-        row.Children.Add(paragraph);
-        return row;
-    }
-
-    private static void AddInline(TextBlock block, string text, Action<int>? onCitation)
-    {
-        var plain = new System.Text.StringBuilder();
-
-        void Flush()
-        {
-            if (plain.Length == 0)
-            {
-                return;
-            }
-
-            block.Inlines?.Add(new Run { Text = plain.ToString() });
-            plain.Clear();
-        }
-
-        var index = 0;
-        while (index < text.Length)
-        {
-            var current = text[index];
-
-            if (current == '`')
-            {
-                var end = text.IndexOf('`', index + 1);
-                if (end > index + 1)
-                {
-                    Flush();
-                    block.Inlines?.Add(new Run
-                    {
-                        Text = text[(index + 1)..end],
-                        FontFamily = MonoFamily,
-                        FontSize = 12.5,
-                        Foreground = Brush(ArcTokens.AccentStrong)
-                    });
-                    index = end + 1;
-                    continue;
-                }
-            }
-
-            if (current == '*' && index + 1 < text.Length && text[index + 1] == '*')
-            {
-                var end = text.IndexOf("**", index + 2, StringComparison.Ordinal);
-                if (end > index + 1)
-                {
-                    Flush();
-                    block.Inlines?.Add(new Run
-                    {
-                        Text = text[(index + 2)..end],
-                        FontWeight = FontWeight.Medium,
-                        Foreground = Brush(ArcTokens.Foreground)
-                    });
-                    index = end + 2;
-                    continue;
-                }
-            }
-
-            if (current == '[' && index + 1 < text.Length && char.IsDigit(text[index + 1]))
-            {
-                var close = text.IndexOf(']', index + 1);
-                if (close > index && int.TryParse(text[(index + 1)..close], out var number))
-                {
-                    Flush();
-                    block.Inlines?.Add(new InlineUIContainer { Child = Citation(number, onCitation), BaselineAlignment = BaselineAlignment.Center });
-                    index = close + 1;
-                    continue;
-                }
-            }
-
-            plain.Append(current);
-            index++;
-        }
-
-        Flush();
-    }
-
-    /// <summary>An inline citation chip: a focusable tinted number that lights its source on activation.</summary>
-    public static Control Citation(int number, Action<int>? onCitation)
-    {
-        var chip = new Border
-        {
-            Background = Tint(ArcTokens.Accent, 0.12),
-            BorderBrush = Tint(ArcTokens.Accent, 0.28),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(5),
-            Height = 15,
-            Padding = new Thickness(4, 0, 4, 0),
-            Margin = new Thickness(2, 0, 2, 0),
-            VerticalAlignment = VerticalAlignment.Center,
-            Cursor = new Cursor(StandardCursorType.Hand),
-            Focusable = true,
-            Child = new TextBlock
-            {
-                Text = number.ToString(),
-                FontSize = 10,
-                LineHeight = 13,
-                Foreground = Brush(ArcTokens.AccentStrong),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            }
+            Markdown = markdown ?? string.Empty,
         };
-        AutomationProperties.SetName(chip, $"Source {number}");
-        if (onCitation is not null)
+        if (maxWidth > 0)
         {
-            chip.PointerPressed += (_, _) => onCitation(number);
-            chip.KeyDown += (_, args) =>
-            {
-                if (args.Key is Key.Enter or Key.Space)
-                {
-                    onCitation(number);
-                    args.Handled = true;
-                }
-            };
+            view.MaxWidth = maxWidth;
+            view.HorizontalAlignment = HorizontalAlignment.Left;
         }
 
-        return chip;
+        return view;
     }
 
     /// <summary>A source card: number, title, domain and an optional read percentage.</summary>

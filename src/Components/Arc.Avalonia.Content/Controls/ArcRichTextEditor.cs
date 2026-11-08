@@ -15,6 +15,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Theme;
 
@@ -84,7 +85,8 @@ public class ArcRichTextEditor : TemplatedControl
     private Border? _toolbar;
     private Border? _slashMenu;
     private TextBox? _linkInput;
-    private ContentControl? _previewHost;
+    private ArcMarkdownView? _previewMarkdown;
+    private TextBlock? _previewEmpty;
     private Panel? _previewPanel;
     private ColumnDefinition? _previewColumn;
     private Border? _previewDivider;
@@ -513,10 +515,19 @@ public class ArcRichTextEditor : TemplatedControl
         frame.Paint(Border.BackgroundProperty, ArcTokens.SurfaceMuted);
 
         var stack = new StackPanel { Spacing = 10 };
-        _previewHost = new ContentControl { HorizontalContentAlignment = HorizontalAlignment.Stretch };
+        // Preview shares the production Markdown renderer, so editor and product output never drift.
+        _previewMarkdown = new ArcMarkdownView
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+        };
+        _previewEmpty = ArcContentUi.Caption("Nothing to preview yet.");
+        _previewEmpty.Paint(TextBlock.ForegroundProperty, ArcTokens.TextMuted);
+        var previewStack = new StackPanel { Spacing = 6 };
+        previewStack.Children.Add(_previewEmpty);
+        previewStack.Children.Add(_previewMarkdown);
         var scroller = new ScrollViewer
         {
-            Content = _previewHost,
+            Content = previewStack,
             MaxHeight = 320,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
@@ -781,7 +792,8 @@ public class ArcRichTextEditor : TemplatedControl
 
         _source = _textBox.Text ?? string.Empty;
         SyncOutputs(true);
-        UpdatePreview(force: !_previewVisible);
+        // The preview is refreshed on show; skip re-parsing the document on every keystroke while hidden.
+        UpdatePreview();
         UpdateCounts();
         UpdateBlockHint();
         UpdateSlashFromText();
@@ -833,12 +845,16 @@ public class ArcRichTextEditor : TemplatedControl
 
     private void UpdatePreview(bool force = false)
     {
-        if (_previewHost is null || (!_previewVisible && !force))
+        if (_previewMarkdown is null || (!_previewVisible && !force))
         {
             return;
         }
 
-        _previewHost.Content = ArcMarkdown.BuildPreview(_source);
+        _previewMarkdown.Markdown = _source;
+        if (_previewEmpty is not null)
+        {
+            _previewEmpty.IsVisible = string.IsNullOrWhiteSpace(_source);
+        }
     }
 
     private void UpdatePreviewVisibility()

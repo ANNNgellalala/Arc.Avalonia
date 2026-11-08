@@ -51,7 +51,7 @@
     {
       "title": "引用同时点亮句子与来源卡",
       "language": "csharp",
-      "code": "void Select(int number)\n{\n    ClearHighlights();\n    // 段落底色随引用号变化，右栏对应的来源卡同时加描边\n    Sentences[number].Background = K.Tint(ArcTokens.Accent, 0.08);\n    SourceCards[number].BorderBrush = K.Tint(ArcTokens.Accent, 0.4);\n}\n\n// K.Paragraph 把 [1] [2] 渲染为可聚焦的引用圆点\nvar sentence = K.Paragraph(\n    \"Across the three benchmarks we read, AI-only deflection lands between 22 and 41 percent. [2]\",\n    Select, \"arc-body-sm\", 640);"
+      "code": "void Select(int number)\n{\n    ClearHighlights();\n    // 段落底色随引用号变化，右栏对应的来源卡同时加描边\n    Sentences[number].Background = K.Tint(ArcTokens.Accent, 0.08);\n    SourceCards[number].BorderBrush = K.Tint(ArcTokens.Accent, 0.4);\n}\n\n// 正文用 ArcMarkdownView 渲染；来源卡点击通过 Select 高亮对应段落\nvar sentence = K.Markdown(\n    \"Across the three benchmarks we read, AI-only deflection lands between 22 and 41 percent. [2]\",\n    640);"
     }
   ]
 }

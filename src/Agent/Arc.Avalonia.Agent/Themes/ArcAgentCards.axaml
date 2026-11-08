@@ -49,6 +49,21 @@
 
             <StackPanel x:Name="PART_Options" Spacing="6" />
 
+            <TextBox x:Name="PART_FreeText"
+                     IsVisible="False"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     MinHeight="38"
+                     MaxHeight="120"
+                     Padding="10,7"
+                     CornerRadius="{DynamicResource ArcRadiusControl}"
+                     BorderThickness="1"
+                     BorderBrush="{DynamicResource ArcBorder}"
+                     Background="{DynamicResource ArcSurfaceMuted}"
+                     Foreground="{DynamicResource ArcForeground}"
+                     FontFamily="{DynamicResource ArcFontBody}"
+                     FontSize="{DynamicResource ArcTextSm}" />
+
             <TextBlock x:Name="PART_Error"
                        FontFamily="{DynamicResource ArcFontBody}"
                        FontSize="{DynamicResource ArcTextSm}"
@@ -62,6 +77,7 @@
                         VerticalAlignment="Center"
                         IsVisible="False">
               <arc:ArcButton x:Name="PART_Submit" Variant="Primary" Size="Sm" />
+              <arc:ArcButton x:Name="PART_Defer" Variant="Ghost" Size="Sm" IsVisible="False" />
               <TextBlock x:Name="PART_Hint"
                          FontFamily="{DynamicResource ArcFontBody}"
                          FontSize="{DynamicResource ArcTextXs}"

@@ -3,8 +3,6 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.Markdown.ArcMarkdownBlockInfo[System.Int32 Index, System.String NodeType, System.Int32 Start, System.Int32 End, System.Int32 Line]
-  ctor Arc.Avalonia.Markdown.ArcMarkdownChatMessage[]
-  ctor Arc.Avalonia.Markdown.ArcMarkdownChatView[]
   ctor Arc.Avalonia.Markdown.ArcMarkdownCodeBlock[]
   ctor Arc.Avalonia.Markdown.ArcMarkdownDocumentView[]
   ctor Arc.Avalonia.Markdown.ArcMarkdownHighlighter[]
@@ -30,34 +28,17 @@
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
   event System.EventHandler Aborted
-  event System.EventHandler Changed
   event System.EventHandler Completed
   event System.EventHandler Updated
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownChatMessage> MessageAdded
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownChatMessage> MessageRemoved
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownChatMessage> MessageUpdated
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownLinkClickedEventArgs> LinkClicked
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownLinkClickedEventArgs> LinkClicked
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> Warning
   event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> Warning
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> Warning
-  event System.EventHandler<System.String> Announced
   event System.EventHandler<System.String> Announced
   event System.EventHandler<System.String> Announced
   field Avalonia.Controls.INameScope AvaloniaNameScope
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode Always
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode NearBottom
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode Never
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus Aborted
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus Complete
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus Failed
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus Streaming
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatRole Assistant
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatRole System
-  field static Arc.Avalonia.Markdown.ArcMarkdownChatRole User
   field static Arc.Avalonia.Markdown.ArcMarkdownStreamingState Aborted
   field static Arc.Avalonia.Markdown.ArcMarkdownStreamingState Completed
   field static Arc.Avalonia.Markdown.ArcMarkdownStreamingState Created
@@ -79,8 +60,6 @@
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurredEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Markdown.ArcMarkdownLinkClickedEventArgs> LinkClickedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> WarningEvent
-  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode> AutoScrollModeProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> OptionsProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> OptionsProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.IArcMarkdownClipboard> ClipboardProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.IArcMarkdownCodeHighlighter> HighlighterProperty
@@ -91,7 +70,6 @@
   field static Avalonia.StyledProperty<System.String> LanguageProperty
   field static Avalonia.StyledProperty<System.String> MarkdownProperty
   field static Avalonia.StyledProperty<System.String> OriginalCodeProperty
-  field static System.Double NearBottomThreshold
   field static System.String AgentChoice
   field static System.String AgentComponentError
   field static System.String AgentConfirm
@@ -117,7 +95,6 @@
   field System.Object ProvideTargetProperty
   field TTarget RootObject
   method Arc.Avalonia.Markdown.ArcMarkdownBlockInfo <Clone>$[]
-  method Arc.Avalonia.Markdown.ArcMarkdownChatMessage FindMessage[System.String messageId]
   method Arc.Avalonia.Markdown.ArcMarkdownImageResult <Clone>$[]
   method Arc.Avalonia.Markdown.ArcMarkdownImageResult Failed[System.String reason]
   method Arc.Avalonia.Markdown.ArcMarkdownImageResult Loaded[Avalonia.Media.Imaging.Bitmap image]
@@ -136,7 +113,6 @@
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseSanitizer[PuraMarkdown.Security.IAstSanitizer sanitizer]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseUrlPolicy[PuraMarkdown.Security.IUrlPolicy urlPolicy]
   method Arc.Avalonia.Markdown.ArcMarkdownStreamingSession BeginStreaming[Arc.Avalonia.Markdown.ArcMarkdownStreamingOptions options]
-  method Arc.Avalonia.Markdown.ArcMarkdownStreamingSession BeginStreamingMessage[Arc.Avalonia.Markdown.ArcMarkdownChatMessage message]
   method Arc.Avalonia.Markdown.ArcMarkdownStreamingStatistics <Clone>$[]
   method Arc.Avalonia.Markdown.ArcMarkdownWarning <Clone>$[]
   method Arc.Avalonia.Markdown.IArcMarkdownClipboard Clipboard[System.Func<System.String, System.Threading.CancellationToken, System.Threading.Tasks.Task> setText]
@@ -145,7 +121,6 @@
   method Avalonia.Controls.Control Render[Markdig.Syntax.MarkdownObject node, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
   method Avalonia.Controls.Control Render[System.String language, System.String source, System.Boolean isClosed, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
   method Avalonia.Controls.Control RenderBlock[Markdig.Syntax.MarkdownObject node]
-  method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcMarkdownChatView.axaml[System.IServiceProvider ]
   method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcMarkdownCodeBlock.axaml[System.IServiceProvider ]
   method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcMarkdownView.axaml[System.IServiceProvider ]
   method Avalonia.Controls.TextBlock CreateTextBlock[]
@@ -179,7 +154,6 @@
   method System.Boolean op_Inequality[Arc.Avalonia.Markdown.ArcMarkdownInteraction left, Arc.Avalonia.Markdown.ArcMarkdownInteraction right]
   method System.Boolean op_Inequality[Arc.Avalonia.Markdown.ArcMarkdownStreamingStatistics left, Arc.Avalonia.Markdown.ArcMarkdownStreamingStatistics right]
   method System.Boolean op_Inequality[Arc.Avalonia.Markdown.ArcMarkdownWarning left, Arc.Avalonia.Markdown.ArcMarkdownWarning right]
-  method System.Boolean RemoveMessage[System.String messageId]
   method System.Boolean ScrollToAnchor[System.String anchor]
   method System.Boolean ScrollToAnchor[System.String anchor]
   method System.Collections.Generic.IEnumerable<Arc.Avalonia.Markdown.IArcMarkdownNodeRenderer> ResolveCandidates[Markdig.Syntax.MarkdownObject node, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
@@ -194,7 +168,6 @@
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
-  method System.Int32 IndexOf[System.String messageId]
   method System.Object get_Current[]
   method System.Object GetService[System.Type ]
   method System.Object TryLoad[System.IServiceProvider , System.String ]
@@ -211,7 +184,6 @@
   method System.String ToString[]
   method System.String ToString[]
   method System.Threading.Tasks.Task AbortAsync[System.Threading.CancellationToken cancellationToken]
-  method System.Threading.Tasks.Task AbortStreamingAsync[]
   method System.Threading.Tasks.Task AppendAsync[System.ReadOnlyMemory<System.Char> delta, System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.Task CompleteAsync[System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.Task CopyAllAsync[System.Threading.CancellationToken cancellationToken]
@@ -223,13 +195,10 @@
   method System.Threading.Tasks.ValueTask DisposeAsync[]
   method System.Uri get_BaseUri[]
   method System.Void AbortStreaming[]
-  method System.Void AbortStreaming[]
-  method System.Void AddMessage[Arc.Avalonia.Markdown.ArcMarkdownChatMessage message]
   method System.Void Announce[System.String message]
   method System.Void Append[System.String delta]
   method System.Void ApplyInteractionStates[System.Collections.Generic.IEnumerable<Arc.Avalonia.Markdown.ArcMarkdownInteraction> states]
   method System.Void ClearInteractionStates[]
-  method System.Void ClearMessages[]
   method System.Void Configure[Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder builder]
   method System.Void Deconstruct[out System.Boolean Success, out Avalonia.Media.Imaging.Bitmap Image, out System.String Reason]
   method System.Void Deconstruct[out System.Int32 Flushes, out System.Int32 Parses, out System.Int32 CommittedChars, out System.Int32 TailChars, out System.Int32 TotalChars]
@@ -238,10 +207,7 @@
   method System.Void Deconstruct[out System.String Code, out System.String Message, out System.String NodeType, out System.String Renderer]
   method System.Void Deconstruct[out System.String ComponentType, out System.String ComponentId, out System.Collections.Generic.IReadOnlyList<System.String> SelectedIds, out System.Boolean Confirmed, out System.String Value]
   method System.Void Dispose[]
-  method System.Void Dispose[]
-  method System.Void InsertMessage[System.Int32 index, Arc.Avalonia.Markdown.ArcMarkdownChatMessage message]
   method System.Void PopParent[]
-  method System.Void Populate:/Themes/ArcMarkdownChatView.axaml[System.IServiceProvider , Avalonia.Controls.ResourceDictionary ]
   method System.Void Populate:/Themes/ArcMarkdownCodeBlock.axaml[System.IServiceProvider , Avalonia.Controls.ResourceDictionary ]
   method System.Void Populate:/Themes/ArcMarkdownTheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void Populate:/Themes/ArcMarkdownView.axaml[System.IServiceProvider , Avalonia.Controls.ResourceDictionary ]
@@ -253,18 +219,11 @@
   method System.Void RenderDocument[PuraMarkdown.Syntax.PuraDocument document]
   method System.Void RenderInline[Markdig.Syntax.MarkdownObject node, Avalonia.Controls.Documents.InlineCollection target, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
   method System.Void RenderInlineChildren[Markdig.Syntax.Inlines.ContainerInline container, Avalonia.Controls.Documents.InlineCollection target]
-  method System.Void ReplaceMessages[System.Collections.Generic.IEnumerable<Arc.Avalonia.Markdown.ArcMarkdownChatMessage> messages]
   method System.Void ScrollToEnd[]
-  method System.Void ScrollToEnd[]
-  method System.Void ScrollToMessage[System.String messageId]
   method System.Void set_BaseUri[System.Uri ]
   method System.Void SetInteractionState[Arc.Avalonia.Markdown.ArcMarkdownInteraction interaction]
   method System.Void Update[Avalonia.Controls.Control existing, Markdig.Syntax.MarkdownObject newNode, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
-  method System.Void UpdateMessage[Arc.Avalonia.Markdown.ArcMarkdownChatMessage message]
   method System.Void Warn[System.String code, System.String message, System.String nodeType, System.String renderer]
-  property Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode AutoScrollMode {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus Status {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownChatRole Role {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownEnglishLocalizer Instance {get}
   property Arc.Avalonia.Markdown.ArcMarkdownHighlighter Default {get}
   property Arc.Avalonia.Markdown.ArcMarkdownLocalizer Default {get}
@@ -273,12 +232,10 @@
   property Arc.Avalonia.Markdown.ArcMarkdownOptions Options {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownOptions Options {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownOptions Options {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownOptions Options {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownPipeline Default {get}
   property Arc.Avalonia.Markdown.ArcMarkdownPipeline Pipeline {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownRendererRegistry Renderers {get;set}
   property Arc.Avalonia.Markdown.ArcMarkdownRendererRegistry Renderers {get}
-  property Arc.Avalonia.Markdown.ArcMarkdownStreamingSession ActiveSession {get}
   property Arc.Avalonia.Markdown.ArcMarkdownStreamingSession ActiveSession {get}
   property Arc.Avalonia.Markdown.ArcMarkdownStreamingState State {get}
   property Arc.Avalonia.Markdown.ArcMarkdownStreamingStatistics Statistics {get}
@@ -340,16 +297,13 @@
   property System.Boolean Handled {get;set}
   property System.Boolean HandledByHost {get;set}
   property System.Boolean InteractionEnabled {get;set}
-  property System.Boolean IsNearBottom {get}
   property System.Boolean IsStreaming {get;set}
-  property System.Boolean IsStreaming {get}
   property System.Boolean IsStreaming {get}
   property System.Boolean IsTail {get;set}
   property System.Boolean IsTailPaused {get}
   property System.Boolean ShowLineNumbers {get;set}
   property System.Boolean Success {get;set}
   property System.Boolean Synchronous {get;set}
-  property System.Collections.Generic.IDictionary<System.String, System.String> Metadata {get}
   property System.Collections.Generic.IReadOnlyCollection<System.String> Languages {get}
   property System.Collections.Generic.IReadOnlyDictionary<System.String, Arc.Avalonia.Markdown.ArcMarkdownInteraction> ComponentStates {get;set}
   property System.Collections.Generic.IReadOnlyDictionary<System.String, Arc.Avalonia.Markdown.ArcMarkdownInteraction> InteractionStates {get}
@@ -359,9 +313,6 @@
   property System.Collections.Generic.IReadOnlyList<System.String> PluginNames {get}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
-  property System.Collections.ObjectModel.ObservableCollection<Arc.Avalonia.Markdown.ArcMarkdownChatMessage> Messages {get}
-  property System.DateTimeOffset CreatedAt {get;set}
-  property System.DateTimeOffset UpdatedAt {get}
   property System.Double BlockSpacing {get;set}
   property System.Double BodySize {get;set}
   property System.Double CaptionSize {get;set}
@@ -377,7 +328,6 @@
   property System.Int32 AppliedChars {get;set}
   property System.Int32 Commits {get;set}
   property System.Int32 CommittedChars {get;set}
-  property System.Int32 ContentVersion {get}
   property System.Int32 End {get;set}
   property System.Int32 Flushes {get;set}
   property System.Int32 ForcedCommits {get;set}
@@ -404,10 +354,7 @@
   property System.String ComponentType {get;set}
   property System.String ComponentType {get;set}
   property System.String CurrentText {get}
-  property System.String Error {get;set}
-  property System.String Id {get;set}
   property System.String Language {get;set}
-  property System.String Markdown {get;set}
   property System.String Markdown {get;set}
   property System.String Message {get;set}
   property System.String Message {get;set}
@@ -429,7 +376,6 @@
   property System.String Value {get;set}
   property System.String Version {get}
   property System.Uri BaseUri {get;set}
-type class Arc.Avalonia.Markdown.ArcMarkdownChatView : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize, System.IDisposable
 type class Arc.Avalonia.Markdown.ArcMarkdownCodeBlock : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Markdown.ArcMarkdownDocumentView : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs : Avalonia.Interactivity.RoutedEventArgs
@@ -440,9 +386,6 @@ type class CompiledAvaloniaXaml.!AvaloniaResources
 type class CompiledAvaloniaXaml.!XamlLoader
 type class CompiledAvaloniaXaml.XamlIlContext.Context`1 : Avalonia.Markup.Xaml.IProvideValueTarget, Avalonia.Markup.Xaml.IRootObjectProvider, Avalonia.Markup.Xaml.IUriContext, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlEagerParentStackProvider, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlParentStackProvider, System.ComponentModel.ITypeDescriptorContext, System.IServiceProvider
 type class CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator : System.Collections.Generic.IEnumerator<System.Object>, System.Collections.IEnumerator, System.IDisposable
-type enum Arc.Avalonia.Markdown.ArcMarkdownChatAutoScrollMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.Markdown.ArcMarkdownChatMessageStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.Markdown.ArcMarkdownChatRole : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Markdown.ArcMarkdownStreamingState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type enum Arc.Avalonia.Markdown.ArcMarkdownTokenKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type interface Arc.Avalonia.Markdown.IArcMarkdownClipboard
@@ -456,7 +399,6 @@ type interface Arc.Avalonia.Markdown.IArcMarkdownLocalizer
 type interface Arc.Avalonia.Markdown.IArcMarkdownNodeRenderer
 type interface Arc.Avalonia.Markdown.IArcMarkdownPlugin
 type sealed Arc.Avalonia.Markdown.ArcMarkdownBlockInfo : System.IEquatable<Arc.Avalonia.Markdown.ArcMarkdownBlockInfo>
-type sealed Arc.Avalonia.Markdown.ArcMarkdownChatMessage
 type sealed Arc.Avalonia.Markdown.ArcMarkdownEnglishLocalizer : Arc.Avalonia.Markdown.IArcMarkdownLocalizer
 type sealed Arc.Avalonia.Markdown.ArcMarkdownHighlighter : Arc.Avalonia.Markdown.IArcMarkdownCodeHighlighter
 type sealed Arc.Avalonia.Markdown.ArcMarkdownImageResult : System.IEquatable<Arc.Avalonia.Markdown.ArcMarkdownImageResult>

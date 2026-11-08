@@ -21,6 +21,7 @@
     <Project Path="src/Components/Arc.Avalonia.Content/Arc.Avalonia.Content.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Media/Arc.Avalonia.Media.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Markdown/Arc.Avalonia.Markdown.csproj" />
+    <Project Path="src/Components/Arc.Avalonia.Chat/Arc.Avalonia.Chat.csproj" />
     <Project Path="src/Components/Arc.Avalonia.Services/Arc.Avalonia.Services.csproj" />
   </Folder>
   <Folder Name="/Agent/">
@@ -56,3 +57,4 @@
     <Project Path="tests/Arc.Avalonia.Tests/Arc.Avalonia.Tests.csproj" />
   </Folder>
 </Solution>
+

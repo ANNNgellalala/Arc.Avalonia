@@ -5,7 +5,6 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Arc.Avalonia.Markdown/Themes/ArcMarkdownView.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Markdown/Themes/ArcMarkdownCodeBlock.axaml" />
-        <ResourceInclude Source="avares://Arc.Avalonia.Markdown/Themes/ArcMarkdownChatView.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

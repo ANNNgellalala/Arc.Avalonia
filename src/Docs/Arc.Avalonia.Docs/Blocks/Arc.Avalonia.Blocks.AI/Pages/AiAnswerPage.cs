@@ -97,7 +97,7 @@ public sealed class AiAnswerPage : ArcItemPage
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(8, 3, 8, 3),
                 Margin = new Thickness(-8, 0, 0, 0),
-                Child = K.Paragraph(text, Select, maxWidth: 700)
+                Child = AiBlockUi.Markdown(text, 700)
             };
             paragraphs.Add(border);
             return border;
@@ -263,8 +263,8 @@ public sealed class AiAnswerPage : ArcItemPage
                     + "proven. The published patterns agree on enrolling a small group first and watching recovery "
                     + "attempts rather than enrolment numbers. [1]", 1),
                 Sentence("Measure recovery, not just sign-in: a failed fallback locks people out for good. [2]", 2),
-                K.Markdown("1. Enable passkeys for staff accounts only\n"
-                    + "2. Watch recovery attempts for two weeks", null, 700),
+                AiBlockUi.Markdown("1. Enable passkeys for staff accounts only\n"
+                    + "2. Watch recovery attempts for two weeks", 700),
                 actions,
                 K.Caption("Related questions"),
                 related,

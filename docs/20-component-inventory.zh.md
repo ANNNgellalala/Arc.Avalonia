@@ -1,8 +1,8 @@
 # 20 · 组件清单（当前实现清点）
 
 > **口径**：本文件由仓库实际产物统计（`tools/api-baselines/*.txt` 的公开类型与基类链 + `src/**` 源码 + `src/Docs/**` 页面与文档），不是设计规划。
-> **快照**：M2 第三波之后（commit `ff9ad27`），M3 Markdown 波次后增补（见 §10）。
-> **一句话**：**32 个 NuGet 包**、**262 个公开 UI 控件**、973 个公开类型、144 个路由事件、164 个 ControlTheme、323 个文档页面（294 篇目录文档）、111 个页面级 block。
+> **快照**：M2 第三波之后（commit `ff9ad27`），M3 Markdown 波次与 Chat/Agent 重构波次后增补（见 §10、§12）。
+> **一句话**：**33 个 NuGet 包**、**323 个文档页面（294 篇目录文档）**、111 个页面级 block；公开控件/类型/路由事件/ControlTheme 计数按 §12 重算。
 
 ---
 
@@ -10,15 +10,15 @@
 
 | 维度 | 数量 |
 |---|---|
-| 可发布包 | **31**（L1 ×1、L2.5 ×1、L2 ×13、L3 ×11、L4 ×3、元包 ×2） |
-| 公开 UI 控件（派生自 Avalonia 控件体系） | **256** |
-| 公开类型（class/record/struct/enum/interface） | **907** |
-| 属性注册（`StyledProperty`/`DirectProperty` 字段） | ≈**1213** |
-| 路由事件（`RoutedEvent.Register`） | **139**（全部带 CLR 包装，100%） |
-| ControlTheme（主题项） | **158** |
+| 可发布包 | **33**（L1 ×1、L2.5 ×1、L2 ×15、L3 ×11、L4 ×3、元包 ×2） |
+| 公开 UI 控件（派生自 Avalonia 控件体系） | 见 §12 重算（M2 快照为 256） |
+| 公开类型（class/record/struct/enum/interface） | 见 §12 重算（M2 快照为 907） |
+| 属性注册（`StyledProperty`/`DirectProperty` 字段） | 见 §12 重算（M2 快照 ≈1213） |
+| 路由事件（`RoutedEvent.Register`） | 见 §12 重算（M2 快照 139，全部带 CLR 包装） |
+| ControlTheme（主题项） | 见 §12 重算（M2 快照 158） |
 | 设计 token | **82** 个常量 / 47 个 Fluent 覆盖键 |
 | 内置图标 | **264**（Lucide，可运行时注册扩展） |
-| 文档页面 / 目录文档 | **320** / **294** |
+| 文档页面 / 目录文档 | **323** / **294** |
 | 页面级 block（L3 组合） | **111** |
 | 源码行数（src 下 31 个发布库） | ≈**125,500** |
 
@@ -68,7 +68,7 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 | `Charts` | 22 | Line/Bar/Donut/Funnel/Radar/Waffle/SplitBar/Streamgraph/Treemap/Sankey/RaceBar/Slope/Ridgeline/Sparkline/Gauge/Brush/RealtimeStream/Sunburst/Treemap/ChartCard/ActivityHeatmap/AnimatedCounter | 20 | 125 | 5 | 20 | 9,876 |
 | `Pickers` | 17 | Calendar/DatePicker/DateRangePicker/TimePicker/ColorPicker/ColorEditor/ColorArea/ColorRamp/EmojiPicker/FileDropzone/AvatarUpload/AvatarCrop/AvatarRing/SignaturePad/SignatureSurface/PickerBase | 9 | 118 | 14 | 22 | 8,330 |
 | `Effects` | 9 | AnnouncementBar / CookieConsent / BottomSheet / HoverCard / ExpandableCard / InViewTitle / TextMorph / TextReveal / TextShimmer | 9 | 54 | 9 | 9 | 4,464 |
-| `Content` | 4 | RichTextEditor / ChatThread / ReorderableList / OnboardingChecklist | 4 | 28 | 7 | 4 | 4,445 |
+| `Content` | 3 | RichTextEditor / ReorderableList / OnboardingChecklist | 4 | 24 | 6 | 3 | 4,200 |
 | `Media` | 15 | Carousel/CarouselDot/CarouselPanel / CardStack / ImageCompare/CompareSurface / Reactions/ReactionPill / HoldToConfirm / SwipeActions/SwipeActionButton / ScrollArea/ScrollOverlay / ResizablePanels/PanePanel | 8 | 69 | 10 | 11 | 5,337 |
 | **合计** | **155** | — | **131** | — | — | — | — |
 
@@ -109,8 +109,8 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 
 | 包 | 控件/内容 |
 |---|---|
-| `Arc.Avalonia.Agent`（2,746 行） | **5 个组合控件**：`ArcAgentSurface`（组合根）、`ArcAgentComposer`、`ArcAgentStreamingText`、`ArcAgentToolCallCard`、`ArcAgentApprovalTray`。**表现运行时**：`IArcAgentWorkspace`/`IArcAgentSession` 纯 reducer、`ArcAgentEvent` 事件模型、`ArcDeltaCoalescer`（Dispatcher 批处理，无定时器）、`ArcApprovalQueue`/`ArcAttentionQueue`/`ArcArtifactIndex`、`ArcAgentItemViewRegistry`、宿主接缝 `IArcAgentTransport`/`IArcAgentCommandSink`/`IArcAgentServices`。边界由 BannedApiAnalyzers（RS0030→error）+ R9 门禁守住 |
-| `Arc.Avalonia.AgentUI`（3,176 行） | **6 个叶子控件**：`ArcAgentTranscript`（增量追加 + 有界窗口）、`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcAgentAskCard`、`ArcBackgroundRunDock`、`ArcAgentAttentionInbox` |
+| `Arc.Avalonia.Agent`（2,746 行） | **6 个组合控件**：`ArcAgentSurface`（组合根）、`ArcAgentConversation`（气泡 + 工具/推理/审批事件卡）、`ArcAgentChoiceCard`（含 free text / defer，合并旧 AskCard）、`ArcAgentConfirmCard`、`ArcAgentToolCallCard`、`ArcAgentApprovalTray`。**表现运行时**：`IArcAgentWorkspace`/`IArcAgentSession` 纯 reducer、`ArcAgentEvent` 事件模型（消息模型统一为 Chat 包 `ArcChatMessage`）、`ArcDeltaCoalescer`（Dispatcher 批处理，无定时器）、`ArcApprovalQueue`/`ArcAttentionQueue`/`ArcArtifactIndex`、`ArcAgentItemViewRegistry`、宿主接缝 `IArcAgentTransport`/`IArcAgentCommandSink`/`IArcAgentServices`。边界由 BannedApiAnalyzers（RS0030→error）+ R9 门禁守住 |
+| `Arc.Avalonia.AgentUI`（3,176 行） | **4 个叶子控件**：`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcBackgroundRunDock`、`ArcAgentAttentionInbox`（`ArcAgentTranscript`/`ArcAgentAskCard` 已删除，迁入 Agent 的 Conversation/ChoiceCard） |
 | `Arc.Avalonia.LifeToday`（3,423 行） | **7 个控件**：`ArcDailyBrief`、`ArcDayAgenda`、`ArcMedicationSchedule`、`ArcQuickCaptureBar`、`ArcReminderCenter`、`ArcReminderRow`、`ArcRoutineScheduleEditor` |
 
 ## 9. 按"用途"再分类（交叉视图，不是分区；同一控件可能出现在多行）
@@ -123,9 +123,9 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 | 浮层与反馈 | Dialog/Drawer/Popover/Tooltip/ShareAccess；Progress/Skeleton/Avatar*/Presence/EmptyState/Stepper/Timeline/CommentThread/Countdown/MetricCard/Heatmap/Usage* | `Overlays`、`Feedback` |
 | 数据展示与图表 | SortableDataTable/TreeTable/TreeView/ArcDataGrid/FilterToolbar/CodeBlock/JsonViewer；Line/Bar/Donut/Funnel/Radar/Waffle/… 22 个图表；官方 DataGrid 封装 | `DataDisplay`、`Charts`、`Feature.DataGrid` |
 | 选择器与上传 | Calendar/DatePicker/DateRangePicker/TimePicker/ColorPicker 系列/EmojiPicker/FileDropzone/AvatarUpload/Crop/Ring/Signature* | `Pickers` |
-| 内容与媒体 | RichTextEditor/ChatThread/ReorderableList/Onboarding；Carousel/CardStack/ImageCompare/Reactions/HoldToConfirm/Swipe/Resizable/Scroll | `Content`、`Media` |
+| 内容与媒体 | RichTextEditor/ReorderableList/Onboarding；ChatView/Bubble/Composer；Carousel/CardStack/ImageCompare/Reactions/HoldToConfirm/Swipe/Resizable/Scroll | `Content`、`Chat`、`Media` |
 | 特殊视觉 | 玻璃/动效/媒体/AI 装饰共 68 个（见 §6） | `Special.*` |
-| Agent 会话与生活流 | AgentSurface/Composer/StreamingText/ToolCallCard/ApprovalTray + Transcript/RunBar/审批/提问/后台 dock/收件箱 + 7 个生活控件 | `Agent`、`AgentUI`、`LifeToday` |
+| Agent 会话与生活流 | AgentSurface/Conversation/ChoiceCard/ConfirmCard/ToolCallCard/ApprovalTray + RunBar/审批/后台 dock/收件箱 + 7 个生活控件 | `Agent`、`AgentUI`、`LifeToday` |
 | 页面级组合 | 登录/设置/收件箱/电商/营销/数据大屏/团队/AI 产品页共 111 个 block | `Blocks.*` |
 
 ## 10. 质量与契约现状
@@ -152,22 +152,46 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 
 ## 10. M3 Markdown 波次增量（2026-11-08）
 
-新增 `Arc.Avalonia.Markdown`（L2，32 个包）与 `pura-agent` 组件；PuraMarkdown 的解析层作为唯一外部依赖特例
+新增 `Arc.Avalonia.Markdown`（L2，Chat 波次后 33 个包）与 `pura-agent` 组件；PuraMarkdown 的解析层作为唯一外部依赖特例
 （`PuraMarkdown.Syntax` + `Markdig`，仅该包，ADR 0006）。
 
 | 维度 | 增量 | 现在 |
 |---|---|---|
-| 可发布包 | +1 `Arc.Avalonia.Markdown` | **32** |
-| 公开 UI 控件 | +4 Markdown（View/DocumentView/ChatView/CodeBlock）+2 Agent（ChoiceCard/ConfirmCard） | **262** |
-| 公开类型（API baseline 统计） | +66 | **973** |
-| 路由事件 | +5 | **144** |
-| ControlTheme | +6 | **164** |
-| 文档页面 | +3（Markdown / Markdown Extended / Markdown Chat） | **323**（gallery smoke pageShows） |
-| Public API baseline | 32/32（新增 Markdown，Agent/AgentUI 更新） | GREEN |
-| 仓库门禁 | 9/9 | GREEN（R5 32/32 包） |
+| 可发布包 | +1 `Arc.Avalonia.Markdown` | **33**（Chat 波次 +1 `Arc.Avalonia.Chat`） |
+| 公开 UI 控件 | +3 Markdown（View/DocumentView/CodeBlock）+2 Agent（ChoiceCard/ConfirmCard） | **261**（§12 重算） |
+| 公开类型（API baseline 统计） | +66 | **965**（§12 重算） |
+| 路由事件 | +5 | **144**（§12 重算） |
+| ControlTheme | +6 | **165**（§12 重算） |
+| 文档页面 | +3（Markdown / Markdown Extended / ~~Markdown Chat~~；Chat 页在 §12 迁入 Chat 包） | **323**（gallery smoke pageShows） |
+| Public API baseline | 33/33（新增 Markdown/Chat，Agent/AgentUI 更新） | GREEN |
+| 仓库门禁 | 9/9 | GREEN（R5 33/33 包） |
 
 Markdown 能力：CommonMark+GFM 全节点矩阵、代码高亮（17 语言族、无第三方库）、GFM 表格、图片/链接/剪贴板
-平台契约、稳定边界流式（committed/tail 两窗口 + 增量控件复用）、消息级虚拟化（1000 条消息约 12 个 realized 行）、
-`pura-agent` choice/confirm 与交互状态恢复、中文默认本地化、主题/浅深色 token 化。**块级虚拟化不在本波次范围**
-（单篇超长文档请拆页或使用 Chat 的消息级虚拟化）。
+平台契约、稳定边界流式（committed/tail 两窗口 + 增量控件复用）、`pura-agent` choice/confirm 与交互状态恢复、
+中文默认本地化、主题/浅深色 token 化。**消息级虚拟化与聊天面在 Chat/Agent 重构波次迁入 `Arc.Avalonia.Chat`（见 §12）**。
+
+---
+
+## 12. Chat/Agent 重构波次（2026-11-09）
+
+新增 `Arc.Avalonia.Chat`（L2）并把聊天从 Markdown/Content 迁出，Agent 对话改为「气泡 + 整宽事件卡」：
+
+* **Chat 包**：唯一消息模型 `ArcChatMessage`（Role/Author/Markdown/Status/Delivery/Error/Attachments/Metadata/`Append`/`Changed`），
+  `ArcChatView`（气泡分组、视图窗口化、流式槽、Never/NearBottom/Always 自动滚动、内置 composer）、`ArcChatBubble`、
+  `ArcChatComposer`，`ArcChatThread` 为 `[Obsolete]` 别名。依赖 Foundation + Services + Markdown。
+* **Markdown 包**：只保留文档渲染（`ArcMarkdownView`/`ArcMarkdownDocumentView`/`ArcMarkdownCodeBlock` + 流式会话）；
+  删除 `ArcMarkdownChatView`/`ArcMarkdownChatMessage` 与主题项。**Content**：删除 `ArcChatThread` 与旧消息模型。
+* **Agent**：新增 `ArcAgentConversation`（用户右/助手左 Markdown 气泡与工具/推理/审批/步骤/artifact 整宽事件卡按 Timeline
+  交织，无 Rows 开关）；消息模型统一为 `ArcChatMessage`；`ArcAgentChoiceCard` 合并 free text / defer（删除 AskCard）；
+  删除 `ArcAgentMessage`/`ArcMessageStatus`/`ArcAgentTranscript`/`ArcAgentAskCard`/`ArcAgentComposer`/`ArcAgentStreamingText`。
+* **文档**：新增 Chat（Group=Chat）、Agent conversation、Agent choice card 页；删除 Markdown chat、Agent transcript、
+  Agent question card；Markdown 组保留 Markdown / Markdown Extended。页面总数净 0（smoke pageShows **323**，audit 294/294）。
+* **计数（2026-11-09 重算，33 包）**：公开 UI 控件 **261**、其中 TemplatedControl **131**；公开类型（API baseline）
+  **965**；路由事件 **144**；ControlTheme **165**；文档页面 **323**（gallery smoke pageShows）。本波次净变化为
+  新增 Chat 4 个控件（View/Bubble/Composer/Thread 别名）+ `ArcAgentConversation`，删除 Markdown ChatView、Content ChatThread、
+  Agent Composer/StreamingText、AgentUI Transcript/AskCard。计数口径：控件 = 发布程序集中 `Avalonia.Controls.Control` 可赋值的
+  public 类型（反射，`.recon/InventoryProbe`）；类型 = `tools/api-baselines/*.txt` 的 `type` 行（含 XAML 生成类型）；主题/路由事件
+  = `src/**` 源码 grep。
+
+
 

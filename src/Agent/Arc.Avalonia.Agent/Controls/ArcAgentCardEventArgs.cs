@@ -23,6 +23,27 @@ public sealed class ArcAgentChoiceSubmittedEventArgs : RoutedEventArgs
 
     /// <summary>Selected option ids, in declaration order.</summary>
     public IReadOnlyList<string> SelectedIds { get; init; } = Array.Empty<string>();
+
+    /// <summary>Optional free-text answer (when the card allows one and the person typed something).</summary>
+    public string? FreeText { get; init; }
+}
+
+/// <summary>Payload of <see cref="ArcAgentChoiceCard.DeferredRequested"/> and its routed companion.</summary>
+public sealed class ArcAgentDeferredRequestedEventArgs : RoutedEventArgs
+{
+    /// <summary>Creates empty args for the routed-event pattern.</summary>
+    public ArcAgentDeferredRequestedEventArgs()
+    {
+    }
+
+    /// <summary>Creates args bound to a routed event.</summary>
+    /// <param name="routedEvent">The event being raised.</param>
+    public ArcAgentDeferredRequestedEventArgs(RoutedEvent routedEvent) : base(routedEvent)
+    {
+    }
+
+    /// <summary>Id of the component that was deferred.</summary>
+    public string ComponentId { get; init; } = string.Empty;
 }
 
 /// <summary>Payload of <see cref="ArcAgentConfirmCard.Decided"/> / <see cref="ArcAgentConfirmCard.DecidedRouted"/>.</summary>

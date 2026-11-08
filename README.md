@@ -59,8 +59,11 @@ Read the analysis first:
   service layer (`ArcWindow`, dialog/notification/navigation/file-picker), the windowed tree table and the
   `Feature.DataGrid` package for large data sets.
 * [`docs/21-markdown-components.zh.md`](docs/21-markdown-components.zh.md) — the Markdown component family: PuraMarkdown
-  syntax (Markdig AST, diagnostics, stable-boundary streaming) rendered with Arc controls, plus code highlighting,
-  AI chat and the `pura-agent` choice/confirm components.
+  syntax (Markdig AST, diagnostics, stable-boundary streaming) rendered with Arc controls, plus code highlighting
+  and the fence/plugin contracts.
+* [`docs/22-chat-agent-refactor.zh.md`](docs/22-chat-agent-refactor.zh.md) — the Chat/Agent refactor: one
+  `ArcChatMessage` model, the `ArcChatView` bubble surface and composer, the unified Agent conversation
+  (bubbles + tool/reasoning/approval event cards) and the removal of the duplicate Markdown renderers.
 
 ## Install
 
@@ -75,7 +78,7 @@ dotnet add package Arc.Avalonia --version 0.9.0-alpha
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:arc="using:Arc.Avalonia.Theme">
   <Application.Styles>
-    <arc:ArcTheme />   <!-- Fluent baseline + Arc tokens + the 11 component themes -->
+    <arc:ArcTheme />   <!-- Fluent baseline + Arc tokens + the 13 component themes -->
   </Application.Styles>
 </Application>
 ```
@@ -85,19 +88,21 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 
 | Package | Contents | Install when |
 | --- | --- | --- |
-| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 12 component families + `Arc.Avalonia.Markdown` + `Arc.Avalonia.Agent` + `AgentUI` + `LifeToday` | normal application |
+| `Arc.Avalonia` (meta) | `Arc.Avalonia.Theme` + the 13 L2 component families (including `Arc.Avalonia.Markdown` and `Arc.Avalonia.Chat`) + `Arc.Avalonia.Agent` + `AgentUI` + `LifeToday` | normal application |
 | `Arc.Avalonia.All` | `Arc.Avalonia` + 5 Special + 6 Blocks packages | you want every surface |
 | `Arc.Avalonia.Theme` | L2.5 aggregate theme (Fluent baseline, tokens, component themes) | you already reference individual component packages |
 | `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
-| `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media}` | L2 component families | you prefer component-level dependencies |
-| `Arc.Avalonia.Markdown` | L2 Markdown family: PuraMarkdown syntax + Arc renderers (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownChatView`, `ArcMarkdownCodeBlock`), streaming, highlighter, plugin/fence contracts | you render Markdown, AI answers or agent transcripts |
-| `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` | building an agent UI on your own runtime |
-| `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent and life surfaces (UI contracts only) | agent / daily-planning UI |
+| `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media,Chat}` | L2 component families | you prefer component-level dependencies |
+| `Arc.Avalonia.Markdown` | L2 Markdown family: PuraMarkdown syntax + Arc renderers (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownCodeBlock`), streaming sessions, highlighter, plugin/fence contracts | you render Markdown documents, AI answers or agent message bodies |
+| `Arc.Avalonia.Chat` | L2 chat family: bubble conversation (`ArcChatView`, `ArcChatBubble`) and composer (`ArcChatComposer`); Markdown bodies, grouping, virtualization-ready list, streaming slot and delivery/status lines. `ArcChatThread` is an obsolete alias | you build chat, AI answers or an agent conversation |
+| `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` / `ArcAgentConversation` and the choice/confirm cards | building an agent UI on your own runtime |
+| `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent leaf controls and life surfaces (run bar, approval sheet, background dock, attention inbox) | agent / daily-planning UI |
 | `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
 
 Every package depends only on Avalonia's official packages (`Avalonia`, `Avalonia.Themes.Fluent`,
-`Avalonia.Fonts.Inter`). `tools/check-package.ps1` unpacks each nupkg and fails the release when any
-other dependency or any page/doc/demo asset is found.
+`Avalonia.Fonts.Inter`), with one deliberate exception: `Arc.Avalonia.Markdown` also consumes the
+`PuraMarkdown.Syntax` parser facade and its `Markdig` dependency (ADR 0006). `tools/check-package.ps1`
+unpacks each nupkg and fails the release when any other dependency or any page/doc/demo asset is found.
 
 ### Build the packages locally
 
@@ -159,9 +164,9 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | --- | --- |
 | ![Markdown](docs/images/docs/markdown-light.png) | ![Markdown extended](docs/images/docs/markdown-extended-light.png) |
 
-| Markdown chat with `pura-agent` components | Markdown dark theme |
+| Chat bubbles (Markdown bodies) | Agent conversation (bubbles + event cards) |
 | --- | --- |
-| ![Markdown chat](docs/images/docs/markdown-chat-light.png) | ![Markdown dark](docs/images/docs/markdown-dark.png) |
+| ![Chat bubbles](docs/images/docs/chat-light.png) | ![Agent conversation](docs/images/docs/agent-conversation-light.png) |
 
 | Dark theme | Dark theme, shell |
 | --- | --- |
@@ -172,14 +177,14 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | Project | Contents |
 | --- | --- |
 | `src/Foundation/Arc.Avalonia` | Foundation (assembly/package `Arc.Avalonia.Foundation`): OKLCH colour engine, palette/theme manager, typography, motion, 264 Lucide icons (extensible via `ArcIcon.Register`), `ArcButton`, `ArcCard`, `ArcBadge`, `ArcIcon`, `ArcSpinner`, `ArcVirtualList`, `ArcUi` |
-| `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 12 component theme families behind one `<arc:ArcTheme/>` element |
+| `src/Theme/Arc.Avalonia.Theme` | Aggregate theme (`Arc.Avalonia.Theme`): official Fluent baseline + 47 Fluent resource-key overrides + the 13 component theme families behind one `<arc:ArcTheme/>` element |
 | `src/Docs/Arc.Avalonia.Docs` | Documentation leaf project (`Arc.Avalonia.Docs`): 323 pages, 294 embedded `Docs/<slug>.json` documents and the demo portraits, discovered by reflection |
 | `src/Docs/Arc.Avalonia.Docs.Abstractions` | Contract assembly (`Arc.Avalonia.Docs.Abstractions`, namespace `Arc.Avalonia.Demo`): `ArcPage`/`ArcItemPage`, the `ArcDoc` model, doc store and validator, `DemoUi` layout helpers, `ArcCatalog`, reflection discovery |
-| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 12 component families, the agent top layer and the two agent surface packages |
+| `src/Meta/Arc.Avalonia.Meta` | Meta package `Arc.Avalonia`: depends on Theme, the 13 component families, the agent top layer and the two agent surface packages |
 | `src/Meta/Arc.Avalonia.All` | Aggregate package `Arc.Avalonia.All`: `Arc.Avalonia` plus the Special and Blocks packages |
 | `src/Apps/Arc.Avalonia.Gallery` | The documentation platform: three-column shell, search, outline, coverage report, API-table generator, `--audit`/`--smoke`/`--shot` harnesses |
-| `src/Agent/Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, approval/attention/artifact queues, Dispatcher-batched delta coalescer, item view registry) plus `ArcAgentSurface` and its composer/card controls. Hosts implement `IArcAgentTransport`; the layer never does I/O, timers or model calls |
-| `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI: agent transcript (incremental append API), run control bar, tool approval sheet, question card, background dock, attention inbox |
+| `src/Agent/Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, approval/attention/artifact queues, Dispatcher-batched delta coalescer, item view registry) plus `ArcAgentSurface`, the bubble + event-card `ArcAgentConversation`, and the choice/confirm cards. Hosts implement `IArcAgentTransport`; the layer never does I/O, timers or model calls |
+| `src/Agent/Arc.Avalonia.AgentUI` | P0 Agent UI leaf controls: run control bar, tool approval sheet, background dock, attention inbox |
 | `src/Agent/Arc.Avalonia.LifeToday` | P0 Today: reminder row and center, daily brief, day agenda, medication schedule, quick capture, routine schedule editor |
 | `src/Components/Arc.Avalonia.Inputs` | Text fields, special inputs, selects, toggles, sliders, plus inline edit, scrub/phone/mention/shortcut input, expanding search, morph select, elastic + histogram sliders, billing toggle, radio cards |
 | `src/Components/Arc.Avalonia.Actions` | Buttons, menus, disclosure, messages, plus action button, floating/expanding button groups, icon morph, user menu |
@@ -190,9 +195,10 @@ section outline on the right. Screenshots below are rendered from the real Avalo
 | `src/Components/Arc.Avalonia.Charts` | Custom-drawn data visualisation on the Arc series palette |
 | `src/Components/Arc.Avalonia.Pickers` | Calendar, date/time range, colour, file dropzone, signature |
 | `src/Components/Arc.Avalonia.Effects` | Text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
-| `src/Components/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, chat thread, onboarding checklist |
+| `src/Components/Arc.Avalonia.Content` | Markdown rich text editor, reorderable list, onboarding checklist |
 | `src/Components/Arc.Avalonia.Media` | Hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
-| `src/Components/Arc.Avalonia.Markdown` | Markdown family: `ArcMarkdownView`/`ArcMarkdownDocumentView`/`ArcMarkdownChatView`/`ArcMarkdownCodeBlock`, the full CommonMark+GFM node renderer set, built-in code highlighter, streaming session (stable boundary + tail window), image/link/clipboard platform contracts, localization and the `pura-agent` fence extensibility point |
+| `src/Components/Arc.Avalonia.Markdown` | Markdown document family: `ArcMarkdownView`/`ArcMarkdownDocumentView`/`ArcMarkdownCodeBlock`, the full CommonMark+GFM node renderer set, built-in code highlighter, streaming session (stable boundary + tail window), image/link/clipboard platform contracts, localization and the `pura-agent` fence extensibility point |
+| `src/Components/Arc.Avalonia.Chat` | Chat family: `ArcChatView` (bubble list with grouping, virtualization-ready rows, streaming slot, auto-scroll) + `ArcChatBubble` (Markdown body, avatar/header, attachments, delivery/status line) + `ArcChatComposer` (Enter send, Shift+Enter newline, attachment tray, stop state); `ArcChatThread` is the obsolete alias |
 | `src/Special/Arc.Avalonia.Special.*` | 55 Special components in five projects: glass and surfaces, motion and interaction, media and input, AI widgets, AI explainers |
 | `src/Blocks/Arc.Avalonia.Blocks.*` | 111 page-level blocks in six projects: marketing, commerce, app shell, team and collaboration, data and charts, AI |
 | `samples/` | Three ProjectReference-based apps (login, settings, data) that show the one-line `<arc:ArcTheme/>` setup end to end |
@@ -383,6 +389,8 @@ the root of every NuGet package.
 * Fonts: **Inter** (SIL Open Font License) via `Avalonia.Fonts.Inter`.
 * The full third-party list (runtime packages, SkiaSharp/HarfBuzzSharp, fonts, icons, Arc UI, and the
   AG-UI semantic-only reference) is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
+
 
 
 

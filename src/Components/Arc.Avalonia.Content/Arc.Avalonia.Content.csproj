@@ -12,6 +12,8 @@
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
+    <!-- Preview uses the shared ArcMarkdownView renderer (no second Markdown implementation). -->
+    <ProjectReference Include="..\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
   </ItemGroup>
 
   <ItemGroup>

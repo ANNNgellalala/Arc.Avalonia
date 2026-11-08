@@ -5,7 +5,6 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Arc.Avalonia.Content/Themes/ArcRichTextEditor.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Content/Themes/ArcReorderableList.axaml" />
-        <ResourceInclude Source="avares://Arc.Avalonia.Content/Themes/ArcChatThread.axaml" />
         <ResourceInclude Source="avares://Arc.Avalonia.Content/Themes/ArcOnboardingChecklist.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
