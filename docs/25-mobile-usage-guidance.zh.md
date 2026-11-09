@@ -140,3 +140,17 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - 结果：**启动即退出**（`pidof` 空），已回滚，应用恢复（pid 11825）。
 - 结论：Avalonia 12.1.4 + Android 下，直接以 `avares://…*.otf` 作为 `FontFamily`（甚至只是在资源字典里声明）会让初始化阶段抛异常。正确路径应是 `Avalonia.Media.Fonts.EmbeddedFontCollection` + `FontManager.Current.AddFontCollection(...)`（在 `App.Initialize` 里 try/catch 注册），并用**族名**引用，而不是直接给 `FontFamily` 一个 otf 的 avares URI。
 - 给使用者的建议（当前结论）：**Android 上暂时不要依赖库内嵌字体**；要么接受系统字体的 CJK 限制（混排正文可能缺字），要么按上面的 `EmbeddedFontCollection` 方案在宿主自行注册并用族名覆盖。
+### 5.4 最终结论（真机验证，2026-11-10）
+
+在真机 `PLQ110`（Android 16 / API 36）上，当前版本（系统默认字体、无任何内嵌字体）**中文完全正常**：
+
+- 首页标题、正文段落、统计卡说明、列表项里的**中英混排**都正确渲染；
+- 顶栏目录按钮、安全区、紧凑布局也都正常（截图 `.recon/phone-cjk.png`）。
+
+因此 §5.1–5.3 的豆腐块是**模拟器系统镜像缺少 CJK 字体**导致的环境问题，不是库缺陷：
+
+- 真机（含中文字体的系统）：`FontFamily.Default` 完全够用；
+- 模拟器 / 无 CJK 字体的设备：才会出现混排豆腐，此时按 §5.3 用 `EmbeddedFontCollection` + 族名在宿主补字体；
+- 库侧**不需要**内嵌字体，保持"跟随系统字体、不钉死字体"的既定策略。
+
+**给使用者的最终建议**：真机验收以真实设备为准；CI/模拟器上若出现中文豆腐块，先检查镜像是否有 Noto CJK，而不是改库。
