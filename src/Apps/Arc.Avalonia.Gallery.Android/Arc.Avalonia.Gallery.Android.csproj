@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Android (phone) head for the Gallery: same shell and pages as the desktop app, driven through
+    Avalonia's single-view lifetime. The Gallery UI is compiled in through source links instead of a
+    ProjectReference because the desktop Gallery is a WinExe with Avalonia.Desktop.
+
+    Build:
+      dotnet build src/Apps/Arc.Avalonia.Gallery.Android/Arc.Avalonia.Gallery.Android.csproj ^
+        -c Release -f net10.0-android -m:1 -nodeReuse:false -p:AndroidSdkDirectory=C:\Users\ANNNgel\AppData\Local\Android\Sdk
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Arc.Avalonia.Gallery.Android</RootNamespace>
+    <AssemblyName>Arc.Avalonia.Gallery.Android</AssemblyName>
+    <ApplicationId>dev.arc.avalonia.gallery</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.0-alpha</ApplicationDisplayVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">C:\Users\ANNNgel\AppData\Local\Android\Sdk</AndroidSdkDirectory>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Android" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reuse the desktop Gallery UI. Program.cs (desktop lifetime) is intentionally not linked. -->
+    <Compile Include="..\Arc.Avalonia.Gallery\App.axaml.cs" Link="Gallery\App.axaml.cs" />
+    <AvaloniaResource Include="..\Arc.Avalonia.Gallery\App.axaml" Link="App.axaml" />
+    <Compile Include="..\Arc.Avalonia.Gallery\Framework\**\*.cs" Link="Gallery\Framework\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\Arc.Avalonia.Gallery\Pages\**\*.cs" Link="Gallery\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Docs\Arc.Avalonia.Docs.Abstractions\Arc.Avalonia.Docs.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Docs\Arc.Avalonia.Docs\Arc.Avalonia.Docs.csproj" />
+    <ProjectReference Include="..\..\Theme\Arc.Avalonia.Theme\Arc.Avalonia.Theme.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Inputs\Arc.Avalonia.Inputs.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Navigation\Arc.Avalonia.Navigation.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.DataDisplay\Arc.Avalonia.DataDisplay.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Charts\Arc.Avalonia.Charts.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Pickers\Arc.Avalonia.Pickers.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Effects\Arc.Avalonia.Effects.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Content\Arc.Avalonia.Content.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Chat\Arc.Avalonia.Chat.csproj" />
+    <ProjectReference Include="..\..\Components\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
+    <ProjectReference Include="..\..\Feature\Arc.Avalonia.Feature.DataGrid\Arc.Avalonia.Feature.DataGrid.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.Agent\Arc.Avalonia.Agent.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
+    <ProjectReference Include="..\..\Agent\Arc.Avalonia.LifeToday\Arc.Avalonia.LifeToday.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Glass\Arc.Avalonia.Special.Glass.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Motion\Arc.Avalonia.Special.Motion.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.Media\Arc.Avalonia.Special.Media.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIWidgets\Arc.Avalonia.Special.AIWidgets.csproj" />
+    <ProjectReference Include="..\..\Special\Arc.Avalonia.Special.AIExplainers\Arc.Avalonia.Special.AIExplainers.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Marketing\Arc.Avalonia.Blocks.Marketing.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Commerce\Arc.Avalonia.Blocks.Commerce.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.App\Arc.Avalonia.Blocks.App.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Team\Arc.Avalonia.Blocks.Team.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Data\Arc.Avalonia.Blocks.Data.csproj" />
+    <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.AI\Arc.Avalonia.Blocks.AI.csproj" />
+  </ItemGroup>
+</Project>

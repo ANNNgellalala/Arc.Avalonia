@@ -17,6 +17,8 @@
     <PackageVersion Include="Avalonia.Desktop" Version="12.1.4" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.4" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+    <!-- 手机端 Gallery head（仅 src/Apps 应用工程引用） -->
+    <PackageVersion Include="Avalonia.Android" Version="12.1.4" />
     <!-- M2-G3c: 唯一允许在 Feature.* 包中直接引用的官方附加控件（R7）。12.1.2 是本地缓存可用版本。 -->
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
     <!-- M2-G4: Agent 边界检查（仅 analyzer，PrivateAssets=all）。本地缓存有 3.3.2 / 5.4.0-beta。 -->
@@ -27,3 +29,4 @@
     <PackageVersion Include="Markdig" Version="1.5.1" />
   </ItemGroup>
 </Project>
+

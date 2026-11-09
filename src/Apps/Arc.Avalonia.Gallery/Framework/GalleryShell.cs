@@ -262,6 +262,9 @@ public sealed class GalleryShell : Grid
     /// <summary>Opens or closes the compact navigation drawer.</summary>
     public void ToggleNavigation() => ToggleMobileNav();
 
+    /// <summary>Closes the compact navigation drawer if it is open.</summary>
+    public void CloseNavigation() => CloseMobileNav();
+
     /// <summary>Switches between the desktop three-column shell and the phone single-column shell.</summary>
     private void ApplyCompact(bool compact)
     {
@@ -345,8 +348,14 @@ public sealed class GalleryShell : Grid
 
     private void ToggleMobileNav()
     {
+        if (!_compact)
+        {
+            return;
+        }
+
         _navOpen = !_navOpen;
-        ApplyCompact(_compact);
+        UpdateNavigationVisibility();
+        UpdateMobileTitle();
     }
 
     private void CloseMobileNav()
@@ -357,7 +366,21 @@ public sealed class GalleryShell : Grid
         }
 
         _navOpen = false;
-        ApplyCompact(_compact);
+        UpdateNavigationVisibility();
+        UpdateMobileTitle();
+    }
+
+    private void UpdateNavigationVisibility()
+    {
+        if (_sidebarHost is not null)
+        {
+            _sidebarHost.IsVisible = !_compact || _navOpen;
+        }
+
+        if (_backdrop is not null)
+        {
+            _backdrop.IsVisible = _compact && _navOpen;
+        }
     }
 
     private void UpdateMobileTitle()

@@ -35,6 +35,7 @@ public static class ShotRunner
         var width = int.TryParse(GetArg(args, "--width"), out var parsedWidth) ? parsedWidth : 1180;
         var height = int.TryParse(GetArg(args, "--height"), out var parsedHeight) ? parsedHeight : 900;
         var compact = args.Contains("--mobile") || width < 900;
+        var navOpen = args.Contains("--nav-open");
         var maxHeight = int.TryParse(GetArg(args, "--max-height"), out var parsedMaxHeight) ? parsedMaxHeight : DefaultMaxHeight;
         var offset = int.TryParse(GetArg(args, "--offset"), out var parsedOffset) ? Math.Max(0, parsedOffset) : 0;
 
@@ -42,7 +43,7 @@ public static class ShotRunner
 
         if (args.Contains("--shell"))
         {
-            await RenderShellAsync(app, output, width, height, compact, filter);
+            await RenderShellAsync(app, output, width, height, compact, navOpen, filter);
             return;
         }
 
@@ -183,7 +184,7 @@ public static class ShotRunner
         return new StackPanel { Children = { header, content } };
     }
 
-    private static async Task RenderShellAsync(Application app, string directory, int width, int height, bool compact, string? slug)
+    private static async Task RenderShellAsync(Application app, string directory, int width, int height, bool compact, bool navOpen, string? slug)
     {
         foreach (var theme in new[] { ArcColorScheme.Light, ArcColorScheme.Dark })
         {
@@ -193,6 +194,13 @@ public static class ShotRunner
             window.Show();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             await Task.Delay(400);
+
+            if (navOpen)
+            {
+                window.Shell.ToggleNavigation();
+                await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+                await Task.Delay(400);
+            }
 
             var root = (Control)window.Content!;
             // The root panel is transparent (the window paints the background), so rendering it on its own
@@ -207,7 +215,8 @@ public static class ShotRunner
             var pixelHeight = Math.Max(1, (int)Math.Round(root.Bounds.Height));
             using var bitmap = new RenderTargetBitmap(new PixelSize(pixelWidth, pixelHeight), new Vector(96, 96));
             bitmap.Render(root);
-            bitmap.Save(Path.Combine(directory, $"shell-{theme.ToString().ToLowerInvariant()}.png"));
+            var suffix = navOpen ? "-nav-open" : string.Empty;
+            bitmap.Save(Path.Combine(directory, $"shell-{theme.ToString().ToLowerInvariant()}{suffix}.png"));
         }
     }
 
