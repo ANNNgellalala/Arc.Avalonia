@@ -28,11 +28,20 @@ public class MainActivity : AvaloniaMainActivity
     {
         LaunchSlug = Intent?.GetStringExtra("arc.slug");
         base.OnCreate(savedInstanceState);
+    }
+
+    protected override void OnPostCreate(Bundle? savedInstanceState)
+    {
+        base.OnPostCreate(savedInstanceState);
 
         // AppCompatActivity routes the system back gesture through OnBackPressedDispatcher, so overriding
         // OnBackPressed() alone is never called. Register a callback instead: close the compact drawer
-        // first, otherwise finish the activity.
-        OnBackPressedDispatcher.AddCallback(this, new ArcBackCallback(this));
+        // first, otherwise finish the activity. Registered after the first create pass and null-guarded:
+        // during OnCreate the dispatcher may not be wired yet.
+        if (OnBackPressedDispatcher is { } dispatcher && this is AndroidX.Lifecycle.ILifecycleOwner owner)
+        {
+            dispatcher.AddCallback(owner, new ArcBackCallback(this));
+        }
     }
 }
 
@@ -59,3 +68,4 @@ internal sealed class ArcBackCallback : OnBackPressedCallback
         _activity.OnBackPressedDispatcher.OnBackPressed();
     }
 }
+
