@@ -1,16 +1,16 @@
 using Android.App;
 using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
-using Avalonia;
+using AndroidX.Activity;
 using Avalonia.Android;
 using Arc.Avalonia.Gallery;
 
 namespace Arc.Avalonia.Gallery.Android;
 
 /// <summary>
-/// Phone host for the Gallery: Avalonia's single-view lifetime renders <c>GalleryShell(compact: true)</c>
-/// (see <see cref="App.OnFrameworkInitializationCompleted"/>), so the same pages, docs and touch behaviour
-/// as the desktop app run on the device.
+/// Phone host for the Gallery. The Activity theme must descend from Theme.AppCompat (see
+/// Resources/values/styles.xml): Avalonia.Android hosts its view through an AppCompatActivity.
 /// </summary>
 [Activity(
     Label = "Arc Gallery",
@@ -24,8 +24,30 @@ public class MainActivity : AvaloniaMainActivity
     /// <summary>Slug passed with `--es arc.slug &lt;slug&gt;`; lets device tests open one page directly.</summary>
     public static string? LaunchSlug { get; private set; }
 
-    /// <summary>Hardware back closes the compact drawer first, and only then leaves the app.</summary>
-    public override void OnBackPressed()
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        LaunchSlug = Intent?.GetStringExtra("arc.slug");
+        base.OnCreate(savedInstanceState);
+
+        // AppCompatActivity routes the system back gesture through OnBackPressedDispatcher, so overriding
+        // OnBackPressed() alone is never called. Register a callback instead: close the compact drawer
+        // first, otherwise finish the activity.
+        OnBackPressedDispatcher.AddCallback(this, new ArcBackCallback(this));
+    }
+}
+
+/// <summary>Hardware/gesture back: close the mobile drawer when it is open, else let the app close.</summary>
+internal sealed class ArcBackCallback : OnBackPressedCallback
+{
+    private readonly MainActivity _activity;
+
+    public ArcBackCallback(MainActivity activity)
+        : base(true)
+    {
+        _activity = activity;
+    }
+
+    public override void HandleOnBackPressed()
     {
         if (MobileApp.CurrentShell is { IsNavigationOpen: true } shell)
         {
@@ -33,30 +55,7 @@ public class MainActivity : AvaloniaMainActivity
             return;
         }
 
-        base.OnBackPressed();
-    }
-
-    protected override void OnCreate(Bundle? savedInstanceState)
-    {
-        LaunchSlug = Intent?.GetStringExtra("arc.slug");
-        base.OnCreate(savedInstanceState);
+        Remove();
+        _activity.OnBackPressedDispatcher.OnBackPressed();
     }
 }
-
-/// <summary>Wires the Avalonia app type into the Android application object.</summary>
-[Application]
-public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
-{
-    protected GalleryAndroidApplication(nint javaReference, JniHandleOwnership transfer)
-        : base(javaReference, transfer)
-    {
-    }
-
-    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
-        base.CustomizeAppBuilder(builder);
-}
-
-
-
-
-
