@@ -40,6 +40,7 @@ public static class DocLayout
     public static DocView Build(ArcItemPage page, ArcDemoContext demo, Action<string> goToSlug, bool compact = false)
     {
         _copyWidth = compact ? double.PositiveInfinity : CopyWidth;
+        CompactLayout = compact;
         var item = page.Item;
         var doc = page.Doc;
         var sections = new List<DocSection>();
@@ -622,5 +623,6 @@ public static class DocLayout
         sections.Add(new DocSection(key, title, heading));
     }
 }
+
 
 

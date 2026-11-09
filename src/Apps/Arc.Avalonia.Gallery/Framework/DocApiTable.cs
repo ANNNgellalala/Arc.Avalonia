@@ -35,6 +35,42 @@ public static class DocApiTable
             Classes = { "arc-caption" }
         });
 
+        if (DocLayout.CompactLayout)
+        {
+            // Phone: four fixed columns cannot fit a 380 DIP content column, so every member becomes a
+            // stacked row (name / type + default / description) instead of being clipped at the right edge.
+            var rows = new StackPanel { Spacing = 6 };
+            var entries = properties
+                .Select(property => (Name: property.Name,
+                    Meta: $"{TypeName(property.PropertyType)} · 默认 {DefaultOf(type, property.Name)}",
+                    Description: api.Descriptions.TryGetValue(property.Name, out var propertyText) ? propertyText : "—"))
+                .Concat(events.Select(evt => (Name: evt.Name,
+                    Meta: TypeName(evt.EventHandlerType),
+                    Description: api.Descriptions.TryGetValue(evt.Name, out var eventText) ? eventText : "—")));
+            foreach (var entry in entries)
+            {
+                rows.Children.Add(new Border
+                {
+                    BorderThickness = new Thickness(1),
+                    BorderBrush = DemoUi.Brush(ArcTokens.Border),
+                    CornerRadius = new CornerRadius(12),
+                    Padding = new Thickness(12, 8),
+                    Child = new StackPanel
+                    {
+                        Spacing = 2,
+                        Children =
+                        {
+                            new TextBlock { Text = entry.Name, Classes = { "arc-mono" } },
+                            new TextBlock { Text = entry.Meta, Classes = { "arc-caption" }, TextWrapping = TextWrapping.Wrap },
+                            new TextBlock { Text = entry.Description, Classes = { "arc-body-sm" }, TextWrapping = TextWrapping.Wrap }
+                        }
+                    }
+                });
+            }
+
+            panel.Children.Add(rows);
+            return panel;
+        }
         var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("220,150,120,*") };
         grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         AddHeader(grid, 0, "属性", "类型", "默认值", "说明");
@@ -216,3 +252,4 @@ public static class DocApiTable
         grid.Children.Add(cell);
     }
 }
+
