@@ -39,11 +39,11 @@ public static class DocLayout
 
     public static DocView Build(ArcItemPage page, ArcDemoContext demo, Action<string> goToSlug, bool compact = false)
     {
-        _copyWidth = compact ? 720 : CopyWidth;
+        _copyWidth = compact ? double.PositiveInfinity : CopyWidth;
         var item = page.Item;
         var doc = page.Doc;
         var sections = new List<DocSection>();
-        var root = new StackPanel { Spacing = 0, MaxWidth = _copyWidth, HorizontalAlignment = HorizontalAlignment.Left };
+        var root = new StackPanel { Spacing = 0, MaxWidth = _copyWidth, HorizontalAlignment = CompactLayout ? HorizontalAlignment.Stretch : HorizontalAlignment.Left };
 
         root.Children.Add(BuildSummary(page, doc));
         Add(root, sections, "purpose", "用途", null, BuildPurpose(doc));
@@ -622,3 +622,4 @@ public static class DocLayout
         sections.Add(new DocSection(key, title, heading));
     }
 }
+
