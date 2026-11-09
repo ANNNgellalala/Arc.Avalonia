@@ -158,6 +158,8 @@ public static class ShotRunner
         }
 
         Control content;
+        var previousCompact = DocLayout.CompactLayout;
+        DocLayout.CompactLayout = compact;
         try
         {
             content = page.Build(context);
@@ -165,6 +167,10 @@ public static class ShotRunner
         catch (Exception exception)
         {
             content = new TextBlock { Text = $"Page failed to build: {exception.Message}" };
+        }
+        finally
+        {
+            DocLayout.CompactLayout = previousCompact;
         }
 
         var header = new StackPanel { Spacing = 10, Margin = new Thickness(0, 0, 0, 36) };

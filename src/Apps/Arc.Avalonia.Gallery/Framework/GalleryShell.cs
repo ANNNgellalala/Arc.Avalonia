@@ -43,7 +43,6 @@ public sealed class GalleryShell : Grid
     private readonly Dictionary<string, StackPanel> _groupItems = new(StringComparer.Ordinal);
     private readonly Dictionary<string, bool> _expandedGroups = new(StringComparer.Ordinal);
 
-    private Grid? _rootGrid;
     private Grid? _contentGrid;
     private Border? _sidebarHost;
     private Border? _backdrop;
@@ -138,7 +137,6 @@ public sealed class GalleryShell : Grid
         // Phone layout: a zero-height header row in desktop mode (the header is hidden) turns into the
         // compact app bar when the window is narrow; the three columns collapse to a single content column
         // and the sidebar becomes an overlay drawer. One control tree, two presentations.
-        _rootGrid = this;
         RowDefinitions = new RowDefinitions("Auto,*");
 
         _mobileHeader = BuildMobileHeader();
@@ -1035,6 +1033,8 @@ public sealed class GalleryShell : Grid
         }
 
         Control content;
+        var previousCompact = DocLayout.CompactLayout;
+        DocLayout.CompactLayout = _compact;
         try
         {
             content = page.Build(new ArcDemoContext(ArcThemeManager.Scheme, ArcThemeManager.Accent));
@@ -1048,6 +1048,11 @@ public sealed class GalleryShell : Grid
                 Foreground = DemoUi.Brush(ArcTokens.Danger),
                 TextWrapping = TextWrapping.Wrap
             };
+        }
+
+        finally
+        {
+            DocLayout.CompactLayout = previousCompact;
         }
 
         var stack = new StackPanel { Spacing = 0 };

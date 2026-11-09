@@ -31,6 +31,12 @@ public static class DocLayout
     /// <summary>Active copy width; compact layout narrows it to the phone viewport.</summary>
     private static double _copyWidth = CopyWidth;
 
+    /// <summary>
+    /// True while the shell or the compact screenshot harness builds a guide page, so pages that own
+    /// layout (the home statistics, for example) can stack their columns for a phone viewport.
+    /// </summary>
+    public static bool CompactLayout { get; set; }
+
     public static DocView Build(ArcItemPage page, ArcDemoContext demo, Action<string> goToSlug, bool compact = false)
     {
         _copyWidth = compact ? 720 : CopyWidth;

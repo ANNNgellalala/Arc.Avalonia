@@ -87,6 +87,11 @@ public sealed class HomePage : ArcPage
 
     private static Control Stats(int items, int docs, int pages, int errors)
     {
+        if (DocLayout.CompactLayout)
+        {
+            return CompactStats(items, docs, pages, errors);
+        }
+
         var grid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,*,*,*"),
@@ -127,6 +132,45 @@ public sealed class HomePage : ArcPage
         }
 
         return grid;
+    }
+
+    /// <summary>Two-column counter stack for the phone layout; desktop keeps the four-column grid.</summary>
+    private static Control CompactStats(int items, int docs, int pages, int errors)
+    {
+        var wrap = new WrapPanel { Margin = new Thickness(0, 30, 0, 6) };
+        var values = new (string Label, string Value, string Tone)[]
+        {
+            ("目录条目", items.ToString(), ArcTokens.Foreground),
+            ("中文文档", docs.ToString(), ArcTokens.Accent),
+            ("条目页", pages.ToString(), ArcTokens.Foreground),
+            ("阻断项", errors.ToString(), errors == 0 ? ArcTokens.Success : ArcTokens.Danger)
+        };
+
+        foreach (var (label, value, tone) in values)
+        {
+            wrap.Children.Add(new ArcCard
+            {
+                Width = 172,
+                Padding = new Thickness(18),
+                Margin = new Thickness(0, 0, 8, 8),
+                Content = new StackPanel
+                {
+                    Spacing = 4,
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = value,
+                            Classes = { "arc-title-sm" },
+                            Foreground = DemoUi.Brush(tone)
+                        },
+                        new TextBlock { Text = label, Classes = { "arc-caption" } }
+                    }
+                }
+            });
+        }
+
+        return wrap;
     }
 
     private static Control Section(string title, IReadOnlyList<string> bullets)
