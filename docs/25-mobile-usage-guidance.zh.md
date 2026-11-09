@@ -134,3 +134,9 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - 做法：把 `NotoSansSC` 子集（1.5 MB，OFL）复制进 Android 工程，`<AvaloniaResource Include="Assets\Fonts\*.otf" />`，并在 `FontManagerOptions.DefaultFamilyName` 里用 `avares://Arc.Avalonia.Gallery.Android/Assets/Fonts#Noto Sans SC`。
 - 结果：应用**启动即退出**（`pidof` 为空、前台回桌面），说明字体资源/族名解析在 AppBuilder 阶段抛异常；已回滚，应用恢复正常（pid 11659 级别）。
 - 下次做法：① 先用 `Avalonia.Media.FontManager.Current.AddFontCollection(...)`/`OpenTypeCollection` 验证资源路径可加载；② 再设 `DefaultFamilyName = "Noto Sans SC"`（不带 URI，靠已注册集合）；③ 失败时把异常打进 `ArcAppInit` 日志再迭代，不要直接在 `CustomizeAppBuilder` 里赌。
+### 5.3 内嵌 CJK 字体第二次尝试（XAML 资源方式，同样失败）
+
+- 做法：`<AvaloniaResource Include="Assets\Fonts\*.otf" />` + `MobileApp.axaml` 里 `<FontFamily x:Key="ArcCjkBody">avares://Arc.Avalonia.Gallery.Android/Assets/Fonts#Noto Sans SC</FontFamily>` + `Style Selector="TextBlock"` 强制使用。
+- 结果：**启动即退出**（`pidof` 空），已回滚，应用恢复（pid 11825）。
+- 结论：Avalonia 12.1.4 + Android 下，直接以 `avares://…*.otf` 作为 `FontFamily`（甚至只是在资源字典里声明）会让初始化阶段抛异常。正确路径应是 `Avalonia.Media.Fonts.EmbeddedFontCollection` + `FontManager.Current.AddFontCollection(...)`（在 `App.Initialize` 里 try/catch 注册），并用**族名**引用，而不是直接给 `FontFamily` 一个 otf 的 avares URI。
+- 给使用者的建议（当前结论）：**Android 上暂时不要依赖库内嵌字体**；要么接受系统字体的 CJK 限制（混排正文可能缺字），要么按上面的 `EmbeddedFontCollection` 方案在宿主自行注册并用族名覆盖。
