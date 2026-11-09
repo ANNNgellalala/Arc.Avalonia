@@ -66,6 +66,45 @@ public class ArcVirtualList : ListBox
     private INotifyCollectionChanged? _collection;
     private ScrollViewer? _scrollViewer;
     private ArcVirtualListScrollState _scrollState;
+    private global::Avalonia.Point? _pressOrigin;
+    private int _selectedBeforePress;
+
+    /// <summary>Drag distance that turns a press into a scroll gesture rather than a tap.</summary>
+    private const double TapSlop = 8;
+
+    /// <inheritdoc />
+    protected override void OnPointerPressed(global::Avalonia.Input.PointerPressedEventArgs e)
+    {
+        _pressOrigin = e.GetPosition(this);
+        _selectedBeforePress = SelectedIndex;
+        base.OnPointerPressed(e);
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerReleased(global::Avalonia.Input.PointerReleasedEventArgs e)
+    {
+        var origin = _pressOrigin;
+        _pressOrigin = null;
+        base.OnPointerReleased(e);
+
+        // Touch scrolling starts with a press, and ListBox selects on press: undo that selection when the
+        // pointer travelled far enough to be a scroll, so scrolling a chat/long list does not select rows.
+        if (origin is { } start)
+        {
+            var delta = e.GetPosition(this) - start;
+            if (Math.Abs(delta.X) > TapSlop || Math.Abs(delta.Y) > TapSlop)
+            {
+                SelectedIndex = _selectedBeforePress;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerCaptureLost(global::Avalonia.Input.PointerCaptureLostEventArgs e)
+    {
+        _pressOrigin = null;
+        base.OnPointerCaptureLost(e);
+    }
 
     static ArcVirtualList()
     {
@@ -310,3 +349,5 @@ public class ArcVirtualList : ListBox
         ScrollStateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
+
+
