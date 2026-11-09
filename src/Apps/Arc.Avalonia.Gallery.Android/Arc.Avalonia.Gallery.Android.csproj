@@ -73,4 +73,13 @@
     <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.Data\Arc.Avalonia.Blocks.Data.csproj" />
     <ProjectReference Include="..\..\Blocks\Arc.Avalonia.Blocks.AI\Arc.Avalonia.Blocks.AI.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- .NET Android injects global usings for Android.App; that makes Avalonia's Application ambiguous in the source-linked Gallery. -->
+    <Using Remove="Android.App" />
+    <Using Remove="Android.Widget" />
+  </ItemGroup>
 </Project>
+
+
+
+
