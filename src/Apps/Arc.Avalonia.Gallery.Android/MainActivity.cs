@@ -1,7 +1,9 @@
 using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
+using Avalonia;
 using Avalonia.Android;
+using Avalonia.Media;
 using Arc.Avalonia.Gallery;
 
 namespace Arc.Avalonia.Gallery.Android;
@@ -22,7 +24,11 @@ public class MainActivity : AvaloniaMainActivity
 {
 }
 
-/// <summary>Wires the Avalonia app type into the Android application object.</summary>
+/// <summary>
+/// Wires the Avalonia app type into the Android application object. Inter is registered so the Arc font
+/// tokens resolve, and Android's system sans-serif is installed as the CJK fallback (Inter has no CJK
+/// glyphs, so Chinese text would otherwise render as tofu boxes on the device).
+/// </summary>
 [Application]
 public class GalleryAndroidApplication : AvaloniaAndroidApplication<App>
 {
@@ -30,4 +36,15 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<App>
         : base(javaReference, transfer)
     {
     }
+
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
+        base.CustomizeAppBuilder(builder)
+            .WithInterFont()
+            .With(new FontManagerOptions
+            {
+                FontFallbacks = new[]
+                {
+                    new FontFallback { FontFamily = new FontFamily("sans-serif") },
+                },
+            });
 }
