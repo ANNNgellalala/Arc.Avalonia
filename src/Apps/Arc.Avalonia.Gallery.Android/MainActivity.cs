@@ -24,6 +24,18 @@ public class MainActivity : AvaloniaMainActivity
     /// <summary>Slug passed with `--es arc.slug &lt;slug&gt;`; lets device tests open one page directly.</summary>
     public static string? LaunchSlug { get; private set; }
 
+    /// <summary>Hardware back closes the compact drawer first, and only then leaves the app.</summary>
+    public override void OnBackPressed()
+    {
+        if (MobileApp.CurrentShell is { IsNavigationOpen: true } shell)
+        {
+            shell.CloseNavigation();
+            return;
+        }
+
+        base.OnBackPressed();
+    }
+
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         LaunchSlug = Intent?.GetStringExtra("arc.slug");
@@ -43,6 +55,7 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
         base.CustomizeAppBuilder(builder);
 }
+
 
 
 

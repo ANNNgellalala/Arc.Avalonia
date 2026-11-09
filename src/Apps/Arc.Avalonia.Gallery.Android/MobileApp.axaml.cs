@@ -14,6 +14,9 @@ namespace Arc.Avalonia.Gallery.Android;
 /// <summary>Minimal phone application: Arc theme + one compact GalleryShell, nothing from the desktop harness.</summary>
 public class MobileApp : Application
 {
+    /// <summary>The live shell, so the Android host can route the hardware back button to the drawer.</summary>
+    public static GalleryShell? CurrentShell { get; private set; }
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -29,6 +32,7 @@ public class MobileApp : Application
         if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
             var shell = new GalleryShell(ResolveLaunchSlug(), compact: true);
+            CurrentShell = shell;
             singleView.MainView = shell;
             shell.AttachedToVisualTree += (_, _) => ApplySafeArea(shell);
         }
@@ -67,7 +71,3 @@ public class MobileApp : Application
         shell.Margin = new Thickness(0, topGap, 0, bottomGap);
     }
 }
-
-
-
-
