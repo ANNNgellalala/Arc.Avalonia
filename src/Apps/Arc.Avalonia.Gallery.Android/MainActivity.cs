@@ -3,6 +3,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Avalonia;
+using AndroidX.Activity;
 using Avalonia.Android;
 using Avalonia.Media;
 using Arc.Avalonia.Gallery;
@@ -24,6 +25,19 @@ public class MainActivity : AvaloniaMainActivity
 {
     /// <summary>Slug passed with `--es arc.slug &lt;slug&gt;`; lets device tests open one page directly.</summary>
     public static string? LaunchSlug { get; private set; }
+
+    /// <summary>
+    /// AppCompatActivity routes the system back gesture through OnBackPressedDispatcher (overriding
+    /// OnBackPressed() is never called). The drawer closes first; otherwise the default back runs.
+    /// </summary>
+    protected override void OnPostCreate(Bundle? savedInstanceState)
+    {
+        base.OnPostCreate(savedInstanceState);
+        if (OnBackPressedDispatcher is { } dispatcher && this is AndroidX.Lifecycle.ILifecycleOwner owner)
+        {
+            dispatcher.AddCallback(owner, new ArcBackCallback(this));
+        }
+    }
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -72,4 +86,26 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
         }
     }
 }
+/// <summary>Hardware/gesture back: close the compact drawer when open, else let the app close.</summary>
+internal sealed class ArcBackCallback : OnBackPressedCallback
+{
+    private readonly MainActivity _activity;
 
+    public ArcBackCallback(MainActivity activity)
+        : base(true)
+    {
+        _activity = activity;
+    }
+
+    public override void HandleOnBackPressed()
+    {
+        if (MobileApp.CurrentShell is { IsNavigationOpen: true } shell)
+        {
+            shell.CloseNavigation();
+            return;
+        }
+
+        Remove();
+        _activity.OnBackPressedDispatcher.OnBackPressed();
+    }
+}
