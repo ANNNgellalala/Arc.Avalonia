@@ -816,7 +816,7 @@ public sealed class GalleryShell : Grid
             Margin = new Thickness(0, 0, 6, 6),
             Cursor = new Cursor(StandardCursorType.Hand)
         };
-        outer.PointerPressed += (_, _) =>
+        outer.Tapped += (_, _) =>
         {
             ArcThemeManager.SetAccent(Application.Current!, accent);
             RebuildAll();
@@ -1302,3 +1302,4 @@ public sealed class GalleryShell : Grid
         button.FontWeight = FontWeight.Medium;
     }
 }
+

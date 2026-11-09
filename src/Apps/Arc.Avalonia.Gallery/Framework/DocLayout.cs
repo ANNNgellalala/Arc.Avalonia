@@ -396,7 +396,7 @@ public static class DocLayout
 
         var card = new ArcCard { Content = row, Padding = new Thickness(16, 12), Interactive = true, HorizontalContentAlignment = HorizontalAlignment.Stretch };
         card.Cursor = new global::Avalonia.Input.Cursor(global::Avalonia.Input.StandardCursorType.Hand);
-        card.PointerPressed += (_, _) => goToSlug(slug);
+        card.Tapped += (_, _) => goToSlug(slug);
         return card;
     }
 
@@ -622,4 +622,5 @@ public static class DocLayout
         sections.Add(new DocSection(key, title, heading));
     }
 }
+
 
