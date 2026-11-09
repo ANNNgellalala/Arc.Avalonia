@@ -67,3 +67,5 @@ public class MobileApp : Application
         shell.Margin = new Thickness(0, topGap, 0, bottomGap);
     }
 }
+
+
