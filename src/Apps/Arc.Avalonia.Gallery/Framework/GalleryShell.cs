@@ -51,6 +51,7 @@ public sealed class GalleryShell : Grid
     private readonly bool _forcedCompact;
     private bool _compact;
     private bool _navOpen;
+    private bool _tocOpen;
     private ScrollViewer? _contentScroller;
     private Border? _contentHost;
     private Border? _tocHost;
@@ -161,7 +162,7 @@ public sealed class GalleryShell : Grid
         _backdrop = new Border { Background = DemoUi.Brush(ArcTokens.Scrim), IsVisible = false };
         _backdrop.ZIndex = 9;
         Grid.SetColumnSpan(_backdrop, 3);
-        _backdrop.Tapped += (_, _) => CloseMobileNav();
+        _backdrop.Tapped += (_, _) => { CloseMobileNav(); CloseMobileToc(); };
         content.Children.Add(_backdrop);
 
         _contentScroller = new ScrollViewer
@@ -209,7 +210,7 @@ public sealed class GalleryShell : Grid
             BorderBrush = DemoUi.Brush(ArcTokens.Border),
             BorderThickness = new Thickness(0, 0, 0, 1)
         };
-        var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"), Height = 48 };
+        var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto,Auto"), Height = 48 };
         var menu = new ArcButton
         {
             Content = new ArcIcon { Icon = "menu", Size = 18 },
@@ -242,7 +243,19 @@ public sealed class GalleryShell : Grid
             Margin = new Thickness(2, 2, 4, 2)
         };
         theme.Click += (_, _) => ArcThemeManager.ToggleScheme(Application.Current!);
-        Grid.SetColumn(theme, 2);
+        Grid.SetColumn(theme, 3);
+        var toc = new ArcButton
+        {
+            Content = new ArcIcon { Icon = "list", Size = 18 },
+            Size = ArcButtonSize.Sm,
+            Variant = ArcButtonVariant.Ghost,
+            Width = 44,
+            Height = 44,
+            Margin = new Thickness(2, 2, 2, 2)
+        };
+        toc.Click += (_, _) => ToggleMobileToc();
+        Grid.SetColumn(toc, 2);
+        grid.Children.Add(toc);
         grid.Children.Add(theme);
         bar.Child = grid;
         return bar;
@@ -264,9 +277,9 @@ public sealed class GalleryShell : Grid
     public void CloseNavigation() => CloseMobileNav();
 
     /// <summary>Switches between the desktop three-column shell and the phone single-column shell.</summary>
-    private void ApplyCompact(bool compact)
+    private void ApplyCompact(bool compact, bool force = false)
     {
-        if (_compact == compact && _contentGrid is not null)
+        if (!force && _compact == compact && _contentGrid is not null)
         {
             return;
         }
@@ -292,12 +305,28 @@ public sealed class GalleryShell : Grid
 
         if (_tocHost is not null)
         {
-            _tocHost.IsVisible = !compact;
+            // Phone: the right-hand TOC column collapses to zero width, so the outline becomes a right-side
+            // overlay opened from the app bar instead of disappearing entirely.
+            _tocHost.IsVisible = !compact || _tocOpen;
+            if (compact)
+            {
+                _tocHost.Width = 300;
+                _tocHost.HorizontalAlignment = HorizontalAlignment.Right;
+                Grid.SetColumn(_tocHost, 0);
+                Grid.SetColumnSpan(_tocHost, 3);
+            }
+            else
+            {
+                _tocHost.Width = double.NaN;
+                _tocHost.HorizontalAlignment = HorizontalAlignment.Stretch;
+                Grid.SetColumn(_tocHost, 2);
+                Grid.SetColumnSpan(_tocHost, 1);
+            }
         }
 
         if (_backdrop is not null)
         {
-            _backdrop.IsVisible = compact && _navOpen;
+            _backdrop.IsVisible = compact && (_navOpen || _tocOpen);
         }
 
         if (_contentHost is not null)
@@ -354,6 +383,25 @@ public sealed class GalleryShell : Grid
         _navOpen = !_navOpen;
         UpdateNavigationVisibility();
         UpdateMobileTitle();
+    }
+
+    /// <summary>Toggles the compact outline overlay.</summary>
+    public void ToggleMobileToc()
+    {
+        _tocOpen = !_tocOpen;
+        ApplyCompact(_compact, force: true);
+    }
+
+    /// <summary>Closes the compact outline overlay.</summary>
+    public void CloseMobileToc()
+    {
+        if (!_tocOpen)
+        {
+            return;
+        }
+
+        _tocOpen = false;
+        ApplyCompact(_compact, force: true);
     }
 
     private void CloseMobileNav()
@@ -1302,4 +1350,7 @@ public sealed class GalleryShell : Grid
         button.FontWeight = FontWeight.Medium;
     }
 }
+
+
+
 
