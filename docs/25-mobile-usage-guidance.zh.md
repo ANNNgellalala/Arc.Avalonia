@@ -129,4 +129,8 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - [ ] 命中区 ≥44×44，滚动条不常驻
 - [ ] 滑动组件：8–10px 起判、方向锁、capture 丢失复位、35% 停靠
 - [ ] 流式/自动滚动不抢手指，回底才恢复跟随
+### 5.2 内嵌 CJK 字体的第一次尝试（失败，已回滚）
 
+- 做法：把 `NotoSansSC` 子集（1.5 MB，OFL）复制进 Android 工程，`<AvaloniaResource Include="Assets\Fonts\*.otf" />`，并在 `FontManagerOptions.DefaultFamilyName` 里用 `avares://Arc.Avalonia.Gallery.Android/Assets/Fonts#Noto Sans SC`。
+- 结果：应用**启动即退出**（`pidof` 为空、前台回桌面），说明字体资源/族名解析在 AppBuilder 阶段抛异常；已回滚，应用恢复正常（pid 11659 级别）。
+- 下次做法：① 先用 `Avalonia.Media.FontManager.Current.AddFontCollection(...)`/`OpenTypeCollection` 验证资源路径可加载；② 再设 `DefaultFamilyName = "Noto Sans SC"`（不带 URI，靠已注册集合）；③ 失败时把异常打进 `ArcAppInit` 日志再迭代，不要直接在 `CustomizeAppBuilder` 里赌。
