@@ -77,7 +77,7 @@ public class MobileApp : Application
     {
         try
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "slug.txt");
+            var path = Path.Combine(GalleryAndroidApplication.DataDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal), "slug.txt");
             return File.Exists(path) ? File.ReadAllText(path).Trim() : null;
         }
         catch
@@ -127,6 +127,7 @@ public class MobileApp : Application
         ProbeFonts(shell);
     }
 }
+
 
 
 

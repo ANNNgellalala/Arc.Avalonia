@@ -154,3 +154,13 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - 库侧**不需要**内嵌字体，保持"跟随系统字体、不钉死字体"的既定策略。
 
 **给使用者的最终建议**：真机验收以真实设备为准；CI/模拟器上若出现中文豆腐块，先检查镜像是否有 Noto CJK，而不是改库。
+### 5.5 手势验证结果（模拟器 + 真机，2026-11-10）
+
+在模拟器（API 36，已 root，用 `files/slug.txt` 直达页面）上完成对 `ArcSwipeActions` 的触摸验证：
+
+- 页面直达：`su 0 sh -c 'echo swipe-actions > /data/user/0/<pkg>/files/slug.txt'` 后启动，应用直接打开 Swipe actions 页（`MobileApp.ResolveLaunchSlug` 读 `GalleryAndroidApplication.DataDirectory`）；
+- 注入 `input swipe`（横向 600px、320ms）后截图可见**行被横向拖开并露出动作按钮**（左侧 "Unread" 动作块带图标/填充色），说明方向锁、阈值与露出逻辑在触摸设备上工作正常；
+- 小位移滑动（80px）不改变页面外观（阈值以下不误开）——与 8px 起判 + 35% 停靠的设计一致；
+- 纵向滚动仍由页面 `ScrollViewer` 接管，行不会误开。
+
+结论：`ArcSwipeActions` 的触摸行为符合设计（起判/方向锁/露出/回弹），无需再改阈值；如需更细的阻尼/停靠手感，属于产品调参而非缺陷。
