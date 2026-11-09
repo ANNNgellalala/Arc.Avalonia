@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
@@ -27,12 +28,30 @@ public class MobileApp : Application
 
         if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
-            var shell = new GalleryShell(initialSlug: null, compact: true);
+            var shell = new GalleryShell(ResolveLaunchSlug(), compact: true);
             singleView.MainView = shell;
             shell.AttachedToVisualTree += (_, _) => ApplySafeArea(shell);
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// Device-test hook: <c>run-as &lt;pkg&gt; sh -c 'echo &lt;slug&gt; &gt; files/slug.txt'</c> opens one page
+    /// directly. (Avalonia creates the app before the activity intent is available, so an intent extra
+    /// cannot be read here.)
+    /// </summary>
+    private static string? ResolveLaunchSlug()
+    {
+        try
+        {
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "slug.txt");
+            return File.Exists(path) ? File.ReadAllText(path).Trim() : null;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>

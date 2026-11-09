@@ -252,8 +252,8 @@ public static class ArcPalette
         Set(dictionary, ArcTokens.FocusOutline, focus);
 
         // ---- Type ----
-        dictionary[ArcTokens.FontDisplay] = new FontFamily(InterFont);
-        dictionary[ArcTokens.FontBody] = new FontFamily(InterFont);
+        dictionary[ArcTokens.FontDisplay] = FontFamily.Default;
+        dictionary[ArcTokens.FontBody] = FontFamily.Default;
         dictionary[ArcTokens.TextXs] = 12.0;
         dictionary[ArcTokens.TextSm] = 14.0;
         dictionary[ArcTokens.TextBase] = 16.0;
@@ -589,6 +589,8 @@ public static class ArcPalette
         return (d1, d2, d3, d4);
     }
 }
+
+
 
 
 

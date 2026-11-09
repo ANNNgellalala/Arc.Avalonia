@@ -3,7 +3,6 @@ using Android.Content.PM;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
-using Avalonia.Media;
 using Arc.Avalonia.Gallery;
 
 namespace Arc.Avalonia.Gallery.Android;
@@ -22,13 +21,17 @@ namespace Arc.Avalonia.Gallery.Android;
         | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.Density)]
 public class MainActivity : AvaloniaMainActivity
 {
+    /// <summary>Slug passed with `--es arc.slug &lt;slug&gt;`; lets device tests open one page directly.</summary>
+    public static string? LaunchSlug { get; private set; }
+
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        LaunchSlug = Intent?.GetStringExtra("arc.slug");
+        base.OnCreate(savedInstanceState);
+    }
 }
 
-/// <summary>
-/// Wires the Avalonia app type into the Android application object. Inter is registered so the Arc font
-/// tokens resolve, and Android's system sans-serif is installed as the CJK fallback (Inter has no CJK
-/// glyphs, so Chinese text would otherwise render as tofu boxes on the device).
-/// </summary>
+/// <summary>Wires the Avalonia app type into the Android application object.</summary>
 [Application]
 public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
 {
@@ -38,15 +41,9 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
     }
 
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
-        base.CustomizeAppBuilder(builder)
-            .WithInterFont()
-            .With(new FontManagerOptions
-            {
-                FontFallbacks = new[]
-                {
-                    new FontFallback { FontFamily = new FontFamily("sans-serif") },
-                },
-            });
+        base.CustomizeAppBuilder(builder);
 }
+
+
 
 
