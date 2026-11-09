@@ -130,7 +130,9 @@ internal static class ArcAgentFallbackCards
             Content = code,
             MaxHeight = 180,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            IsScrollChainingEnabled = false,
+            AllowAutoHide = true
         };
 
         var header = new StackPanel

@@ -199,7 +199,8 @@ function Complete-GatesReport {
     $hasError = @($Report.rules | Where-Object { $_.status -eq 'ERROR' }).Count -gt 0
     $hasRed = @($Report.rules | Where-Object { $_.status -eq 'RED' }).Count -gt 0
     $hasKnown = @($Report.rules | Where-Object { $_.status -eq 'KNOWN-RED' }).Count -gt 0
-    $Report.status = if ($hasError) { 'ERROR' } elseif ($hasRed) { 'RED' } elseif ($hasKnown) { 'KNOWN-RED' } else { 'GREEN' }
+    $hasSkip = @($Report.rules | Where-Object { $_.status -eq 'SKIP' }).Count -gt 0
+    $Report.status = if ($hasError) { 'ERROR' } elseif ($hasRed) { 'RED' } elseif ($hasKnown) { 'KNOWN-RED' } elseif ($hasSkip) { 'SKIP' } else { 'GREEN' }
 
     $Report.summary.checked = [int](@($Report.rules | Measure-Object -Property checked -Sum).Sum)
     $Report.summary.newViolations = [int](@($Report.rules | Measure-Object -Property newViolations -Sum).Sum)

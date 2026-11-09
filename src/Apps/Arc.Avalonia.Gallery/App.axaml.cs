@@ -29,10 +29,19 @@ public partial class App : Application
         ArcServiceProvider.Register<IFilePickerService>(StorageProviderFilePickerService.Instance);
         ArcServiceProvider.Register<IArcThemeService>(new ArcThemeService(this));
 
+        var args = Environment.GetCommandLineArgs().Skip(1).ToArray();
+
+        // M2 mobile wave: the same shell runs inside a single-view lifetime (Android/iOS). The platform
+        // supplies one view, so the shell is forced into the compact presentation from the first layout pass.
+        if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
+            singleView.MainView = new GalleryShell(initialSlug: null, compact: true);
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var args = Environment.GetCommandLineArgs().Skip(1).ToArray();
-
             if (args.Contains("--shot"))
             {
                 // Offscreen rendering can occasionally leave the Win32 loop alive after the last page, so a
@@ -87,7 +96,7 @@ public partial class App : Application
                     var exitCode = 1;
                     try
                     {
-                        exitCode = NavigationSmoke.Run();
+                        exitCode = NavigationSmoke.Run(args.Contains("--mobile"));
                     }
                     catch (Exception exception)
                     {
@@ -106,7 +115,10 @@ public partial class App : Application
 
             var pageIndex = Array.IndexOf(args, "--page");
             var initialSlug = pageIndex >= 0 && pageIndex + 1 < args.Length ? args[pageIndex + 1] : null;
-            desktop.MainWindow = new GalleryWindow(initialSlug);
+            // M2 mobile wave: --mobile opens the phone shell (412x915 DIP, compact single-column layout);
+            // any narrow window width also switches to compact at runtime.
+            var mobile = args.Contains("--mobile");
+            desktop.MainWindow = new GalleryWindow(initialSlug, mobile);
             desktop.MainWindow.Show();
         }
 

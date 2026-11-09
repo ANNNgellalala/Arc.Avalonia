@@ -137,12 +137,28 @@ public class ArcAgentConfirmCard : TemplatedControl
 
         if (_confirm is not null)
         {
-            _confirm.Click += (_, _) => TryDecide(true);
+            _confirm.MinHeight = 44;
+            var canConfirm = ArcAgentTapGuard.Watch(_confirm);
+            _confirm.Click += (_, _) =>
+            {
+                if (canConfirm())
+                {
+                    TryDecide(true);
+                }
+            };
         }
 
         if (_cancel is not null)
         {
-            _cancel.Click += (_, _) => TryDecide(false);
+            _cancel.MinHeight = 44;
+            var canCancel = ArcAgentTapGuard.Watch(_cancel);
+            _cancel.Click += (_, _) =>
+            {
+                if (canCancel())
+                {
+                    TryDecide(false);
+                }
+            };
         }
 
         RebuildContent();

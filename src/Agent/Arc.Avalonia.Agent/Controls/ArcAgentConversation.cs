@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -96,6 +97,12 @@ public class ArcAgentConversation : Panel, IDisposable
     private bool _firstSync = true;
     private bool _disposed;
 
+    // Touch latch: a finger drag over the timeline pauses auto-follow and resets on capture loss.
+    private const double DragSlop = 8;
+    private Point _pointerOrigin;
+    private bool _pointerPressed;
+    private bool _userDragging;
+
     /// <summary>Creates the conversation surface and its chrome.</summary>
     public ArcAgentConversation()
     {
@@ -122,6 +129,10 @@ public class ArcAgentConversation : Panel, IDisposable
             Content = _rowsHost,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            // The timeline owns its gestures: inner markdown/code scrollers never chain into this one, and
+            // this one never chains into an outer page/sheet scroller. Scrollbars stay auto-hide.
+            IsScrollChainingEnabled = false,
+            AllowAutoHide = true,
             Padding = new Thickness(0, 2, 2, 2)
         };
 
@@ -424,7 +435,7 @@ public class ArcAgentConversation : Panel, IDisposable
 
         // Show the beginning of the run on first render (design review and screenshots); later events follow
         // the reader only while the viewport is already near the end.
-        if (appended && !_firstSync && IsNearBottom())
+        if (appended && !_firstSync && !_pointerPressed && !_userDragging && IsNearBottom())
         {
             ScrollToEnd();
         }
@@ -436,6 +447,50 @@ public class ArcAgentConversation : Panel, IDisposable
     {
         var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
         return maximum - Math.Max(0, _scroll.Offset.Y) <= 64;
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        _pointerPressed = true;
+        _pointerOrigin = e.GetPosition(this);
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (!_pointerPressed)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(this);
+        if (Math.Abs(position.X - _pointerOrigin.X) > DragSlop || Math.Abs(position.Y - _pointerOrigin.Y) > DragSlop)
+        {
+            _userDragging = true;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        ResetPointerState();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        ResetPointerState();
+    }
+
+    private void ResetPointerState()
+    {
+        _pointerPressed = false;
+        _userDragging = false;
     }
 
     private void AppendRow(ArcAgentEvent @event, IArcAgentSession session)

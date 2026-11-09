@@ -2,7 +2,7 @@
 
 > 版本：1.0（M2-G3a，2026-11-07）
 > 状态：Accepted；对应 [ADR 0005](adr/0005-control-contract.md)、[docs/13 §2.4/D7](13-framework-layering-and-agent-top.zh.md)
-> 门禁：`tools/check-contracts.ps1`（R10）→ `tools/check-all.ps1`（9 行全绿才通过）
+> 门禁：`tools/check-contracts.ps1`（R10）、`tools/check-touch.ps1`（R11）、`tools/mobile-smoke.ps1`（R12）→ `tools/check-all.ps1`（11 行全绿才通过；R12 可在 `--mobile` 未落地时 SKIP）
 > 适用范围：`src/{Foundation,Components,Agent}` 的 TemplatedControl 与公开交互事件；`Charts` 自绘 `Control` 见 §1 规则 1 例外。
 
 本规范写给**第三方控件作者与主题作者**：它把 Arc 的模板/事件/键盘契约写成可执行规则，并给出可直接复制的
@@ -181,13 +181,25 @@ private void RaiseSubmitted(string text)
 | 装饰图标 | 不进入可访问性树（`IsVisible=false` 或 `AutomationProperties.IsOffscreenBehavior=FromPoint` 约定） |
 | 动效 | 遵循 `ArcThemeManager.ReducedMotion`；不自研帧时钟/绘制缓存（R8） |
 
+### 5.1 移动 / 触控契约（T6）
+
+手机端与桌面端的差异是“没有 hover、命中区更小、手势会竞争”，以下 7 条为 T6 的可回归口径（R11 静态检查 + R12 真机 smoke）：
+
+1. **44px 命中区**：可点击/可拖拽目标至少 44×44 CSS px；视觉尺寸小时用 `Padding`/透明底扩大命中区（R11 `small-hit-target` 只做 informational 提示）。
+2. **滚动条不常驻**：移动端默认 `Auto`/`Overlay`，不得用 `ScrollBarVisibility.Visible` 常驻滚动条；桌面专用控件需在文件标注 `desktop-only` 并在 R11 豁免。
+3. **滚动/拖拽方向消歧**：首次移动超过阈值后锁定主轴（水平/垂直），横向手势不得触发纵向滚动；自定义滚动必须同时支持 `PointerPressed`/`PointerMoved`/`Gestures`，不能只处理 `PointerWheelChanged`（R11 `wheel-only-scroll`）。
+4. **capture 兜底**：任何 `CapturePointer` 必须处理 `PointerCaptureLost`/`PointerCanceled`，用于来电、切后台、系统手势抢占等中断场景（R11 `missing-capture-lost`）。
+5. **嵌套滚动 chaining**：内层滚动到边界后才把滚动手势交给父容器；横向轮播/纵向列表嵌套时优先消费主轴，避免“滑不动/滑过头”。
+6. **hover-only 替代**：悬停才出现的信息/操作（tooltip、hover 操作条）必须有触摸等价路径（点击展开、长按、常显按钮），不能让触摸用户失去功能。
+7. **点击时机**：`PointerPressed` 只做视觉/捕获状态，实际执行放到 `Tapped`/`Released`；避免手指滑动时误触发（R11 `press-executes-action`）。
+
 ## 6. 门禁与 CI
 
 ```powershell
-pwsh -NoProfile tools/check-contracts.ps1                 # R10：当前统计 + 违规
-pwsh -NoProfile tools/check-contracts.ps1 -UpdateBaseline # 切片中途刷新过渡 allowlist
-pwsh -NoProfile tools/check-contracts.ps1 -NoBaseline     # 审计模式：所有命中都红
-pwsh -NoProfile tools/check-all.ps1                       # 9 行门禁；R10 计入 Exempt/New
+pwsh -NoProfile tools/check-contracts.ps1                 # R10：契约统计 + 违规
+pwsh -NoProfile tools/check-touch.ps1                     # R11：手机/触控静态检查
+pwsh -NoProfile tools/mobile-smoke.ps1                    # R12：Gallery --smoke --mobile（无 --mobile/旧二进制则 SKIP）
+pwsh -NoProfile tools/check-all.ps1                       # 11 行门禁；R10/R11 计入 Exempt/New，R12 SKIP 不算红
 ```
 
 - `tools/contracts-baseline.json` 只保存**改造进行中**的 allowlist（kind+file+symbol），不是架构豁免；

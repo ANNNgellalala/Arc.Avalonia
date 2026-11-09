@@ -42,6 +42,12 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     private bool _subscribedToTheme;
     private bool _disposed;
 
+    // Touch follow-mode: a drag pauses streaming auto-scroll (mirrors the chat transcript behaviour).
+    private const double DragSlop = 8;
+    private Point _pointerOrigin;
+    private bool _pointerPressed;
+    private bool _userPausedFollow;
+
     static ArcMarkdownView()
     {
         MarkdownProperty.Changed.AddClassHandler<ArcMarkdownView>((view, _) => view.Render());
@@ -275,8 +281,20 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
+        if (_scroll is not null)
+        {
+            _scroll.ScrollChanged -= OnScrollChanged;
+        }
+
         _scroll = e.NameScope.Find<ScrollViewer>("PART_Scroll");
         _host = e.NameScope.Find<Panel>("PART_Host");
+        if (_scroll is not null)
+        {
+            _scroll.IsScrollChainingEnabled = false;
+            _scroll.AllowAutoHide = true;
+            _scroll.ScrollChanged += OnScrollChanged;
+        }
+
         Render();
     }
 
@@ -302,16 +320,109 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
             Application.Current.ActualThemeVariantChanged -= OnThemeVariantChanged;
             _subscribedToTheme = false;
         }
+
+        if (_scroll is not null)
+        {
+            _scroll.ScrollChanged -= OnScrollChanged;
+        }
     }
 
     /// <inheritdoc />
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        // Streaming "follow" pauses as soon as the reader scrolls away from the bottom.
+        // Wheel is not a touch gesture: it is a helpful extra signal, never the only one. In Avalonia
+        // Delta.Y > 0 scrolls up, i.e. away from the streaming end, so that direction pauses follow.
         base.OnPointerWheelChanged(e);
-        if (e.Delta.Y < 0)
+        if (e.Delta.Y > 0)
         {
-            _activeSession?.NotifyUserScrolled();
+            PauseFollow();
+        }
+        else if (e.Delta.Y < 0)
+        {
+            ResumeFollowIfNearEnd();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        _pointerPressed = true;
+        _pointerOrigin = e.GetPosition(this);
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (!_pointerPressed)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(this);
+        if (Math.Abs(position.X - _pointerOrigin.X) > DragSlop || Math.Abs(position.Y - _pointerOrigin.Y) > DragSlop)
+        {
+            PauseFollow();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        _pointerPressed = false;
+        ResumeFollowIfNearEnd();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        _pointerPressed = false;
+        ResumeFollowIfNearEnd();
+    }
+
+    private void PauseFollow()
+    {
+        _userPausedFollow = true;
+        _activeSession?.NotifyUserScrolled();
+    }
+
+    private void ResumeFollowIfNearEnd()
+    {
+        if (!_userPausedFollow || _scroll is null)
+        {
+            return;
+        }
+
+        var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
+        if (maximum - Math.Max(0, _scroll.Offset.Y) <= 56)
+        {
+            _userPausedFollow = false;
+            _activeSession?.NotifyUserScrolledToEnd();
+        }
+    }
+
+    private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (sender is not ScrollViewer scroll)
+        {
+            return;
+        }
+
+        var maximum = Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height);
+        var distance = maximum - Math.Max(0, scroll.Offset.Y);
+
+        // Scrolling up (finger drag or wheel) pauses streaming follow: never yank the reader back down.
+        if (e.OffsetDelta.Y < -0.5)
+        {
+            PauseFollow();
+        }
+        else if (!_pointerPressed && _userPausedFollow && distance <= 56)
+        {
+            _userPausedFollow = false;
+            _activeSession?.NotifyUserScrolledToEnd();
         }
     }
 

@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
+using Arc.Avalonia.Markdown.Controls;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -208,9 +209,19 @@ public class ArcMarkdownCodeBlock : TemplatedControl
             Variant = ArcButtonVariant.Ghost,
             Size = ArcButtonSize.Sm,
             Compact = true,
+            MinHeight = 44,
+            MinWidth = 44,
         };
         AutomationProperties.SetName(copy, localizer.Get(ArcMarkdownStringKeys.CopyCode));
-        copy.Click += OnCopyClick;
+        var copyGuard = new ArcMarkdownTapGuard();
+        copyGuard.Attach(copy);
+        copy.Click += (sender, args) =>
+        {
+            if (!copyGuard.IsCancelled)
+            {
+                OnCopyClick(sender, args);
+            }
+        };
         Grid.SetColumn(copy, 1);
         header.Children.Add(copy);
         _copyButton = copy;
@@ -253,8 +264,12 @@ public class ArcMarkdownCodeBlock : TemplatedControl
         stack.Children.Add(header);
         stack.Children.Add(new ScrollViewer
         {
+            // Horizontal scrolling belongs to the code block alone: it never chains to the vertical page
+            // scroll, and the scrollbar stays out of the way until the block is actually touched.
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            IsScrollChainingEnabled = false,
+            AllowAutoHide = true,
             Content = body,
         });
 
@@ -266,12 +281,20 @@ public class ArcMarkdownCodeBlock : TemplatedControl
                 Variant = ArcButtonVariant.Ghost,
                 Size = ArcButtonSize.Sm,
                 Compact = true,
+                MinHeight = 44,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 8, 0, 0),
             };
             AutomationProperties.SetName(toggle, _expanded ? "收起代码块" : "展开全部代码");
+            var toggleGuard = new ArcMarkdownTapGuard();
+            toggleGuard.Attach(toggle);
             toggle.Click += (_, _) =>
             {
+                if (toggleGuard.IsCancelled)
+                {
+                    return;
+                }
+
                 _expanded = !_expanded;
                 Rebuild();
             };

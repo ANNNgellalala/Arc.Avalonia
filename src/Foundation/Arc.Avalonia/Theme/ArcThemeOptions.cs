@@ -44,6 +44,18 @@ public sealed record ArcThemeOptions
     /// </summary>
     public double CornerRadiusScale { get; init; } = 1.0;
 
+    /// <summary>
+    /// Top safe-area inset in px that the host reserves for system UI (status bar / notch). 0 keeps the
+    /// token default; <see cref="ArcTouch.ApplySafeArea"/> adds it to a control's margin.
+    /// </summary>
+    public double SafeAreaTop { get; init; }
+
+    /// <summary>
+    /// Bottom safe-area inset in px that the host reserves for system UI (home indicator / gesture bar).
+    /// 0 keeps the token default; <see cref="ArcTouch.ApplySafeArea"/> adds it to a control's margin.
+    /// </summary>
+    public double SafeAreaBottom { get; init; }
+
     /// <summary>True when a custom brand colour is in use.</summary>
     public bool HasCustomAccent => AccentColor is not null;
 }

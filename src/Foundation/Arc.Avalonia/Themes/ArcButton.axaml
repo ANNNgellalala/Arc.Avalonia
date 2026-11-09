@@ -11,7 +11,10 @@
     <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="FontSize" Value="14" />
-    <Setter Property="MinHeight" Value="{DynamicResource ArcControlHeightMd}" />
+    <!-- Touch floor (M2-T8): a button never renders shorter than the 44px minimum hit target, even when the
+         density preset would shrink ArcControlHeightMd below it. Default density keeps the exact old 44px,
+         so desktop visuals are unchanged; the explicit .sm size below keeps its 36px exception. -->
+    <Setter Property="MinHeight" Value="{DynamicResource ArcHitTargetMin}" />
     <Setter Property="Padding" Value="16,0" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />

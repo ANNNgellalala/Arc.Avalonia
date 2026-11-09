@@ -328,12 +328,28 @@ public class ArcAgentChoiceCard : TemplatedControl
 
         if (_submit is not null)
         {
-            _submit.Click += (_, _) => TrySubmit();
+            _submit.MinHeight = 44;
+            var canSubmit = ArcAgentTapGuard.Watch(_submit);
+            _submit.Click += (_, _) =>
+            {
+                if (canSubmit())
+                {
+                    TrySubmit();
+                }
+            };
         }
 
         if (_defer is not null)
         {
-            _defer.Click += (_, _) => TryDefer();
+            _defer.MinHeight = 44;
+            var canDefer = ArcAgentTapGuard.Watch(_defer);
+            _defer.Click += (_, _) =>
+            {
+                if (canDefer())
+                {
+                    TryDefer();
+                }
+            };
         }
 
         if (_freeTextBox is not null)
@@ -489,6 +505,7 @@ public class ArcAgentChoiceCard : TemplatedControl
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Padding = new Thickness(10, 8, 10, 8),
+            MinHeight = 44,
             BorderThickness = new Thickness(1),
             BorderBrush = ArcUi.Brush(selected ? ArcTokens.Accent : ArcTokens.BorderSubtle),
             Background = selected ? ArcUi.Brush(ArcTokens.AccentSubtle) : null,
@@ -497,7 +514,14 @@ public class ArcAgentChoiceCard : TemplatedControl
             Content = content
         };
 
-        button.Click += (_, _) => ToggleOption(option.Id);
+        var canClick = ArcAgentTapGuard.Watch(button);
+        button.Click += (_, _) =>
+        {
+            if (canClick())
+            {
+                ToggleOption(option.Id);
+            }
+        };
         AutomationProperties.SetName(
             button,
             $"{option.Label}. {(selected ? "Selected" : "Not selected")}. " +

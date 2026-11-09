@@ -1,0 +1,20 @@
+{
+  "$comment": "R11 触控门禁的过渡基线：只记录红项（wheel-only-scroll / missing-capture-lost），warning/informational 不计入。",
+  "version": 1,
+  "generatedAt": "2026-11-09T23:30:45+08:00",
+  "counters": {
+    "scannedFiles": 369,
+    "wheelOnlyScroll": 0,
+    "missingCaptureLost": 0,
+    "pressExecutesAction": 5,
+    "scrollbarAlwaysVisible": 0,
+    "smallHitTargets": 2,
+    "violations": 0
+  },
+  "allow": [],
+  "notes": [
+    "刷新命令: pwsh -NoProfile tools/check-touch.ps1 -UpdateBaseline",
+    "目标是 allow=[]：手机端路径修复后清空。",
+    "warning/informational 项（press-executes-action/scrollbar-always-visible/small-hit-target）不入基线。"
+  ]
+}

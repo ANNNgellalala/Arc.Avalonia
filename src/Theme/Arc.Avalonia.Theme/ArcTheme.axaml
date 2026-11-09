@@ -33,5 +33,15 @@
   <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />
   <StyleInclude Source="avares://Arc.Avalonia.Markdown/Themes/ArcMarkdownTheme.axaml" />
   <StyleInclude Source="avares://Arc.Avalonia.Chat/Themes/ArcChatTheme.axaml" />
+
+  <!--
+    Touch-first hosts (M2-T8) can opt into the mobile scrollbar/chrome overrides after this aggregate;
+    they are intentionally not part of the default theme so desktop visuals stay identical:
+
+        <Application.Styles>
+          <arc:ArcTheme />
+          <StyleInclude Source="avares://Arc.Avalonia.Theme/ArcMobileStyles.axaml" />
+        </Application.Styles>
+  -->
 </Styles>
 

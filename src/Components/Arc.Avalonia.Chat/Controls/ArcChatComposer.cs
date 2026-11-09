@@ -57,6 +57,21 @@ public class ArcChatComposer : TemplatedControl
     public static readonly StyledProperty<Control?> LeadingContentProperty =
         AvaloniaProperty.Register<ArcChatComposer, Control?>(nameof(LeadingContent));
 
+    /// <summary>
+    /// When true (default) Enter sends and Shift+Enter inserts a newline; when false Enter only inserts a
+    /// newline, which is what soft-keyboard hosts usually want when the keyboard itself offers "send".
+    /// </summary>
+    public static readonly StyledProperty<bool> SendOnEnterProperty =
+        AvaloniaProperty.Register<ArcChatComposer, bool>(nameof(SendOnEnter), true);
+
+    /// <summary>Soft-keyboard inset supplied by the host; the composer lifts itself by the bottom value.</summary>
+    public static readonly StyledProperty<Thickness> KeyboardInsetsProperty =
+        AvaloniaProperty.Register<ArcChatComposer, Thickness>(nameof(KeyboardInsets));
+
+    /// <summary>Device safe-area inset supplied by the host; the composer lifts itself by the bottom value.</summary>
+    public static readonly StyledProperty<Thickness> SafeAreaProperty =
+        AvaloniaProperty.Register<ArcChatComposer, Thickness>(nameof(SafeArea));
+
     private Panel? _host;
     private TextBox? _input;
     private Border? _frame;
@@ -82,6 +97,9 @@ public class ArcChatComposer : TemplatedControl
         AllowAttachmentsProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.Rebuild());
         MaxAttachmentsProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.UpdateActions());
         LeadingContentProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.Rebuild());
+        SendOnEnterProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.UpdateInputHelpText());
+        KeyboardInsetsProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.ApplyInsets());
+        SafeAreaProperty.Changed.AddClassHandler<ArcChatComposer>((composer, _) => composer.ApplyInsets());
     }
 
     /// <summary>Raised when the user submits a draft.</summary>
@@ -141,6 +159,27 @@ public class ArcChatComposer : TemplatedControl
     {
         get => GetValue(LeadingContentProperty);
         set => SetValue(LeadingContentProperty, value);
+    }
+
+    /// <summary>Whether Enter sends (true, default) or only inserts a newline (false).</summary>
+    public bool SendOnEnter
+    {
+        get => GetValue(SendOnEnterProperty);
+        set => SetValue(SendOnEnterProperty, value);
+    }
+
+    /// <summary>Host-supplied soft-keyboard inset; lifts the composer by its bottom value.</summary>
+    public Thickness KeyboardInsets
+    {
+        get => GetValue(KeyboardInsetsProperty);
+        set => SetValue(KeyboardInsetsProperty, value);
+    }
+
+    /// <summary>Host-supplied safe-area inset; lifts the composer by its bottom value.</summary>
+    public Thickness SafeArea
+    {
+        get => GetValue(SafeAreaProperty);
+        set => SetValue(SafeAreaProperty, value);
     }
 
     /// <summary>Pending attachments staged in the tray.</summary>
@@ -286,6 +325,7 @@ public class ArcChatComposer : TemplatedControl
 
         var currentText = _input?.Text ?? Text;
         _host.Children.Clear();
+        ApplyInsets();
 
         var shell = new StackPanel { Spacing = 6 };
 
@@ -331,7 +371,7 @@ public class ArcChatComposer : TemplatedControl
         _input.Paint(TextBox.SelectionBrushProperty, ArcTokens.AccentSubtle);
         _input.Paint(TextBox.CaretBrushProperty, ArcTokens.AccentStrong);
         AutomationProperties.SetName(_input, Placeholder);
-        AutomationProperties.SetHelpText(_input, "输入消息。Enter 发送，Shift+Enter 换行。");
+        UpdateInputHelpText();
         _input.TextChanged += (_, _) =>
         {
             Text = _input.Text ?? string.Empty;
@@ -387,8 +427,8 @@ public class ArcChatComposer : TemplatedControl
             Variant = variant,
             Size = ArcButtonSize.Sm,
             Compact = true,
-            Width = 34,
-            Height = 34,
+            Width = 44,
+            Height = 44,
             VerticalAlignment = VerticalAlignment.Bottom,
             IsVisible = visibleOrEnabled,
         };
@@ -398,13 +438,37 @@ public class ArcChatComposer : TemplatedControl
 
     private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Enter || e.KeyModifiers.HasFlag(KeyModifiers.Shift) || _input?.IsFocused != true)
+        if (e.Key != Key.Enter || e.KeyModifiers.HasFlag(KeyModifiers.Shift) || _input?.IsFocused != true || !SendOnEnter)
         {
             return;
         }
 
         e.Handled = true;
         Submit();
+    }
+
+    /// <summary>Lifts the composer by the injected keyboard/safe-area insets (soft-keyboard hosts).</summary>
+    private void ApplyInsets()
+    {
+        if (_host is null)
+        {
+            return;
+        }
+
+        var bottom = Math.Max(0, KeyboardInsets.Bottom) + Math.Max(0, SafeArea.Bottom);
+        _host.Margin = new Thickness(0, 0, 0, bottom);
+    }
+
+    private void UpdateInputHelpText()
+    {
+        if (_input is null)
+        {
+            return;
+        }
+
+        AutomationProperties.SetHelpText(
+            _input,
+            SendOnEnter ? "输入消息。Enter 发送，Shift+Enter 换行。" : "输入消息。Enter 换行，点击发送按钮发送。");
     }
 
     private void UpdateActions()

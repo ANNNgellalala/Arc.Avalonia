@@ -1,0 +1,60 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    Opt-in touch scrollbar styles (M2-T8).
+
+    Deliberately NOT referenced by <arc:ArcTheme/>: desktop consumers keep today's Fluent scrollbars
+    unchanged. Touch hosts opt in after the theme include:
+
+        <Application.Styles>
+          <arc:ArcTheme />
+          <StyleInclude Source="avares://Arc.Avalonia.Theme/ArcMobileStyles.axaml" />
+        </Application.Styles>
+
+    All colours come from Arc tokens (R6); the file adds no includes and no render/timer code (R4/R8).
+  -->
+
+  <!-- Vertical rail: 6px wide; idle semi-transparent, fully opaque while touched/hovered. -->
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="6" />
+    <Setter Property="MinWidth" Value="6" />
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
+  <Style Selector="ScrollBar:vertical:pointerover">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="ScrollBar:vertical:focus-visible">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <!-- Horizontal rail mirror. -->
+  <Style Selector="ScrollBar:horizontal">
+    <Setter Property="Height" Value="6" />
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal:pointerover">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal:focus-visible">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <!-- Thumbs: never shorter than the 44px touch target in the scroll direction and always Arc-tinted.
+       A too-short thumb is the usual "can't grab the scrollbar on a phone" failure. -->
+  <Style Selector="ScrollBar /template/ Thumb">
+    <Setter Property="Background" Value="{DynamicResource ArcBorderStrong}" />
+  </Style>
+  <Style Selector="ScrollBar:vertical /template/ Thumb">
+    <Setter Property="MinHeight" Value="{DynamicResource ArcHitTargetMin}" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
+  <Style Selector="ScrollBar:horizontal /template/ Thumb">
+    <Setter Property="MinWidth" Value="{DynamicResource ArcHitTargetMin}" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
+  <Style Selector="ScrollBar:pointerover /template/ Thumb">
+    <Setter Property="Background" Value="{DynamicResource ArcTextMuted}" />
+  </Style>
+</Styles>

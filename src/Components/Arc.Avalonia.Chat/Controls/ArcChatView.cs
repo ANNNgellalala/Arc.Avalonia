@@ -81,6 +81,21 @@ public class ArcChatView : TemplatedControl, IDisposable
     public static readonly StyledProperty<bool> ShowTimestampsProperty =
         AvaloniaProperty.Register<ArcChatView, bool>(nameof(ShowTimestamps), true);
 
+    /// <summary>
+    /// Distance from the end (px) at which auto-follow re-arms after the user dragged or scrolled up.
+    /// Defaults to <see cref="NearBottomThreshold"/>.
+    /// </summary>
+    public static readonly StyledProperty<double> AutoFollowResumeThresholdProperty =
+        AvaloniaProperty.Register<ArcChatView, double>(nameof(AutoFollowResumeThreshold), NearBottomThreshold);
+
+    /// <summary>Soft-keyboard inset supplied by the host; the composer is lifted by its bottom value.</summary>
+    public static readonly StyledProperty<Thickness> KeyboardInsetsProperty =
+        AvaloniaProperty.Register<ArcChatView, Thickness>(nameof(KeyboardInsets));
+
+    /// <summary>Device safe-area inset supplied by the host; the composer is lifted by its bottom value.</summary>
+    public static readonly StyledProperty<Thickness> SafeAreaProperty =
+        AvaloniaProperty.Register<ArcChatView, Thickness>(nameof(SafeArea));
+
     private readonly Dictionary<string, ArcChatParticipant> _people = new(StringComparer.Ordinal);
     private readonly List<Ellipse> _typingDots = [];
     private ArcVirtualList? _list;
@@ -105,6 +120,15 @@ public class ArcChatView : TemplatedControl, IDisposable
     private bool _defaultsLoaded;
     private bool _disposed;
 
+    // Touch handling: a drag latches "user is scrolling" so streaming appends never yank the viewport
+    // back to the end, and taps after a drag are not treated as clicks (8 px slop).
+    private const double DragSlop = 8;
+    private const double NarrowScrollBarWidth = 480;
+    private Point _pointerOrigin;
+    private bool _pointerPressed;
+    private bool _pointerMoved;
+    private bool _userScrolling;
+
     static ArcChatView()
     {
         AutoScrollModeProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.OnAutoScrollModeChanged());
@@ -119,6 +143,8 @@ public class ArcChatView : TemplatedControl, IDisposable
         GroupWindowProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.RefreshRows());
         ShowAvatarsProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.RefreshRows());
         ShowTimestampsProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.RefreshRows());
+        KeyboardInsetsProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.UpdateComposerInsets());
+        SafeAreaProperty.Changed.AddClassHandler<ArcChatView>((view, _) => view.UpdateComposerInsets());
     }
 
     /// <summary>Creates the chat surface.</summary>
@@ -214,6 +240,30 @@ public class ArcChatView : TemplatedControl, IDisposable
         get => GetValue(ShowTimestampsProperty);
         set => SetValue(ShowTimestampsProperty, value);
     }
+
+    /// <summary>Re-arm threshold for auto-follow after a user drag (see <see cref="AutoFollowResumeThresholdProperty"/>).</summary>
+    public double AutoFollowResumeThreshold
+    {
+        get => GetValue(AutoFollowResumeThresholdProperty);
+        set => SetValue(AutoFollowResumeThresholdProperty, value);
+    }
+
+    /// <summary>Host-supplied soft-keyboard inset; forwarded to the composer.</summary>
+    public Thickness KeyboardInsets
+    {
+        get => GetValue(KeyboardInsetsProperty);
+        set => SetValue(KeyboardInsetsProperty, value);
+    }
+
+    /// <summary>Host-supplied safe-area inset; forwarded to the composer.</summary>
+    public Thickness SafeArea
+    {
+        get => GetValue(SafeAreaProperty);
+        set => SetValue(SafeAreaProperty, value);
+    }
+
+    /// <summary>True while a touch/pointer drag has paused auto-follow until the viewport returns near the end.</summary>
+    public bool IsAutoFollowPaused => _userScrolling;
 
     /// <summary>Built-in composer (created by the template).</summary>
     public ArcChatComposer? Composer => _composer;
@@ -341,6 +391,87 @@ public class ArcChatView : TemplatedControl, IDisposable
 
         DetachScrollViewer();
         StopTypingTimer();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        _pointerPressed = true;
+        _pointerMoved = false;
+        _pointerOrigin = e.GetPosition(this);
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (!_pointerPressed || _pointerMoved)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(this);
+        if (Math.Abs(position.X - _pointerOrigin.X) <= DragSlop && Math.Abs(position.Y - _pointerOrigin.Y) <= DragSlop)
+        {
+            return;
+        }
+
+        // A real drag: pause follow immediately so content growth (streaming) cannot fight the finger.
+        _pointerMoved = true;
+        _userScrolling = true;
+        _follow = false;
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        _pointerPressed = false;
+        _pointerMoved = false;
+        ResumeFollowIfNearEnd();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        _pointerPressed = false;
+        _pointerMoved = false;
+        ResumeFollowIfNearEnd();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        base.OnPointerWheelChanged(e);
+
+        // Wheel is not a touch gesture, so it is never the only pause signal - but it is a cheap extra hint:
+        // scrolling up (Delta.Y > 0) moves away from the end and pauses follow; scrolling back re-arms it.
+        if (e.Delta.Y > 0)
+        {
+            _userScrolling = true;
+            _follow = false;
+        }
+        else if (e.Delta.Y < 0)
+        {
+            ResumeFollowIfNearEnd();
+        }
+    }
+
+    private void ResumeFollowIfNearEnd()
+    {
+        if (_scroll is null)
+        {
+            return;
+        }
+
+        var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
+        if (maximum - Math.Max(0, _scroll.Offset.Y) <= Math.Max(0, AutoFollowResumeThreshold))
+        {
+            _userScrolling = false;
+            _follow = true;
+        }
     }
 
     /// <summary>Adds a message to the end (same id updates in place).</summary>
@@ -599,6 +730,7 @@ public class ArcChatView : TemplatedControl, IDisposable
     public void ScrollToEnd()
     {
         _follow = true;
+        _userScrolling = false;
         RequestScrollToEnd();
     }
 
@@ -656,8 +788,10 @@ public class ArcChatView : TemplatedControl, IDisposable
     internal bool ShouldFollow() => AutoScrollMode switch
     {
         ArcChatAutoScrollMode.Never => false,
-        ArcChatAutoScrollMode.Always => true,
-        _ => _follow,
+        // "Always" means the transcript follows new content, but never while the reader is actively
+        // dragging or has scrolled away - that is the touch feedback bug this slice fixes.
+        ArcChatAutoScrollMode.Always => !_userScrolling,
+        _ => _follow && !_userScrolling,
     };
 
     internal void OnBubbleInteraction(ArcMarkdownInteractionEventArgs args) => InteractionOccurred?.Invoke(this, args);
@@ -974,6 +1108,22 @@ public class ArcChatView : TemplatedControl, IDisposable
 
         _composerHost.Content = _composer;
         ApplyComposerVisibility();
+        UpdateComposerInsets();
+    }
+
+    /// <summary>Lifts the composer by the host-supplied keyboard and safe-area bottom insets.</summary>
+    private void UpdateComposerInsets()
+    {
+        if (_composerHost is null)
+        {
+            return;
+        }
+
+        if (_composer is not null)
+        {
+            _composer.KeyboardInsets = KeyboardInsets;
+            _composer.SafeArea = SafeArea;
+        }
     }
 
     private void OnComposerStopRequested()
@@ -1321,6 +1471,7 @@ public class ArcChatView : TemplatedControl, IDisposable
         var scroll = _list.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
         if (ReferenceEquals(scroll, _scroll))
         {
+            ApplyScrollHostPolicy(scroll);
             return;
         }
 
@@ -1329,8 +1480,37 @@ public class ArcChatView : TemplatedControl, IDisposable
         if (_scroll is not null)
         {
             _scroll.ScrollChanged += OnScrollChanged;
+            _scroll.SizeChanged += OnScrollHostSizeChanged;
             _lastOffset = Math.Max(0, _scroll.Offset.Y);
+            ApplyScrollHostPolicy(_scroll);
         }
+    }
+
+    /// <summary>
+    /// Nested scroll disambiguation and non-persistent scrollbars: the transcript owns its own gestures
+    /// (never chains to a page/sheet scroller) and hides the scrollbar on phone-width surfaces.
+    /// </summary>
+    private void ApplyScrollHostPolicy(ScrollViewer? scroll)
+    {
+        if (scroll is null)
+        {
+            return;
+        }
+
+        scroll.IsScrollChainingEnabled = false;
+        scroll.AllowAutoHide = true;
+        scroll.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+        var narrow = Bounds.Width > 0 && Bounds.Width < NarrowScrollBarWidth;
+        scroll.VerticalScrollBarVisibility = narrow ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+    }
+
+    private void OnScrollHostSizeChanged(object? sender, SizeChangedEventArgs e) => ApplyScrollHostPolicy(_scroll);
+
+    /// <inheritdoc />
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        ApplyScrollHostPolicy(_scroll);
     }
 
     private void DetachScrollViewer()
@@ -1338,6 +1518,7 @@ public class ArcChatView : TemplatedControl, IDisposable
         if (_scroll is not null)
         {
             _scroll.ScrollChanged -= OnScrollChanged;
+            _scroll.SizeChanged -= OnScrollHostSizeChanged;
             _scroll = null;
         }
     }
@@ -1357,11 +1538,14 @@ public class ArcChatView : TemplatedControl, IDisposable
         if (offset + 0.5 < _lastOffset)
         {
             _follow = false;
+            _userScrolling = true;
         }
 
-        if (distance <= NearBottomThreshold)
+        // Re-arm only after the gesture ended (finger up) and the viewport is back near the end.
+        if (!_pointerPressed && distance <= Math.Max(0, AutoFollowResumeThreshold))
         {
             _follow = true;
+            _userScrolling = false;
         }
 
         _lastOffset = offset;

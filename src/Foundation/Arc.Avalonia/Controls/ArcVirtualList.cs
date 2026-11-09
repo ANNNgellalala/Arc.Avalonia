@@ -43,6 +43,11 @@ public enum ArcVirtualListScrollState
 /// scroll viewer differently still works through the visual-tree fallback, but the contract expects
 /// <c>PART_ScrollViewer</c>.
 /// </para>
+/// <para>
+/// Touch input is delegated, not re-implemented: the host theme's <see cref="ScrollViewer"/> owns panning,
+/// fling and inertia, so the list never intercepts <c>PointerMoved</c>; a tap still selects through the base
+/// <see cref="ListBox"/> and keyboard navigation is untouched.
+/// </para>
 /// </summary>
 [TemplatePart("PART_ScrollViewer", typeof(ScrollViewer))]
 public class ArcVirtualList : ListBox

@@ -16,6 +16,8 @@
         <ScrollViewer x:Name="PART_Scroll"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto"
+                      IsScrollChainingEnabled="False"
+                      AllowAutoHide="True"
                       Background="{TemplateBinding Background}">
           <StackPanel x:Name="PART_Host" Spacing="0" Margin="0" />
         </ScrollViewer>

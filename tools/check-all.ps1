@@ -2,7 +2,8 @@
 <#
 .SYNOPSIS
     一键门禁：依次运行 R3 依赖、R1/R2 架构、R4 主题、R6 token-only、R8 无渲染层自研、R9 Agent 边界、
-    R10 控件契约，以及 R5 打包产物检查，输出红/绿/known-red 三态汇总表。只有“新增违规”才 exit 1。
+    R10 控件契约、R11 手机/触控、R12 手机端 smoke，以及 R5 打包产物检查，输出红/绿/known-red 三态汇总表。
+    只有“新增违规”才 exit 1。
 
 .DESCRIPTION
     各子门禁先写 .recon/gates/<name>-latest.json，再由本脚本汇总；子门禁的 exit code 只用于兜底。
@@ -10,11 +11,12 @@
       GREEN      无违规（可有已登记豁免，如 R6 的 28 条存量 token 例外、R10 的过渡 allowlist）
       KNOWN-RED  仅基线内已知红（tools/gates-baseline.json；M1 目标）
       RED        新增违规（或子门禁自身 ERROR）
+      SKIP       子门禁明确跳过（当前仅 R12 在 Gallery 尚无 --mobile 时跳过；不算红，汇总显示 10/11 + 1 skip）
     R5（dotnet pack 产物）由 check-package.ps1 实现（artifacts/ 未生成时为 RED，先 dotnet pack）。
     R9（Agent 边界）主门禁是 BannedApiAnalyzers（RS0030 → error），check-agent-boundary.ps1 是离线兜底；
     其报告是简化 schema（gate/status/issues），本脚本单独兼容，不进入 gates-baseline 的 known-red。
-    R10（控件契约）的过渡 allowlist 在 tools/contracts-baseline.json（切片改造中途由 -UpdateBaseline 刷新），
-    未完成项降级为 exempt；新增契约违规照常 RED，不进入 gates-baseline。
+    R10（控件契约）的过渡 allowlist 在 tools/contracts-baseline.json（切片改造中途由 -UpdateBaseline 刷新）；
+    R11（触控）的过渡 allowlist 在 tools/touch-baseline.json（真实 P1 命中）；两者都不进入 gates-baseline。
 
 .PARAMETER KnownRed
     严格模式：把 KNOWN-RED 也视为失败（exit 1）。默认 known-red 不阻塞（docs/14 §9 的 M0 预期状态）。
@@ -24,7 +26,7 @@
     自检失败同样 exit 1。
 
 .PARAMETER Gate
-    只跑指定门禁：R1 / R2 / R3 / R4 / R5 / R6 / R8 / R9 / R10 / selftest（大小写不敏感，前缀匹配）。
+    只跑指定门禁：R1 / R2 / R3 / R4 / R5 / R6 / R8 / R9 / R10 / R11 / R12 / selftest（大小写不敏感，前缀匹配）。
 
 .PARAMETER Quiet
     不打印汇总表（仅用于脚本化调用；仍写报告）。
@@ -66,7 +68,9 @@ $gateDefs = @(
     [pscustomobject]@{ Rule = 'R6'; Name = 'token-only'; Script = 'check-token-only.ps1'; Args = @() },
     [pscustomobject]@{ Rule = 'R8'; Name = 'no-render'; Script = 'check-no-render.ps1'; Args = @() },
     [pscustomobject]@{ Rule = 'R9'; Name = 'agent-boundary'; Script = 'check-agent-boundary.ps1'; Args = @() },
-    [pscustomobject]@{ Rule = 'R10'; Name = 'contracts'; Script = 'check-contracts.ps1'; Args = @() }
+    [pscustomobject]@{ Rule = 'R10'; Name = 'contracts'; Script = 'check-contracts.ps1'; Args = @() },
+    [pscustomobject]@{ Rule = 'R11'; Name = 'touch'; Script = 'check-touch.ps1'; Args = @() },
+    [pscustomobject]@{ Rule = 'R12'; Name = 'mobile-smoke'; Script = 'mobile-smoke.ps1'; Args = @() }
 )
 if ($SelfTest) {
     $gateDefs += [pscustomobject]@{ Rule = 'R3-ST'; Name = 'deps-selftest'; Script = 'check-deps.ps1'; Args = @('-SelfTest') }

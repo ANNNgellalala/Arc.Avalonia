@@ -28,12 +28,16 @@ public static class DocLayout
 {
     private const double CopyWidth = 860;
 
-    public static DocView Build(ArcItemPage page, ArcDemoContext demo, Action<string> goToSlug)
+    /// <summary>Active copy width; compact layout narrows it to the phone viewport.</summary>
+    private static double _copyWidth = CopyWidth;
+
+    public static DocView Build(ArcItemPage page, ArcDemoContext demo, Action<string> goToSlug, bool compact = false)
     {
+        _copyWidth = compact ? 720 : CopyWidth;
         var item = page.Item;
         var doc = page.Doc;
         var sections = new List<DocSection>();
-        var root = new StackPanel { Spacing = 0, MaxWidth = CopyWidth, HorizontalAlignment = HorizontalAlignment.Left };
+        var root = new StackPanel { Spacing = 0, MaxWidth = _copyWidth, HorizontalAlignment = HorizontalAlignment.Left };
 
         root.Children.Add(BuildSummary(page, doc));
         Add(root, sections, "purpose", "用途", null, BuildPurpose(doc));
@@ -86,7 +90,7 @@ public static class DocLayout
                 Text = doc.Summary,
                 Classes = { "arc-body", "arc-secondary" },
                 TextWrapping = TextWrapping.Wrap,
-                MaxWidth = CopyWidth
+                MaxWidth = _copyWidth
             });
         }
 
@@ -218,7 +222,8 @@ public static class DocLayout
 
         if (page.DemoOnCanvas)
         {
-            panel.Children.Add(DemoUi.Canvas(preview, 24));
+            var stage = DemoUi.Canvas(preview, _copyWidth < CopyWidth ? 16 : 24);
+            panel.Children.Add(WrapPreview(stage));
         }
         else
         {
@@ -226,12 +231,33 @@ public static class DocLayout
             panel.Children.Add(new ScrollViewer
             {
                 Content = preview,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled
+                HorizontalScrollBarVisibility = _copyWidth < CopyWidth ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                IsScrollChainingEnabled = false
             });
         }
 
         return panel;
+    }
+
+    /// <summary>
+    /// Compact pages keep a fixed-width preview inside a horizontally scrollable strip (scrollbar hidden) so
+    /// the document column itself never grows past the phone viewport.
+    /// </summary>
+    private static Control WrapPreview(Control preview)
+    {
+        if (_copyWidth >= CopyWidth)
+        {
+            return preview;
+        }
+
+        return new ScrollViewer
+        {
+            Content = preview,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            IsScrollChainingEnabled = false
+        };
     }
 
     private static Control VariantChip(ArcDocVariant variant)
@@ -523,7 +549,7 @@ public static class DocLayout
         Text = text,
         Classes = { "arc-body", "arc-secondary" },
         TextWrapping = TextWrapping.Wrap,
-        MaxWidth = CopyWidth,
+        MaxWidth = _copyWidth,
         LineHeight = 26
     };
 
@@ -581,7 +607,7 @@ public static class DocLayout
                 Text = subtitle,
                 Classes = { "arc-body-sm", "arc-secondary" },
                 TextWrapping = TextWrapping.Wrap,
-                MaxWidth = CopyWidth
+                MaxWidth = _copyWidth
             });
         }
 

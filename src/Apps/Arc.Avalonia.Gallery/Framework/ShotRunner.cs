@@ -33,6 +33,8 @@ public static class ShotRunner
         var accentArg = GetArg(args, "--accent");
         var accent = accentArg is not null && Enum.TryParse<ArcAccent>(accentArg, true, out var parsedAccent) ? parsedAccent : ArcAccent.Neutral;
         var width = int.TryParse(GetArg(args, "--width"), out var parsedWidth) ? parsedWidth : 1180;
+        var height = int.TryParse(GetArg(args, "--height"), out var parsedHeight) ? parsedHeight : 900;
+        var compact = args.Contains("--mobile") || width < 900;
         var maxHeight = int.TryParse(GetArg(args, "--max-height"), out var parsedMaxHeight) ? parsedMaxHeight : DefaultMaxHeight;
         var offset = int.TryParse(GetArg(args, "--offset"), out var parsedOffset) ? Math.Max(0, parsedOffset) : 0;
 
@@ -40,7 +42,7 @@ public static class ShotRunner
 
         if (args.Contains("--shell"))
         {
-            await RenderShellAsync(app, output, width, filter);
+            await RenderShellAsync(app, output, width, height, compact, filter);
             return;
         }
 
@@ -62,14 +64,14 @@ public static class ShotRunner
         {
             Width = width,
             Background = ArcResources.Brush(ArcTokens.Background),
-            Padding = new Thickness(56, 48, 56, 40)
+            Padding = compact ? new Thickness(16, 12, 16, 32) : new Thickness(56, 48, 56, 40)
         };
 
         var clip = new Border { Width = width, ClipToBounds = true, Child = host };
         var window = new Window
         {
             Width = width,
-            Height = 900,
+            Height = height,
             Position = new PixelPoint(-6000, -6000),
             ShowInTaskbar = false,
             Content = clip
@@ -90,7 +92,7 @@ public static class ShotRunner
             {
                 try
                 {
-                    await RenderPageAsync(clip, host, window, page, theme, themeDirectory, width, maxHeight, offset);
+                    await RenderPageAsync(clip, host, window, page, theme, themeDirectory, width, height, compact, maxHeight, offset);
                     Console.WriteLine($"SHOT {theme.ToString().ToLowerInvariant()}/{page.Slug}.png");
                 }
                 catch (Exception exception)
@@ -101,14 +103,14 @@ public static class ShotRunner
         }
     }
 
-    private static async Task RenderPageAsync(Border clip, Border host, Window window, ArcPage page, ArcColorScheme theme, string directory, int width, int maxHeight, int offset)
+    private static async Task RenderPageAsync(Border clip, Border host, Window window, ArcPage page, ArcColorScheme theme, string directory, int width, int height, bool compact, int maxHeight, int offset)
     {
-        host.Child = BuildPage(page, theme);
+        host.Child = BuildPage(page, theme, compact);
         host.RenderTransform = null;
         host.Margin = offset > 0 ? new Thickness(0, -offset, 0, 0) : default;
         clip.Background = ArcResources.Brush(ArcTokens.Background);
         clip.Height = double.NaN;
-        window.Height = 900;
+        window.Height = height;
 
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
         await Task.Delay(60);
@@ -124,9 +126,10 @@ public static class ShotRunner
             naturalHeight = Math.Max(240, pageContent.DesiredSize.Height + padding.Top + padding.Bottom);
         }
         var visibleHeight = Math.Max(240, naturalHeight - offset);
-        var height = (int)Math.Ceiling(Math.Min(visibleHeight, Math.Min(maxHeight, 1400)));
-        window.Height = height;
-        clip.Height = height;
+        var sliceCap = compact ? height : 1400;
+        var slices = (int)Math.Ceiling(Math.Min(visibleHeight, Math.Min(maxHeight, sliceCap)));
+        window.Height = slices;
+        clip.Height = slices;
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
         await Task.Delay(120);
 
@@ -143,13 +146,13 @@ public static class ShotRunner
         bitmap.Save(Path.Combine(directory, $"{page.Order:000}-{page.Slug}{suffix}.png"));
     }
 
-    private static Control BuildPage(ArcPage page, ArcColorScheme theme)
+    private static Control BuildPage(ArcPage page, ArcColorScheme theme, bool compact)
     {
         var context = new ArcDemoContext(theme, ArcThemeManager.Accent);
         if (page is ArcItemPage itemPage)
         {
             // Item pages render the Chinese documentation layout, including the completeness preview.
-            var built = DocLayout.Build(itemPage, context, _ => { });
+            var built = DocLayout.Build(itemPage, context, _ => { }, compact);
             return new StackPanel { Children = { built.Root } };
         }
 
@@ -180,13 +183,13 @@ public static class ShotRunner
         return new StackPanel { Children = { header, content } };
     }
 
-    private static async Task RenderShellAsync(Application app, string directory, int width, string? slug)
+    private static async Task RenderShellAsync(Application app, string directory, int width, int height, bool compact, string? slug)
     {
         foreach (var theme in new[] { ArcColorScheme.Light, ArcColorScheme.Dark })
         {
             ArcThemeManager.Apply(app, theme, ArcAccent.Neutral);
             await Task.Delay(60);
-            var window = new GalleryWindow(slug) { Width = width, Height = 900 };
+            var window = new GalleryWindow(slug, compact) { Width = width, Height = height };
             window.Show();
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             await Task.Delay(400);

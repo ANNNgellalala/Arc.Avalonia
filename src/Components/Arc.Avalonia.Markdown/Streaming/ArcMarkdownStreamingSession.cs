@@ -347,6 +347,18 @@ public sealed partial class ArcMarkdownStreamingSession : IAsyncDisposable
         }
     }
 
+    /// <summary>Re-arms follow mode once the reader scrolls back to the end (touch follow latch).</summary>
+    internal void NotifyUserScrolledToEnd()
+    {
+        lock (_gate)
+        {
+            if (_options.AutoScrollToEnd)
+            {
+                _follow = true;
+            }
+        }
+    }
+
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {

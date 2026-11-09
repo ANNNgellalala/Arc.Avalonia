@@ -297,6 +297,16 @@ public static class ArcPalette
         dictionary[ArcTokens.DurationStandard] = TimeSpan.FromMilliseconds(240);
         dictionary[ArcTokens.DurationConsidered] = TimeSpan.FromMilliseconds(480);
 
+        // ---- Touch (M2-T8) ----
+        // Physical hit targets; never scaled by ApplyErgonomics so a phone never gets a sub-44px control.
+        dictionary[ArcTokens.HitTargetMin] = ArcTouch.HitTargetMin;
+        dictionary[ArcTokens.HitTargetComfortable] = ArcTouch.HitTargetComfortable;
+
+        // Safe area: 0 means "the host has not reserved an inset". A host overrides these two entries in
+        // its own resource dictionary (status bar / home indicator) and ArcTouch.ApplySafeArea picks them up.
+        dictionary[ArcTokens.SafeAreaTop] = ArcTouch.SafeAreaDefault;
+        dictionary[ArcTokens.SafeAreaBottom] = ArcTouch.SafeAreaDefault;
+
         return dictionary;
     }
 
@@ -377,6 +387,11 @@ public static class ArcPalette
             ScaleRadius(dictionary, ArcTokens.RadiusPanel, radiusScale);
             ScaleRadius(dictionary, ArcTokens.RadiusSurface, radiusScale);
         }
+
+        // Safe area is host data rather than a design scale: write it verbatim into both variants so
+        // ArcTouch.SafeAreaTop/Bottom (and any XAML DynamicResource) see the reserved insets.
+        dictionary[ArcTokens.SafeAreaTop] = options.SafeAreaTop;
+        dictionary[ArcTokens.SafeAreaBottom] = options.SafeAreaBottom;
     }
 
     private static void ScaleNumber(ResourceDictionary dictionary, string key, double scale)

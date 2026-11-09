@@ -112,5 +112,18 @@ public static class ArcTokens
     public const string DurationFast = "ArcDurationFast";
     public const string DurationStandard = "ArcDurationStandard";
     public const string DurationConsidered = "ArcDurationConsidered";
+
+    // Touch (M2-T8)
+    /// <summary>Minimum hit target in px (44); deliberately not scaled by the density preset.</summary>
+    public const string HitTargetMin = "ArcHitTargetMin";
+
+    /// <summary>Comfortable hit target in px (48); used by primary mobile actions.</summary>
+    public const string HitTargetComfortable = "ArcHitTargetComfortable";
+
+    /// <summary>Top safe-area inset; 0 by default, hosts override the token when they reserve space.</summary>
+    public const string SafeAreaTop = "ArcSafeAreaTop";
+
+    /// <summary>Bottom safe-area inset; 0 by default, hosts override the token when they reserve space.</summary>
+    public const string SafeAreaBottom = "ArcSafeAreaBottom";
 }
 

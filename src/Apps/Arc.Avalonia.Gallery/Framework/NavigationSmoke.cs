@@ -14,13 +14,18 @@ namespace Arc.Avalonia.Gallery;
 /// </summary>
 public static class NavigationSmoke
 {
-    public static int Run()
+    public static int Run(bool mobile = false)
     {
         var failures = new List<string>();
         var itemShows = 0;
         var pageShows = 0;
 
-        var window = new GalleryWindow { Width = 1280, Height = 900, ShowInTaskbar = false };
+        var window = new GalleryWindow(null, mobile)
+        {
+            Width = mobile ? 412 : 1280,
+            Height = mobile ? 915 : 900,
+            ShowInTaskbar = false
+        };
 
         try
         {

@@ -40,7 +40,7 @@ $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 if ([string]::IsNullOrWhiteSpace($OutDir)) { $OutDir = Join-Path $root '.recon/gates' }
 
 $report = New-GatesReport -Gate 'R6' -Name 'token-only' -Title 'token-only 取色' `
-    -Scope 'src/**/*.cs, src/**/*.axaml（排除 bin/obj）'
+    -Scope 'src/**/*.cs, src/**/*.axaml（排除 bin/obj；含 src/Apps 与 src/Docs）'
 $rule = New-GatesRule -Id 'R6' -Title '不得出现 hex/rgb/Color.FromArgb'
 [void]$report.rules.Add($rule)
 Add-GatesNote -Report $report -Note '存量豁免: tools/token-allow.json（file+rule+max 行数）；新文件/超量命中 fail-closed。'
@@ -64,6 +64,7 @@ foreach ($entry in @($allowConfig.allow)) {
 }
 
 $files = @(Get-GatesSourceFiles -Root (Join-Path $root 'src') -Extensions @('.cs', '.axaml'))
+Add-GatesNote -Report $report -Note 'R6 覆盖 src/**（含 src/Apps 与 src/Docs）；apps 侧若确需字面色，按逐文件 allowlist 登记，不做目录排除。'
 $hits = @{}   # "file|rule" → List[int] 行号
 foreach ($file in $files) {
     $rel = ConvertTo-GatesRelPath -Path $file.FullName -Base $root

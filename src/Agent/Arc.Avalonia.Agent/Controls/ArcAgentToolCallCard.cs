@@ -142,9 +142,25 @@ public class ArcAgentToolCallCard : Panel
         {
             var approve = ArcUi.Button("Approve", ArcButtonVariant.Primary, ArcButtonSize.Sm, "check");
             var deny = ArcUi.Button("Deny", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "x");
+            approve.MinHeight = 44;
+            deny.MinHeight = 44;
+            var canApprove = ArcAgentTapGuard.Watch(approve);
+            var canDeny = ArcAgentTapGuard.Watch(deny);
             var callId = _call.Id;
-            approve.Click += (_, _) => RaiseToolAction(ApproveRequestedEvent, ApproveRequested, callId);
-            deny.Click += (_, _) => RaiseToolAction(DenyRequestedEvent, DenyRequested, callId);
+            approve.Click += (_, _) =>
+            {
+                if (canApprove())
+                {
+                    RaiseToolAction(ApproveRequestedEvent, ApproveRequested, callId);
+                }
+            };
+            deny.Click += (_, _) =>
+            {
+                if (canDeny())
+                {
+                    RaiseToolAction(DenyRequestedEvent, DenyRequested, callId);
+                }
+            };
             ArcUi.Name(approve, $"Approve {_call.ToolName}");
             ArcUi.Name(deny, $"Deny {_call.ToolName}");
             actions.Children.Add(approve);
@@ -153,15 +169,31 @@ public class ArcAgentToolCallCard : Panel
         else if (_call.Status == ArcToolCallStatus.Failed)
         {
             var retry = ArcUi.Button("Retry", ArcButtonVariant.Secondary, ArcButtonSize.Sm, "refresh-cw");
+            retry.MinHeight = 44;
+            var canRetry = ArcAgentTapGuard.Watch(retry);
             var callId = _call.Id;
-            retry.Click += (_, _) => RaiseToolAction(RetryRequestedEvent, RetryRequested, callId);
+            retry.Click += (_, _) =>
+            {
+                if (canRetry())
+                {
+                    RaiseToolAction(RetryRequestedEvent, RetryRequested, callId);
+                }
+            };
             ArcUi.Name(retry, $"Retry {_call.ToolName}");
             actions.Children.Add(retry);
         }
 
         var details = ArcUi.Button("Details", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "code");
+        details.MinHeight = 44;
+        var canOpenDetails = ArcAgentTapGuard.Watch(details);
         var currentId = _call.Id;
-        details.Click += (_, _) => RaiseToolAction(DetailsRequestedEvent, DetailsRequested, currentId);
+        details.Click += (_, _) =>
+        {
+            if (canOpenDetails())
+            {
+                RaiseToolAction(DetailsRequestedEvent, DetailsRequested, currentId);
+            }
+        };
         actions.Children.Add(details);
 
         if (actions.Children.Count > 0)

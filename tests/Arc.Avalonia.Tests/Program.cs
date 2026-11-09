@@ -92,11 +92,11 @@ public static class Program
             translucent.A is >= 101 and <= 103);
 
         var tokenFields = typeof(ArcTokens).GetFields().Count(f => f.IsLiteral && f.FieldType == typeof(string));
-        // 82 declared constants must all materialise in ArcPalette.Build for every scheme/accent combo
+        // 86 declared constants must all materialise in ArcPalette.Build for every scheme/accent combo
         // (ControlThumbShadow was the one that used to be computed but never registered), and the
         // injectable IArcResourceHost must feed ArcResources without a live Application.
         Check("token count, palette coverage and resource host",
-            tokenFields == 82 && PaletteCoversAllTokens() && ResourceHostChecks());
+            tokenFields == 86 && PaletteCoversAllTokens() && ResourceHostChecks());
         Check("token keys",
             ArcTokens.Background == "ArcBackground" &&
             ArcTokens.Surface == "ArcSurface" &&
@@ -469,7 +469,7 @@ public static class Program
             .Select(f => (string)f.GetRawConstantValue()!)
             .ToArray();
 
-        if (keys.Length < 82)
+        if (keys.Length < 86)
         {
             Console.WriteLine($"  MISSING TOKENS: only {keys.Length} declared, expected at least 82");
             return false;
@@ -1675,5 +1675,6 @@ public static class Program
         }
     }
 }
+
 
 

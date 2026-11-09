@@ -87,8 +87,12 @@ internal sealed class TableRenderer : IArcMarkdownNodeRenderer
 
         return new ScrollViewer
         {
+            // A wide table scrolls horizontally on its own; the gesture must not leak into the page scroller
+            // and the scrollbar only appears while the table is touched.
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            IsScrollChainingEnabled = false,
+            AllowAutoHide = true,
             Margin = new Thickness(0, 0, 0, frameStyle.BlockSpacing),
             // The card must hug its columns when the table is narrower than the viewport; the fit host
             // keeps it left-aligned instead of letting ScrollContentPresenter stretch it to full width.

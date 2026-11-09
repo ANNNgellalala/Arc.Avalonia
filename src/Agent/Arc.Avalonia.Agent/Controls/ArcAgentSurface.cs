@@ -100,6 +100,8 @@ public class ArcAgentSurface : Panel, IArcAgentCommandSink
             Width = 320,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            IsScrollChainingEnabled = false,
+            AllowAutoHide = true,
             IsVisible = false
         };
 

@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Arc.Avalonia.Markdown.Controls;
 using Markdig.Extensions.TaskLists;
 using Markdig.Syntax.Inlines;
 
@@ -273,7 +274,9 @@ internal static class ArcMarkdownDefaultInlineRenderer
         var button = new HyperlinkButton
         {
             Content = content,
-            Padding = new Thickness(0),
+            // A little vertical padding grows the touch target of an inline link without breaking the line box.
+            Padding = new Thickness(2, 2, 2, 2),
+            MinHeight = 24,
             Background = null,
             BorderThickness = new Thickness(0),
             CornerRadius = new CornerRadius(0),
@@ -286,6 +289,10 @@ internal static class ArcMarkdownDefaultInlineRenderer
             ToolTip.SetTip(button, title);
         }
 
+        // Swiping over a document must not open a link: the guard cancels clicks after an 8 px drag.
+        var tapGuard = new ArcMarkdownTapGuard();
+        tapGuard.Attach(button);
+
         // Token-only hover/focus feedback: the framework accent colour never leaks into Arc surfaces.
         button.PointerEntered += (_, _) => content.Opacity = 0.82;
         button.PointerExited += (_, _) => content.Opacity = 1;
@@ -294,6 +301,11 @@ internal static class ArcMarkdownDefaultInlineRenderer
 
         button.Click += async (_, _) =>
         {
+            if (tapGuard.IsCancelled)
+            {
+                return;
+            }
+
             var click = new ArcMarkdownLinkClick(url, displayText);
             try
             {
