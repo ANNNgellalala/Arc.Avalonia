@@ -5,6 +5,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.VisualTree;
+using System.Linq;
 using Arc.Avalonia.Gallery;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
@@ -87,6 +90,33 @@ public class MobileApp : Application
     /// Edge-to-edge Android windows overlay the status bar; give the compact header the platform safe-area
     /// top inset (28 DIP fallback for common densities) so the app bar never sits under the clock.
     /// </summary>
+    /// <summary>Diagnostic: log the font family the visible text actually resolves to, plus system fonts.</summary>
+    private static void ProbeFonts(Control shell)
+    {
+        try
+        {
+            var families = shell.GetVisualDescendants()
+                .OfType<global::Avalonia.Controls.TextBlock>()
+                .Select(block => block.FontFamily?.Name ?? "<null>")
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Distinct()
+                .Take(12);
+            global::Android.Util.Log.Info("ArcFont", "text families: " + string.Join(", ", families));
+
+            var fonts = FontManager.Current.SystemFonts
+                .Select(family => family.Name)
+                .Where(name => name.Contains("Noto", System.StringComparison.OrdinalIgnoreCase)
+                               || name.Contains("CJK", System.StringComparison.OrdinalIgnoreCase)
+                               || name.Contains("sans", System.StringComparison.OrdinalIgnoreCase))
+                .Take(20);
+            global::Android.Util.Log.Info("ArcFont", "system fonts: " + string.Join(", ", fonts));
+        }
+        catch (System.Exception exception)
+        {
+            global::Android.Util.Log.Error("ArcFont", exception.ToString());
+        }
+    }
+
     private static void ApplySafeArea(Control shell)
     {
         var top = TopLevel.GetTopLevel(shell);
@@ -94,8 +124,11 @@ public class MobileApp : Application
         var topGap = padding.Top > 0 ? padding.Top : 28;
         var bottomGap = padding.Bottom > 0 ? padding.Bottom : 12;
         shell.Margin = new Thickness(0, topGap, 0, bottomGap);
+        ProbeFonts(shell);
     }
 }
+
+
 
 
 
