@@ -198,6 +198,24 @@ public static class ArcDocStore
                 // Resource-only or native assembly: skip.
             }
         }
+        // Android (and other bundled hosts) have no loose .dll files on disk: the assemblies live inside
+        // the APK/app bundle, so load every referenced Arc assembly explicitly before enumerating them.
+        foreach (var reference in Assembly.GetEntryAssembly()?.GetReferencedAssemblies() ?? Array.Empty<AssemblyName>())
+        {
+            if (reference.Name is null || !reference.Name.StartsWith("Arc.Avalonia", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            try
+            {
+                _ = Assembly.Load(reference);
+            }
+            catch
+            {
+                // Already loaded or not available in this host; the loop below simply skips it.
+            }
+        }
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -209,3 +227,4 @@ public static class ArcDocStore
         }
     }
 }
+
