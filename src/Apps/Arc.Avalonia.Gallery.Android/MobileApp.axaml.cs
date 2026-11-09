@@ -21,6 +21,21 @@ public class MobileApp : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        try
+        {
+            InitializeGallery();
+        }
+        catch (Exception exception)
+        {
+            global::Android.Util.Log.Error("ArcAppInit", exception.ToString());
+            throw;
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private void InitializeGallery()
+    {
         ArcThemeManager.Apply(this, ArcColorScheme.Light, ArcAccent.Neutral);
         ArcServiceProvider.Register<IFilePickerService>(StorageProviderFilePickerService.Instance);
         ArcServiceProvider.Register<IArcThemeService>(new ArcThemeService(this));
@@ -37,7 +52,6 @@ public class MobileApp : Application
             shell.AttachedToVisualTree += (_, _) => ApplySafeArea(shell);
         }
 
-        base.OnFrameworkInitializationCompleted();
     }
 
     /// <summary>
@@ -71,3 +85,5 @@ public class MobileApp : Application
         shell.Margin = new Thickness(0, topGap, 0, bottomGap);
     }
 }
+
+
