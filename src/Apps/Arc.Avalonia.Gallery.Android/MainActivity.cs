@@ -2,7 +2,9 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Avalonia;
 using Avalonia.Android;
+using Avalonia.Media;
 using Arc.Avalonia.Gallery;
 
 namespace Arc.Avalonia.Gallery.Android;
@@ -43,6 +45,20 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
     {
     }
 
+    /// <summary>
+    /// System font by default (no brand font pinning), but Android's default family does not always cover
+    /// CJK glyphs for body runs: fall back through the platform families so Chinese never renders as tofu.
+    /// </summary>
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
+        base.CustomizeAppBuilder(builder).With(new FontManagerOptions
+        {
+            FontFallbacks = new FontFallback[]
+            {
+                new() { FontFamily = new FontFamily("sans-serif") },
+                new() { FontFamily = new FontFamily("sans-serif-condensed") },
+            },
+        });
+
     public override void OnCreate()
     {
         try
@@ -56,3 +72,4 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
         }
     }
 }
+
