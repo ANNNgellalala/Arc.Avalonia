@@ -55,3 +55,6 @@
 * 静态：`pwsh tools/check-touch.ps1`（R11）——`wheel-only-scroll` / `missing-capture-lost` 为红项，其余为 warning/informational。
 * 运行时：`pwsh tools/mobile-smoke.ps1`（R12）——跑 `Gallery.dll --smoke --mobile` 并校验 `pageShows>=320 && failures=0`。
 * 手测：`dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --mobile`
+
+> 真机验证后的使用者建议（Android 宿主接入、布局、手势）见 [docs/25 手机端使用与开发建议](../25-mobile-usage-guidance.zh.md)。
+
