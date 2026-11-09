@@ -15,7 +15,7 @@ namespace Arc.Avalonia.Gallery.Android;
 /// </summary>
 [Activity(
     Label = "Arc Gallery",
-    Theme = "@android:style/Theme.Material.Light.NoActionBar",
+    Theme = "@style/ArcGalleryTheme",
     MainLauncher = true,
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode
@@ -30,7 +30,7 @@ public class MainActivity : AvaloniaMainActivity
 /// glyphs, so Chinese text would otherwise render as tofu boxes on the device).
 /// </summary>
 [Application]
-public class GalleryAndroidApplication : AvaloniaAndroidApplication<App>
+public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
 {
     protected GalleryAndroidApplication(nint javaReference, JniHandleOwnership transfer)
         : base(javaReference, transfer)
@@ -48,3 +48,5 @@ public class GalleryAndroidApplication : AvaloniaAndroidApplication<App>
                 },
             });
 }
+
+

@@ -21,7 +21,14 @@
     <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">C:\Users\ANNNgel\AppData\Local\Android\Sdk</AndroidSdkDirectory>
     <IsPackable>false</IsPackable>
     <!-- Plain adb install needs the managed assemblies inside the APK; otherwise the runtime expects the Fast Deployment override directory and aborts. -->
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <!-- Mirror the known-good SmartBill / DSHRemote Android hosts: no linker, no AOT, no trimming,
+         embed assemblies so a plain `adb install` starts (Debug default is fast-deploy). -->
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <PublishTrimmed>false</PublishTrimmed>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <ImplicitUsings>enable</ImplicitUsings>    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -34,8 +41,11 @@
 
   <ItemGroup>
     <!-- Reuse the desktop Gallery UI. Program.cs (desktop lifetime) is intentionally not linked. -->
-    <Compile Include="..\Arc.Avalonia.Gallery\App.axaml.cs" Link="Gallery\App.axaml.cs" />
-    <AvaloniaResource Include="..\Arc.Avalonia.Gallery\App.axaml" Link="App.axaml" />
+    <Compile Remove="..\Arc.Avalonia.Gallery\Framework\ShotRunner.cs" />
+    <Compile Remove="..\Arc.Avalonia.Gallery\Framework\CatalogAudit.cs" />
+    <Compile Remove="..\Arc.Avalonia.Gallery\Framework\ThemeReport.cs" />
+    <Compile Remove="..\Arc.Avalonia.Gallery\Framework\NavigationSmoke.cs" />
+    
     <Compile Include="..\Arc.Avalonia.Gallery\Framework\**\*.cs" Link="Gallery\Framework\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\Arc.Avalonia.Gallery\Pages\**\*.cs" Link="Gallery\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
@@ -81,6 +91,8 @@
     <Using Remove="Android.Widget" />
   </ItemGroup>
 </Project>
+
+
 
 
 

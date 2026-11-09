@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:arc="using:Arc.Avalonia.Theme"
+             x:Class="Arc.Avalonia.Gallery.Android.MobileApp"
+             RequestedThemeVariant="Light">
+  <Application.Styles>
+    <arc:ArcTheme />
+    <StyleInclude Source="avares://Arc.Avalonia.AgentUI/Themes/ArcAgentUITheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.LifeToday/Themes/ArcLifeTodayTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.Glass/Themes/ArcSpecialGlassTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.Motion/Themes/ArcSpecialMotionTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.Media/Themes/ArcSpecialMediaTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.AIWidgets/Themes/ArcSpecialAIWidgetsTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Special.AIExplainers/Themes/ArcSpecialAIExplainersTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.Marketing/Themes/ArcBlocksMarketingTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.Commerce/Themes/ArcBlocksCommerceTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.App/Themes/ArcBlocksAppTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.Team/Themes/ArcBlocksTeamTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.Data/Themes/ArcBlocksDataTheme.axaml" />
+    <StyleInclude Source="avares://Arc.Avalonia.Blocks.AI/Themes/ArcBlocksAITheme.axaml" />
+  </Application.Styles>
+</Application>

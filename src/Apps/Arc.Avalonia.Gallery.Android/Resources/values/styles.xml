@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Avalonia.Android hosts the view through an AppCompatActivity, so the activity theme must
+       descend from Theme.AppCompat; a plain android:Theme.Material.Light crashes with
+       "You need to use a Theme.AppCompat theme ... with this activity". -->
+  <style name="ArcGalleryTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowBackground">@android:color/white</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+  </style>
+</resources>
