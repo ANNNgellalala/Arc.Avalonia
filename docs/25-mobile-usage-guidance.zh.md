@@ -109,6 +109,14 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 4. `ArcSwipeActions` 的阈值/停靠手感尚未在真机逐项标定（下一轮 4 组手势 + 截图对比）。
 5. `ArcChatView` 消息行点选（`ArcVirtualList`）拖拽后仍可能选中——需 8px 抑制。
 
+## 5.1 Android 中英混排 CJK 豆腐块（未解决，实测结论）
+
+真机/模拟器同一页面里出现"**纯中文标题正常、中英混排正文全是 □□□**"：
+- 已试无效：`ArcFontBody = FontFamily.Default`；`ArcFontBody = "sans-serif"`；`ArcFontBody = "Noto Sans CJK SC"`（该族在测试机不存在，反而全豆腐）；`ArcFluentOverrides` 里覆写 `ContentControlThemeFontFamily = Default`。
+- 结论：正文文本并非走 `ArcFontBody` 的样式路径（ArcBaseStyles 的 `TextBlock` setter 未生效或优先级低于 Fluent 的隐式 ControlTheme），实际继承的是 Fluent/Inter（Inter 无 CJK 字形），而标题类元素显式用了 `ArcFontDisplay` 才正常。
+- 下一轮方案：① 用 `ControlTheme`/`Style` 在 `TextBlock` 上强制 `FontFamily`（提高优先级），或② 删掉 `Avalonia.Fonts.Inter` 依赖、让 Fluent 的默认字体回落到平台默认，或③ 内嵌 CJK 字体子集作为 body 字体（最稳，体积 2–3 MB）。
+- 给使用者的建议：**在 Android 上不要依赖 `FontFamily.Default` 的逐字回退**——Avalonia 12 + Skia 在混排文本里不会逐字替换字体；要么把正文字体显式设成系统 CJK 族，要么内嵌 CJK 字体。
+
 ## 6. 给使用者的 10 条检查清单
 
 - [ ] Activity 主题继承 `Theme.AppCompat.*`（否则启动即崩）
@@ -121,3 +129,4 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - [ ] 命中区 ≥44×44，滚动条不常驻
 - [ ] 滑动组件：8–10px 起判、方向锁、capture 丢失复位、35% 停靠
 - [ ] 流式/自动滚动不抢手指，回底才恢复跟随
+

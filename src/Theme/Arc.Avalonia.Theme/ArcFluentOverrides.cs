@@ -135,6 +135,11 @@ public static class ArcFluentOverrides
         dictionary[ArcFluentKeys.ScrollBarTrackStroke] = Brushes.Transparent;
         dictionary[ArcFluentKeys.ScrollBarBackground] = Brushes.Transparent;
 
+        // Mixed Latin+CJK runs inherit Fluent's content font, which points at Inter by default; Inter has no
+        // CJK glyphs, so body copy rendered as tofu on Android. Point it at the platform default family.
+        dictionary["ContentControlThemeFontFamily"] = FontFamily.Default;
+
         return dictionary;
     }
 }
+
