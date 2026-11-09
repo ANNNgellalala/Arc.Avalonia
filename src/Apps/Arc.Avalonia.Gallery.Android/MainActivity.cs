@@ -29,3 +29,30 @@ public class MainActivity : AvaloniaMainActivity
         base.OnCreate(savedInstanceState);
     }
 }
+
+/// <summary>
+/// Avalonia's Android application object, which performs the AppBuilder setup. Without this
+/// [Application] class the default Android Application is used, Avalonia never initialises and the
+/// activity dies with "AvaloniaView initialization has failed".
+/// </summary>
+[Application]
+public class GalleryAndroidApplication : AvaloniaAndroidApplication<MobileApp>
+{
+    protected GalleryAndroidApplication(nint javaReference, JniHandleOwnership transfer)
+        : base(javaReference, transfer)
+    {
+    }
+
+    public override void OnCreate()
+    {
+        try
+        {
+            base.OnCreate();
+        }
+        catch (System.Exception exception)
+        {
+            global::Android.Util.Log.Error("ArcAppInit", "application create failed: " + exception);
+            throw;
+        }
+    }
+}

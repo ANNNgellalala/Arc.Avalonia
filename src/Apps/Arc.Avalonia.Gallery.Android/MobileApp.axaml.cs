@@ -17,7 +17,18 @@ public class MobileApp : Application
     /// <summary>The live shell, so the Android host can route the hardware back button to the drawer.</summary>
     public static GalleryShell? CurrentShell { get; private set; }
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        try
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+        catch (Exception exception)
+        {
+            global::Android.Util.Log.Error("ArcAppInit", "Initialize failed: " + exception);
+            throw;
+        }
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -85,5 +96,6 @@ public class MobileApp : Application
         shell.Margin = new Thickness(0, topGap, 0, bottomGap);
     }
 }
+
 
 
