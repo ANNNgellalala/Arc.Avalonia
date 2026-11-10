@@ -66,44 +66,6 @@ internal static class ArcChatUi
         return icon;
     }
 
-    /// <summary>Round initials avatar; loads an image when the participant has one.</summary>
-    public static Border Avatar(ArcChatParticipant? participant, bool own, double diameter = 28)
-    {
-        var border = new Border
-        {
-            Width = diameter,
-            Height = diameter,
-            CornerRadius = new CornerRadius(diameter / 2),
-            BorderThickness = new Thickness(1),
-            ClipToBounds = true,
-            VerticalAlignment = VerticalAlignment.Top,
-        };
-
-        border.Paint(Border.BorderBrushProperty, own ? ArcTokens.Accent : ArcTokens.BorderSubtle);
-        var image = LoadAvatar(participant?.Avatar);
-        if (image is not null)
-        {
-            border.Background = image;
-        }
-        else
-        {
-            border.Paint(Border.BackgroundProperty, own ? ArcTokens.AccentSubtle : ArcTokens.SurfaceMuted);
-            var initials = new TextBlock
-            {
-                Text = Initials(participant?.Name),
-                FontSize = Math.Max(10, diameter * 0.36),
-                FontWeight = FontWeight.Medium,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            initials.Paint(TextBlock.ForegroundProperty, own ? ArcTokens.AccentStrong : ArcTokens.TextSecondary);
-            border.Child = initials;
-        }
-
-        AutomationProperties.SetName(border, participant?.Name ?? "Avatar");
-        return border;
-    }
-
     private static ImageBrush? LoadAvatar(string? source)
     {
         if (string.IsNullOrWhiteSpace(source))
@@ -206,3 +168,4 @@ internal static class ArcChatUi
         return pill;
     }
 }
+

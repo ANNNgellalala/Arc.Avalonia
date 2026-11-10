@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    L2 Chat family: one message model, one bubble surface and one composer for human chat, AI answers and
+    L2 Chat family: one upstream message model (PuraChatMessage), one composer for human chat, AI answers and
     agent conversations. The body of every bubble is ArcMarkdownView (Arc.Avalonia.Markdown is the single
     Markdown renderer in the solution); the agent layer composes bubbles with full-width event cards
     instead of inventing a second chat control.
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="PuraMarkdown.Agent" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,3 +33,4 @@
     <InternalsVisibleTo Include="Arc.Avalonia.AgentUI" />
   </ItemGroup>
 </Project>
+
