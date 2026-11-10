@@ -1,5 +1,5 @@
 {
-  "$comment": "R3 外部依赖策略（docs/13 §2.2 + docs/14 §3.2）。check-deps.ps1 用它做 fail-closed 判定：默认拒绝；deny 优先级高于 allow；任何 Avalonia.* 不在白名单内一律拒绝。修改本文件需在 docs/adr/0002-dependency-policy.md 记录理由。",
+  "$comment": "R3 外部依赖策略（docs/13 §2.2 + docs/14 §3.2）。check-deps.ps1 用它做 fail-closed 判定：默认拒绝；deny 优先级高于 allow；任何 Avalonia.* 不在白名单内一律拒绝。修改白/黑名单需在 docs/adr/0002-dependency-policy.md 记录；PuraMarkdown.Agent 的有范围例外见 docs/adr/0007-agent-chat-puramarkdown-bridge.md。",
   "version": 1,
   "scan": {
     "publishRoots": [
@@ -35,7 +35,16 @@
     { "id": "Avalonia.Controls.DataGrid", "scope": "featureOnly" },
     { "id": "Avalonia.Controls.ColorPicker", "scope": "featureOnly" },
     { "id": "PuraMarkdown.Core", "scope": "libraries" },
-    { "id": "Markdig", "scope": "libraries" }
+    { "id": "Markdig", "scope": "libraries" },
+    {
+      "id": "PuraMarkdown.Agent",
+      "scope": "agentChatBridge",
+      "allowedProjects": [
+        "src/Components/Arc.Avalonia.Chat/*.csproj",
+        "src/Agent/Arc.Avalonia.Agent/*.csproj"
+      ],
+      "note": "第三方 Avalonia UI 控件库（ADR 0007 有范围例外）：只允许 Arc.Avalonia.Chat 与 Arc.Avalonia.Agent 直接引用；Markdown/Foundation/其它包仍只允许 PuraMarkdown.Core（+ Markdig）。"
+    }
   ],
   "allowedTransitive": [
     "Avalonia.Angle.Windows.Natives",
@@ -52,7 +61,13 @@
     "HarfBuzzSharp",
     "MicroCom.Runtime",
     "SkiaSharp",
-    "Tmds.DBus.Protocol"
+    "Tmds.DBus.Protocol",
+    "PuraMarkdown.Agent",
+    "Avalonia.Controls.ItemsRepeater",
+    "JsonSchema.Net",
+    "JsonPointer.Net",
+    "Json.More.Net",
+    "Humanizer.Core"
   ],
   "allowedTransitivePatterns": [
     "SkiaSharp.NativeAssets.*",
@@ -113,6 +128,7 @@
     "闭包来源：obj/project.assets.json 的 targets.<tfm>.*.dependencies，含 project 类型节点继续下钻，因此“官方附加控件/项目引用间接带来第三方包”也会被抓到。",
     "Avalonia 本体（Avalonia、Avalonia.Base、Avalonia.Controls、Avalonia.Markup.Xaml、Avalonia.Themes.Fluent）属于 L0 官方平台，不计为外部 UI 框架。",
     "PuraMarkdown.Core（MIT）是 PuraMarkdown 的解析层：只依赖 Markdig、不依赖 Avalonia，是 Markdown 组件族的语法契约（ADR 0006）。Markdig 是它的解析依赖。两者都不是 UI 组件库；Arc.Avalonia.Markdown 只消费 AST/诊断/大纲，所有控件/主题/交互仍由 Arc 实现。",
+    "PuraMarkdown.Agent（MIT）是第三方 Avalonia UI 控件库，属 ADR 0007 的有范围例外：只允许 Arc.Avalonia.Chat / Arc.Avalonia.Agent **直接 PackageReference**；Theme/Meta/All 等通过 Chat/Agent 间接获得属正常传递闭包（allowedTransitive 放行）。其传递链为 Avalonia.Controls.ItemsRepeater、JsonSchema.Net → JsonPointer.Net → Json.More.Net / Humanizer.Core。Arc.Avalonia.Markdown 与其它发布包不得**直接**引用。",
     "Avalonia.Desktop 只允许应用（src/Apps）直接引用；发布库不得引用。",
     "M1-T1 出库后 src/Docs（Arc.Avalonia.Docs / Docs.Abstractions）是叶子工程（app 层），默认不扫描；-IncludeApps 时按应用规则检查。"
   ]

@@ -1,8 +1,9 @@
 # Third-party notices
 
-Arc for Avalonia ships only Avalonia's official packages as NuGet dependencies; every control,
-theme, chart and surface in this repository is our own XAML/C#. The items below are the third-party
-works whose code, assets, fonts or design language reach consumers of these packages.
+Arc for Avalonia ships Avalonia's official packages as its baseline; every control, theme, chart and
+surface in this repository is our own XAML/C# **except** the Agent/Chat rendering surface, which
+delegates to `PuraMarkdown.Agent` under ADR 0007's scoped exception. The items below are the
+third-party works whose code, assets, fonts or design language reach consumers of these packages.
 
 ## Runtime dependencies (NuGet)
 
@@ -12,14 +13,19 @@ works whose code, assets, fonts or design language reach consumers of these pack
 | [Avalonia.Themes.Fluent](https://github.com/AvaloniaUI/Avalonia) | MIT | Official Fluent baseline that `ArcTheme` adapts on top of |
 | [Avalonia.Fonts.Inter](https://github.com/AvaloniaUI/Avalonia) | MIT | Inter font package used as the Arc body font |
 | [PuraMarkdown.Core](https://github.com/) (local package `0.1.0-alpha.1`) | MIT | Markdown parsing, Markdig AST facade, diagnostics/outline, stable-boundary streaming scanner for `Arc.Avalonia.Markdown` (ADR 0006). No Avalonia dependency and no UI code. |
+| [PuraMarkdown.Agent](https://github.com/) (local package `0.1.0-alpha.1`) | MIT | Avalonia rendering controls + Chat + Agent components + Testing. **Scoped exception (ADR 0007)**: only `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` may reference it; `Arc.Avalonia.Markdown` and other packages may not. |
+| `Avalonia.Controls.ItemsRepeater` (`12.0.0`, transitive via `PuraMarkdown.Agent`) | MIT | Items repeater/virtualization primitive used by the upstream Chat/Agent rendering controls |
+| `JsonSchema.Net` (`9.6.0`, transitive via `PuraMarkdown.Agent`) | MIT | JSON Schema validation for upstream `pura-agent` fence payloads; pulls `JsonPointer.Net` → `Json.More.Net` and `Humanizer.Core` |
 | [Markdig](https://github.com/xoofx/markdig) (transitive via `PuraMarkdown.Core`) | BSD-2-Clause | CommonMark/GFM parser used by the Markdown syntax layer |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) (transitive via `Avalonia.Skia`) | MIT | 2D rendering backend |
 | [HarfBuzzSharp](https://github.com/mono/SkiaSharp) (transitive via `Avalonia.Skia`) | MIT | Text shaping backend |
 
 No other third-party NuGet package is referenced by the publishable libraries. The dependency
-whitelist is enforced by `tools/check-package.ps1` and `tools/check-deps.ps1`. The only two
-non-Avalonia runtime packages are the Markdown syntax layer and its Markdig parser, and both are
-confined to `Arc.Avalonia.Markdown` (ADR 0006); no third-party UI component library is used.
+whitelist is enforced by `tools/check-package.ps1` and `tools/check-deps.ps1`: `PuraMarkdown.Core`
+and `Markdig` are confined to `Arc.Avalonia.Markdown` (ADR 0006), while `PuraMarkdown.Agent` and its
+transitive chain are confined to `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` (ADR 0007). No other
+third-party UI component library is used. The Agent/Chat scoped exception was requested by the user
+and is auditable in `tools/deps-policy.json` (`agentChatBridge`) and `tools/check-package.ps1`.
 
 ## Fonts
 

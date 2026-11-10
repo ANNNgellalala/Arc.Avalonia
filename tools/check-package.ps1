@@ -57,6 +57,11 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 # shape check below; they are not expected to aggregate the Feature packages.
 # ---------------------------------------------------------------------------
 $allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid', 'PuraMarkdown.Core', 'Markdig')
+# 按包放行的外部依赖（ADR 0007）：PuraMarkdown.Agent 只允许 Chat/Agent 声明；Markdown 仍只有 Core+Markdig。
+$allowedExternalByPackage = @{
+    'Arc.Avalonia.Chat'  = @('PuraMarkdown.Agent')
+    'Arc.Avalonia.Agent' = @('PuraMarkdown.Agent')
+}
 
 # Layer families the meta packages must aggregate (dependency-shape contract for Arc.Avalonia / .All).
 $components = @(
@@ -248,9 +253,10 @@ foreach ($file in $nupkgs) {
     if (-not $hasNoticesFile) { $issues.Add((New-Issue -Package $pkg.Id -Code 'package.notices' -Message '包根缺少 THIRD-PARTY-NOTICES.md')) }
 
     # --- dependencies -------------------------------------------------------
+    $packageAllowedExternal = @($allowedExternalByPackage[$pkg.Id] | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
     foreach ($dep in $pkg.Dependencies) {
         $isArc = $dep.id -like 'Arc.Avalonia*'
-        $isAllowedExternal = $allowedExternal -contains $dep.id
+        $isAllowedExternal = ($allowedExternal -contains $dep.id) -or ($packageAllowedExternal -contains $dep.id)
         if (-not $isArc -and -not $isAllowedExternal) {
             $issues.Add((New-Issue -Package $pkg.Id -Code 'package.dependency' -Message "非白名单依赖：$($dep.id) $($dep.version)"))
         }

@@ -38,11 +38,29 @@ PuraMarkdown 把 3 个包改名为职责对齐的 id，并同步对齐命名空�
 | 旧 | 新 | Arc 是否使用 |
 | --- | --- | --- |
 | `PuraMarkdown.Syntax` | **`PuraMarkdown.Core`**（Markdig 解析、`PuraDocument`、大纲、诊断、流式扫描；无 Avalonia） | ✅ 唯一使用 |
-| `PuraMarkdown`（UI 控件） | `PuraMarkdown.Agent`（Avalonia 渲染控件 + Agent/Chat/Testing） | ❌ 不使用（Arc 自己渲染） |
+| `PuraMarkdown`（UI 控件） | `PuraMarkdown.Agent`（Avalonia 渲染控件 + Agent/Chat/Testing） | ⚠️ 部分使用：仅 Chat/Agent 与 Agent 迁移委托（ADR 0007）；Markdown 包仍不使用 |
 | `PuraMarkdown.Plugins` | `PuraMarkdown.Extension`（ColorCode/Mermaid，渲染引擎依赖只在此包） | ❌ 不使用 |
 
 命名空间映射：`PuraMarkdown.Syntax` / 根 `PuraMarkdown` → **`PuraMarkdown.Core`**；`PuraMarkdown.Security` → **`PuraMarkdown.Core.Security`**。版本仍为 `0.1.0-alpha.1`。
 Arc 侧同步修改：`Directory.Packages.props`、`Arc.Avalonia.Markdown.csproj`、Markdown 包内 using、测试、`tools/deps-policy.json`、`tools/check-package.ps1`、README/ADR 0006/第三方声明。
+
+## 1.2 Chat/Agent 渲染改由 PuraMarkdown.Agent 承担（2026-11-11，ADR 0007）
+
+按 [docs/29](29-puramarkdown-agent-migration.zh.md) §4 的决策，`Arc.Avalonia.Chat` 与 `Arc.Avalonia.Agent`
+的聊天/Agent 渲染（消息气泡、流式正文、工具卡片、choice/confirm、Agent fence）委托上游
+**`PuraMarkdown.Agent`**；Arc 不再自研同层渲染器，保留 Agent 表现运行时、布局壳、composer 输入框、
+审批/注意力 UI 与主题适配（`ArcChatThemeAdapter` → `PuraTheme`）。
+
+依赖边界（ADR 0007 有范围例外）：
+
+* `PuraMarkdown.Agent` 只允许 `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` **直接引用**；
+* 本包（`Arc.Avalonia.Markdown`）与 Foundation/其它 L2/L3 包仍只允许 `PuraMarkdown.Core`（+ `Markdig`），
+  不随 Chat/Agent 迁移改变渲染实现；
+* 传递依赖 `Avalonia.Controls.ItemsRepeater`、`JsonSchema.Net`（→ `JsonPointer.Net` / `Json.More.Net` /
+  `Humanizer.Core`）只在经此例外路径进入闭包，`tools/check-deps.ps1` 的 `agentChatBridge` scope 会拒绝越界包；
+* 许可证与用途登记在 [`THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md)。
+
+Chat/Agent 的目标 API、删除清单与兼容性见 [docs/29](29-puramarkdown-agent-migration.zh.md) §2–§5。
 
 ## 2. 包内容
 
@@ -52,7 +70,7 @@ Arc 侧同步修改：`Directory.Packages.props`、`Arc.Avalonia.Markdown.csproj
 | `ArcMarkdownDocumentView` | 已解析 `PuraDocument` 的渲染宿主（宿主自己解析/缓存 AST 时使用） |
 | `ArcMarkdownCodeBlock` | 围栏代码：语言标签、行号、token 高亮、复制、长代码折叠 |
 | 节点渲染器 | CommonMark + GFM 全节点矩阵：heading/paragraph/quote/list/task list/table/code/thematic break/html 回退/强调/行内代码/链接/图片/自动链接/换行 |
-| `pura-agent` 组件 | `Arc.Avalonia.Agent` 提供 choice/confirm 控件与 JSON 解析，作为 `IArcMarkdownFenceRenderer` 注册；消息气泡/聊天输入在 `Arc.Avalonia.Chat`（见 [docs/22](22-chat-agent-refactor.zh.md)） |
+| `pura-agent` 组件 | Chat/Agent 侧改由 `PuraMarkdown.Agent` 的 `AgentPlugin`/`PuraToolCallCard`/choice/confirm 承担（ADR 0007）；本包只消费 Core 的 AST/诊断，不依赖该 UI 库 |
 | 平台契约 | 图片加载、链接打开、剪贴板、本地化都可注入；默认离线安全 |
 | 主题 | `<arc:ArcTheme/>` 已聚合 `ArcMarkdownTheme.axaml`；所有颜色/字号/圆角走 token |
 
@@ -151,7 +169,7 @@ view.SetInteractionState(...);    // 持久化/虚拟化恢复
 * `dotnet build ArcUI.slnx` 0 error；
 * gallery `--audit` / `--smoke` 通过，新增 Markdown 页面在 light/dark 下可渲染；
 * `Arc.Avalonia.Verify` 覆盖：全节点矩阵、流式完成=全量、边界切分、Agent 组件交互；Chat 断言见 docs/22；
-* 9 个仓库门禁（`tools/check-all.ps1`）绿，`check-package` 依赖闭包包含 `PuraMarkdown.Core` / `Markdig` 且无其它第三方 UI 库。
+* 11 个仓库门禁（`tools/check-all.ps1`）绿；`check-package` 中本包依赖闭包只含 `PuraMarkdown.Core` / `Markdig`，`PuraMarkdown.Agent` 仅允许出现在 Chat/Agent 包（ADR 0007）。
 
 ## 7. 已知限制
 

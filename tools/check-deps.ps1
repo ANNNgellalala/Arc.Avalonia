@@ -73,7 +73,9 @@ function Get-DepsPolicyVerdict {
     param(
         [Parameter(Mandatory)][string]$PackageId,
         [bool]$IsApp,
-        [bool]$IsFeature
+        [bool]$IsFeature,
+        [string]$ProjectRel = '',
+        [bool]$IsDirectPackage = $false
     )
     # 1) deny 优先（直接或传递命中都拒绝）
     if (Test-PolicyExactId -Id $PackageId -Ids @($policy.denied.exact)) {
@@ -98,6 +100,23 @@ function Get-DepsPolicyVerdict {
             'featureOnly' {
                 if ($IsFeature) { return [pscustomobject]@{ allowed = $true; category = 'feature'; kind = ''; reason = 'Feature 专用官方包' } }
                 return [pscustomobject]@{ allowed = $false; category = 'scope'; kind = 'feature-package-outside-feature'; reason = '只允许 Arc.Avalonia.Feature.* 发布包引用（R7）' }
+            }
+            'agentChatBridge' {
+                # ADR 0007 有范围例外：只校验“直接 PackageReference”（Chat/Agent）。
+                # 经 Chat/Agent 链条传递到 Theme/Meta/All 的 PuraMarkdown.Agent 属正常闭包，交给 allowedTransitive。
+                if (-not $IsDirectPackage) {
+                    return [pscustomobject]@{ allowed = $true; category = 'agent-chat-bridge-transitive'; kind = ''; reason = 'PuraMarkdown.Agent 传递依赖；直接引用范围由 agentChatBridge 校验' }
+                }
+                $allowed = $false
+                if ($null -ne $entry.PSObject.Properties['allowedProjects']) {
+                    foreach ($pattern in @($entry.allowedProjects)) {
+                        if (Test-GatesGlobMatch -Name $ProjectRel -Pattern ([string]$pattern)) { $allowed = $true; break }
+                    }
+                }
+                if ($allowed) {
+                    return [pscustomobject]@{ allowed = $true; category = 'agent-chat-bridge'; kind = ''; reason = 'ADR 0007 有范围例外：Chat/Agent 直接引用 PuraMarkdown.Agent' }
+                }
+                return [pscustomobject]@{ allowed = $false; category = 'scope'; kind = 'agent-chat-bridge-outside-scope'; reason = 'PuraMarkdown.Agent 只允许 Arc.Avalonia.Chat / Arc.Avalonia.Agent 直接 PackageReference（ADR 0007）' }
             }
             default {
                 return [pscustomobject]@{ allowed = $true; category = 'direct'; kind = ''; reason = '官方直接依赖' }
@@ -196,7 +215,8 @@ function Invoke-DepsClosureScan {
         [Parameter(Mandatory)][string]$ProjectLabel,
         [bool]$IsApp = $false,
         [bool]$IsFeature = $false,
-        [object]$PackageIdLookup = $null
+        [object]$PackageIdLookup = $null,
+        [System.Collections.Generic.HashSet[string]]$DirectPackages = $null
     )
     $result = New-DepsScanResult
     $assets = $null
@@ -397,7 +417,8 @@ function Invoke-DepsClosureScan {
                     if ($nodeCmps.ContainsKey($_)) { $nodeCmps[$_].Id } else { $_ }
                 })
             if ($node.Type -eq 'project') { [void]$projectRefIds.Add($canonicalId); continue }
-            $verdict = Get-DepsPolicyVerdict -PackageId $canonicalId -IsApp $IsApp -IsFeature $IsFeature
+            $isDirectPackage = ($null -ne $DirectPackages -and $DirectPackages.Contains($canonicalId))
+            $verdict = Get-DepsPolicyVerdict -PackageId $canonicalId -IsApp $IsApp -IsFeature $IsFeature -ProjectRel $ProjectLabel -IsDirectPackage $isDirectPackage
             if (-not $categories.ContainsKey($verdict.category)) { $categories[$verdict.category] = 0 }
             $categories[$verdict.category]++
             if ($verdict.category -eq 'build-only') {
@@ -611,7 +632,22 @@ foreach ($project in $projects) {
             continue
         }
     }
-    $scan = Invoke-DepsClosureScan -AssetsPath $assetsPath -ProjectLabel $project.Rel -IsApp $isApp -IsFeature $isFeature -PackageIdLookup $packageIdLookup
+    # 直接 PackageReference 集合（用于 agentChatBridge 等“只限直接引用”的 scope；传递依赖交给 allowedTransitive）。
+    $directPackages = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    if (Test-Path -LiteralPath $project.Path) {
+        try {
+            [xml]$csprojXml = Get-Content -LiteralPath $project.Path -Raw -Encoding utf8
+            foreach ($prNode in @($csprojXml.SelectNodes('//PackageReference'))) {
+                $include = [string]$prNode.GetAttribute('Include')
+                if (-not [string]::IsNullOrWhiteSpace($include)) { [void]$directPackages.Add($include.Trim()) }
+            }
+        }
+        catch {
+            $scanErrors++
+            Add-GatesItem -Rule $rule -Severity 'new' -Kind 'scan-error' -Project $project.Rel -Detail "csproj 解析失败（无法判断直接 PackageReference）: $($_.Exception.Message)"
+        }
+    }
+    $scan = Invoke-DepsClosureScan -AssetsPath $assetsPath -ProjectLabel $project.Rel -IsApp $isApp -IsFeature $isFeature -PackageIdLookup $packageIdLookup -DirectPackages $directPackages
     foreach ($err in $scan.Errors) {
         $scanErrors++
         Add-GatesItem -Rule $rule -Severity 'new' -Kind 'scan-error' -Project $project.Rel -Detail $err
@@ -638,6 +674,7 @@ if ($buildOnlySeen.Count -gt 0) {
     $rule.notes.Add("build-only 已从发布闭包剔除 $($buildOnlySeen.Count) 个: $(@($buildOnlySeen) -join ', ')（编译期 analyzer/tooling，见 deps-policy.buildOnlyPackages）")
 }
 $rule.notes.Add('节点键 = csproj PackageId（缺省 AssemblyName，再缺省工程名）；libraries[].path 按 NuGet 语义相对工程目录解析。')
+$rule.notes.Add('agentChatBridge（PuraMarkdown.Agent）只校验 csproj 的直接 PackageReference；经 Chat/Agent 传递到 Theme/Meta/All 的依赖走 allowedTransitive 白名单。')
 $rule.notes.Add("R3 当前无 known-red 基线：任何命中都是新增违规，必须修。")
 $report.notes.Add('Apps 与发布库共用同一策略；Avalonia.Desktop 只在 -IncludeApps 扫描 src/Apps 时判定为应用专用合法。')
 $report.notes.Add('SelfTest: pwsh -NoProfile tools/check-deps.ps1 -SelfTest')
