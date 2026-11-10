@@ -8,8 +8,9 @@
 
 .DESCRIPTION
     Scans src/Agent/Arc.Avalonia.Agent/**/*.cs for the forbidden symbol names listed in
-    tools/BannedSymbols.txt, and checks the project's ProjectReference allow-list (Foundation,
-    Components, sibling Agent projects, Avalonia packages only). Writes a gates-compatible JSON report.
+    tools/BannedSymbols.txt, and checks the project's ProjectReference/PackageReference allow-list
+    (Foundation, Components, sibling Agent projects, Avalonia official packages; PuraMarkdown.Agent
+    is the ADR 0007 scoped exception for Agent/Chat rendering). Writes a gates-compatible JSON report.
 
 .PARAMETER Quiet
     Only print the one-line summary.
@@ -104,7 +105,8 @@ if (Test-Path -LiteralPath $project) {
 
     foreach ($reference in @($xml.SelectNodes('//PackageReference'))) {
         $id = [string]$reference.Include
-        if ($id -ne 'Avalonia' -and $id -ne 'Microsoft.CodeAnalysis.BannedApiAnalyzers') {
+        # PuraMarkdown.Agent 是 ADR 0007 的 Agent/Chat 渲染有范围例外；其余第三方 UI 库仍禁止。
+        if ($id -ne 'Avalonia' -and $id -ne 'Microsoft.CodeAnalysis.BannedApiAnalyzers' -and $id -ne 'PuraMarkdown.Agent') {
             $issues.Add([pscustomobject]@{
                     code   = 'package-outside-allowlist'
                     file   = 'src/Agent/Arc.Avalonia.Agent/Arc.Avalonia.Agent.csproj'
@@ -123,7 +125,8 @@ $report = [ordered]@{
     notes       = @(
         '主门禁: Microsoft.CodeAnalysis.BannedApiAnalyzers（RS0030 -> error）',
         '本脚本是离线兜底；不替代 analyzer。',
-        '允许的依赖: L1 Foundation, L2 Components, L4 AgentUI, Avalonia 官方包。'
+        '允许的依赖: L1 Foundation, L2 Components, L4 AgentUI, Avalonia 官方包。',
+        'PuraMarkdown.Agent: ADR 0007 有范围例外（Agent/Chat 渲染委托）；其它第三方 UI 组件库仍禁止。'
     )
 }
 $reportPath = Join-Path $OutDir 'agent-boundary-latest.json'
