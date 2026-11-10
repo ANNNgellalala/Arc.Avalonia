@@ -26,9 +26,12 @@
     <!-- Markdown 组件族：PuraMarkdown 语法层 + 其 Markdig 解析依赖（ADR 0006）。
          PuraMarkdown.Core 只依赖 Markdig、不依赖 Avalonia；渲染全部由 Arc 实现。 -->
     <PackageVersion Include="PuraMarkdown.Core" Version="0.1.0-alpha.1" />
+    <!-- Agent/Chat rendering engine: UI controls for markdown, chat and pura-agent components. Allowed only in Arc.Avalonia.Chat / Arc.Avalonia.Agent (ADR 0007). -->
+    <PackageVersion Include="PuraMarkdown.Agent" Version="0.1.0-alpha.1" />
     <PackageVersion Include="Markdig" Version="1.5.1" />
   </ItemGroup>
 </Project>
+
 
 
 
