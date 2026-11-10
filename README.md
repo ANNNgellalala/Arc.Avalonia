@@ -94,8 +94,8 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 | `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
 | `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media,Chat}` | L2 component families | you prefer component-level dependencies |
 | `Arc.Avalonia.Markdown` | L2 Markdown family: PuraMarkdown syntax + Arc renderers (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownCodeBlock`), streaming sessions, highlighter, plugin/fence contracts | you render Markdown documents, AI answers or agent message bodies |
-| `Arc.Avalonia.Chat` | L2 chat family: bubble conversation (`ArcChatView`, `ArcChatBubble`) and composer (`ArcChatComposer`); Markdown bodies, grouping, virtualization-ready list, streaming slot and delivery/status lines. `ArcChatThread` is an obsolete alias | you build chat, AI answers or an agent conversation |
-| `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` / `ArcAgentConversation` and the choice/confirm cards | building an agent UI on your own runtime |
+| `Arc.Avalonia.Chat` | L2 chat family: `ArcChatView` hosts `PuraChatView` from **PuraMarkdown.Agent** (messages, Markdown/pura-agent rendering, streaming, snapshots all upstream) + Arc-token theme mapping (`ArcChatThemeAdapter`) + `ArcChatComposer` input surface | you build chat, AI answers or an agent conversation |
+| `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` / `ArcAgentConversation`; transcript rendering, tool-call cards and pura-agent choice/confirm components come from **PuraMarkdown.Agent** (ADR 0007) | building an agent UI on your own runtime |
 | `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent leaf controls and life surfaces (run bar, approval sheet, background dock, attention inbox) | agent / daily-planning UI |
 | `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
 
@@ -389,6 +389,7 @@ the root of every NuGet package.
 * Fonts: **Inter** (SIL Open Font License) via `Avalonia.Fonts.Inter`.
 * The full third-party list (runtime packages, SkiaSharp/HarfBuzzSharp, fonts, icons, Arc UI, and the
   AG-UI semantic-only reference) is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
 
 
 

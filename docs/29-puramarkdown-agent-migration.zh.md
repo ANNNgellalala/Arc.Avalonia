@@ -28,7 +28,9 @@
 public sealed class ArcChatView : ContentControl          // 内部 Host = PuraChatView
 {
     public ObservableCollection<PuraChatMessage> Messages { get; }   // 上游模型
+    public PuraChatView Host { get; }                                  // 上游视图
     public PuraMarkdownOptions? Options { get; set; }                 // 由 ArcChatThemeAdapter 构建
+    public bool ShowComposer / Placeholder / AllowAttachments { get; set; }
     public void AddMessage(PuraChatMessage message);
     public void UpdateMessage(PuraChatMessage message);
     public bool RemoveMessage(string messageId);
@@ -39,7 +41,7 @@ public sealed class ArcChatView : ContentControl          // 内部 Host = PuraC
     public void RestoreSnapshot(PuraChatSnapshot snapshot);
     public PuraChatAutoScrollMode AutoScrollMode { get; set; }
 }
-public static class ArcChatThemeAdapter { public static PuraMarkdownOptions Create(PuraPipeline pipeline); }
+public static class ArcChatThemeAdapter { public static PuraMarkdownOptions CreateOptions(); public static PuraPipeline BuildPipeline(); }
 
 // Arc.Avalonia.Agent
 public sealed class ArcAgentConversation : ContentControl   // ArcChatView + Agent pipeline
@@ -73,3 +75,4 @@ public sealed class ArcAgentConversation : ContentControl   // ArcChatView + Age
 4. `check-all 11/11`（R3 依赖闭包含 `PuraMarkdown.Agent` 与其传递依赖；R5 包依赖声明正确）；
 5. `check-public-api` 更新基线；
 6. 真机 Gallery：Chat 页与 Agent 页可交互（发消息、流式、工具卡/choice/confirm）。
+
