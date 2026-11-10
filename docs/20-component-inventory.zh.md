@@ -109,7 +109,7 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 
 | 包 | 控件/内容 |
 |---|---|
-| `Arc.Avalonia.Agent`（2,746 行） | **6 个组合控件**：`ArcAgentSurface`（组合根）、`ArcAgentConversation`（气泡 + 工具/推理/审批事件卡）、`ArcAgentChoiceCard`（含 free text / defer，合并旧 AskCard）、`ArcAgentConfirmCard`、`ArcAgentToolCallCard`、`ArcAgentApprovalTray`。**表现运行时**：`IArcAgentWorkspace`/`IArcAgentSession` 纯 reducer、`ArcAgentEvent` 事件模型（消息模型统一为 Chat 包 `ArcChatMessage`）、`ArcDeltaCoalescer`（Dispatcher 批处理，无定时器）、`ArcApprovalQueue`/`ArcAttentionQueue`/`ArcArtifactIndex`、`ArcAgentItemViewRegistry`、宿主接缝 `IArcAgentTransport`/`IArcAgentCommandSink`/`IArcAgentServices`。边界由 BannedApiAnalyzers（RS0030→error）+ R9 门禁守住 |
+| `Arc.Avalonia.Agent` | **3 个组合控件**：`ArcAgentSurface`（组合根）、`ArcAgentConversation`（`ArcChatView` + 会话投影，渲染由 PuraMarkdown.Agent 提供，见 §13）、`ArcAgentApprovalTray`。**表现运行时**：`IArcAgentWorkspace`/`IArcAgentSession` 纯 reducer、`ArcAgentEvent` 事件模型（消息模型统一为 Chat 包 `ArcChatMessage`）、`ArcDeltaCoalescer`（Dispatcher 批处理，无定时器）、`ArcApprovalQueue`/`ArcAttentionQueue`/`ArcArtifactIndex`、`ArcAgentItemViewRegistry`、宿主接缝 `IArcAgentTransport`/`IArcAgentCommandSink`/`IArcAgentServices`。边界由 BannedApiAnalyzers（RS0030→error）+ R9 门禁守住 |
 | `Arc.Avalonia.AgentUI`（3,176 行） | **4 个叶子控件**：`ArcRunControlBar`、`ArcToolApprovalSheet`、`ArcBackgroundRunDock`、`ArcAgentAttentionInbox`（`ArcAgentTranscript`/`ArcAgentAskCard` 已删除，迁入 Agent 的 Conversation/ChoiceCard） |
 | `Arc.Avalonia.LifeToday`（3,423 行） | **7 个控件**：`ArcDailyBrief`、`ArcDayAgenda`、`ArcMedicationSchedule`、`ArcQuickCaptureBar`、`ArcReminderCenter`、`ArcReminderRow`、`ArcRoutineScheduleEditor` |
 
@@ -192,7 +192,11 @@ Markdown 能力：CommonMark+GFM 全节点矩阵、代码高亮（17 语言族�
   Agent Composer/StreamingText、AgentUI Transcript/AskCard。计数口径：控件 = 发布程序集中 `Avalonia.Controls.Control` 可赋值的
   public 类型（反射，`.recon/InventoryProbe`）；类型 = `tools/api-baselines/*.txt` 的 `type` 行（含 XAML 生成类型）；主题/路由事件
   = `src/**` 源码 grep。
+## 13. PuraMarkdown.Agent 迁移（2026-11-11，ADR 0007）
 
+用户决策：**Agent/Chat 渲染改用 `PuraMarkdown.Agent`，不再自研**（计划见 [docs/29](29-puramarkdown-agent-migration.zh.md)）。§8、§12 中的自研气泡/卡片描述为迁移前历史，现状：
 
-
-
+* **Chat（L2）**：`ArcChatView` 是 `PuraChatView` 的薄封装（消息模型 `PuraChatMessage`、Markdown/pura-agent 渲染、流式、快照全部上游）；新增 `ArcChatThemeAdapter`（Arc token → `PuraTheme`，light/dark 跟随系统）；保留 `ArcChatComposer`（输入框）。删除 `ArcChatMessage`、`ArcChatRole`、`ArcChatMessageStatus`、`ArcChatDeliveryState`、`ArcChatParticipant`、`ArcChatBubble`、`ArcChatRow`、`ArcChatThread`。Chat 包不再依赖 `Arc.Avalonia.Markdown`。
+* **Agent（L4）**：`ArcAgentConversation` 为 `ContentControl`，内部 `ArcChatView`；workspace/session reducer 把事件投影成 `PuraChatMessage`（正文/`PuraToolCall`/状态），提问与审批合成 `pura-agent` fence 交给上游 `AgentPlugin` 渲染；交互经 `PuraInteractionEventArgs` 回映为 `AnswerRequested`/`ApprovalDecisionRequested`。删除 `ArcAgentMarkdownPlugin`、`ArcAgentJson`、`ArcAgentModels`、`ArcAgentChoiceCard`、`ArcAgentConfirmCard`、`ArcAgentFallbackCards`、`ArcAgentToolCallCard` 及其 EventArg/Theme。表现运行时（reducer、coalescer、审批/注意力队列、传输接缝）保持不变。
+* **依赖边界**：`PuraMarkdown.Agent` 只允许 Chat/Agent 直接引用（R3/R9 有范围例外），传递依赖 ItemsRepeater/JsonSchema.Net 等入白名单；Avalonia 固定 12.1.5。
+* **验证**：build 0 error、VERIFY 180/0、audit 294/294、smoke 323/0、pack 33、check-all 11/11、public API 33/33（基线已更新）。
