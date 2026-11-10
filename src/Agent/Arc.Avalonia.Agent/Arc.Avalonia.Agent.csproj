@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <!-- M2-G5: chat/agent rendering engine (ADR 0007); only Chat and Agent may reference it. -->
+    <PackageReference Include="PuraMarkdown.Agent" />
     <!--
       M2-G4 boundary CI: Microsoft's official banned-symbol analyzer, build-only. The banned list lives in
       tools/BannedSymbols.txt and is wired as an AdditionalFiles item below; RS0030 is promoted to an error
@@ -46,6 +48,7 @@
     <WarningsAsErrors>$(WarningsAsErrors);RS0030</WarningsAsErrors>
   </PropertyGroup>
 </Project>
+
 
 
 

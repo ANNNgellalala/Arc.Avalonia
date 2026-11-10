@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Arc.Avalonia.Chat;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Agent;
 
@@ -42,11 +43,11 @@ public interface IArcAgentSession
     /// <summary>Curated run state bound by the run bar and transcript.</summary>
     ArcAgentRunState Run { get; }
 
-    /// <summary>Messages in arrival order (the design system's single chat message model).</summary>
-    IReadOnlyList<ArcChatMessage> Messages { get; }
+    /// <summary>Messages in arrival order (the upstream chat message model, rendered by PuraMarkdown.Agent).</summary>
+    IReadOnlyList<PuraChatMessage> Messages { get; }
 
-    /// <summary>Tool calls in arrival order.</summary>
-    IReadOnlyList<ArcToolCall> ToolCalls { get; }
+    /// <summary>Tool calls in arrival order (the upstream tool-call model).</summary>
+    IReadOnlyList<PuraToolCall> ToolCalls { get; }
 
     /// <summary>Plan steps in arrival order.</summary>
     IReadOnlyList<ArcAgentStep> Steps { get; }
@@ -70,10 +71,11 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
 {
     private const int MaxPendingEvents = 256;
 
-    private readonly List<ArcChatMessage> _messages = new();
-    private readonly Dictionary<string, ArcChatMessage> _messageIndex = new(StringComparer.Ordinal);
-    private readonly List<ArcToolCall> _toolCalls = new();
-    private readonly Dictionary<string, ArcToolCall> _toolIndex = new(StringComparer.Ordinal);
+    private readonly List<PuraChatMessage> _messages = new();
+    private readonly Dictionary<string, PuraChatMessage> _messageIndex = new(StringComparer.Ordinal);
+    private readonly List<PuraToolCall> _toolCalls = new();
+    private readonly Dictionary<string, PuraToolCall> _toolIndex = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _toolPositions = new(StringComparer.Ordinal);
     private readonly List<ArcAgentStep> _steps = new();
     private readonly Dictionary<string, ArcAgentStep> _stepIndex = new(StringComparer.Ordinal);
     private readonly List<ArcAgentEvent> _timeline = new();
@@ -98,10 +100,10 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
     public ArcAgentRunState Run { get; }
 
     /// <inheritdoc />
-    public IReadOnlyList<ArcChatMessage> Messages => _messages;
+    public IReadOnlyList<PuraChatMessage> Messages => _messages;
 
     /// <inheritdoc />
-    public IReadOnlyList<ArcToolCall> ToolCalls => _toolCalls;
+    public IReadOnlyList<PuraToolCall> ToolCalls => _toolCalls;
 
     /// <inheritdoc />
     public IReadOnlyList<ArcAgentStep> Steps => _steps;
@@ -203,11 +205,11 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
             case ArcMessageStartedEvent messageStart:
                 if (!_messageIndex.TryGetValue(messageStart.MessageId, out var startedMessage))
                 {
-                    startedMessage = new ArcChatMessage
+                    startedMessage = new PuraChatMessage
                     {
                         Id = messageStart.MessageId,
                         Role = MapRole(messageStart.Role),
-                        Status = ArcChatMessageStatus.Streaming,
+                        Status = PuraChatMessageStatus.Streaming,
                         CreatedAt = messageStart.At,
                     };
                     _messages.Add(startedMessage);
@@ -215,7 +217,7 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
                 }
                 else
                 {
-                    startedMessage.Status = ArcChatMessageStatus.Streaming;
+                    startedMessage.Status = PuraChatMessageStatus.Streaming;
                 }
 
                 break;
@@ -223,11 +225,10 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
             case ArcMessageDeltaEvent delta:
                 if (_messageIndex.TryGetValue(delta.MessageId, out var streaming))
                 {
-                    streaming.Append(delta.Delta);
-                    if (streaming.Status == ArcChatMessageStatus.Draft)
-                    {
-                        streaming.Status = ArcChatMessageStatus.Streaming;
-                    }
+                    // Append-only delta: the upstream model raises PropertyChanged, so the chat view updates
+                    // the rendered Markdown without re-creating the row.
+                    streaming.Markdown += delta.Delta;
+                    streaming.Status = PuraChatMessageStatus.Streaming;
                 }
 
                 break;
@@ -248,14 +249,13 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
             case ArcToolCallStartedEvent toolStart:
                 if (!_toolIndex.ContainsKey(toolStart.CallId))
                 {
-                    var call = new ArcToolCall
+                    var call = new PuraToolCall
                     {
                         Id = toolStart.CallId,
-                        ToolName = toolStart.ToolName,
-                        Intent = toolStart.Intent,
-                        Risk = toolStart.Risk,
-                        Status = ArcToolCallStatus.Running
+                        Name = toolStart.ToolName,
+                        Status = PuraToolCallStatus.Running,
                     };
+                    _toolPositions[toolStart.CallId] = _toolCalls.Count;
                     _toolCalls.Add(call);
                     _toolIndex[toolStart.CallId] = call;
                 }
@@ -265,7 +265,13 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
             case ArcToolArgsDeltaEvent args:
                 if (_toolIndex.TryGetValue(args.CallId, out var runningTool))
                 {
-                    runningTool.AppendArguments(args.DeltaJson);
+                    // PuraToolCall is an immutable record: replace it and keep the list position stable.
+                    var updated = runningTool with { Arguments = (runningTool.Arguments ?? string.Empty) + args.DeltaJson };
+                    _toolIndex[args.CallId] = updated;
+                    if (_toolPositions.TryGetValue(args.CallId, out var position))
+                    {
+                        _toolCalls[position] = updated;
+                    }
                 }
 
                 break;
@@ -273,8 +279,18 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
             case ArcToolCallEndedEvent toolEnd:
                 if (_toolIndex.TryGetValue(toolEnd.CallId, out var finishedTool))
                 {
-                    finishedTool.Status = toolEnd.Status;
-                    finishedTool.ResultSummary = toolEnd.ResultSummary;
+                    var failed = toolEnd.Status is ArcToolCallStatus.Failed or ArcToolCallStatus.Denied;
+                    var updated = finishedTool with
+                    {
+                        Status = MapToolStatus(toolEnd.Status),
+                        Result = failed ? null : toolEnd.ResultSummary,
+                        Error = failed ? toolEnd.ResultSummary ?? "Tool call failed" : null,
+                    };
+                    _toolIndex[toolEnd.CallId] = updated;
+                    if (_toolPositions.TryGetValue(toolEnd.CallId, out var position))
+                    {
+                        _toolCalls[position] = updated;
+                    }
                 }
 
                 break;
@@ -284,6 +300,7 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
                 _messageIndex.Clear();
                 _toolCalls.Clear();
                 _toolIndex.Clear();
+                _toolPositions.Clear();
                 _steps.Clear();
                 _stepIndex.Clear();
                 RunRef = snapshot.Snapshot.RunRef;
@@ -297,6 +314,7 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
 
                 foreach (var call in snapshot.Snapshot.ToolCalls)
                 {
+                    _toolPositions[call.Id] = _toolCalls.Count;
                     _toolCalls.Add(call);
                     _toolIndex[call.Id] = call;
                 }
@@ -312,11 +330,20 @@ internal sealed class ArcAgentSessionModel : IArcAgentSession
         }
     }
 
-    /// <summary>Maps the event protocol's role to the design system chat role.</summary>
-    internal static ArcChatRole MapRole(ArcAgentRole role) => role switch
+    /// <summary>Maps the event protocol's role to the upstream chat role.</summary>
+    internal static PuraChatRole MapRole(ArcAgentRole role) => role switch
     {
-        ArcAgentRole.User => ArcChatRole.User,
-        ArcAgentRole.System => ArcChatRole.System,
-        _ => ArcChatRole.Assistant,
+        ArcAgentRole.User => PuraChatRole.User,
+        ArcAgentRole.System => PuraChatRole.System,
+        ArcAgentRole.Tool => PuraChatRole.Tool,
+        _ => PuraChatRole.Assistant,
+    };
+
+    /// <summary>Maps the Arc tool-call lifecycle onto the upstream tool-call status.</summary>
+    internal static PuraToolCallStatus MapToolStatus(ArcToolCallStatus status) => status switch
+    {
+        ArcToolCallStatus.Succeeded => PuraToolCallStatus.Succeeded,
+        ArcToolCallStatus.Failed or ArcToolCallStatus.Denied => PuraToolCallStatus.Failed,
+        _ => PuraToolCallStatus.Running,
     };
 }

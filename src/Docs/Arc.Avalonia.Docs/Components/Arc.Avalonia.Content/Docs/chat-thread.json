@@ -1,28 +1,28 @@
 {
   "slug": "chat-thread",
-  "nameZh": "聊天线程",
-  "summary": "实时对话流：同作者连续消息合并成组、自己的消息靠右，支持附件、送达回执、输入提示与输入框。",
+  "nameZh": "聊天会话",
+  "summary": "对话视图：消息、Markdown 正文、工具调用卡与流式生命周期由 PuraMarkdown.Agent 渲染，Arc 只提供设计系统包装、输入框与 token 主题映射。",
   "purpose": [
-    "按时间顺序铺开一段对话：Participants 提供姓名与头像，CurrentUserId 决定哪些消息靠右，连续同作者且在 GroupWindow 内的消息合并成一组，只在组开头显示一次头像与时间。",
-    "消息正文统一是 Markdown，由 ArcMarkdownView 渲染；ArcdChatMessage 同时带附件、生成状态（Draft / Streaming / Complete / Failed / Aborted）与送达回执（Sent / Delivered / Read）。",
-    "Typing 里的参与者会在消息流底部显示「正在输入」提示，自己不会被提示；ShowComposer 控制底部输入框是否出现，Enter 发送、Shift+Enter 换行，发送后通过 Send 事件把 ArcChatDraft 交给调用方。"
+    "按时间顺序铺开一段对话。消息模型是上游 PuraChatMessage（角色 User / Assistant / System / Tool、状态 Streaming / Complete / Failed / Aborted、ToolCalls 与 Metadata）；ArcChatView 内部宿主是 PuraChatView，虚拟化、增量流式与正文渲染都由 PuraMarkdown.Agent 负责（ADR 0007）。",
+    "正文统一是 Markdown，由上游 PuraMarkdownView 渲染：标题、列表、代码块、表格、链接与 pura-agent 围栏（choice / confirm / tool-call）都能直接出现在消息里。Arc 不再自研气泡、行模型或 Markdown 插件，只把 Arc 色板映射成 PuraTheme（ArcChatThemeAdapter）。",
+    "ArcChatView 额外提供 ShowComposer / Placeholder / AllowAttachments：输入框仍是 Arc 的 ArcChatComposer（表单控件，不属于聊天渲染），Enter 发送、Shift+Enter 换行，发送后通过 Send 事件把 ArcChatDraft 交给宿主；BeginStreamingMessage 返回上游 PuraStreamingSession，Append / Complete / Abort 与一次性渲染等价。"
   ],
   "whenToUse": [
     "客服会话、私信、团队频道等需要连续追加消息的界面。",
-    "需要区分自己与他人的消息、并展示送达回执的一对一聊天。",
-    "会话里可能出现文件、图片等附件时。"
+    "需要展示 AI 回答、Markdown 正文、工具调用卡或 pura-agent 交互围栏的会话。",
+    "需要流式生成、快照恢复或超长消息虚拟化的聊天面板。"
   ],
   "whenNotToUse": [
     "围绕单个对象的评审讨论、需要嵌套回复与解决状态时，改用 comment-thread。",
     "只是记录事件历史时，改用 timeline。",
-    "需要完整的消息搜索、频道列表与未读管理时，chat-thread 只负责单个会话的面板，外层结构需要自己组织。"
+    "需要完整的消息搜索、频道列表与未读管理时，chat-thread 只负责单个会话面板，外层结构需要自己组织。"
   ],
   "variants": [
-    { "key": "variant-grouped", "label": "Grouped", "note": "同作者连续消息合并，只显示一次头像与姓名" },
-    { "key": "variant-attachments", "label": "Attachments", "note": "消息里带文件或图片" },
-    { "key": "variant-typing", "label": "Typing", "note": "底部显示他人正在输入" },
-    { "key": "state-status-delivered", "label": "Delivered", "note": "自己消息旁的回执标记" },
-    { "key": "variant-composer", "label": "Composer", "note": "底部输入框与附件按钮" }
+    { "key": "variant-conversation", "label": "Conversation", "note": "多轮对话：用户、助手与系统消息在同一条时间线上" },
+    { "key": "variant-markdown", "label": "Markdown", "note": "正文由上游 PuraMarkdownView 渲染，含标题、列表、代码块与表格" },
+    { "key": "variant-tool-call", "label": "Tool call", "note": "消息的 ToolCalls 在正文上方渲染为工具调用卡（状态 / 参数 / 结果 / 耗时）" },
+    { "key": "state-status-failed", "label": "Failed", "note": "Status=Failed + Error 时显示错误行，已收到的正文仍然保留" },
+    { "key": "state-streaming", "label": "Streaming", "note": "Status=Streaming 的助手消息由 PuraStreamingSession 增量填充" }
   ],
   "relations": [
     { "type": "alternative", "target": "comment-thread", "note": "需要嵌套回复与解决状态时改用 comment-thread" },
@@ -35,8 +35,8 @@
       "title": "Chat thread 与 Comment thread",
       "rows": [
         { "dimension": "组织方式", "self": "按时间流动的单层消息", "other": "围绕一个对象的树状讨论" },
-        { "dimension": "身份方向", "self": "自己的消息靠右，他人靠左", "other": "所有评论同列，用缩进表达回复" },
-        { "dimension": "状态", "self": "生成状态与送达回执分开", "other": "解决与重新打开" }
+        { "dimension": "消息模型", "self": "上游 PuraChatMessage（角色 + 工具调用）", "other": "评论节点 + 解决状态" },
+        { "dimension": "状态", "self": "生成状态（Streaming / Failed）与工具调用状态", "other": "解决与重新打开" }
       ]
     },
     {
@@ -44,61 +44,57 @@
       "title": "Chat thread 与 Presence stack",
       "rows": [
         { "dimension": "职责", "self": "承载整段对话与输入", "other": "只显示谁在场、谁在输入" },
-        { "dimension": "数据", "self": "参与者、消息、附件与状态", "other": "成员、状态与姓名" },
+        { "dimension": "数据", "self": "PuraChatMessage 列表 + ToolCalls + 快照", "other": "成员、状态与姓名" },
         { "dimension": "组合方式", "self": "页面主体", "other": "常放在聊天页头部" }
       ]
     }
   ],
   "examples": [
     {
-      "title": "一段带附件与输入提示的对话",
+      "title": "多轮对话、工具调用与流式消息",
       "language": "csharp",
-      "code": "var now = DateTimeOffset.Now;\nvar people = new List<ArcChatParticipant>\n{\n    new() { Id = \"me\", Name = \"Alex Rivera\" },\n    new() { Id = \"sam\", Name = \"Sam Lee\" },\n};\n\nvar chat = new ArcChatView\n{\n    Width = 680,\n    Height = 420,\n    CurrentUserId = \"me\",\n    Label = \"Release team conversation\",\n    Placeholder = \"Message the team\",\n    Participants = people,\n};\n\nchat.AddMessage(new ArcChatMessage\n{\n    Role = ArcChatRole.User,\n    Author = people[1],\n    Markdown = \"Can you add the new screenshots?\",\n    CreatedAt = now.AddMinutes(-9),\n});\nchat.AddMessage(new ArcChatMessage\n{\n    Role = ArcChatRole.Assistant,\n    Author = people[0],\n    Markdown = \"On it. The release notes draft is attached.\",\n    Delivery = ArcChatDeliveryState.Delivered,\n    Attachments = new List<ArcChatAttachment> { new() { Name = \"release-notes.md\", Size = 18_432 } },\n});\nchat.Typing = new List<string> { \"sam\" };\nchat.Send += (_, draft) => SendMessage(draft.Text, draft.Attachments);"
+      "code": "var now = DateTimeOffset.Now;\n\nvar chat = new ArcChatView\n{\n    Width = 680,\n    Height = 470,\n    ShowComposer = true,\n    Placeholder = \"Message the team\",\n};\n\nchat.AddMessage(new PuraChatMessage\n{\n    Role = PuraChatRole.User,\n    Markdown = \"Can you add the new screenshots?\",\n    CreatedAt = now.AddMinutes(-9),\n});\nchat.AddMessage(new PuraChatMessage\n{\n    Role = PuraChatRole.Assistant,\n    ToolCalls = new[]\n    {\n        new PuraToolCall\n        {\n            Id = \"call-1\",\n            Name = \"repo.write\",\n            Status = PuraToolCallStatus.Succeeded,\n            Arguments = \"{ \\\"path\\\": \\\"release-notes.md\\\" }\",\n            Result = \"written · 18,432 bytes\",\n        },\n    },\n    Markdown = \"Release notes saved next to the pricing screenshot.\",\n});\n\n// 流式：上游 PuraStreamingSession 负责增量与全量校正\nvar streaming = new PuraChatMessage { Id = \"m2\", Role = PuraChatRole.Assistant };\nvar session = chat.BeginStreamingMessage(streaming);\nsession.Append(\"### Changelog\\n\\n- screenshot added\");\nawait session.CompleteAsync();\n\nchat.Send += (_, draft) => SendMessage(draft.Text, draft.Attachments);"
     },
     {
-      "title": "隐藏输入框的只读会话",
+      "title": "只读会话（隐藏输入框）",
       "language": "xaml",
-      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:chat=\"clr-namespace:Arc.Avalonia.Chat;assembly=Arc.Avalonia.Chat\">\n  <chat:ArcChatView Label=\"Archived conversation\"\n                    CurrentUserId=\"me\"\n                    ShowComposer=\"False\"\n                    Participants=\"{Binding Participants}\" />\n</Window>"
+      "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:chat=\"clr-namespace:Arc.Avalonia.Chat;assembly=Arc.Avalonia.Chat\">\n  <chat:ArcChatView Placeholder=\"Archived conversation\"\n                    ShowComposer=\"False\"\n                    AutoScrollMode=\"Never\" />\n</Window>"
     }
   ],
   "api": {
     "type": "Arc.Avalonia.Chat.ArcChatView",
     "exclude": ["TemplatedParent"],
     "descriptions": {
-      "Messages": "消息集合，按时间从旧到新；气泡正文由 ArcMarkdownView 渲染",
-      "AddMessage": "追加消息，同 id 时原地更新",
+      "Host": "内部的上游 PuraChatView；高级用法（虚拟化、快照）可直接使用",
+      "Messages": "上游消息集合 ObservableCollection<PuraChatMessage>，按时间从旧到新",
+      "Options": "上游 PuraMarkdownOptions（pipeline + theme）；默认由 ArcChatThemeAdapter 从 Arc token 构建",
+      "AddMessage": "追加 PuraChatMessage",
       "InsertMessage": "在指定位置插入消息，同 id 时原地更新",
-      "UpdateMessage": "按 id 替换消息并触发更新",
+      "UpdateMessage": "通知视图消息已变化",
       "RemoveMessage": "按 id 删除消息",
       "ClearMessages": "清空消息",
       "ReplaceMessages": "整体替换消息集合",
       "FindMessage": "按 id 查找消息",
-      "BeginStreamingMessage": "开始流式消息，返回 ArcMarkdownStreamingSession",
+      "BeginStreamingMessage": "开始流式消息，返回上游 PuraStreamingSession",
       "AbortStreaming": "中断当前流式消息并保留部分内容",
-      "ScrollToEnd": "滚到最新消息并恢复跟随",
+      "ScrollToEnd": "滚到最新消息",
       "ScrollToMessage": "把指定 id 的消息滚动到视口",
-      "Participants": "参与者集合，元素是 ArcChatParticipant（Id / Name / Avatar）",
-      "CurrentUserId": "当前用户 id，决定哪些消息靠右显示，默认 me",
-      "Typing": "正在输入的参与者 id；自己的 id 会被忽略",
+      "RestoreSnapshot": "从 PuraChatSnapshot 恢复整段会话",
+      "Composer": "内置的 ArcChatComposer（Arc 保留的输入控件）",
+      "ShowComposer": "是否显示内置输入框，默认 false",
       "Placeholder": "输入框占位文案",
-      "ShowComposer": "是否显示底部输入框，默认 true",
-      "AllowAttachments": "是否显示附件按钮，默认 true",
-      "MarkdownOptions": "气泡正文使用的 ArcMarkdownOptions（pipeline / 平台契约 / 本地化）",
-      "AutoScrollMode": "自动滚动策略：Never / NearBottom / Always",
-      "Label": "消息日志的无障碍名称",
-      "GroupWindow": "连续同作者消息合并的时间窗口，默认 5 分钟",
-      "ShowAvatars": "是否显示头像列",
-      "ShowTimestamps": "是否显示姓名与时间头",
-      "Composer": "模板创建的 ArcChatComposer",
-      "DefaultMessages": "未提供 Messages 时使用的初始消息（兼容旧 API）",
-      "MessageAdded": "追加消息时触发",
+      "AllowAttachments": "输入框是否允许附件",
+      "IsStreaming": "当前是否有进行中的流式消息",
+      "ActiveSession": "当前上游流式会话，没有时为 null",
+      "AutoScrollMode": "自动滚动策略：Never / NearBottom / Always（映射到 PuraChatAutoScrollMode）",
+      "DefaultMessages": "未提供消息时用于初始化的消息列表",
+      "MessageAdded": "追加消息时触发，参数是 PuraChatMessage",
       "MessageUpdated": "消息正文或状态变化时触发",
       "MessageRemoved": "删除消息时触发",
       "Send": "输入框发送时触发，参数是文本与附件的 ArcChatDraft",
       "StopRequested": "用户点击停止时触发，宿主负责中断生成",
-      "InteractionOccurred": "气泡内 pura-agent 交互上报",
-      "Warning": "气泡内 Markdown 渲染警告",
-      "Announced": "无障碍播报文本"
+      "InteractionOccurred": "消息内 pura-agent 交互上报",
+      "Dispose": "释放视图与输入框订阅"
     }
   }
 }

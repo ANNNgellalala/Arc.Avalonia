@@ -5,16 +5,18 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
-using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Agent;
 
 /// <summary>
 /// Maps a projected value (message, tool call, approval request, artifact...) to a view. Defaults are built in;
 /// a host can register overrides for any type. This is a view registry, not a rendering layer: it only chooses
-/// controls/DataTemplates and never draws anything.
+/// controls/DataTemplates and never draws anything. Message and tool-call bodies are rendered by the upstream
+/// PuraMarkdown.Agent chat surface; the defaults here are compact host fallbacks for non-chat placements.
 /// </summary>
 public interface IArcAgentItemViewRegistry
 {
@@ -44,8 +46,8 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
             return;
         }
 
-        Register<ArcChatMessage>(message => MessageView(message));
-        Register<ArcToolCall>(call => new ArcAgentToolCallCard { Call = call, Margin = new Thickness(0, 2, 0, 2) });
+        Register<PuraChatMessage>(message => MessageView(message));
+        Register<PuraToolCall>(call => ToolCallView(call));
         Register<ArcApprovalRequest>(request => ApprovalView(request));
         Register<ArcArtifact>(artifact => ArtifactView(artifact));
     }
@@ -101,13 +103,14 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
         return ArcUi.Text(value.ToString() ?? string.Empty, "arc-body-sm");
     }
 
-    private static Control MessageView(ArcChatMessage message)
+    private static Control MessageView(PuraChatMessage message)
     {
         var stack = ArcUi.Stack(2);
         stack.Children.Add(ArcUi.Caption(message.Role switch
         {
-            ArcChatRole.User => "You",
-            ArcChatRole.System => "System",
+            PuraChatRole.User => "You",
+            PuraChatRole.System => "System",
+            PuraChatRole.Tool => "Tool",
             _ => "Assistant"
         }));
         var text = ArcUi.Text(message.Markdown, "arc-body-sm", 680);
@@ -115,11 +118,32 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
         stack.Children.Add(text);
         return new Border
         {
-            Background = message.IsStreaming ? ArcUi.Brush(ArcTokens.SurfaceMuted) : null,
+            Background = message.Status == PuraChatMessageStatus.Streaming ? ArcUi.Brush(ArcTokens.SurfaceMuted) : null,
             CornerRadius = ArcResources.Radius(ArcTokens.RadiusControl),
             Padding = new Thickness(10, 6, 10, 6),
             Child = stack
         };
+    }
+
+    private static Control ToolCallView(PuraToolCall call)
+    {
+        var stack = ArcUi.Stack(4);
+        stack.Children.Add(ArcUi.Strong(call.Name));
+        stack.Children.Add(ArcUi.Pill(
+            call.Status.ToString(),
+            "wrench",
+            accent: call.Status == PuraToolCallStatus.Succeeded));
+        if (!string.IsNullOrWhiteSpace(call.Result))
+        {
+            stack.Children.Add(ArcUi.Caption(call.Result));
+        }
+
+        if (!string.IsNullOrWhiteSpace(call.Error))
+        {
+            stack.Children.Add(ArcUi.Caption(call.Error));
+        }
+
+        return ArcUi.Surface(stack, 10);
     }
 
     private static Control ApprovalView(ArcApprovalRequest request)
@@ -151,4 +175,3 @@ public sealed class ArcAgentItemViewRegistry : IArcAgentItemViewRegistry
         return ArcUi.Surface(row, 10);
     }
 }
-

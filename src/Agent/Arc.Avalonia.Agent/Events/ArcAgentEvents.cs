@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Arc.Avalonia.Chat;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Agent;
 
@@ -263,7 +263,7 @@ public sealed record ArcMessageEndedEvent(
     ArcEventStamp Stamp,
     DateTimeOffset At,
     string MessageId,
-    ArcChatMessageStatus Status = ArcChatMessageStatus.Complete)
+    PuraChatMessageStatus Status = PuraChatMessageStatus.Complete)
     : ArcAgentEvent(Stamp, At)
 {
     /// <inheritdoc />
@@ -379,45 +379,6 @@ public sealed record ArcCustomEvent(ArcEventStamp Stamp, DateTimeOffset At, stri
 {
     /// <inheritdoc />
     public override ArcAgentEventKind EventKind => ArcAgentEventKind.Custom;
-}
-
-/// <summary>One tool call in a session.</summary>
-public sealed class ArcToolCall
-{
-    private readonly StringBuilder _arguments = new();
-    private string? _cachedArguments;
-
-    /// <summary>Stable call id.</summary>
-    public required string Id { get; init; }
-
-    /// <summary>The tool name shown as the card subtitle.</summary>
-    public required string ToolName { get; init; }
-
-    /// <summary>Plain-language intent shown above the arguments.</summary>
-    public string Intent { get; init; } = string.Empty;
-
-    /// <summary>Risk level used by the approval card.</summary>
-    public ArcRiskLevel Risk { get; init; }
-
-    /// <summary>Lifecycle status.</summary>
-    public ArcToolCallStatus Status { get; set; }
-
-    /// <summary>Accumulated JSON arguments (display only; the host owns parsing).</summary>
-    public string Arguments => _cachedArguments ??= _arguments.ToString();
-
-    /// <summary>Optional result summary.</summary>
-    public string? ResultSummary { get; set; }
-
-    internal void AppendArguments(string delta)
-    {
-        if (string.IsNullOrEmpty(delta))
-        {
-            return;
-        }
-
-        _arguments.Append(delta);
-        _cachedArguments = null;
-    }
 }
 
 /// <summary>One plan step in a session.</summary>
@@ -571,10 +532,10 @@ public sealed class ArcAgentSessionSnapshot
     public ArcRunPhase Phase { get; init; }
 
     /// <summary>Messages at snapshot time (the design system's single chat message model).</summary>
-    public IReadOnlyList<ArcChatMessage> Messages { get; init; } = Array.Empty<ArcChatMessage>();
+    public IReadOnlyList<PuraChatMessage> Messages { get; init; } = Array.Empty<PuraChatMessage>();
 
     /// <summary>Tool calls at snapshot time.</summary>
-    public IReadOnlyList<ArcToolCall> ToolCalls { get; init; } = Array.Empty<ArcToolCall>();
+    public IReadOnlyList<PuraToolCall> ToolCalls { get; init; } = Array.Empty<PuraToolCall>();
 
     /// <summary>Steps at snapshot time.</summary>
     public IReadOnlyList<ArcAgentStep> Steps { get; init; } = Array.Empty<ArcAgentStep>();

@@ -1,18 +1,19 @@
 using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Arc.Avalonia.Chat;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.Markdown;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Content.Pages;
 
 /// <summary>
-/// Chat thread's completeness preview on the Chat package: grouped consecutive messages, an own message with
-/// an attachment and a Delivered receipt, the typing row and the built-in composer. Declared state keys match
-/// Docs/chat-thread.json so the audit can compare the two.
+/// Chat thread's completeness preview on the Chat package. The surface is Arc's <see cref="ArcChatView"/>
+/// wrapper around the upstream <c>PuraChatView</c>; the message model is <see cref="PuraChatMessage"/> and the
+/// Markdown bodies, tool-call cards, pura-agent fences and streaming lifecycle are rendered by
+/// PuraMarkdown.Agent (ADR 0007). Declared state keys match Docs/chat-thread.json so the audit can compare them.
 /// </summary>
 public sealed class ChatThreadPage : ArcItemPage
 {
@@ -20,86 +21,82 @@ public sealed class ChatThreadPage : ArcItemPage
 
     public override IReadOnlyList<string> ImplementedStates => new[]
     {
-        "variant-grouped", "variant-attachments", "variant-typing", "state-status-delivered", "variant-composer"
+        "variant-conversation", "variant-markdown", "variant-tool-call", "state-status-failed", "state-streaming"
     };
 
     protected override Control BuildDemo(ArcDemoContext context)
     {
-        // Bubble bodies are ArcMarkdownView; refresh the token snapshot for the active palette.
-        ArcMarkdownStyle.Current = new ArcMarkdownStyle();
-
         var now = DateTimeOffset.Now;
-        var participants = new List<ArcChatParticipant>
-        {
-            new() { Id = "me", Name = "Alex Rivera" },
-            new() { Id = "sam", Name = "Sam Lee" }
-        };
 
         var chat = new ArcChatView
         {
             Width = 680,
-            Height = 420,
+            Height = 470,
             HorizontalAlignment = HorizontalAlignment.Left,
-            CurrentUserId = "me",
-            Label = "Release team conversation",
-            Placeholder = "Message the team",
-            Participants = participants,
             ShowComposer = true,
+            Placeholder = "Message the team",
             AllowAttachments = true,
-            // Pinned to the top so the preview always shows the first bubble.
+            // Pinned to the top so the preview always shows the first message.
             AutoScrollMode = ArcChatAutoScrollMode.Never
         };
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m1",
-            Role = ArcChatRole.User,
-            Author = participants[1],
+            Role = PuraChatRole.User,
             Markdown = "Can you add the new screenshots?",
             CreatedAt = now.AddMinutes(-9)
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m2",
-            Role = ArcChatRole.User,
-            Author = participants[1],
-            Markdown = "The pricing page one is the hero.",
+            Role = PuraChatRole.Assistant,
+            Markdown =
+                "On it — two screenshots and a **Markdown** copy of the notes are coming.\n\n" +
+                "| File | Size |\n| :--- | ---: |\n| pricing-page.png | 245 KB |\n| release-notes.md | 18 KB |",
             CreatedAt = now.AddMinutes(-8)
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m3",
-            Role = ArcChatRole.Assistant,
-            Author = participants[0],
-            Markdown = "On it. The release notes draft is attached.",
-            CreatedAt = now.AddMinutes(-2),
-            Delivery = ArcChatDeliveryState.Delivered,
-            Attachments = new List<ArcChatAttachment>
+            Role = PuraChatRole.Assistant,
+            ToolCalls = new[]
             {
-                new() { Name = "release-notes.md", Size = 18_432 }
-            }
+                new PuraToolCall
+                {
+                    Id = "call-1",
+                    Name = "repo.write",
+                    Status = PuraToolCallStatus.Succeeded,
+                    Arguments = "{ \"path\": \"release-notes.md\" }",
+                    Result = "written · 18,432 bytes",
+                    Duration = TimeSpan.FromMilliseconds(1260)
+                }
+            },
+            Markdown = "Release notes saved next to the pricing screenshot.",
+            CreatedAt = now.AddMinutes(-6)
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m4",
-            Role = ArcChatRole.User,
-            Author = participants[1],
-            Markdown = "Perfect, reviewing now.",
+            Role = PuraChatRole.Assistant,
+            Status = PuraChatMessageStatus.Failed,
+            Error = "Upload interrupted: 2 of 3 files were uploaded; retrying keeps the received parts.",
+            Markdown = "The pricing screenshot was uploaded before the connection dropped.",
+            CreatedAt = now.AddMinutes(-3)
+        });
+
+        chat.AddMessage(new PuraChatMessage
+        {
+            Id = "m5",
+            Role = PuraChatRole.Assistant,
+            Status = PuraChatMessageStatus.Streaming,
+            Markdown = "### Generating the changelog\n\n- Added the pricing page screenshot\n- Unified every bubble body on",
             CreatedAt = now.AddMinutes(-1)
         });
 
-        chat.Typing = new List<string> { "sam" };
-
-        var panel = new StackPanel { Spacing = 8, HorizontalAlignment = HorizontalAlignment.Left };
-        panel.Children.Add(new TextBlock
-        {
-            Text = "分组消息 · 附件 · Delivered 回执 · 正在输入 · 输入框",
-            Classes = { "arc-caption" }
-        });
-        panel.Children.Add(chat);
-        return panel;
+        return chat;
     }
 }

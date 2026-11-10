@@ -1,109 +1,92 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using Avalonia.Media;
-using Avalonia.Threading;
 using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
-using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Theme;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
+using PuraMarkdown.Agent.Rendering;
 
 namespace Arc.Avalonia.Agent;
 
 /// <summary>
-/// The agent conversation: one scrollable timeline where human/assistant messages render as
-/// <see cref="ArcChatBubble"/> (user right, assistant left, Markdown body) and every run event renders as a
-/// full-width card in timeline order - tool calls through <see cref="ArcAgentToolCallCard"/>, reasoning as a
-/// collapsible card, approvals as approve/deny event cards, structured questions through
-/// <see cref="ArcAgentChoiceCard"/> (free text and "answer later" included), and compact cards for steps,
-/// artifacts, attention entries and run phase changes.
-/// <para>
-/// There is deliberately no "rows mode" switch: the conversation always uses bubbles for messages and cards
-/// for events. It only projects the session it is given, appends/updates rows incrementally as events arrive
-/// (streaming bodies update in place) and never performs I/O, timers or model calls.
-/// </para>
+/// The agent transcript. Rendering is fully delegated to the upstream chat surface: the projection writes
+/// <see cref="PuraChatMessage"/> rows (Markdown body, <see cref="PuraToolCall"/> cards, status/error) into an
+/// <see cref="ArcChatView"/>, and the pura-agent components (choice / confirm) come from the upstream
+/// <c>AgentPlugin</c> pipeline through synthesized <c>pura-agent</c> fences for pending questions/approvals.
+/// Arc keeps only the presentation runtime (workspace/session reducer, approval queue) and this projection.
 /// </summary>
-public class ArcAgentConversation : Panel, IDisposable
+public sealed class ArcAgentConversation : ContentControl, IDisposable
 {
-    /// <summary>The workspace to project; the active session is shown.</summary>
+    /// <summary>Workspace projected into the transcript.</summary>
     public static readonly StyledProperty<IArcAgentWorkspace?> WorkspaceProperty =
         AvaloniaProperty.Register<ArcAgentConversation, IArcAgentWorkspace?>(nameof(Workspace));
 
-    /// <summary>Optional single session; takes precedence over <see cref="Workspace"/>.</summary>
+    /// <summary>Single session shown instead of the workspace's active session.</summary>
     public static readonly StyledProperty<IArcAgentSession?> SessionProperty =
         AvaloniaProperty.Register<ArcAgentConversation, IArcAgentSession?>(nameof(Session));
 
-    /// <summary>Markdown environment for bubbles and reasoning cards; defaults to the agent pipeline.</summary>
-    public static readonly StyledProperty<ArcMarkdownOptions?> MarkdownOptionsProperty =
-        AvaloniaProperty.Register<ArcAgentConversation, ArcMarkdownOptions?>(nameof(MarkdownOptions));
+    /// <summary>Render options; null keeps the Arc token adapter defaults.</summary>
+    public static readonly StyledProperty<PuraMarkdownOptions?> MarkdownOptionsProperty =
+        AvaloniaProperty.Register<ArcAgentConversation, PuraMarkdownOptions?>(nameof(MarkdownOptions));
 
-    /// <summary>Shows the conversation header (title, run state, counts).</summary>
+    /// <summary>Shows the header row.</summary>
     public static readonly StyledProperty<bool> ShowHeaderProperty =
         AvaloniaProperty.Register<ArcAgentConversation, bool>(nameof(ShowHeader), true);
 
-    /// <summary>Header title.</summary>
+    /// <summary>Transcript title.</summary>
     public static readonly StyledProperty<string> TitleProperty =
         AvaloniaProperty.Register<ArcAgentConversation, string>(nameof(Title), "Conversation");
 
-    /// <summary>Copy shown while there is nothing to project.</summary>
+    /// <summary>Placeholder shown while there are no messages.</summary>
     public static readonly StyledProperty<string> EmptyTextProperty =
-        AvaloniaProperty.Register<ArcAgentConversation, string>(
-            nameof(EmptyText), "No messages yet. Start the agent to see the conversation here.");
+        AvaloniaProperty.Register<ArcAgentConversation, string>(nameof(EmptyText), "No messages yet.");
 
-    /// <summary>Raised when an approval event card reports approve/deny (CLR companion).</summary>
+    /// <summary>Raised when an approval card reports approve/deny (routed companion).</summary>
     public static readonly RoutedEvent<ArcAgentApprovalDecisionEventArgs> ApprovalDecisionRequestedEvent =
         RoutedEvent.Register<ArcAgentConversation, ArcAgentApprovalDecisionEventArgs>(
             "ApprovalDecisionRequested", RoutingStrategies.Bubble);
 
-    /// <summary>Raised when a structured question card reports an answer or a deferral (CLR companion).</summary>
+    /// <summary>Raised when a choice card reports an answer or deferral (routed companion).</summary>
     public static readonly RoutedEvent<ArcAgentQuestionAnswerEventArgs> AnswerRequestedEvent =
         RoutedEvent.Register<ArcAgentConversation, ArcAgentQuestionAnswerEventArgs>(
             "AnswerRequested", RoutingStrategies.Bubble);
 
-    /// <summary>Raised when a failed tool card asks to retry (CLR companion).</summary>
+    /// <summary>Raised when a failed tool card asks to retry (routed companion; upstream cards have no actions).</summary>
     public static readonly RoutedEvent<ArcAgentToolRetryEventArgs> RetryRequestedEvent =
         RoutedEvent.Register<ArcAgentConversation, ArcAgentToolRetryEventArgs>(
             "RetryRequested", RoutingStrategies.Bubble);
 
-    private readonly StackPanel _rowsHost;
-    private readonly ScrollViewer _scroll;
-    private readonly StackPanel _badgeHost;
-    private readonly TextBlock _summary;
-    private readonly TextBlock _titleText;
+    /// <summary>Prefix reserved for projection rows that do not come from session messages.</summary>
+    private const string SyntheticPrefix = "arc:";
+
+    private readonly Grid _root;
     private readonly Grid _header;
-    private readonly Border _divider;
-    private readonly Dictionary<string, ArcChatBubble> _messageRows = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ArcAgentToolCallCard> _toolRows = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ReasoningRow> _reasoningRows = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ApprovalRow> _approvalRows = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _questionRows = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, StepRow> _stepRows = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _eventRowKeys = new(StringComparer.Ordinal);
-    private readonly List<ArcChatMessage> _localMessages = new();
+    private readonly TextBlock _titleText;
+    private readonly TextBlock _summary;
+    private readonly TextBlock _emptyCopy;
+    private readonly Border _emptyHost;
+    private readonly ArcChatView _chat;
+    private readonly Dictionary<string, PuraChatMessage> _projected = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string[]> _choiceOptions = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _localNotices = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _stepTitles = new(StringComparer.Ordinal);
 
     private IArcAgentWorkspace? _workspace;
     private IArcAgentSession? _session;
-    private int _eventCursor;
-    private Control? _emptyState;
-    private TextBlock? _emptyCopy;
-    private bool _firstSync = true;
+    private int _timelineCursor;
+    private bool _syncing;
     private bool _disposed;
 
-    // Touch latch: a finger drag over the timeline pauses auto-follow and resets on capture loss.
-    private const double DragSlop = 8;
-    private Point _pointerOrigin;
-    private bool _pointerPressed;
-    private bool _userDragging;
-
-    /// <summary>Creates the conversation surface and its chrome.</summary>
+    /// <summary>Creates the transcript surface and its chrome.</summary>
     public ArcAgentConversation()
     {
         ClipToBounds = false;
@@ -114,49 +97,54 @@ public class ArcAgentConversation : Panel, IDisposable
         titles.Children.Add(_titleText);
         titles.Children.Add(_summary);
 
-        _badgeHost = ArcUi.HStack(6);
-        _badgeHost.VerticalAlignment = VerticalAlignment.Center;
-
         _header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = 12 };
         _header.Children.Add(titles);
-        Grid.SetColumn(_badgeHost, 1);
-        _header.Children.Add(_badgeHost);
 
-        _divider = ArcUi.Divider();
-        _rowsHost = new StackPanel { Spacing = 8 };
-        _scroll = new ScrollViewer
+        _chat = new ArcChatView
         {
-            Content = _rowsHost,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            // The timeline owns its gestures: inner markdown/code scrollers never chain into this one, and
-            // this one never chains into an outer page/sheet scroller. Scrollbars stay auto-hide.
-            IsScrollChainingEnabled = false,
-            AllowAutoHide = true,
-            Padding = new Thickness(0, 2, 2, 2)
+            ShowComposer = false,
+            AutoScrollMode = ArcChatAutoScrollMode.NearBottom,
+        };
+        _chat.InteractionOccurred += OnChatInteraction;
+        _chat.Host.Warning += OnChatWarning;
+
+        _emptyCopy = ArcUi.Caption(EmptyText);
+        _emptyCopy.HorizontalAlignment = HorizontalAlignment.Center;
+        _emptyCopy.VerticalAlignment = VerticalAlignment.Center;
+        _emptyCopy.Opacity = 0.7;
+        _emptyHost = new Border
+        {
+            IsHitTestVisible = false,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = _emptyCopy,
         };
 
-        var grid = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,*"), RowSpacing = 8 };
-        grid.Children.Add(_header);
-        Grid.SetRow(_divider, 1);
-        grid.Children.Add(_divider);
-        Grid.SetRow(_scroll, 2);
-        grid.Children.Add(_scroll);
+        var body = new Grid();
+        body.Children.Add(_chat);
+        body.Children.Add(_emptyHost);
 
-        Children.Add(new Border
+        var grid = new Grid { RowDefinitions = new RowDefinitions("Auto,*,Auto"), RowSpacing = 8 };
+        grid.Children.Add(_header);
+        Grid.SetRow(body, 1);
+        grid.Children.Add(body);
+
+        _root = new Grid();
+        _root.Children.Add(new Border
         {
             Background = ArcUi.Brush(ArcTokens.Surface),
             BorderBrush = ArcUi.Brush(ArcTokens.Border),
             BorderThickness = new Thickness(1),
             CornerRadius = ArcResources.Radius(ArcTokens.RadiusPanel),
             Padding = new Thickness(12),
-            Child = grid
+            Child = grid,
         });
+        Content = _root;
 
         ArcUi.Name(
             this,
             "Agent conversation",
-            "A timeline of messages, tool calls, reasoning, approvals, questions, steps and artifacts.");
+            "A transcript of messages, tool calls, approvals and questions, rendered by PuraMarkdown.Agent.");
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
 
         UpdateHeader();
@@ -177,8 +165,8 @@ public class ArcAgentConversation : Panel, IDisposable
         set => SetValue(SessionProperty, value);
     }
 
-    /// <summary>Markdown environment for message and reasoning bodies.</summary>
-    public ArcMarkdownOptions? MarkdownOptions
+    /// <summary>Render options (pipeline + theme); null uses the Arc token adapter defaults.</summary>
+    public PuraMarkdownOptions? MarkdownOptions
     {
         get => GetValue(MarkdownOptionsProperty);
         set => SetValue(MarkdownOptionsProperty, value);
@@ -191,109 +179,597 @@ public class ArcAgentConversation : Panel, IDisposable
         set => SetValue(ShowHeaderProperty, value);
     }
 
-    /// <summary>Header title.</summary>
+    /// <summary>Transcript title.</summary>
     public string Title
     {
         get => GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
     }
 
-    /// <summary>Copy shown when the conversation is empty.</summary>
+    /// <summary>Placeholder shown while there are no messages.</summary>
     public string EmptyText
     {
         get => GetValue(EmptyTextProperty);
         set => SetValue(EmptyTextProperty, value);
     }
 
-    /// <summary>Events of the projected session, in order (empty when no session is attached).</summary>
+    /// <summary>The upstream chat surface host (advanced scenarios: snapshots, scroll).</summary>
+    public ArcChatView Chat => _chat;
+
+    /// <summary>The session currently projected, if any.</summary>
+    public IArcAgentSession? ActiveSession => _session;
+
+    /// <summary>Accepted events of the projected session (replay/debug record).</summary>
     public IReadOnlyList<ArcAgentEvent> Timeline => _session?.Timeline ?? Array.Empty<ArcAgentEvent>();
 
-    /// <summary>Raised when an approval event card reports approve/deny.</summary>
+    /// <summary>Raised when an approval card reports approve/deny (CLR companion).</summary>
     public event EventHandler<ArcAgentApprovalDecisionEventArgs>? ApprovalDecisionRequested;
 
-    /// <summary>Bubbling routed companion of <see cref="ApprovalDecisionRequested"/>.</summary>
+    /// <summary>Bubbling companion to <see cref="ApprovalDecisionRequested"/>.</summary>
     public event EventHandler<ArcAgentApprovalDecisionEventArgs>? ApprovalDecisionRequestedRouted
     {
         add => AddHandler(ApprovalDecisionRequestedEvent, value);
         remove => RemoveHandler(ApprovalDecisionRequestedEvent, value);
     }
 
-    /// <summary>Raised when a structured question card reports an answer or a deferral.</summary>
+    /// <summary>Raised when a choice card reports an answer (CLR companion).</summary>
     public event EventHandler<ArcAgentQuestionAnswerEventArgs>? AnswerRequested;
 
-    /// <summary>Bubbling routed companion of <see cref="AnswerRequested"/>.</summary>
+    /// <summary>Bubbling companion to <see cref="AnswerRequested"/>.</summary>
     public event EventHandler<ArcAgentQuestionAnswerEventArgs>? AnswerRequestedRouted
     {
         add => AddHandler(AnswerRequestedEvent, value);
         remove => RemoveHandler(AnswerRequestedEvent, value);
     }
 
-    /// <summary>Raised when a failed tool card asks to retry.</summary>
+    /// <summary>
+    /// Raised when a failed tool card asks to retry (CLR companion). Kept for API compatibility: the upstream
+    /// tool-call card is display-only, so the conversation no longer produces this event by itself.
+    /// </summary>
+#pragma warning disable CS0067 // Kept for API compatibility; the upstream tool card is display-only.
     public event EventHandler<ArcAgentToolRetryEventArgs>? RetryRequested;
+#pragma warning restore CS0067
 
-    /// <summary>Bubbling routed companion of <see cref="RetryRequested"/>.</summary>
+    /// <summary>Bubbling companion to <see cref="RetryRequested"/>.</summary>
     public event EventHandler<ArcAgentToolRetryEventArgs>? RetryRequestedRouted
     {
         add => AddHandler(RetryRequestedEvent, value);
         remove => RemoveHandler(RetryRequestedEvent, value);
     }
 
-    /// <summary>Raised when a pura-agent component inside a bubble reports an interaction.</summary>
-    public event EventHandler<ArcMarkdownInteractionEventArgs>? InteractionOccurred;
+    /// <summary>Forwarded upstream interaction events (choice/confirm/tool-call components).</summary>
+    public event EventHandler<PuraInteractionEventArgs>? InteractionOccurred;
 
-    /// <summary>Raised for recoverable Markdown renderer warnings inside bubbles.</summary>
-    public event EventHandler<ArcMarkdownWarningEventArgs>? Warning;
+    /// <summary>Forwarded upstream render warnings (limits, unsafe links...).</summary>
+    public event EventHandler<PuraWarningEventArgs>? Warning;
 
-    static ArcAgentConversation()
-    {
-        WorkspaceProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.RebindWorkspace());
-        SessionProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.BindSession(conversation.Session, force: true));
-        MarkdownOptionsProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.RebuildAll());
-        ShowHeaderProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.ApplyHeaderVisibility());
-        TitleProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.UpdateHeader());
-        EmptyTextProperty.Changed.AddClassHandler<ArcAgentConversation>((conversation, _) => conversation.UpdateEmptyState());
-    }
-
-    /// <summary>Re-projects the session from its timeline (call after a manual snapshot restore).</summary>
-    public void Refresh()
-    {
-        RebuildAll();
-    }
-
-    /// <summary>Scrolls the conversation to the newest row.</summary>
-    public void ScrollToEnd()
-    {
-        if (_scroll is null)
-        {
-            return;
-        }
-
-        Dispatcher.UIThread.Post(() => _scroll.ScrollToEnd(), DispatcherPriority.Background);
-    }
-
-    /// <summary>
-    /// Appends a local, host-owned system notice (for example a transport failure). Local messages are not
-    /// part of the session projection; they are kept after the timeline and survive re-renders.
-    /// </summary>
-    /// <param name="text">Plain text or Markdown body.</param>
-    internal void AppendSystemNotice(string text)
+    /// <summary>Adds a local system notice (host/transport errors); it survives reruns of the projection.</summary>
+    public void AppendSystemNotice(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             return;
         }
 
-        var message = new ArcChatMessage
-        {
-            Role = ArcChatRole.System,
-            Status = ArcChatMessageStatus.Complete,
-            Markdown = text,
-        };
-        _localMessages.Add(message);
-        EnsureMessageRow(message);
+        var id = SyntheticPrefix + "notice:" + Guid.NewGuid().ToString("N");
+        _localNotices.Add(id);
+        EnsureSynthetic(id, "> " + text);
         UpdateEmptyState();
-        ScrollToEnd();
     }
+
+    /// <summary>Re-projects the workspace/session into the transcript.</summary>
+    public void Refresh() => Sync();
+
+    /// <summary>Scrolls to the newest row.</summary>
+    public void ScrollToEnd() => _chat.ScrollToEnd();
+
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == WorkspaceProperty)
+        {
+            AttachWorkspace(change.GetNewValue<IArcAgentWorkspace?>());
+        }
+        else if (change.Property == SessionProperty)
+        {
+            AttachSession(change.GetNewValue<IArcAgentSession?>());
+        }
+        else if (change.Property == MarkdownOptionsProperty && change.GetNewValue<PuraMarkdownOptions?>() is { } options)
+        {
+            _chat.Options = options;
+        }
+        else if (change.Property == ShowHeaderProperty || change.Property == TitleProperty)
+        {
+            UpdateHeader();
+        }
+        else if (change.Property == EmptyTextProperty)
+        {
+            _emptyCopy.Text = EmptyText;
+            UpdateEmptyState();
+        }
+    }
+
+    private void AttachWorkspace(IArcAgentWorkspace? workspace)
+    {
+        if (ReferenceEquals(_workspace, workspace))
+        {
+            return;
+        }
+
+        if (_workspace is not null)
+        {
+            _workspace.Changed -= OnWorkspaceChanged;
+        }
+
+        _workspace = workspace;
+        if (_workspace is not null)
+        {
+            _workspace.Changed += OnWorkspaceChanged;
+        }
+
+        AttachSession(ResolveSession());
+    }
+
+    private void AttachSession(IArcAgentSession? session)
+    {
+        if (ReferenceEquals(_session, session))
+        {
+            Sync();
+            return;
+        }
+
+        if (_session is not null)
+        {
+            _session.Changed -= OnSessionChanged;
+        }
+
+        _session = session;
+        _timelineCursor = 0;
+        _choiceOptions.Clear();
+        _stepTitles.Clear();
+        ClearProjected(keepLocalNotices: true);
+
+        if (_session is not null)
+        {
+            _session.Changed += OnSessionChanged;
+        }
+
+        Sync();
+    }
+
+    private IArcAgentSession? ResolveSession() => Session ?? _workspace?.Active;
+
+    private void OnWorkspaceChanged(object? sender, ArcAgentWorkspaceChangedEventArgs e) => Sync();
+
+    private void OnSessionChanged(object? sender, ArcAgentSessionChangedEventArgs e) => Sync();
+
+    private void Sync()
+    {
+        if (_disposed || _syncing)
+        {
+            return;
+        }
+
+        _syncing = true;
+        try
+        {
+            var session = ResolveSession();
+            if (!ReferenceEquals(session, _session))
+            {
+                // AttachSession calls Sync() itself, but that nested call is reentrancy-guarded; keep
+                // projecting in this pass so the first event after attaching is never dropped.
+                AttachSession(session);
+            }
+
+            var follow = _chat.Host.IsNearBottom;
+            var streaming = SyncMessages(session);
+            SyncTimeline(session);
+            UpdateHeader();
+            UpdateEmptyState();
+
+            if (follow && streaming && _chat.AutoScrollMode != ArcChatAutoScrollMode.Never)
+            {
+                _chat.ScrollToEnd();
+            }
+        }
+        finally
+        {
+            _syncing = false;
+        }
+    }
+
+    /// <summary>Projects session messages and tool calls; returns true while the newest message streams.</summary>
+    private bool SyncMessages(IArcAgentSession? session)
+    {
+        if (session is null)
+        {
+            ClearProjected(keepLocalNotices: true);
+            return false;
+        }
+
+        var live = new HashSet<string>(StringComparer.Ordinal);
+        var streaming = false;
+        PuraChatMessage? toolHost = null;
+        foreach (var source in session.Messages)
+        {
+            var copy = EnsureProjected(source);
+            var markdown = FormatMessage(source);
+            if (!string.Equals(copy.Markdown, markdown, StringComparison.Ordinal))
+            {
+                copy.Markdown = markdown;
+            }
+
+            if (copy.Status != source.Status)
+            {
+                copy.Status = source.Status;
+            }
+
+            if (!string.Equals(copy.Error, source.Error, StringComparison.Ordinal))
+            {
+                copy.Error = source.Error;
+            }
+
+            if (source.Role is PuraChatRole.Assistant or PuraChatRole.Tool)
+            {
+                toolHost = copy;
+            }
+
+            streaming |= source.Status == PuraChatMessageStatus.Streaming;
+            live.Add(source.Id);
+        }
+
+        var calls = session.ToolCalls.Select(MapToolCall).ToArray();
+        if (calls.Length > 0)
+        {
+            toolHost ??= EnsureSynthetic(SyntheticPrefix + "tools:" + session.SessionId, string.Empty);
+            live.Add(toolHost.Id);
+            var signature = ToolSignature(calls);
+            if (!string.Equals(GetSignature(toolHost.Id), signature, StringComparison.Ordinal))
+            {
+                toolHost.ToolCalls = calls;
+                _signatures[toolHost.Id] = signature;
+            }
+        }
+
+        foreach (var id in _projected.Keys
+                     .Where(id => !live.Contains(id) && !_localNotices.Contains(id) && !id.StartsWith(SyntheticPrefix, StringComparison.Ordinal))
+                     .ToArray())
+        {
+            RemoveProjected(id);
+        }
+
+        return streaming;
+    }
+
+    private readonly Dictionary<string, string> _signatures = new(StringComparer.Ordinal);
+
+    private string GetSignature(string id) => _signatures.TryGetValue(id, out var value) ? value : string.Empty;
+
+    private static string ToolSignature(IReadOnlyList<PuraToolCall> calls) => string.Join(
+        "|",
+        calls.Select(call => $"{call.Id}:{call.Status}:{call.Arguments?.Length}:{call.Result?.Length}:{call.Error}"));
+
+    private void SyncTimeline(IArcAgentSession? session)
+    {
+        if (session is null)
+        {
+            _timelineCursor = 0;
+            return;
+        }
+
+        var timeline = session.Timeline;
+        if (_timelineCursor > timeline.Count)
+        {
+            _timelineCursor = 0;
+            ClearSynthetics(keepLocalNotices: true);
+        }
+
+        for (var index = _timelineCursor; index < timeline.Count; index++)
+        {
+            HandleTimelineEvent(timeline[index]);
+        }
+
+        _timelineCursor = timeline.Count;
+    }
+
+    private void HandleTimelineEvent(ArcAgentEvent @event)
+    {
+        switch (@event)
+        {
+            case ArcStateSnapshotEvent:
+                // A snapshot replaces the projection: drop synthetic rows and let the next sync rebuild them.
+                ClearSynthetics(keepLocalNotices: true);
+                break;
+
+            case ArcQuestionRequestedEvent question:
+                _choiceOptions[question.Request.RequestId] = question.Request.Options.ToArray();
+                EnsureSynthetic(
+                    SyntheticPrefix + "question:" + question.Request.RequestId,
+                    ChoiceFence(question.Request));
+                break;
+
+            case ArcApprovalRequestedEvent approval:
+                EnsureSynthetic(
+                    SyntheticPrefix + "approval:" + approval.Request.RequestId,
+                    ConfirmFence(approval.Request));
+                break;
+
+            case ArcApprovalResolvedEvent resolved:
+                RemoveProjected(SyntheticPrefix + "approval:" + resolved.RequestId);
+                break;
+
+            case ArcStepStartedEvent step:
+                _stepTitles[step.StepId] = step.Title;
+                EnsureSynthetic(
+                    SyntheticPrefix + "step:" + step.StepId,
+                    "**▸ " + step.Title + "**");
+                break;
+
+            case ArcStepFinishedEvent finished:
+                var stepId = SyntheticPrefix + "step:" + finished.StepId;
+                if (_projected.TryGetValue(stepId, out var stepRow))
+                {
+                    var title = _stepTitles.TryGetValue(finished.StepId, out var known) && !string.IsNullOrWhiteSpace(known)
+                        ? " " + known
+                        : string.Empty;
+                    var icon = finished.Status switch
+                    {
+                        ArcStepStatus.Done => "✓",
+                        ArcStepStatus.Failed => "✕",
+                        ArcStepStatus.Skipped => "–",
+                        _ => "▸",
+                    };
+                    stepRow.Markdown = "**" + icon + title + "**";
+                }
+
+                break;
+
+            case ArcArtifactPublishedEvent artifact:
+                EnsureSynthetic(
+                    SyntheticPrefix + "artifact:" + artifact.Artifact.Title + ":" + artifact.Artifact.At.Ticks,
+                    ArtifactMarkdown(artifact.Artifact));
+                break;
+        }
+    }
+
+    private PuraChatMessage EnsureProjected(PuraChatMessage source)
+    {
+        if (_projected.TryGetValue(source.Id, out var existing) && existing.Role == source.Role)
+        {
+            return existing;
+        }
+
+        if (existing is not null)
+        {
+            RemoveProjected(source.Id);
+        }
+
+        var copy = new PuraChatMessage
+        {
+            Id = source.Id,
+            Role = source.Role,
+            Status = source.Status,
+            CreatedAt = source.CreatedAt,
+        };
+        copy.Markdown = FormatMessage(source);
+        _projected[source.Id] = copy;
+        _chat.AddMessage(copy);
+        return copy;
+    }
+
+    private PuraChatMessage EnsureSynthetic(string id, string markdown)
+    {
+        if (_projected.TryGetValue(id, out var existing))
+        {
+            if (!string.Equals(existing.Markdown, markdown, StringComparison.Ordinal))
+            {
+                existing.Markdown = markdown;
+            }
+
+            return existing;
+        }
+
+        var created = new PuraChatMessage
+        {
+            Id = id,
+            Role = PuraChatRole.Assistant,
+            Status = PuraChatMessageStatus.Complete,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+        created.Markdown = markdown;
+        _projected[id] = created;
+        _chat.AddMessage(created);
+        return created;
+    }
+
+    private void RemoveProjected(string id)
+    {
+        if (!_projected.Remove(id))
+        {
+            return;
+        }
+
+        _signatures.Remove(id);
+        _localNotices.Remove(id);
+        _chat.RemoveMessage(id);
+    }
+
+    private void ClearProjected(bool keepLocalNotices)
+    {
+        foreach (var id in _projected.Keys.ToArray())
+        {
+            if (keepLocalNotices && _localNotices.Contains(id))
+            {
+                continue;
+            }
+
+            RemoveProjected(id);
+        }
+
+        _signatures.Clear();
+        _projected.Clear();
+    }
+
+    private void ClearSynthetics(bool keepLocalNotices)
+    {
+        foreach (var id in _projected.Keys
+                     .Where(id => id.StartsWith(SyntheticPrefix, StringComparison.Ordinal) &&
+                                  !(keepLocalNotices && _localNotices.Contains(id)))
+                     .ToArray())
+        {
+            RemoveProjected(id);
+        }
+    }
+
+    private void OnChatInteraction(object? sender, PuraInteractionEventArgs args)
+    {
+        InteractionOccurred?.Invoke(this, args);
+
+        switch (args.ComponentType)
+        {
+            case "choice":
+                var requestId = args.ComponentId ?? string.Empty;
+                var selected = _choiceOptions.TryGetValue(requestId, out var options)
+                    ? args.SelectedIds
+                        .Select(id => int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) &&
+                                      index >= 0 && index < options.Length
+                            ? options[index]
+                            : id)
+                        .ToArray()
+                    : args.SelectedIds.ToArray();
+                _choiceOptions.Remove(requestId);
+                RemoveProjected(SyntheticPrefix + "question:" + requestId);
+                RaiseAnswer(new ArcAgentQuestionAnswerEventArgs(AnswerRequestedEvent)
+                {
+                    RequestId = requestId,
+                    SelectedOptions = selected,
+                });
+                break;
+
+            case "confirm":
+                var approvalId = args.ComponentId ?? string.Empty;
+                RemoveProjected(SyntheticPrefix + "approval:" + approvalId);
+                RaiseApproval(new ArcAgentApprovalDecisionEventArgs(ApprovalDecisionRequestedEvent)
+                {
+                    RequestId = approvalId,
+                    Approved = args.Confirmed == true,
+                });
+                break;
+        }
+    }
+
+    private void OnChatWarning(object? sender, PuraWarningEventArgs args) => Warning?.Invoke(this, args);
+
+    private void RaiseApproval(ArcAgentApprovalDecisionEventArgs args)
+    {
+        ApprovalDecisionRequested?.Invoke(this, args);
+        RaiseEvent(args);
+    }
+
+    private void RaiseAnswer(ArcAgentQuestionAnswerEventArgs args)
+    {
+        AnswerRequested?.Invoke(this, args);
+        RaiseEvent(args);
+    }
+
+    private void UpdateHeader()
+    {
+        _titleText.Text = Title;
+        _header.IsVisible = ShowHeader;
+
+        var session = _session ?? ResolveSession();
+        if (session is null)
+        {
+            _summary.Text = "No active run";
+            return;
+        }
+
+        var step = string.IsNullOrWhiteSpace(session.Run.CurrentStep) ? string.Empty : " · " + session.Run.CurrentStep;
+        _summary.Text = $"{session.Run.Phase}{step} · {session.Messages.Count} msg · {session.ToolCalls.Count} tools";
+    }
+
+    private void UpdateEmptyState() => _emptyHost.IsVisible = _chat.Messages.Count == 0;
+
+
+    private static string FormatMessage(PuraChatMessage message)
+    {
+        var prefix = message.Role switch
+        {
+            PuraChatRole.User => "**You**\n\n",
+            PuraChatRole.System => "> ",
+            PuraChatRole.Tool => "**Tool result**\n\n",
+            _ => string.Empty,
+        };
+        var body = prefix + message.Markdown;
+        if (message.Status is PuraChatMessageStatus.Failed or PuraChatMessageStatus.Aborted &&
+            !string.IsNullOrWhiteSpace(message.Error))
+        {
+            body += "\n\n---\n\n*" + message.Error + "*";
+        }
+
+        return body;
+    }
+
+    private static PuraToolCall MapToolCall(PuraToolCall call) => call;
+
+    private static string ChoiceFence(ArcQuestionRequest request)
+    {
+        var options = request.Options
+            .Select((option, index) => new Dictionary<string, object?>
+            {
+                ["id"] = index.ToString(CultureInfo.InvariantCulture),
+                ["label"] = option,
+            })
+            .ToArray();
+        var payload = new Dictionary<string, object?>
+        {
+            ["type"] = "choice",
+            ["version"] = "1.0",
+            ["id"] = request.RequestId,
+            ["question"] = request.Question,
+            ["options"] = options,
+            ["multi"] = false,
+        };
+        var note = request.AllowFreeText ? "\n\n> 也可以直接输入回答。" : string.Empty;
+        return Fence(payload, note);
+    }
+
+    private static string ConfirmFence(ArcApprovalRequest request)
+    {
+        var payload = new Dictionary<string, object?>
+        {
+            ["type"] = "confirm",
+            ["version"] = "1.0",
+            ["id"] = request.RequestId,
+            ["question"] = $"Approve \"{request.ToolName}\"?",
+            ["description"] = request.Intent,
+            ["danger"] = request.Risk == ArcRiskLevel.High,
+            ["confirmLabel"] = "Approve",
+            ["cancelLabel"] = "Deny",
+        };
+        return Fence(payload);
+    }
+
+    private static string ArtifactMarkdown(ArcArtifact artifact)
+    {
+        var text = $"📄 **{artifact.Title}**";
+        if (!string.IsNullOrWhiteSpace(artifact.Subtitle))
+        {
+            text += "\n\n" + artifact.Subtitle;
+        }
+
+        if (!string.IsNullOrWhiteSpace(artifact.DisplayText))
+        {
+            text += "\n\n`" + artifact.DisplayText.Replace("`", "'", StringComparison.Ordinal) + "`";
+        }
+
+        return text;
+    }
+
+    private static string Fence(object payload, string? note = null) =>
+        "```pura-agent\n" + JsonSerializer.Serialize(payload) + "\n```" + (note ?? string.Empty);
 
     /// <inheritdoc />
     public void Dispose()
@@ -304,869 +780,21 @@ public class ArcAgentConversation : Panel, IDisposable
         }
 
         _disposed = true;
-        UnsubscribeWorkspace();
-        UnsubscribeSession();
-        GC.SuppressFinalize(this);
-    }
-
-    private void RebindWorkspace()
-    {
-        UnsubscribeWorkspace();
-        _workspace = Workspace;
-        if (_workspace is not null)
-        {
-            _workspace.Changed += OnWorkspaceChanged;
-        }
-
-        BindSession(ResolveSession(), force: false);
-    }
-
-    private IArcAgentSession? ResolveSession() => Session ?? _workspace?.Active;
-
-    private void OnWorkspaceChanged(object? sender, ArcAgentWorkspaceChangedEventArgs e)
-    {
-        BindSession(ResolveSession(), force: false);
-        Sync();
-    }
-
-    private void BindSession(IArcAgentSession? session, bool force)
-    {
-        if (!force && ReferenceEquals(_session, session))
-        {
-            UpdateHeader();
-            return;
-        }
-
-        UnsubscribeSession();
-        _session = session;
-        if (_session is not null)
-        {
-            _session.Changed += OnSessionChanged;
-        }
-
-        RebuildAll();
-    }
-
-    private void OnSessionChanged(object? sender, ArcAgentSessionChangedEventArgs e) => Sync();
-
-    private void UnsubscribeWorkspace()
-    {
-        if (_workspace is not null)
-        {
-            _workspace.Changed -= OnWorkspaceChanged;
-            _workspace = null;
-        }
-    }
-
-    private void UnsubscribeSession()
-    {
         if (_session is not null)
         {
             _session.Changed -= OnSessionChanged;
             _session = null;
         }
-    }
 
-    private void RebuildAll()
-    {
-        ResetRows();
-        _eventCursor = 0;
-        _firstSync = true;
-        Sync();
-    }
-
-    private void ResetRows()
-    {
-        _messageRows.Clear();
-        _toolRows.Clear();
-        _reasoningRows.Clear();
-        _approvalRows.Clear();
-        _questionRows.Clear();
-        _stepRows.Clear();
-        _eventRowKeys.Clear();
-        _emptyState = null;
-        _emptyCopy = null;
-        _rowsHost.Children.Clear();
-    }
-
-    private void Sync()
-    {
-        if (_session is null)
+        if (_workspace is not null)
         {
-            UpdateHeader();
-            UpdateEmptyState();
-            return;
+            _workspace.Changed -= OnWorkspaceChanged;
+            _workspace = null;
         }
 
-        var timeline = _session.Timeline;
-        if (timeline.Count < _eventCursor)
-        {
-            _eventCursor = 0;
-            ResetRows();
-        }
-
-        var appended = false;
-        for (; _eventCursor < timeline.Count; _eventCursor++)
-        {
-            var @event = timeline[_eventCursor];
-            if (@event is ArcStateSnapshotEvent)
-            {
-                ResetRows();
-                foreach (var message in _session.Messages)
-                {
-                    EnsureMessageRow(message);
-                }
-
-                appended = true;
-                continue;
-            }
-
-            AppendRow(@event, _session);
-            appended = true;
-        }
-
-        foreach (var local in _localMessages)
-        {
-            EnsureMessageRow(local);
-        }
-
-        UpdateHeader();
-        UpdateEmptyState();
-
-        // Show the beginning of the run on first render (design review and screenshots); later events follow
-        // the reader only while the viewport is already near the end.
-        if (appended && !_firstSync && !_pointerPressed && !_userDragging && IsNearBottom())
-        {
-            ScrollToEnd();
-        }
-
-        _firstSync = false;
-    }
-
-    private bool IsNearBottom()
-    {
-        var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
-        return maximum - Math.Max(0, _scroll.Offset.Y) <= 64;
-    }
-
-    /// <inheritdoc />
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
-    {
-        base.OnPointerPressed(e);
-        _pointerPressed = true;
-        _pointerOrigin = e.GetPosition(this);
-    }
-
-    /// <inheritdoc />
-    protected override void OnPointerMoved(PointerEventArgs e)
-    {
-        base.OnPointerMoved(e);
-        if (!_pointerPressed)
-        {
-            return;
-        }
-
-        var position = e.GetPosition(this);
-        if (Math.Abs(position.X - _pointerOrigin.X) > DragSlop || Math.Abs(position.Y - _pointerOrigin.Y) > DragSlop)
-        {
-            _userDragging = true;
-        }
-    }
-
-    /// <inheritdoc />
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
-    {
-        base.OnPointerReleased(e);
-        ResetPointerState();
-    }
-
-    /// <inheritdoc />
-    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-    {
-        base.OnPointerCaptureLost(e);
-        ResetPointerState();
-    }
-
-    private void ResetPointerState()
-    {
-        _pointerPressed = false;
-        _userDragging = false;
-    }
-
-    private void AppendRow(ArcAgentEvent @event, IArcAgentSession session)
-    {
-        switch (@event)
-        {
-            case ArcMessageStartedEvent started:
-                AddMessageRow(session, started.MessageId);
-                break;
-            case ArcMessageDeltaEvent delta:
-                AddMessageRow(session, delta.MessageId);
-                break;
-            case ArcMessageEndedEvent ended:
-                AddMessageRow(session, ended.MessageId);
-                break;
-            case ArcReasoningDeltaEvent reasoning:
-                AppendReasoning(reasoning);
-                break;
-            case ArcToolCallStartedEvent tool:
-                AddToolRow(session, tool.CallId);
-                break;
-            case ArcToolArgsDeltaEvent args:
-                AddToolRow(session, args.CallId);
-                break;
-            case ArcToolCallEndedEvent toolEnd:
-                AddToolRow(session, toolEnd.CallId);
-                break;
-            case ArcApprovalRequestedEvent approval:
-                AddApprovalRow(approval.Request);
-                break;
-            case ArcApprovalResolvedEvent resolved:
-                ResolveApprovalRow(resolved.RequestId, resolved.State);
-                break;
-            case ArcQuestionRequestedEvent question:
-                AddQuestionRow(question.Request);
-                break;
-            case ArcStepStartedEvent step:
-                UpdateStepRow(session, step.StepId, step.Title);
-                break;
-            case ArcStepFinishedEvent step:
-                UpdateStepRow(session, step.StepId, null);
-                break;
-            case ArcArtifactPublishedEvent artifact:
-                AddEventRow($"artifact:{artifact.Artifact.ArtifactId}", BuildArtifactCard(artifact.Artifact));
-                break;
-            case ArcAttentionRaisedEvent attention:
-                AddEventRow($"attention:{attention.Entry.EntryId}", BuildAttentionCard(attention.Entry));
-                break;
-            case ArcRunStartedEvent run:
-                AddEventRow(
-                    $"run:{run.Run.RunId}",
-                    BuildCompactCard(
-                        "circle-dot",
-                        ArcTokens.Accent,
-                        "Run started",
-                        run.Run.Label ?? run.Run.Kind.ToString(),
-                        null));
-                break;
-            case ArcRunPhaseChangedEvent phase:
-                AddEventRow(
-                    $"phase:{phase.Stamp.EventId}",
-                    BuildCompactCard(
-                        "activity",
-                        PhaseToken(phase.Phase),
-                        $"Run {PhaseWord(phase.Phase)}",
-                        null,
-                        phase.At.ToLocalTime().ToString("HH:mm")));
-                break;
-            case ArcCustomEvent custom:
-                AddEventRow(
-                    $"custom:{custom.Stamp.EventId}",
-                    BuildCompactCard("message-circle", ArcTokens.TextSecondary, custom.Kind, custom.Payload, null));
-                break;
-            case ArcStateDeltaEvent delta:
-                AddEventRow(
-                    $"state:{delta.Stamp.EventId}",
-                    BuildCompactCard("activity", ArcTokens.TextMuted, "State update", delta.DeltaJson, null));
-                break;
-        }
-    }
-
-    private void AddMessageRow(IArcAgentSession session, string messageId)
-    {
-        if (_messageRows.ContainsKey(messageId))
-        {
-            return;
-        }
-
-        var message = session.Messages.FirstOrDefault(candidate => string.Equals(candidate.Id, messageId, StringComparison.Ordinal));
-        if (message is null)
-        {
-            return;
-        }
-
-        EnsureMessageRow(message);
-    }
-
-    private void EnsureMessageRow(ArcChatMessage message)
-    {
-        if (_messageRows.ContainsKey(message.Id))
-        {
-            return;
-        }
-
-        var bubble = new ArcChatBubble
-        {
-            Message = message,
-            IsOwn = message.Role == ArcChatRole.User,
-            ShowHeader = true,
-            ShowStatus = true,
-            ShowAvatar = message.Role != ArcChatRole.System,
-            FirstInGroup = true,
-            LastInGroup = true,
-            MarkdownOptions = ResolveOptions(),
-            Margin = new Thickness(0, 2, 0, 2)
-        };
-        bubble.InteractionOccurred += (_, args) => InteractionOccurred?.Invoke(this, args);
-        bubble.Warning += (_, args) => Warning?.Invoke(this, args);
-
-        _messageRows[message.Id] = bubble;
-        _rowsHost.Children.Add(bubble);
-    }
-
-    private void AddToolRow(IArcAgentSession session, string callId)
-    {
-        var call = session.ToolCalls.FirstOrDefault(candidate => string.Equals(candidate.Id, callId, StringComparison.Ordinal));
-        if (call is null)
-        {
-            return;
-        }
-
-        if (_toolRows.TryGetValue(callId, out var existing))
-        {
-            existing.Call = call;
-            return;
-        }
-
-        var card = new ArcAgentToolCallCard { Call = call, Margin = new Thickness(0, 2, 0, 2) };
-        card.ApproveRequested += (_, id) => RaiseApprovalDecision(id, Approved: true, null);
-        card.DenyRequested += (_, id) => RaiseApprovalDecision(id, Approved: false, "Denied by the user.");
-        card.RetryRequested += (_, id) => RaiseRetry(id);
-        _toolRows[callId] = card;
-        _rowsHost.Children.Add(card);
-    }
-
-    private void AppendReasoning(ArcReasoningDeltaEvent reasoning)
-    {
-        if (!_reasoningRows.TryGetValue(reasoning.ReasoningId, out var row))
-        {
-            var body = new ArcMarkdownView { Markdown = string.Empty, Options = ResolveOptions() };
-            var header = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 6,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            header.Children.Add(ArcUi.Icon("sparkles", 14, ArcTokens.TextSecondary));
-            header.Children.Add(ArcUi.Text("Reasoning", "arc-caption arc-secondary"));
-            var expander = new Expander
-            {
-                Header = header,
-                Content = body,
-                IsExpanded = false,
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            };
-            var surface = ArcUi.Surface(expander, 10);
-            surface.Margin = new Thickness(0, 2, 0, 2);
-            row = new ReasoningRow { Body = body };
-            _reasoningRows[reasoning.ReasoningId] = row;
-            _rowsHost.Children.Add(surface);
-        }
-
-        row.Text.Append(reasoning.Delta);
-        row.Body.Markdown = row.Text.ToString();
-    }
-
-    private void AddApprovalRow(ArcApprovalRequest request)
-    {
-        if (_approvalRows.ContainsKey(request.RequestId))
-        {
-            return;
-        }
-
-        var row = new ApprovalRow(request, RaiseApprovalDecision);
-        _approvalRows[request.RequestId] = row;
-        _rowsHost.Children.Add(row.Control);
-    }
-
-    private void ResolveApprovalRow(string requestId, ArcApprovalState state)
-    {
-        if (_approvalRows.TryGetValue(requestId, out var row))
-        {
-            row.Apply(state);
-        }
-    }
-
-    private void AddQuestionRow(ArcQuestionRequest request)
-    {
-        if (!_questionRows.Add(request.RequestId))
-        {
-            return;
-        }
-
-        var options = request.Options.Count > 0
-            ? request.Options.Select(option => new ArcAgentChoiceOption(option, option)).ToArray()
-            : Array.Empty<ArcAgentChoiceOption>();
-        var model = new ArcAgentChoiceModel
-        {
-            Type = "question",
-            Version = "1.0",
-            Id = request.RequestId,
-            Question = request.Question,
-            Options = options,
-            Multi = false,
-            Min = options.Length > 0 ? 1 : 0,
-            SubmitLabel = "Send answer"
-        };
-        var card = new ArcAgentChoiceCard
-        {
-            Model = model,
-            AllowFreeText = request.AllowFreeText || options.Length == 0,
-            AllowDefer = true,
-            Margin = new Thickness(0, 2, 0, 2)
-        };
-        card.Submitted += (_, args) => RaiseAnswer(request.RequestId, args.SelectedIds, args.FreeText, deferred: false);
-        card.DeferredRequested += (_, _) => RaiseAnswer(request.RequestId, Array.Empty<string>(), null, deferred: true);
-        _rowsHost.Children.Add(card);
-    }
-
-    private void UpdateStepRow(IArcAgentSession session, string stepId, string? title)
-    {
-        var step = session.Steps.FirstOrDefault(candidate => string.Equals(candidate.Id, stepId, StringComparison.Ordinal));
-        if (!_stepRows.TryGetValue(stepId, out var row))
-        {
-            row = new StepRow();
-            _stepRows[stepId] = row;
-            _rowsHost.Children.Add(row.Control);
-        }
-
-        row.Update(title ?? step?.Title ?? "Step", step?.Status ?? ArcStepStatus.Running);
-    }
-
-    private void AddEventRow(string key, Control control)
-    {
-        if (!_eventRowKeys.Add(key))
-        {
-            return;
-        }
-
-        control.Margin = new Thickness(0, 2, 0, 2);
-        _rowsHost.Children.Add(control);
-    }
-
-    private ArcMarkdownOptions ResolveOptions() => MarkdownOptions ?? ArcAgentMarkdown.DefaultOptions;
-
-    private void UpdateHeader()
-    {
-        _titleText.Text = Title;
-        _header.IsVisible = ShowHeader;
-        _divider.IsVisible = ShowHeader;
-        if (!ShowHeader)
-        {
-            return;
-        }
-
-        _badgeHost.Children.Clear();
-        var session = _session;
-        if (session is null)
-        {
-            _summary.Text = "No run attached.";
-            _badgeHost.Children.Add(ArcUi.Badge("Idle", ArcBadgeTone.Neutral));
-            ArcUi.Name(this, "Agent conversation. No run attached.");
-            return;
-        }
-
-        var messageCount = session.Messages.Count;
-        var toolCount = session.ToolCalls.Count;
-        _summary.Text =
-            $"{messageCount} message{(messageCount == 1 ? string.Empty : "s")} · " +
-            $"{toolCount} tool call{(toolCount == 1 ? string.Empty : "s")} · {PhaseWord(session.Run.Phase)}";
-        _badgeHost.Children.Add(PhaseBadge(session.Run.Phase));
-        if (session.Run.Phase is ArcRunPhase.Running or ArcRunPhase.Planning
-            or ArcRunPhase.AwaitingApproval or ArcRunPhase.AwaitingInput)
-        {
-            _badgeHost.Children.Add(ArcUi.Pill("Live", "activity", accent: true));
-        }
-
-        ArcUi.Name(
-            this,
-            $"Agent conversation, {messageCount} messages, {toolCount} tool calls, {PhaseWord(session.Run.Phase)}.");
-    }
-
-    private void ApplyHeaderVisibility()
-    {
-        _header.IsVisible = ShowHeader;
-        _divider.IsVisible = ShowHeader;
-    }
-
-    private void UpdateEmptyState()
-    {
-        var empty = _session is null || _rowsHost.Children.Count == 0
-            || (_rowsHost.Children.Count == 1 && ReferenceEquals(_rowsHost.Children[0], _emptyState));
-        if (!empty)
-        {
-            if (_emptyState is not null && _rowsHost.Children.Contains(_emptyState))
-            {
-                _rowsHost.Children.Remove(_emptyState);
-            }
-
-            return;
-        }
-
-        if (_emptyState is null)
-        {
-            var copy = ArcUi.Body(EmptyText, 520);
-            copy.HorizontalAlignment = HorizontalAlignment.Center;
-            copy.TextAlignment = TextAlignment.Center;
-            _emptyCopy = copy;
-            var panel = new StackPanel
-            {
-                Spacing = 6,
-                Margin = new Thickness(0, 24, 0, 24),
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            panel.Children.Add(ArcUi.Icon("message-circle", 22, ArcTokens.TextMuted));
-            panel.Children.Add(copy);
-            _emptyState = panel;
-        }
-
-        if (_emptyCopy is not null)
-        {
-            _emptyCopy.Text = EmptyText;
-        }
-
-        if (!_rowsHost.Children.Contains(_emptyState))
-        {
-            _rowsHost.Children.Insert(0, _emptyState);
-        }
-    }
-
-    private void RaiseApprovalDecision(string requestId, bool Approved, string? reason)
-    {
-        var args = new ArcAgentApprovalDecisionEventArgs
-        {
-            RequestId = requestId,
-            Approved = Approved,
-            Reason = reason
-        };
-        ApprovalDecisionRequested?.Invoke(this, args);
-        args.RoutedEvent = ApprovalDecisionRequestedEvent;
-        RaiseEvent(args);
-    }
-
-    private void RaiseAnswer(string requestId, IReadOnlyList<string> selected, string? freeText, bool deferred)
-    {
-        var args = new ArcAgentQuestionAnswerEventArgs
-        {
-            RequestId = requestId,
-            SelectedOptions = selected,
-            FreeText = freeText,
-            Deferred = deferred
-        };
-        AnswerRequested?.Invoke(this, args);
-        args.RoutedEvent = AnswerRequestedEvent;
-        RaiseEvent(args);
-    }
-
-    private void RaiseRetry(string callId)
-    {
-        var args = new ArcAgentToolRetryEventArgs { CallId = callId };
-        RetryRequested?.Invoke(this, args);
-        args.RoutedEvent = RetryRequestedEvent;
-        RaiseEvent(args);
-    }
-
-    private static Control BuildCompactCard(
-        string icon,
-        string iconToken,
-        string title,
-        string? detail,
-        string? trailing)
-    {
-        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("26,*,Auto"), ColumnSpacing = 8 };
-        row.Children.Add(new Border
-        {
-            Width = 24,
-            Height = 24,
-            CornerRadius = new CornerRadius(8),
-            Background = ArcUi.Brush(ArcTokens.SurfaceMuted),
-            VerticalAlignment = VerticalAlignment.Top,
-            Child = new ArcIcon
-            {
-                Icon = icon,
-                Size = 13,
-                Foreground = ArcUi.Brush(iconToken),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            }
-        });
-
-        var copy = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
-        copy.Children.Add(ArcUi.Text(title, "arc-body-sm"));
-        if (!string.IsNullOrWhiteSpace(detail))
-        {
-            copy.Children.Add(ArcUi.Caption(Trim(detail, 500)));
-        }
-
-        Grid.SetColumn(copy, 1);
-        row.Children.Add(copy);
-        if (!string.IsNullOrWhiteSpace(trailing))
-        {
-            var caption = ArcUi.Caption(trailing);
-            caption.VerticalAlignment = VerticalAlignment.Center;
-            Grid.SetColumn(caption, 2);
-            row.Children.Add(caption);
-        }
-
-        return ArcUi.Surface(row, 10, radius: 18);
-    }
-
-    private static Control BuildArtifactCard(ArcArtifact artifact)
-    {
-        var stack = new StackPanel { Spacing = 2 };
-        var head = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
-        head.Children.Add(ArcUi.Icon("file", 14, ArcTokens.Success));
-        head.Children.Add(ArcUi.Text(artifact.Title, "arc-body-sm"));
-        stack.Children.Add(head);
-        if (!string.IsNullOrWhiteSpace(artifact.Subtitle))
-        {
-            stack.Children.Add(ArcUi.Caption(artifact.Subtitle));
-        }
-
-        if (!string.IsNullOrWhiteSpace(artifact.DisplayText))
-        {
-            stack.Children.Add(ArcUi.Mono(Trim(artifact.DisplayText, 400)));
-        }
-
-        return ArcUi.Surface(stack, 10, radius: 18);
-    }
-
-    private static Control BuildAttentionCard(ArcAttentionEntry entry)
-    {
-        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("26,*,Auto"), ColumnSpacing = 8 };
-        row.Children.Add(new Border
-        {
-            Width = 24,
-            Height = 24,
-            CornerRadius = new CornerRadius(8),
-            Background = ArcUi.Brush(ArcTokens.SurfaceMuted),
-            VerticalAlignment = VerticalAlignment.Top,
-            Child = new ArcIcon
-            {
-                Icon = "bell",
-                Size = 13,
-                Foreground = ArcUi.Brush(ArcTokens.Warning),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            }
-        });
-
-        var copy = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
-        copy.Children.Add(ArcUi.Text(entry.Title, "arc-body-sm"));
-        if (!string.IsNullOrWhiteSpace(entry.Detail))
-        {
-            copy.Children.Add(ArcUi.Caption(entry.Detail));
-        }
-
-        Grid.SetColumn(copy, 1);
-        row.Children.Add(copy);
-        var pill = ArcUi.Pill(
-            entry.Level.ToString(),
-            "bell",
-            accent: entry.Level == ArcAttentionLevel.Blocking);
-        pill.VerticalAlignment = VerticalAlignment.Center;
-        Grid.SetColumn(pill, 2);
-        row.Children.Add(pill);
-        return ArcUi.Surface(row, 10, radius: 18);
-    }
-
-    private static string Trim(string text, int max) =>
-        text.Length <= max ? text : text[..max] + "…";
-
-    private static ArcBadge PhaseBadge(ArcRunPhase phase) => phase switch
-    {
-        ArcRunPhase.Running or ArcRunPhase.Planning => ArcUi.Badge("Running", ArcBadgeTone.Accent),
-        ArcRunPhase.AwaitingApproval or ArcRunPhase.AwaitingInput => ArcUi.Badge("Awaiting input", ArcBadgeTone.Warning),
-        ArcRunPhase.Paused => ArcUi.Badge("Paused", ArcBadgeTone.Warning),
-        ArcRunPhase.Done => ArcUi.Badge("Done", ArcBadgeTone.Success),
-        ArcRunPhase.Failed => ArcUi.Badge("Failed", ArcBadgeTone.Danger),
-        ArcRunPhase.Stopped or ArcRunPhase.TakenOver => ArcUi.Badge("Stopped", ArcBadgeTone.Neutral),
-        _ => ArcUi.Badge("Idle", ArcBadgeTone.Neutral)
-    };
-
-    private static string PhaseWord(ArcRunPhase phase) => phase switch
-    {
-        ArcRunPhase.Planning => "planning",
-        ArcRunPhase.Running => "the agent is working",
-        ArcRunPhase.AwaitingApproval => "waiting for approval",
-        ArcRunPhase.AwaitingInput => "waiting for your answer",
-        ArcRunPhase.Paused => "paused",
-        ArcRunPhase.Done => "run finished",
-        ArcRunPhase.Failed => "the run hit an error",
-        ArcRunPhase.Stopped => "run stopped",
-        ArcRunPhase.TakenOver => "taken over",
-        _ => "idle"
-    };
-
-    private static string PhaseToken(ArcRunPhase phase) => phase switch
-    {
-        ArcRunPhase.Done => ArcTokens.Success,
-        ArcRunPhase.Failed => ArcTokens.Danger,
-        ArcRunPhase.AwaitingApproval or ArcRunPhase.AwaitingInput => ArcTokens.Warning,
-        _ => ArcTokens.TextSecondary
-    };
-
-    private sealed class ReasoningRow
-    {
-        internal required ArcMarkdownView Body { get; init; }
-
-        internal StringBuilder Text { get; } = new();
-    }
-
-    private sealed class StepRow
-    {
-        private readonly TextBlock _title;
-        private readonly StackPanel _badgeHost;
-
-        internal StepRow()
-        {
-            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("26,*,Auto"), ColumnSpacing = 8 };
-            row.Children.Add(new Border
-            {
-                Width = 24,
-                Height = 24,
-                CornerRadius = new CornerRadius(8),
-                Background = ArcUi.Brush(ArcTokens.SurfaceMuted),
-                VerticalAlignment = VerticalAlignment.Top,
-                Child = new ArcIcon
-                {
-                    Icon = "list-ordered",
-                    Size = 13,
-                    Foreground = ArcUi.Brush(ArcTokens.TextSecondary),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            });
-            _title = ArcUi.Text("Step", "arc-body-sm");
-            Grid.SetColumn(_title, 1);
-            row.Children.Add(_title);
-            _badgeHost = ArcUi.HStack(4);
-            _badgeHost.VerticalAlignment = VerticalAlignment.Center;
-            Grid.SetColumn(_badgeHost, 2);
-            row.Children.Add(_badgeHost);
-            Control = ArcUi.Surface(row, 10, radius: 18);
-        }
-
-        internal Control Control { get; }
-
-        internal void Update(string title, ArcStepStatus status)
-        {
-            _title.Text = title;
-            _badgeHost.Children.Clear();
-            _badgeHost.Children.Add(StepBadge(status));
-        }
-
-        private static ArcBadge StepBadge(ArcStepStatus status) => status switch
-        {
-            ArcStepStatus.Done => ArcUi.Badge("Done", ArcBadgeTone.Success),
-            ArcStepStatus.Failed => ArcUi.Badge("Failed", ArcBadgeTone.Danger),
-            ArcStepStatus.Skipped => ArcUi.Badge("Skipped", ArcBadgeTone.Neutral),
-            ArcStepStatus.Running => ArcUi.Badge("Running", ArcBadgeTone.Accent),
-            _ => ArcUi.Badge("Pending", ArcBadgeTone.Neutral)
-        };
-    }
-
-    private sealed class ApprovalRow
-    {
-        private readonly ArcBadge _badge;
-        private readonly StackPanel _actions;
-        private readonly TextBlock _state;
-        private readonly Action<string, bool, string?> _decision;
-        private readonly string _requestId;
-
-        internal ApprovalRow(ArcApprovalRequest request, Action<string, bool, string?> decision)
-        {
-            _requestId = request.RequestId;
-            _decision = decision;
-
-            var header = new Grid { ColumnDefinitions = new ColumnDefinitions("26,*,Auto"), ColumnSpacing = 8 };
-            header.Children.Add(new Border
-            {
-                Width = 24,
-                Height = 24,
-                CornerRadius = new CornerRadius(8),
-                Background = ArcUi.Brush(ArcTokens.SurfaceMuted),
-                VerticalAlignment = VerticalAlignment.Top,
-                Child = new ArcIcon
-                {
-                    Icon = "shield",
-                    Size = 13,
-                    Foreground = ArcUi.Brush(ArcTokens.Warning),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            });
-
-            var copy = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
-            copy.Children.Add(ArcUi.Text($"Approval needed: {request.ToolName}", "arc-body-sm arc-medium"));
-            if (!string.IsNullOrWhiteSpace(request.Intent))
-            {
-                copy.Children.Add(ArcUi.Caption(request.Intent));
-            }
-
-            if (request.Arguments.Count > 0)
-            {
-                copy.Children.Add(ArcUi.Mono(Trim(
-                    string.Join(" · ", request.Arguments.Select(argument => $"{argument.Name}={argument.Value}")),
-                    240)));
-            }
-
-            Grid.SetColumn(copy, 1);
-            header.Children.Add(copy);
-            _badge = ArcUi.Badge("Needs approval", ArcBadgeTone.Warning);
-            Grid.SetColumn(_badge, 2);
-            header.Children.Add(_badge);
-
-            _actions = ArcUi.HStack(6);
-            var approve = ArcUi.Button("Approve", ArcButtonVariant.Primary, ArcButtonSize.Sm, "check");
-            var deny = ArcUi.Button("Deny", ArcButtonVariant.Ghost, ArcButtonSize.Sm, "x");
-            ArcUi.Name(approve, $"Approve {request.ToolName}");
-            ArcUi.Name(deny, $"Deny {request.ToolName}");
-            approve.Click += (_, _) => _decision(_requestId, true, null);
-            deny.Click += (_, _) => _decision(_requestId, false, "Denied by the user.");
-            _actions.Children.Add(approve);
-            _actions.Children.Add(deny);
-
-            _state = ArcUi.Caption(string.Empty);
-            _state.IsVisible = false;
-
-            var stack = new StackPanel { Spacing = 6 };
-            stack.Children.Add(header);
-            stack.Children.Add(_actions);
-            stack.Children.Add(_state);
-            Control = ArcUi.Surface(stack, 10, radius: 18);
-        }
-
-        internal Control Control { get; }
-
-        internal void Apply(ArcApprovalState state)
-        {
-            _badge.Content = state switch
-            {
-                ArcApprovalState.Approved => "Approved",
-                ArcApprovalState.Denied => "Denied",
-                ArcApprovalState.Expired => "Expired",
-                ArcApprovalState.Deferred => "Deferred",
-                _ => "Needs approval"
-            };
-            _badge.Tone = state switch
-            {
-                ArcApprovalState.Approved => ArcBadgeTone.Success,
-                ArcApprovalState.Denied => ArcBadgeTone.Neutral,
-                ArcApprovalState.Expired => ArcBadgeTone.Danger,
-                ArcApprovalState.Deferred => ArcBadgeTone.Warning,
-                _ => ArcBadgeTone.Warning
-            };
-            _actions.IsVisible = false;
-            _state.Text = state switch
-            {
-                ArcApprovalState.Approved => "Approved by the user.",
-                ArcApprovalState.Denied => "Denied by the user.",
-                ArcApprovalState.Expired => "The request expired before a decision.",
-                ArcApprovalState.Deferred => "Deferred; the host decides when to ask again.",
-                _ => string.Empty
-            };
-            _state.IsVisible = !string.IsNullOrWhiteSpace(_state.Text);
-        }
+        _chat.InteractionOccurred -= OnChatInteraction;
+        _chat.Host.Warning -= OnChatWarning;
+        _chat.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

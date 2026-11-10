@@ -622,3 +622,4 @@ public class ArcChatComposer : TemplatedControl
            || name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)
            || name.EndsWith(".webp", StringComparison.OrdinalIgnoreCase);
 }
+

@@ -27,6 +27,8 @@ using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 using PuraMarkdown.Core.Security;
 using Agent = Arc.Avalonia.Agent;
 using AgentUi = Arc.Avalonia.AgentUI.Controls;
@@ -900,45 +902,62 @@ public static class Program
         dispatcher.RunPending();
         Check("coalescer flushes a batch once", flushes == 1 && batched == 5 && coalescer.FlushCount == 1);
 
-        // Unified message model + conversation projection (Chat message model is the only one now).
+        // Unified message model + conversation projection (PuraMarkdown.Agent's chat message is the only one).
         var sessionA = first.GetSession("run-a");
-        Check("agent session messages use the unified chat message model",
+        Check("agent session messages use the upstream chat message model",
             sessionA is not null &&
             sessionA.Messages.Count == 1 &&
-            sessionA.Messages[0] is ArcChatMessage { Markdown: "hello world" } &&
-            sessionA.Messages[0].Role == ArcChatRole.Assistant);
+            sessionA.Messages[0] is PuraChatMessage { Markdown: "hello world" } &&
+            sessionA.Messages[0].Role == PuraChatRole.Assistant);
+
+        // Agent tool calls project to the upstream PuraToolCall model (arguments/result/status carried over).
+        Check("agent session maps tool calls to the upstream PuraToolCall",
+            sessionA is not null &&
+            sessionA.ToolCalls.Count == 1 &&
+            sessionA.ToolCalls[0] is PuraToolCall
+            {
+                Id: "call-1",
+                Name: "repo.search",
+                Status: PuraToolCallStatus.Succeeded,
+                Result: "1 match"
+            });
+
+        Check("pura tool-call JSON maps to PuraToolCall",
+            PuraToolCall.TryParse(
+                """{"id":"call-9","name":"repo.search","status":"succeeded","arguments":{"q":"x"},"result":"1 match"}""",
+                out var parsedCall,
+                out _) &&
+            parsedCall is
+            {
+                Id: "call-9",
+                Name: "repo.search",
+                Status: PuraToolCallStatus.Succeeded,
+                Result: "1 match"
+            } &&
+            parsedCall.Arguments == """{"q":"x"}""");
 
         var conversation = new Agent.ArcAgentConversation { Session = sessionA };
-        var conversationControls = Walk(conversation).ToArray();
-        var bubbles = conversationControls.OfType<ArcChatBubble>().ToArray();
-        var toolCards = conversationControls.OfType<Agent.ArcAgentToolCallCard>().ToArray();
-        Check("agent conversation interleaves message bubbles and event cards",
-            conversation.Timeline.Count == 14 &&
-            bubbles.Length == 1 &&
-            toolCards.Length == 1 &&
-            Array.IndexOf(conversationControls, bubbles[0]) < Array.IndexOf(conversationControls, toolCards[0]));
+        Check("agent conversation projects the full timeline", conversation.Timeline.Count == 14);
 
-        var approvalDecision = (string?)null;
-        conversation.ApprovalDecisionRequested += (_, args) =>
-        {
-            if (args.Approved)
-            {
-                approvalDecision = args.RequestId;
-            }
-        };
-        var approveButton = conversationControls
-            .OfType<ArcButton>()
-            .FirstOrDefault(button => (AutomationProperties.GetName(button) ?? string.Empty)
-                .StartsWith("Approve", StringComparison.Ordinal));
-        approveButton?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, approveButton));
-        Check("agent conversation raises approval decisions", approvalDecision == "approval-1");
+        // The conversation now renders through PuraChatView: approvals/questions are synthesized pura-agent
+        // fences and tool calls ride on PuraChatMessage.ToolCalls, so assert the upstream projection (the
+        // rendered controls need a visual tree, which this headless harness does not create).
+        Check("agent conversation projects tool calls as PuraToolCall cards",
+            conversation.Chat.Messages.Any(message =>
+                message.ToolCalls is { Count: 1 } calls &&
+                calls[0] is { Name: "repo.search", Status: PuraToolCallStatus.Succeeded }));
+        Check("agent conversation projects approvals as pura-agent confirm components",
+            conversation.Chat.Messages.Any(message =>
+                string.Equals(message.Id, "arc:approval:approval-1", StringComparison.Ordinal) &&
+                message.Markdown.Contains("\"type\":\"confirm\"", StringComparison.Ordinal) &&
+                message.Markdown.Contains("approval-1", StringComparison.Ordinal)));
 
-        // View registry defaults + override.
+        // View registry defaults + override (messages and tool calls come from PuraMarkdown.Agent).
         var registry = new Agent.ArcAgentItemViewRegistry();
         Check("view registry resolves a message view",
-            registry.Resolve(new ArcChatMessage { Id = "m", Role = ArcChatRole.Assistant }) is Control);
+            registry.Resolve(new PuraChatMessage { Id = "m", Role = PuraChatRole.Assistant }) is Control);
         Check("view registry resolves a tool view",
-            registry.Resolve(new Agent.ArcToolCall { Id = "c", ToolName = "t" }) is Control);
+            registry.Resolve(new PuraToolCall { Id = "c", Name = "t" }) is Control);
         Check("view registry resolves an approval view",
             registry.Resolve(new Agent.ArcApprovalRequest { RequestId = "a", RunId = "r", CallId = "c", ToolName = "t" }) is Control);
         Check("view registry resolves an artifact view",
@@ -1248,8 +1267,6 @@ public static class Program
                 abortSession.State == ArcMarkdownStreamingState.Aborted &&
                 abortView.GetPlainText().Contains("部分内容"));
 
-            // --- pura-agent plugin (owned by md-agent; checked when it has landed) ----
-            MarkdownAgentChecks();
         }
         finally
         {
@@ -1259,219 +1276,139 @@ public static class Program
     }
 
     /// <summary>
-    /// Chat package after the Chat/Agent refactor: the single message model, bubble grouping flags, list
-    /// CRUD/events, streaming writeback (complete keeps the appended Markdown, abort keeps the partial body) and
-    /// the composer send/attachment-tray contract. Realized-window counts need a visual tree and are covered by
-    /// the Chat package's headless probe (1000 messages → 10 realized rows); this console harness verifies the
-    /// model and view contracts without a desktop.
+    /// Chat family after the PuraMarkdown.Agent migration: <see cref="ArcChatView"/> is a thin wrapper over
+    /// <see cref="PuraChatView"/>, so the message collection, list CRUD/events, streaming lifecycle and
+    /// snapshot round-trip are asserted against the upstream contracts; Arc keeps the composer contract.
+    /// Message-level virtualization is a PuraChatView concern and is covered by its own headless probe.
     /// </summary>
     private static void ChatChecks()
     {
-        var message = new ArcChatMessage
+        var palette = ArcPalette.Build(ArcColorScheme.Light, ArcAccent.Neutral);
+        ArcResources.UseHost(new MarkdownResourceHost(palette));
+        try
         {
-            Role = ArcChatRole.Assistant,
-            Status = ArcChatMessageStatus.Streaming
-        };
-        message.Append("hello ");
-        message.Append("world");
-        Check("chat message appends streaming markdown",
-            message.Markdown == "hello world" &&
-            message.Status == ArcChatMessageStatus.Streaming &&
-            message.IsStreaming);
-        message.Complete();
-        Check("chat message completes",
-            message.Status == ArcChatMessageStatus.Complete && !message.IsStreaming);
+            var chat = new ArcChatView();
+            var added = 0;
+            var updated = 0;
+            var removed = 0;
+            chat.MessageAdded += (_, _) => added++;
+            chat.MessageUpdated += (_, _) => updated++;
+            chat.MessageRemoved += (_, _) => removed++;
 
-        var ownMessage = new ArcChatMessage { Role = ArcChatRole.User };
-        ownMessage.Append("hi");
-        ownMessage.Complete();
-        Check("chat user complete sets a delivery receipt",
-            ownMessage.Delivery == ArcChatDeliveryState.Sent &&
-            ownMessage.Status == ArcChatMessageStatus.Complete);
+            var firstMessage = new PuraChatMessage
+            {
+                Id = "user-1",
+                Role = PuraChatRole.User,
+                Markdown = "**你好**"
+            };
+            chat.AddMessage(firstMessage);
+            chat.InsertMessage(0, new PuraChatMessage
+            {
+                Id = "system-1",
+                Role = PuraChatRole.System,
+                Markdown = "系统消息"
+            });
+            firstMessage.Markdown = "**你好**，Markdown";
+            chat.UpdateMessage(firstMessage);
+            Check("chat view delegates add/insert/update to the upstream message collection",
+                chat.Messages.Count == 2 && added == 2 && updated == 1 &&
+                ReferenceEquals(chat.FindMessage("user-1"), firstMessage) &&
+                chat.Messages[0].Id == "system-1");
 
-        var bubble = new ArcChatBubble
-        {
-            Message = message,
-            IsOwn = true,
-            FirstInGroup = true,
-            LastInGroup = false,
-            ShowHeader = true,
-            ShowStatus = true
-        };
-        Check("chat bubble exposes grouping and ownership flags",
-            ReferenceEquals(bubble.Message, message) &&
-            bubble.IsOwn && bubble.FirstInGroup && !bubble.LastInGroup && bubble.ShowHeader);
+            Check("chat view delegates remove/replace to the upstream list",
+                chat.RemoveMessage("user-1") && removed == 1 &&
+                chat.Messages.Count == 1 && !chat.RemoveMessage("missing") &&
+                ReplaceChatMessages(chat) == 2);
+            chat.ClearMessages();
+            Check("chat view delegates clear to the upstream list", chat.Messages.Count == 0);
 
-        var chat = new ArcChatView();
-        var added = 0;
-        var updated = 0;
-        var removed = 0;
-        chat.MessageAdded += (_, _) => added++;
-        chat.MessageUpdated += (_, _) => updated++;
-        chat.MessageRemoved += (_, _) => removed++;
+            // 1000 messages must be accepted headless; message-level virtualization is PuraChatView's job.
+            var bulk = new ArcChatView();
+            for (var index = 0; index < 1000; index++)
+            {
+                bulk.AddMessage(new PuraChatMessage { Id = $"bulk-{index}", Markdown = $"message {index}" });
+            }
 
-        var firstMessage = new ArcChatMessage
-        {
-            Role = ArcChatRole.User,
-            Markdown = "**你好**"
-        };
-        chat.AddMessage(firstMessage);
-        chat.InsertMessage(0, new ArcChatMessage
-        {
-            Id = "system-1",
-            Role = ArcChatRole.System,
-            Markdown = "系统消息"
-        });
-        firstMessage.Markdown = "**你好**，Markdown";
-        chat.UpdateMessage(firstMessage);
-        Check("chat view add/insert/update contracts",
-            chat.Messages.Count == 2 && added == 2 && updated == 1 &&
-            ReferenceEquals(chat.FindMessage(firstMessage.Id), firstMessage) &&
-            chat.Messages[0].Id == "system-1");
-        Check("chat view remove/replace contracts",
-            chat.RemoveMessage(firstMessage.Id) && removed == 1 &&
-            chat.Messages.Count == 1 && !chat.RemoveMessage("missing") &&
-            ReplaceChatMessages(chat) == 2);
+            Check("chat view accepts 1000 messages headless", bulk.Messages.Count == 1000 && !bulk.IsStreaming);
 
-        // 1000 messages must be accepted by the model without a template; message-level virtualization
-        // (realized rows) is measured by the Chat package headless probe, not by this console harness.
-        var bulk = new ArcChatView();
-        for (var index = 0; index < 1000; index++)
-        {
-            bulk.AddMessage(new ArcChatMessage { Id = $"bulk-{index}", Markdown = $"message {index}" });
+            // Streaming lifecycle: PuraChatView keeps the in-flight body on the session and writes it back into
+            // the message collection when the stream ends (complete or abort), so both phases are asserted.
+            var streamingMessage = new PuraChatMessage { Id = "assistant-1", Role = PuraChatRole.Assistant };
+            var session = chat.BeginStreamingMessage(streamingMessage);
+            session.Append("## 流式回复\n\n第一段");
+            PumpDispatcher(session.FlushAsync(), TimeSpan.FromSeconds(20));
+            Check("chat streaming begins through the upstream session",
+                chat.IsStreaming &&
+                session.State == PuraStreamingState.Streaming &&
+                session.CurrentText.Contains("第一段") &&
+                streamingMessage.Status == PuraChatMessageStatus.Streaming);
+            var chatCompleted = PumpDispatcher(session.CompleteAsync(), TimeSpan.FromSeconds(20));
+            Check("chat streaming completion keeps the full markdown and completes the message",
+                chatCompleted &&
+                session.State == PuraStreamingState.Completed &&
+                !chat.IsStreaming &&
+                streamingMessage.Status == PuraChatMessageStatus.Complete &&
+                streamingMessage.Markdown == "## 流式回复\n\n第一段" &&
+                chat.Messages.Contains(streamingMessage));
+
+            var abortChat = new ArcChatView();
+            var abortMessage = new PuraChatMessage { Id = "assistant-abort", Role = PuraChatRole.Assistant };
+            var abortSession = abortChat.BeginStreamingMessage(abortMessage);
+            abortSession.Append("部分回复");
+            PumpDispatcher(abortSession.FlushAsync(), TimeSpan.FromSeconds(20));
+            abortChat.AbortStreaming();
+            var abortWrittenBack = PumpUntil(() => abortChat.Messages.Contains(abortMessage), TimeSpan.FromSeconds(20));
+            Check("chat streaming abort keeps the partial body and marks the message aborted",
+                abortWrittenBack &&
+                abortSession.State == PuraStreamingState.Aborted &&
+                abortMessage.Status == PuraChatMessageStatus.Aborted &&
+                abortMessage.Markdown == "部分回复" &&
+                abortChat.Messages.Contains(abortMessage));
+
+            // Snapshot round-trip through the upstream serializer -> RestoreSnapshot.
+            var snapshotView = new ArcChatView();
+            snapshotView.AddMessage(new PuraChatMessage { Id = "snap-1", Role = PuraChatRole.User, Markdown = "hello" });
+            snapshotView.AddMessage(new PuraChatMessage { Id = "snap-2", Role = PuraChatRole.Assistant, Markdown = "world" });
+            var snapshotJson = PuraChatSnapshotSerializer.Serialize(snapshotView.Host.CreateSnapshot());
+            var restoredView = new ArcChatView();
+            restoredView.RestoreSnapshot(PuraChatSnapshotSerializer.Deserialize(snapshotJson));
+            Check("chat snapshot round-trips through Serialize/RestoreSnapshot",
+                restoredView.Messages.Count == 2 &&
+                restoredView.Messages[0] is { Id: "snap-1", Markdown: "hello" } &&
+                restoredView.Messages[1] is { Id: "snap-2", Markdown: "world" });
+
+            // Composer stays an Arc-owned control.
+            var composer = new ArcChatComposer { MaxAttachments = 2 };
+            ArcChatDraft? draft = null;
+            composer.Send += (_, args) => draft = args;
+            composer.Text = "ping";
+            composer.AddAttachment(new ArcChatAttachment { Name = "a.txt", Size = 1 });
+            composer.AddAttachment(new ArcChatAttachment { Name = "b.txt", Size = 2 });
+            composer.AddAttachment(new ArcChatAttachment { Name = "c.txt", Size = 3 });
+            Check("chat composer caps the attachment tray",
+                composer.PendingAttachments.Count == 2 && composer.MaxAttachments == 2);
+            composer.Submit();
+            Check("chat composer submits a draft and clears the tray",
+                draft is { Text: "ping" } &&
+                draft.Attachments.Count == 2 &&
+                composer.Text.Length == 0 &&
+                composer.PendingAttachments.Count == 0);
         }
-
-        Check("chat view accepts 1000 messages headless", bulk.Messages.Count == 1000 && !bulk.IsStreaming);
-
-        var streamingMessage = new ArcChatMessage { Role = ArcChatRole.Assistant };
-        var session = chat.BeginStreamingMessage(streamingMessage);
-        session.Append("## 流式回复\n\n第一段");
-        PumpDispatcher(session.FlushAsync(), TimeSpan.FromSeconds(20));
-        Check("chat streaming writes deltas back into the message",
-            chat.IsStreaming &&
-            session.CurrentText.Contains("第一段") &&
-            streamingMessage.Status == ArcChatMessageStatus.Streaming &&
-            streamingMessage.Markdown.Contains("第一段"));
-        var chatCompleteTask = session.CompleteAsync();
-        var chatCompleted = PumpDispatcher(chatCompleteTask, TimeSpan.FromSeconds(20));
-        Check("chat streaming completion keeps the full markdown and upserts the message",
-            chatCompleted &&
-            session.State == ArcMarkdownStreamingState.Completed &&
-            !chat.IsStreaming &&
-            streamingMessage.Status == ArcChatMessageStatus.Complete &&
-            streamingMessage.Markdown == "## 流式回复\n\n第一段" &&
-            chat.Messages.Contains(streamingMessage));
-
-        var abortChat = new ArcChatView();
-        var abortMessage = new ArcChatMessage { Role = ArcChatRole.Assistant };
-        var abortSession = abortChat.BeginStreamingMessage(abortMessage);
-        abortSession.Append("部分回复");
-        PumpDispatcher(abortSession.FlushAsync(), TimeSpan.FromSeconds(20));
-        var abortTask = abortChat.AbortStreamingAsync();
-        var abortFinished = PumpDispatcher(abortTask, TimeSpan.FromSeconds(20));
-        Check("chat streaming abort keeps the partial body and marks the message",
-            abortFinished &&
-            abortMessage.Status == ArcChatMessageStatus.Aborted &&
-            abortMessage.Markdown.Contains("部分回复") &&
-            abortChat.Messages.Contains(abortMessage));
-
-        var composer = new ArcChatComposer { MaxAttachments = 2 };
-        ArcChatDraft? draft = null;
-        composer.Send += (_, args) => draft = args;
-        composer.Text = "ping";
-        composer.AddAttachment(new ArcChatAttachment { Name = "a.txt", Size = 1 });
-        composer.AddAttachment(new ArcChatAttachment { Name = "b.txt", Size = 2 });
-        composer.AddAttachment(new ArcChatAttachment { Name = "c.txt", Size = 3 });
-        Check("chat composer caps the attachment tray",
-            composer.PendingAttachments.Count == 2 && composer.MaxAttachments == 2);
-        composer.Submit();
-        Check("chat composer submits a draft and clears the tray",
-            draft is { Text: "ping" } &&
-            draft.Attachments.Count == 2 &&
-            composer.Text.Length == 0 &&
-            composer.PendingAttachments.Count == 0);
+        finally
+        {
+            ArcResources.UseHost(null);
+        }
     }
 
     private static int ReplaceChatMessages(ArcChatView chat)
     {
         chat.ReplaceMessages(new[]
         {
-            new ArcChatMessage { Id = "replace-a", Markdown = "a" },
-            new ArcChatMessage { Id = "replace-b", Markdown = "b" }
+            new PuraChatMessage { Id = "replace-a", Markdown = "a" },
+            new PuraChatMessage { Id = "replace-b", Markdown = "b" }
         });
         return chat.Messages.Count;
     }
-
-    /// <summary>
-    /// Agent integration (md-agent): the <c>pura-agent</c> fence plugin parses choice/confirm JSON into Arc
-    /// cards, reports interactions through <see cref="ArcMarkdownRenderContext.InteractionSink"/> and restores
-    /// a persisted state through <see cref="ArcMarkdownRenderContext.ComponentStates"/>.
-    /// </summary>
-    private static void MarkdownAgentChecks()
-    {
-        var pipeline = Agent.ArcAgentMarkdown.DefaultPipeline;
-        Check("markdown agent plugin registers choice and confirm",
-            pipeline.PluginNames.Contains("arc.agent") &&
-            Agent.ArcAgentMarkdown.DefaultOptions.InteractionEnabled &&
-            new Agent.ArcAgentMarkdownPlugin().ComponentTypes.SequenceEqual(new[] { "choice", "confirm" }));
-
-        var interactions = new List<ArcMarkdownInteraction>();
-        var document = pipeline.Syntax.ParseDocument(AgentChoiceFence + "\n\n" + AgentConfirmFence);
-        var context = new ArcMarkdownRenderContext
-        {
-            Options = Agent.ArcAgentMarkdown.DefaultOptions,
-            Renderers = pipeline.Renderers,
-            Sanitized = document.Sanitized ?? new SanitizeResult(),
-            Dispatcher = Dispatcher.UIThread,
-            InteractionSink = interaction => interactions.Add(interaction),
-        };
-        var fences = document.Markdown.Where(block => block is FencedCodeBlock).ToArray();
-        var choiceCard = context.RenderBlock(fences[0]) as Agent.ArcAgentChoiceCard;
-        var confirmCard = context.RenderBlock(fences[1]) as Agent.ArcAgentConfirmCard;
-        Check("markdown agent plugin renders choice and confirm cards",
-            choiceCard is { ComponentId: "release-channel" } &&
-            confirmCard is { ComponentId: "publish-confirm" } &&
-            choiceCard.Model is { Question: "发布到哪个通道？" } &&
-            confirmCard.Model is { Question: "确认写入发布说明？" });
-
-        var selected = choiceCard!.ToggleOption("stable");
-        var confirmed = confirmCard!.TryDecide(true);
-        Check("markdown agent interactions report through the interaction sink",
-            selected && confirmed && interactions.Count == 2 &&
-            interactions[0] is { ComponentType: "choice", Confirmed: true } choiceInteraction &&
-            choiceInteraction.SelectedIds.SequenceEqual(new[] { "stable" }) &&
-            interactions[1] is { ComponentType: "confirm", Confirmed: true } confirmInteraction &&
-            confirmInteraction.SelectedIds.Count == 0);
-
-        var restoredContext = new ArcMarkdownRenderContext
-        {
-            Options = Agent.ArcAgentMarkdown.DefaultOptions,
-            Renderers = pipeline.Renderers,
-            Sanitized = document.Sanitized ?? new SanitizeResult(),
-            Dispatcher = Dispatcher.UIThread,
-            ComponentStates = new Dictionary<string, ArcMarkdownInteraction>(StringComparer.Ordinal)
-            {
-                ["release-channel"] = interactions[0]
-            },
-        };
-        var restoredCard = restoredContext.RenderBlock(fences[0]) as Agent.ArcAgentChoiceCard;
-        Check("markdown agent restores a persisted choice state",
-            restoredCard is { IsSubmitted: true } &&
-            restoredCard.SelectedIds.SequenceEqual(new[] { "stable" }));
-    }
-
-    private const string AgentChoiceFence = """
-        ```pura-agent
-        { "type": "choice", "version": "1.0", "id": "release-channel", "question": "发布到哪个通道？",
-          "options": [ { "id": "stable", "label": "stable" }, { "id": "beta", "label": "beta" } ] }
-        ```
-        """;
-
-    private const string AgentConfirmFence = """
-        ```pura-agent
-        { "type": "confirm", "version": "1.0", "id": "publish-confirm", "question": "确认写入发布说明？", "confirmLabel": "确认发布" }
-        ```
-        """;
 
     /// <summary>Walks a rendered node tree and appends every visible text fragment (inlines included).</summary>
     private static string TextOf(Control control)
@@ -1691,6 +1628,20 @@ public static class Program
 
         Dispatcher.UIThread.RunJobs();
         return task.IsCompleted && !task.IsFaulted && !task.IsCanceled;
+    }
+
+    /// <summary>Pumps the Avalonia dispatcher until <paramref name="condition"/> holds or the timeout elapses.</summary>
+    private static bool PumpUntil(Func<bool> condition, TimeSpan timeout)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        while (!condition() && stopwatch.Elapsed < timeout)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(5);
+        }
+
+        Dispatcher.UIThread.RunJobs();
+        return condition();
     }
 
     /// <summary>Slice a palette into the resource host contract the Markdown style reads at construction.</summary>

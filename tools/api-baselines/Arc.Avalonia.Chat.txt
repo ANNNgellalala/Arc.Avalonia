@@ -3,94 +3,48 @@
 # One line per public type/member; do not edit by hand.
 
   ctor Arc.Avalonia.Chat.ArcChatAttachment[]
-  ctor Arc.Avalonia.Chat.ArcChatBubble[]
   ctor Arc.Avalonia.Chat.ArcChatComposer[]
   ctor Arc.Avalonia.Chat.ArcChatDraft[System.String Text, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Chat.ArcChatAttachment> Attachments]
-  ctor Arc.Avalonia.Chat.ArcChatMessage[]
-  ctor Arc.Avalonia.Chat.ArcChatParticipant[]
   ctor Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs[]
   ctor Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs[Arc.Avalonia.Chat.ArcChatDraft draft]
-  ctor Arc.Avalonia.Chat.ArcChatThread[]
   ctor Arc.Avalonia.Chat.ArcChatView[]
   ctor CompiledAvaloniaXaml.XamlIlContext.Context`1[System.IServiceProvider , System.Object[] , System.String ]
   ctor CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator[System.Collections.Generic.List<System.Object> , System.IServiceProvider ]
-  event System.EventHandler Changed
   event System.EventHandler StopRequested
   event System.EventHandler StopRequested
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatDraft> Send
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatDraft> Send
-  event System.EventHandler<Arc.Avalonia.Chat.ArcChatMessage> MessageAdded
-  event System.EventHandler<Arc.Avalonia.Chat.ArcChatMessage> MessageRemoved
-  event System.EventHandler<Arc.Avalonia.Chat.ArcChatMessage> MessageUpdated
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs> SendRouted
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownInteractionEventArgs> InteractionOccurred
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> Warning
-  event System.EventHandler<Arc.Avalonia.Markdown.ArcMarkdownWarningEventArgs> Warning
-  event System.EventHandler<System.String> Announced
-  event System.EventHandler<System.String> Announced
+  event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageAdded
+  event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageRemoved
+  event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageUpdated
+  event System.EventHandler<PuraMarkdown.Agent.PuraInteractionEventArgs> InteractionOccurred
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode Always
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode NearBottom
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode Never
-  field static Arc.Avalonia.Chat.ArcChatDeliveryState Delivered
-  field static Arc.Avalonia.Chat.ArcChatDeliveryState None
-  field static Arc.Avalonia.Chat.ArcChatDeliveryState Read
-  field static Arc.Avalonia.Chat.ArcChatDeliveryState Sent
-  field static Arc.Avalonia.Chat.ArcChatMessageStatus Aborted
-  field static Arc.Avalonia.Chat.ArcChatMessageStatus Complete
-  field static Arc.Avalonia.Chat.ArcChatMessageStatus Draft
-  field static Arc.Avalonia.Chat.ArcChatMessageStatus Failed
-  field static Arc.Avalonia.Chat.ArcChatMessageStatus Streaming
-  field static Arc.Avalonia.Chat.ArcChatRole Assistant
-  field static Arc.Avalonia.Chat.ArcChatRole System
-  field static Arc.Avalonia.Chat.ArcChatRole User
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs> SendEvent
-  field static Avalonia.StyledProperty<Arc.Avalonia.Chat.ArcChatAutoScrollMode> AutoScrollModeProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.Chat.ArcChatMessage> MessageProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> MarkdownOptionsProperty
-  field static Avalonia.StyledProperty<Arc.Avalonia.Markdown.ArcMarkdownOptions> MarkdownOptionsProperty
   field static Avalonia.StyledProperty<Avalonia.Controls.Control> LeadingContentProperty
   field static Avalonia.StyledProperty<Avalonia.Thickness> KeyboardInsetsProperty
-  field static Avalonia.StyledProperty<Avalonia.Thickness> KeyboardInsetsProperty
-  field static Avalonia.StyledProperty<Avalonia.Thickness> SafeAreaProperty
   field static Avalonia.StyledProperty<Avalonia.Thickness> SafeAreaProperty
   field static Avalonia.StyledProperty<System.Boolean> AllowAttachmentsProperty
-  field static Avalonia.StyledProperty<System.Boolean> AllowAttachmentsProperty
-  field static Avalonia.StyledProperty<System.Boolean> AnimateEntryProperty
-  field static Avalonia.StyledProperty<System.Boolean> FirstInGroupProperty
-  field static Avalonia.StyledProperty<System.Boolean> IsOwnProperty
   field static Avalonia.StyledProperty<System.Boolean> IsRunningProperty
-  field static Avalonia.StyledProperty<System.Boolean> LastInGroupProperty
   field static Avalonia.StyledProperty<System.Boolean> SendOnEnterProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowAvatarProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowAvatarsProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowComposerProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowHeaderProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowStatusProperty
-  field static Avalonia.StyledProperty<System.Boolean> ShowTimestampsProperty
-  field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<Arc.Avalonia.Chat.ArcChatParticipant>> ParticipantsProperty
-  field static Avalonia.StyledProperty<System.Collections.Generic.IEnumerable<System.String>> TypingProperty
-  field static Avalonia.StyledProperty<System.Double> AutoFollowResumeThresholdProperty
   field static Avalonia.StyledProperty<System.Int32> MaxAttachmentsProperty
-  field static Avalonia.StyledProperty<System.String> CurrentUserIdProperty
-  field static Avalonia.StyledProperty<System.String> LabelProperty
-  field static Avalonia.StyledProperty<System.String> PlaceholderProperty
   field static Avalonia.StyledProperty<System.String> PlaceholderProperty
   field static Avalonia.StyledProperty<System.String> TextProperty
-  field static Avalonia.StyledProperty<System.TimeSpan> GroupWindowProperty
-  field static System.Double NearBottomThreshold
   field System.Collections.Generic.List<System.Object> ParentsStack
   field System.Object IntermediateRoot
   field System.Object ProvideTargetObject
   field System.Object ProvideTargetProperty
   field TTarget RootObject
   method Arc.Avalonia.Chat.ArcChatDraft <Clone>$[]
-  method Arc.Avalonia.Chat.ArcChatMessage FindMessage[System.String messageId]
-  method Arc.Avalonia.Markdown.ArcMarkdownStreamingSession BeginStreaming[]
-  method Arc.Avalonia.Markdown.ArcMarkdownStreamingSession BeginStreamingMessage[Arc.Avalonia.Chat.ArcChatMessage message]
   method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcChatTheme.Resources.axaml[System.IServiceProvider ]
   method Avalonia.Styling.Styles Build:/Themes/ArcChatTheme.axaml[System.IServiceProvider ]
+  method PuraMarkdown.Agent.Chat.PuraChatMessage FindMessage[System.String messageId]
+  method PuraMarkdown.Agent.PuraMarkdownOptions CreateOptions[]
+  method PuraMarkdown.Agent.PuraPipeline BuildPipeline[]
+  method PuraMarkdown.Agent.PuraStreamingSession BeginStreamingMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
   method System.Boolean Equals[Arc.Avalonia.Chat.ArcChatDraft other]
   method System.Boolean Equals[System.Object obj]
   method System.Boolean op_Equality[Arc.Avalonia.Chat.ArcChatDraft left, Arc.Avalonia.Chat.ArcChatDraft right]
@@ -98,119 +52,71 @@
   method System.Boolean RemoveMessage[System.String messageId]
   method System.Boolean TryAddAttachment[Arc.Avalonia.Chat.ArcChatAttachment attachment]
   method System.Int32 GetHashCode[]
-  method System.Int32 IndexOf[System.String messageId]
   method System.Object get_Current[]
   method System.Object GetService[System.Type ]
   method System.Object TryLoad[System.IServiceProvider , System.String ]
   method System.Object TryLoad[System.String ]
   method System.String ToString[]
-  method System.Threading.Tasks.Task AbortStreamingAsync[]
   method System.Uri get_BaseUri[]
   method System.Void AbortStreaming[]
   method System.Void AddAttachment[Arc.Avalonia.Chat.ArcChatAttachment attachment]
-  method System.Void AddMessage[Arc.Avalonia.Chat.ArcChatMessage message]
-  method System.Void Append[System.String delta]
-  method System.Void ApplyGrouping[System.Boolean isOwn, System.Boolean firstInGroup, System.Boolean lastInGroup, System.Boolean showHeader, System.Boolean showStatus, System.Boolean showAvatar]
+  method System.Void AddMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
   method System.Void Clear[]
   method System.Void ClearMessages[]
-  method System.Void Complete[]
   method System.Void Deconstruct[out System.String Text, out System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Chat.ArcChatAttachment> Attachments]
   method System.Void Dispose[]
   method System.Void FocusInput[]
-  method System.Void InsertMessage[System.Int32 index, Arc.Avalonia.Chat.ArcChatMessage message]
+  method System.Void InsertMessage[System.Int32 index, PuraMarkdown.Agent.Chat.PuraChatMessage message]
   method System.Void PopParent[]
   method System.Void Populate:/Themes/ArcChatTheme.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void Populate:/Themes/ArcChatTheme.Resources.axaml[System.IServiceProvider , Avalonia.Controls.ResourceDictionary ]
   method System.Void PushParent[System.Object ]
   method System.Void RemoveAttachment[Arc.Avalonia.Chat.ArcChatAttachment attachment]
-  method System.Void ReplaceMessages[System.Collections.Generic.IEnumerable<Arc.Avalonia.Chat.ArcChatMessage> messages]
+  method System.Void ReplaceMessages[System.Collections.Generic.IEnumerable<PuraMarkdown.Agent.Chat.PuraChatMessage> messages]
+  method System.Void RestoreSnapshot[PuraMarkdown.Agent.Chat.PuraChatSnapshot snapshot]
   method System.Void ScrollToEnd[]
   method System.Void ScrollToMessage[System.String messageId]
   method System.Void set_BaseUri[System.Uri ]
   method System.Void Submit[]
-  method System.Void UpdateMessage[Arc.Avalonia.Chat.ArcChatMessage message]
+  method System.Void UpdateMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
   property Arc.Avalonia.Chat.ArcChatAutoScrollMode AutoScrollMode {get;set}
   property Arc.Avalonia.Chat.ArcChatComposer Composer {get}
-  property Arc.Avalonia.Chat.ArcChatDeliveryState Delivery {get;set}
   property Arc.Avalonia.Chat.ArcChatDraft Draft {get;set}
-  property Arc.Avalonia.Chat.ArcChatMessage Message {get;set}
-  property Arc.Avalonia.Chat.ArcChatMessageStatus Status {get;set}
-  property Arc.Avalonia.Chat.ArcChatParticipant Author {get;set}
-  property Arc.Avalonia.Chat.ArcChatRole Role {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownOptions MarkdownOptions {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownOptions MarkdownOptions {get;set}
-  property Arc.Avalonia.Markdown.ArcMarkdownStreamingSession ActiveSession {get}
-  property Arc.Avalonia.Markdown.ArcMarkdownView Body {get}
   property Avalonia.Controls.Control LeadingContent {get;set}
   property Avalonia.Thickness KeyboardInsets {get;set}
-  property Avalonia.Thickness KeyboardInsets {get;set}
   property Avalonia.Thickness SafeArea {get;set}
-  property Avalonia.Thickness SafeArea {get;set}
+  property PuraMarkdown.Agent.Chat.PuraChatView Host {get}
+  property PuraMarkdown.Agent.PuraMarkdownOptions Options {get;set}
+  property PuraMarkdown.Agent.PuraStreamingSession ActiveSession {get}
   property System.Boolean AllowAttachments {get;set}
   property System.Boolean AllowAttachments {get;set}
-  property System.Boolean AnimateEntry {get;set}
-  property System.Boolean FirstInGroup {get;set}
-  property System.Boolean IsAutoFollowPaused {get}
   property System.Boolean IsImage {get;set}
-  property System.Boolean IsNearBottom {get}
-  property System.Boolean IsOwn {get;set}
   property System.Boolean IsRunning {get;set}
   property System.Boolean IsStreaming {get}
-  property System.Boolean IsStreaming {get}
-  property System.Boolean LastInGroup {get;set}
   property System.Boolean SendOnEnter {get;set}
-  property System.Boolean ShowAvatar {get;set}
-  property System.Boolean ShowAvatars {get;set}
   property System.Boolean ShowComposer {get;set}
-  property System.Boolean ShowHeader {get;set}
-  property System.Boolean ShowStatus {get;set}
-  property System.Boolean ShowTimestamps {get;set}
-  property System.Collections.Generic.IDictionary<System.String, System.String> Metadata {get;set}
-  property System.Collections.Generic.IEnumerable<Arc.Avalonia.Chat.ArcChatMessage> DefaultMessages {get;set}
-  property System.Collections.Generic.IEnumerable<Arc.Avalonia.Chat.ArcChatParticipant> Participants {get;set}
-  property System.Collections.Generic.IEnumerable<System.String> Typing {get;set}
-  property System.Collections.Generic.IList<Arc.Avalonia.Chat.ArcChatAttachment> Attachments {get;set}
+  property System.Collections.Generic.IEnumerable<PuraMarkdown.Agent.Chat.PuraChatMessage> DefaultMessages {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Chat.ArcChatAttachment> Attachments {get;set}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Chat.ArcChatAttachment> PendingAttachments {get}
-  property System.Collections.ObjectModel.ObservableCollection<Arc.Avalonia.Chat.ArcChatMessage> Messages {get}
-  property System.DateTimeOffset CreatedAt {get;set}
-  property System.DateTimeOffset UpdatedAt {get}
-  property System.Double AutoFollowResumeThreshold {get;set}
-  property System.Int32 ContentVersion {get}
+  property System.Collections.ObjectModel.ObservableCollection<PuraMarkdown.Agent.Chat.PuraChatMessage> Messages {get}
   property System.Int32 MaxAttachments {get;set}
   property System.Int64 Size {get;set}
   property System.Object Current {get}
-  property System.String Avatar {get;set}
-  property System.String CurrentUserId {get;set}
-  property System.String Error {get;set}
-  property System.String FocusedMessageId {get}
-  property System.String Id {get;set}
-  property System.String Id {get;set}
-  property System.String Label {get;set}
-  property System.String Markdown {get;set}
-  property System.String Name {get;set}
   property System.String Name {get;set}
   property System.String Placeholder {get;set}
   property System.String Placeholder {get;set}
   property System.String Text {get;set}
   property System.String Text {get;set}
   property System.String Url {get;set}
-  property System.TimeSpan GroupWindow {get;set}
   property System.Uri BaseUri {get;set}
-type class Arc.Avalonia.Chat.ArcChatBubble : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Chat.ArcChatComposer : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
 type class Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
-type class Arc.Avalonia.Chat.ArcChatThread : Arc.Avalonia.Chat.ArcChatView, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize, System.IDisposable
-type class Arc.Avalonia.Chat.ArcChatView : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize, System.IDisposable
 type class CompiledAvaloniaXaml.!AvaloniaResources
 type class CompiledAvaloniaXaml.!XamlLoader
 type class CompiledAvaloniaXaml.XamlIlContext.Context`1 : Avalonia.Markup.Xaml.IProvideValueTarget, Avalonia.Markup.Xaml.IRootObjectProvider, Avalonia.Markup.Xaml.IUriContext, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlEagerParentStackProvider, Avalonia.Markup.Xaml.XamlIl.Runtime.IAvaloniaXamlIlParentStackProvider, System.ComponentModel.ITypeDescriptorContext, System.IServiceProvider
 type class CompiledAvaloniaXaml.XamlIlContext.ParentStackEnumerable.Enumerator : System.Collections.Generic.IEnumerator<System.Object>, System.Collections.IEnumerator, System.IDisposable
 type enum Arc.Avalonia.Chat.ArcChatAutoScrollMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.Chat.ArcChatDeliveryState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.Chat.ArcChatMessageStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
-type enum Arc.Avalonia.Chat.ArcChatRole : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
 type sealed Arc.Avalonia.Chat.ArcChatAttachment
 type sealed Arc.Avalonia.Chat.ArcChatDraft : System.IEquatable<Arc.Avalonia.Chat.ArcChatDraft>
-type sealed Arc.Avalonia.Chat.ArcChatMessage
-type sealed Arc.Avalonia.Chat.ArcChatParticipant
+type sealed Arc.Avalonia.Chat.ArcChatView : Avalonia.Controls.ContentControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IContentControl, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Presenters.IContentPresenterHost, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize, System.IDisposable
+type static Arc.Avalonia.Chat.ArcChatThemeAdapter

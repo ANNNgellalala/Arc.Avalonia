@@ -6,15 +6,17 @@ using Avalonia.Layout;
 using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
-using Arc.Avalonia.Markdown;
+using PuraMarkdown.Agent;
+using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Chat.Pages;
 
 /// <summary>
-/// Chat family showcase: <see cref="ArcChatView"/> bubbles (grouping, avatars, timestamps, attachments,
-/// delivery/status lines, system messages, typing row, built-in composer), the standalone
-/// <see cref="ArcChatComposer"/>, and the streaming slot with Append/Complete/Abort. Every bubble body is
-/// rendered by <c>ArcMarkdownView</c>, so the same surface serves human chat and AI answers.
+/// Chat family showcase built on the upstream engine: <see cref="ArcChatView"/> wraps
+/// <c>PuraChatView</c> (messages, Markdown rendering, streaming lifecycle, pura-agent components all come from
+/// PuraMarkdown.Agent), while Arc keeps the composer, the design-system wrapper and the token-derived theme
+/// mapping. The page shows grouped multi-turn messages, a tool call rendered above the assistant body, a
+/// failed message, a system notice, the standalone composer and the Append / Complete / Abort streaming slot.
 /// </summary>
 public sealed class ChatPage : ArcPage
 {
@@ -23,17 +25,14 @@ public sealed class ChatPage : ArcPage
     public override string Group => "Chat";
 
     public override string? Description =>
-        "气泡会话：用户靠右、助手靠左，同作者连续消息合并成组；正文用 ArcMarkdownView 渲染，支持附件、" +
-        "送达与生成状态、系统消息、正在输入、内置输入框与流式槽。1000 条消息只实例化视口内的气泡。";
+        "对话视图：渲染引擎整体委托给 PuraMarkdown.Agent（PuraChatView / PuraChatMessage / " +
+        "PuraStreamingSession），Arc 只保留设计系统包装、输入框与主题 token 映射；pura-agent 围栏" +
+        "（choice / confirm / tool-call）由上游直接渲染。";
 
     public override int Order => 1100;
 
     public override Control Build(ArcDemoContext context)
     {
-        // ArcMarkdownStyle.Current is a token snapshot used by the bubble/composer chrome; rebuild it on every
-        // page build so a page opened after a light/dark swap renders with the active palette.
-        ArcMarkdownStyle.Current = new ArcMarkdownStyle();
-
         return new StackPanel
         {
             Children =
@@ -48,74 +47,84 @@ public sealed class ChatPage : ArcPage
     private static Control BubbleSection()
     {
         var now = DateTimeOffset.Now;
-        var participants = new List<ArcChatParticipant>
-        {
-            new() { Id = "me", Name = "Alex Rivera" },
-            new() { Id = "sam", Name = "Sam Lee" }
-        };
-
         var chat = new ArcChatView
         {
             Width = 960,
-            Height = 365,
+            Height = 380,
             HorizontalAlignment = HorizontalAlignment.Left,
-            CurrentUserId = "me",
-            Participants = participants,
-            Label = "发布团队会话",
+            ShowComposer = true,
             Placeholder = "输入消息…",
-            // Pinned to the top so the screenshot always starts at the first bubble.
+            AllowAttachments = true,
+            // Pinned to the top so the screenshot always starts at the first message.
             AutoScrollMode = ArcChatAutoScrollMode.Never
         };
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m1",
-            Role = ArcChatRole.User,
-            Author = participants[0],
+            Role = PuraChatRole.User,
             Markdown = "把发布说明的截图和变更日志补上，顺便给我一个 Markdown 版本。",
-            CreatedAt = now.AddMinutes(-6),
-            Delivery = ArcChatDeliveryState.Read
+            CreatedAt = now.AddMinutes(-6)
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m2",
-            Role = ArcChatRole.Assistant,
-            Author = participants[1],
+            Role = PuraChatRole.Assistant,
             CreatedAt = now.AddMinutes(-5),
+            ToolCalls = new[]
+            {
+                new PuraToolCall
+                {
+                    Id = "call-1",
+                    Name = "repo.search",
+                    Status = PuraToolCallStatus.Succeeded,
+                    Arguments = "{ \"query\": \"release notes\" }",
+                    Result = "12 files matched · docs/29-puramarkdown-agent-migration.zh.md",
+                    Duration = TimeSpan.FromMilliseconds(840)
+                }
+            },
             Markdown =
                 "### 发布说明草稿已更新\n\n" +
                 "- 新增定价页截图与空状态文案\n" +
-                "- 气泡正文统一交给 `ArcMarkdownView` 渲染\n\n" +
-                "```csharp\nchat.AddMessage(new ArcChatMessage\n{\n    Role = ArcChatRole.Assistant,\n    Markdown = \"**Done**\",\n});\n```\n\n" +
+                "- 正文渲染全部交给 `PuraMarkdown.Agent`（`PuraChatView` + `PuraMarkdownView`）\n\n" +
+                "```csharp\nchat.AddMessage(new PuraChatMessage\n{\n    Role = PuraChatRole.Assistant,\n    Markdown = \"**Done**\",\n});\n```\n\n" +
                 "| 状态 | 含义 |\n| :--- | :--- |\n| Streaming | token 仍在到达 |\n| Complete | 生成完成 |\n| Failed | 生成失败 |"
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "m3",
-            Role = ArcChatRole.Assistant,
-            Status = ArcChatMessageStatus.Failed,
+            Role = PuraChatRole.User,
+            Markdown = "把附件也补上。",
+            CreatedAt = now.AddMinutes(-3)
+        });
+
+        chat.AddMessage(new PuraChatMessage
+        {
+            Id = "m4",
+            Role = PuraChatRole.Assistant,
+            Status = PuraChatMessageStatus.Failed,
             Error = "流式连接中断：已保留收到的内容，宿主可以重试。",
             Markdown = "连接中断前收到的最后一段正文仍然可读。",
             CreatedAt = now.AddMinutes(-1)
         });
 
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
-            Id = "m4",
-            Role = ArcChatRole.System,
+            Id = "m5",
+            Role = PuraChatRole.System,
             Markdown = "Sam 加入了会话",
             CreatedAt = now
         });
 
         var caption = DemoUi.Caption(
-            "气泡分组 · 生成状态与错误行 · 系统消息 · 内置 composer；Markdown 正文含代码块与表格。");
+            "消息模型 = PuraChatMessage · 正文与工具卡 = PuraMarkdown.Agent 渲染 · 生成状态与错误行 · 系统消息 · 内置 composer。");
 
         return DemoUi.Section(
-            "会话气泡",
-            "ArcChatView 按作者与 GroupWindow 合并连续消息，只在一组开头显示头像与时间；自己的消息靠右。" +
-            "气泡正文是完整 Markdown，附件、送达回执与生成状态分行展示。",
+            "会话视图",
+            "ArcChatView 包装上游 PuraChatView：消息、Markdown 渲染、代码块/表格、pura-agent 围栏与流式生命周期" +
+            "都由 PuraMarkdown.Agent 提供；Arc 额外派生 token 主题、内置 composer 与无障碍名称。",
             new StackPanel { Spacing = 10, Children = { chat, caption } });
     }
 
@@ -133,7 +142,7 @@ public sealed class ChatPage : ArcPage
         };
 
         composer.Send += (_, draft) =>
-            status.Text = $"Send · {draft.Text.Length} 字符 · {draft.Attachments.Count} 个附件 · 宿主追加消息";
+            status.Text = $"Send · {draft.Text.Length} 字符 · {draft.Attachments.Count} 个附件 · 宿主追加 PuraChatMessage";
         composer.StopRequested += (_, _) => status.Text = "StopRequested · 宿主中断当前生成并保留部分内容";
 
         var running = new ArcButton
@@ -172,8 +181,8 @@ public sealed class ChatPage : ArcPage
 
         return DemoUi.Section(
             "输入框",
-            "ArcChatComposer 是独立的输入控件：多行输入、Enter 发送、Shift+Enter 换行、附件 tray、IsRunning " +
-            "停止态与 LeadingContent 插槽。Agent 层复用同一个输入框，不再维护第二套。",
+            "ArcChatComposer 是 Arc 保留的宿主输入控件（属于表单，不是聊天渲染）：多行输入、Enter 发送、" +
+            "Shift+Enter 换行、附件 tray、IsRunning 停止态与 LeadingContent 插槽。Agent 层复用同一个输入框。",
             new StackPanel
             {
                 Spacing = 10,
@@ -187,23 +196,22 @@ public sealed class ChatPage : ArcPage
         var chat = new ArcChatView
         {
             Width = 560,
-            Height = 165,
+            Height = 190,
             HorizontalAlignment = HorizontalAlignment.Left,
             ShowComposer = false,
-            AutoScrollMode = ArcChatAutoScrollMode.Never,
-            Label = "流式回答演示"
+            AutoScrollMode = ArcChatAutoScrollMode.Never
         };
-        chat.AddMessage(new ArcChatMessage
+        chat.AddMessage(new PuraChatMessage
         {
             Id = "s1",
-            Role = ArcChatRole.User,
+            Role = PuraChatRole.User,
             Markdown = "把变更日志生成一下。",
             CreatedAt = now.AddMinutes(-1)
         });
 
         var status = DemoUi.Caption("会话未开始 · 点击按钮演示 Append / Complete / Abort。");
-        ArcMarkdownStreamingSession? session = null;
-        ArcChatMessage? streamingMessage = null;
+        PuraStreamingSession? session = null;
+        var streamingMessage = new PuraChatMessage { Id = "s2", Role = PuraChatRole.Assistant };
 
         void EnsureSession()
         {
@@ -212,13 +220,6 @@ public sealed class ChatPage : ArcPage
                 return;
             }
 
-            streamingMessage = new ArcChatMessage
-            {
-                Id = "s2",
-                Role = ArcChatRole.Assistant,
-                Status = ArcChatMessageStatus.Streaming,
-                Markdown = string.Empty
-            };
             session = chat.BeginStreamingMessage(streamingMessage);
         }
 
@@ -231,8 +232,8 @@ public sealed class ChatPage : ArcPage
         append.Click += (_, _) =>
         {
             EnsureSession();
-            session!.Append("\n\n- 新增 `ArcChatView` 气泡\n- 统一 `ArcChatMessage` 模型");
-            status.Text = $"Streaming · {session.CurrentText.Length} 字符 · 状态 {streamingMessage!.Status}";
+            session!.Append("\n\n- 新增 `ArcChatView` 包装\n- 消息模型换成 `PuraChatMessage`");
+            status.Text = $"Streaming · {session.State} · {session.CurrentText.Length} 字符 · 待处理 {session.PendingChars}";
         };
 
         var complete = new ArcButton
@@ -249,7 +250,8 @@ public sealed class ChatPage : ArcPage
             }
 
             await session.CompleteAsync();
-            status.Text = "Completed · 全量 Markdown 解析，与一次性渲染一致。";
+            status.Text = "Completed · PuraMarkdown.Agent 做一次全量校正，结果与一次性渲染一致。";
+            session = null;
         };
 
         var abort = new ArcButton
@@ -266,28 +268,18 @@ public sealed class ChatPage : ArcPage
             }
 
             await session.AbortAsync();
-            status.Text = "Aborted · 已收到的部分内容保留并写回消息。";
-        };
-
-        var side = new StackPanel
-        {
-            Spacing = 8,
-            Width = 380,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Children =
-            {
-                DemoUi.Label("流式会话"),
-                DemoUi.Body("流式消息放在列表外的流式槽，完成后带最终 Markdown 与状态 upsert 回 Messages；" +
-                            "自动滚动支持 Never / NearBottom / Always。"),
-                DemoUi.Row(append, complete, abort),
-                status,
-                DemoUi.Body("消息级虚拟化：1000 条历史消息只实例化视口内的气泡。")
-            }
+            status.Text = "Aborted · 保留已生成内容并写入历史（状态 Aborted）。";
+            session = null;
         };
 
         return DemoUi.Section(
-            "流式与虚拟化",
-            "ArcChatView 的流式槽与 Markdown 流式会话共用稳定边界策略；完成时全量解析一次，结果与一次性渲染一致。",
-            DemoUi.Row(chat, side));
+            "流式槽",
+            "BeginStreamingMessage 返回上游 PuraStreamingSession；Append 增量、Complete 全量校正、Abort 保留" +
+            "部分内容。Arc 不再自研流式会话与 Markdown 增量边界。",
+            new StackPanel
+            {
+                Spacing = 10,
+                Children = { chat, DemoUi.Row(append, complete, abort, status) }
+            });
     }
 }
