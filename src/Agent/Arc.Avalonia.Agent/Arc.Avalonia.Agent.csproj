@@ -34,9 +34,8 @@
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Overlays\Arc.Avalonia.Overlays.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Feedback\Arc.Avalonia.Feedback.csproj" />
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Actions\Arc.Avalonia.Actions.csproj" />
-    <!-- L4 -> L2: messages use the single Chat model/bubble and Markdown renders every body. -->
+    <!-- L4 -> L2: transcripts are PuraChatMessage rows rendered by PuraMarkdown.Agent (via ArcChatView). -->
     <ProjectReference Include="..\..\Components\Arc.Avalonia.Chat\Arc.Avalonia.Chat.csproj" />
-    <ProjectReference Include="..\..\Components\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.AgentUI\Arc.Avalonia.AgentUI.csproj" />
   </ItemGroup>
 
@@ -48,6 +47,7 @@
     <WarningsAsErrors>$(WarningsAsErrors);RS0030</WarningsAsErrors>
   </PropertyGroup>
 </Project>
+
 
 
 

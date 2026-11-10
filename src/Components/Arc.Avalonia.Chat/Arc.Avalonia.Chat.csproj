@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!--
-    L2 Chat family: one upstream message model (PuraChatMessage), one composer for human chat, AI answers and
-    agent conversations. The body of every bubble is ArcMarkdownView (Arc.Avalonia.Markdown is the single
-    Markdown renderer in the solution); the agent layer composes bubbles with full-width event cards
-    instead of inventing a second chat control.
+    <!--
+    L2 Chat family (ADR 0007): the chat surface is a thin Arc wrapper over PuraMarkdown.Agent's
+    PuraChatView/PuraChatMessage (Markdown, pura-agent components and streaming all live upstream);
+    Arc supplies the token-derived theme mapping (ArcChatThemeAdapter) and the composer input surface.
   -->
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Chat</RootNamespace>
@@ -23,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
     <ProjectReference Include="..\Arc.Avalonia.Services\Arc.Avalonia.Services.csproj" />
-    <ProjectReference Include="..\Arc.Avalonia.Markdown\Arc.Avalonia.Markdown.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,5 +31,6 @@
     <InternalsVisibleTo Include="Arc.Avalonia.AgentUI" />
   </ItemGroup>
 </Project>
+
 
 

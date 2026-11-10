@@ -10,7 +10,6 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Arc.Avalonia.Controls;
-using Arc.Avalonia.Markdown;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 
@@ -622,4 +621,5 @@ public class ArcChatComposer : TemplatedControl
            || name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)
            || name.EndsWith(".webp", StringComparison.OrdinalIgnoreCase);
 }
+
 
