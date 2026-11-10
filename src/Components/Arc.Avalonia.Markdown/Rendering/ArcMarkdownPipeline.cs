@@ -6,8 +6,8 @@ using Avalonia.Threading;
 using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using PuraMarkdown.Security;
-using PuraMarkdown.Syntax;
+using PuraMarkdown.Core.Security;
+using PuraMarkdown.Core;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -20,7 +20,11 @@ public sealed class ArcMarkdownOptions
     /// <summary>Image loader used for <c>![](url)</c>; defaults to an offline refusal.</summary>
     public IArcMarkdownImageLoader ImageLoader { get; init; } = ArcMarkdownPlatform.DefaultImageLoader;
 
-    /// <summary>Link handler invoked for link clicks the host did not mark handled.</summary>
+    /// <summary>
+    /// Opens links. The "open in browser" row of the link context menu delegates here when a host installs
+    /// one (in-app navigation, deep links, allow-lists); with the default no-op handler the menu falls back to
+    /// <see cref="ArcMarkdownPlatform.OpenInBrowserAsync"/> (system browser/mail client).
+    /// </summary>
     public IArcMarkdownLinkHandler LinkHandler { get; init; } = ArcMarkdownPlatform.DefaultLinkHandler;
 
     /// <summary>Clipboard used by copy-code and copy-all actions.</summary>
@@ -251,3 +255,4 @@ public sealed class ArcMarkdownPipelineBuilder
             _plugins.Select(plugin => plugin.Name).ToArray());
     }
 }
+

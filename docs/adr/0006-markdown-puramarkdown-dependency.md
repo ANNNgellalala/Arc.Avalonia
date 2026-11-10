@@ -5,7 +5,7 @@
 
 ## 背景
 
-PuraMarkdown 已经把 Markdown 解析与 Avalonia 渲染解耦：`PuraMarkdown.Syntax` 只依赖 Markdig，
+PuraMarkdown 已经把 Markdown 解析与 Avalonia 渲染解耦：`PuraMarkdown.Core` 只依赖 Markdig，
 输出 Markdig AST + `PuraDocument`（版本/诊断/大纲）+ 流式稳定边界扫描。它自带的 Avalonia 渲染包
 定位为 Demo；生产 UI 由 Arc 实现。Arc 需要完整的 Markdown 渲染组件（文档、代码、表格、图片/链接、
 流式、AI Chat、Agent 组件），并保持 Arc 设计系统的一致性。
@@ -16,13 +16,13 @@ PuraMarkdown 已经把 Markdown 解析与 Avalonia 渲染解耦：`PuraMarkdown.
 ## 决策
 
 1. 新增 `Arc.Avalonia.Markdown`（L2 组件族），允许它直接依赖：
-   * `PuraMarkdown.Syntax`（MIT，解析/诊断/大纲/流式边界；无 Avalonia 依赖）；
-   * `Markdig`（BSD-2-Clause，PuraMarkdown.Syntax 的解析依赖；Arc 渲染器需要 AST 类型）。
+   * `PuraMarkdown.Core`（MIT，解析/诊断/大纲/流式边界；无 Avalonia 依赖）；
+   * `Markdig`（BSD-2-Clause，PuraMarkdown.Core 的解析依赖；Arc 渲染器需要 AST 类型）。
 2. 其它 Arc 发布库的依赖白名单保持不变；不得引用 PuraMarkdown 的 Avalonia 渲染包 / Agent / Chat 包。
 3. Arc 不复制 Markdig 节点、不实现 Markdown 解析；所有控件、主题、交互仍由 Arc 自己实现。
 4. `tools/deps-policy.json` 的 `allowedDirect` 增加两个包；`tools/check-package.ps1` 的
    `$allowedExternal` 同步增加；meta 包依赖形状把 `Arc.Avalonia.Markdown` 计入 L2 组件族。
-5. 包产物会声明 `PuraMarkdown.Syntax`/`Markdig` 依赖；第三方清单（`THIRD-PARTY-NOTICES.md`）同步登记。
+5. 包产物会声明 `PuraMarkdown.Core`/`Markdig` 依赖；第三方清单（`THIRD-PARTY-NOTICES.md`）同步登记。
 
 ## 理由
 
@@ -37,3 +37,6 @@ PuraMarkdown 已经把 Markdown 解析与 Avalonia 渲染解耦：`PuraMarkdown.
 * 如果 PuraMarkdown 后续发布 1.0 稳定版，Arc 侧只需改 `Directory.Packages.props` 的版本号；
 * 若未来需要脱离 Markdig（C 阶段语义模型），`ArcMarkdownOptions` 的渲染器契约已经是 Arc 自有类型，
   替换解析层只影响 `ArcMarkdownPipeline` 与 `ArcMarkdownStreamingSession`。
+## 变更记录
+
+* **2026-11-10 包改名（上游 ADR-0028）**：`PuraMarkdown.Syntax` → **`PuraMarkdown.Core`**，命名空间 `PuraMarkdown.Syntax`/根 `PuraMarkdown` → `PuraMarkdown.Core`、`PuraMarkdown.Security` → `PuraMarkdown.Core.Security`；版本仍为 `0.1.0-alpha.1`。本 ADR 的决策内容不变：Arc 仍只允许 `PuraMarkdown.Core`（+ 其 `Markdig` 依赖）出现在 `Arc.Avalonia.Markdown`，其它包不得引用。同步更新了 `Directory.Packages.props`、`tools/deps-policy.json`、`tools/check-package.ps1`、README/文档与第三方声明。

@@ -29,7 +29,7 @@ type, colour, motion intent) matters more than API-name parity.
 | `src/Components/Arc.Avalonia.Effects` | effects agent | text reveal/in-view/morph/shimmer, announcement bar, cookie consent, hover card, bottom sheet, expandable card |
 | `src/Components/Arc.Avalonia.Content` | content agent | rich text editor, reorderable list, chat thread, onboarding checklist |
 | `src/Components/Arc.Avalonia.Media` | media agent | hold to confirm, swipe actions, reactions, image compare, carousel, card stack, scroll area, resizable panels |
-| `src/Components/Arc.Avalonia.Markdown` | markdown team | PuraMarkdown syntax consumption, full CommonMark+GFM renderers, streaming, code highlighter, AI chat, `pura-agent` fence contracts; the only project allowed to reference `PuraMarkdown.Syntax`/`Markdig` (ADR 0006) |
+| `src/Components/Arc.Avalonia.Markdown` | markdown team | PuraMarkdown syntax consumption, full CommonMark+GFM renderers, streaming, code highlighter, AI chat, `pura-agent` fence contracts; the only project allowed to reference `PuraMarkdown.Core`/`Markdig` (ADR 0006) |
 | `src/Components/Arc.Avalonia.Chat` | chat team | unified `ArcChatMessage` model, `ArcChatView` bubble surface (virtualized, streaming), `ArcChatComposer`; `ArcChatThread` is the obsolete alias; Agent conversation composes Chat bubbles with event cards |
 
 **Never edit files outside your project** (except adding your `ResourceInclude` lines inside your own
@@ -311,7 +311,7 @@ These rules keep `dotnet pack` reproducible and R5-clean; `tools/check-package.p
 * **Central package management.** Package versions live in `Directory.Packages.props`; csproj files use
   `<PackageReference Include="..." />` with no `Version`. The only allowed non-Arc packages are
   `Avalonia`, `Avalonia.Desktop` (apps only), `Avalonia.Themes.Fluent` and `Avalonia.Fonts.Inter`, plus
-  `PuraMarkdown.Syntax` and `Markdig` confined to `Arc.Avalonia.Markdown` (ADR 0006).
+  `PuraMarkdown.Core` and `Markdig` confined to `Arc.Avalonia.Markdown` (ADR 0006).
   `poc/Directory.Packages.props` opts the POCs out; do not add other nested overrides.
 * **No demo residue in packages.** Pages, documents, demo portraits, sample personas and demo-only
   helpers stay in `src/Docs`. Publishable libraries must not reference `Arc.Avalonia.Docs*`, carry
@@ -330,5 +330,6 @@ These rules keep `dotnet pack` reproducible and R5-clean; `tools/check-package.p
 * **Local release verification** (offline): `dotnet pack ArcUI.slnx -c Release -o artifacts -m:1
   -nodeReuse:false` then `pwsh tools/check-package.ps1` (exit 0 = 28 packages, clean dependency closure,
   xml + license + readme present, no Pages/Docs/demo entries).
+
 
 

@@ -3,7 +3,7 @@ using Avalonia.Controls.Documents;
 using Avalonia.Threading;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using PuraMarkdown.Security;
+using PuraMarkdown.Core.Security;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -108,7 +108,10 @@ public sealed class ArcMarkdownRenderContext
 /// <summary>A renderer warning surfaced to the host.</summary>
 public sealed record ArcMarkdownWarning(string Code, string Message, string? NodeType = null, string? Renderer = null);
 
-/// <summary>A link click; set <see cref="Handled"/> to stop the default handler.</summary>
+/// <summary>
+/// A link click; set <see cref="Handled"/> to stop the built-in copy/open-in-browser menu and handle the
+/// click entirely in the host.
+/// </summary>
 public sealed class ArcMarkdownLinkClick(string url, string text)
 {
     /// <summary>Link target.</summary>
@@ -117,7 +120,7 @@ public sealed class ArcMarkdownLinkClick(string url, string text)
     /// <summary>Visible link text.</summary>
     public string Text { get; } = text;
 
-    /// <summary>When true the view raises the event but does not open the link.</summary>
+    /// <summary>When true the renderer shows no menu and the host is responsible for the action.</summary>
     public bool Handled { get; set; }
 }
 
@@ -132,3 +135,4 @@ public sealed record ArcMarkdownInteraction(
     /// <summary>Raw JSON payload (component specific).</summary>
     public string? Raw { get; init; }
 }
+

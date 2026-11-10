@@ -68,6 +68,11 @@
   field static Avalonia.StyledProperty<System.Double> StrokeWidthProperty
   field static Avalonia.StyledProperty<System.String> IconProperty
   field static System.Collections.Generic.IReadOnlyDictionary<System.String, System.String> Paths
+  field static System.Double DragThreshold
+  field static System.Double HitTargetComfortable
+  field static System.Double HitTargetMin
+  field static System.Double SafeAreaDefault
+  field static System.Double SwipeThreshold
   field static System.String Accent
   field static System.String AccentForeground
   field static System.String AccentStrong
@@ -104,12 +109,16 @@
   field static System.String GradientInk
   field static System.String GradientSoft
   field static System.String GradientTo
+  field static System.String HitTargetComfortable
+  field static System.String HitTargetMin
   field static System.String LeadingBody
   field static System.String LeadingDisplay
   field static System.String RadiusControl
   field static System.String RadiusPanel
   field static System.String RadiusPill
   field static System.String RadiusSurface
+  field static System.String SafeAreaBottom
+  field static System.String SafeAreaTop
   field static System.String Scrim
   field static System.String Series1
   field static System.String Series2
@@ -201,8 +210,15 @@
   method Avalonia.Media.IBrush Brush[System.String key]
   method Avalonia.Media.IBrush Brush[System.String key]
   method Avalonia.Styling.Styles Build:/Theme/ArcBaseStyles.axaml[System.IServiceProvider ]
+  method Avalonia.Thickness SafeAreaThickness[System.Boolean bottom, System.Boolean top]
   method System.Boolean Equals[Arc.Avalonia.Theme.ArcThemeOptions other]
   method System.Boolean Equals[System.Object obj]
+  method System.Boolean ExceedsHorizontalDominance[Avalonia.Vector delta]
+  method System.Boolean ExceedsHorizontalDominance[System.Double dx, System.Double dy]
+  method System.Boolean IsDragGesture[Avalonia.Point start, Avalonia.Point end, System.Double threshold]
+  method System.Boolean IsHorizontalSwipe[Avalonia.Vector delta, System.Double viewportWidth, System.Double threshold]
+  method System.Boolean IsTouchPrimary[Avalonia.Visual target]
+  method System.Boolean IsVerticalSwipe[Avalonia.Vector delta, System.Double viewportHeight, System.Double threshold]
   method System.Boolean op_Equality[Arc.Avalonia.Theme.ArcThemeOptions left, Arc.Avalonia.Theme.ArcThemeOptions right]
   method System.Boolean op_Inequality[Arc.Avalonia.Theme.ArcThemeOptions left, Arc.Avalonia.Theme.ArcThemeOptions right]
   method System.Boolean TryFind[System.String key, Avalonia.Styling.ThemeVariant variant, out System.Object value]
@@ -231,6 +247,7 @@
   method System.ValueTuple<System.Double, System.Double, System.Double> ToOklch[Avalonia.Media.Color color]
   method System.Void Apply[Avalonia.Application app, Arc.Avalonia.Theme.ArcColorScheme scheme, Arc.Avalonia.Theme.ArcAccent accent]
   method System.Void Apply[Avalonia.Application app, Arc.Avalonia.Theme.ArcThemeOptions options]
+  method System.Void ApplySafeArea[Avalonia.Controls.Control target, System.Boolean bottom, System.Boolean top]
   method System.Void ClearProviders[]
   method System.Void Name[Avalonia.Controls.Control control, System.String name, System.String help]
   method System.Void PopParent[]
@@ -254,6 +271,7 @@
   method System.Void SetScheme[Avalonia.Application app, Arc.Avalonia.Theme.ArcColorScheme scheme]
   method System.Void ToggleScheme[Avalonia.Application app]
   method System.Void UseHost[Arc.Avalonia.Theme.IArcResourceHost host]
+  method System.Void UseTouchPrimaryProbe[System.Func<Avalonia.Visual, System.Boolean> probe]
   property Arc.Avalonia.Controls.ArcBadgeTone Tone {get;set}
   property Arc.Avalonia.Controls.ArcButtonSize Size {get;set}
   property Arc.Avalonia.Controls.ArcButtonVariant Variant {get;set}
@@ -279,6 +297,10 @@
   property System.Boolean StickToBottom {get;set}
   property System.Collections.Generic.IReadOnlyCollection<System.String> RegisteredNames {get}
   property System.Double CornerRadiusScale {get;set}
+  property System.Double SafeAreaBottom {get;set}
+  property System.Double SafeAreaBottom {get}
+  property System.Double SafeAreaTop {get;set}
+  property System.Double SafeAreaTop {get}
   property System.Double Size {get;set}
   property System.Double Size {get;set}
   property System.Double StrokeWidth {get;set}
@@ -326,3 +348,4 @@ type static Arc.Avalonia.Theme.ArcPalette
 type static Arc.Avalonia.Theme.ArcResources
 type static Arc.Avalonia.Theme.ArcThemeManager
 type static Arc.Avalonia.Theme.ArcTokens
+type static Arc.Avalonia.Theme.ArcTouch

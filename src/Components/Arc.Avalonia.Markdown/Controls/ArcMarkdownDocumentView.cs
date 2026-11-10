@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using PuraMarkdown.Syntax;
+using PuraMarkdown.Core;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -68,3 +68,4 @@ public class ArcMarkdownDocumentView : ContentControl
 
     private PuraDocument? _document;
 }
+

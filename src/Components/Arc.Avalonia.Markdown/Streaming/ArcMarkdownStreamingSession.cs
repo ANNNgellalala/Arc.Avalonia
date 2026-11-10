@@ -1,7 +1,7 @@
 using System.Text;
 using Avalonia.Threading;
-using PuraMarkdown;
-using PuraMarkdown.Syntax;
+using PuraMarkdown.Core;
+using PuraMarkdown.Core;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -850,3 +850,4 @@ public sealed partial class ArcMarkdownStreamingSession : IAsyncDisposable
         int CommittedOffset,
         bool TailPaused);
 }
+

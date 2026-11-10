@@ -59,6 +59,7 @@
   field System.Object ProvideTargetProperty
   field TTarget RootObject
   method Avalonia.Controls.ResourceDictionary Build[Arc.Avalonia.Theme.ArcThemeOptions options]
+  method Avalonia.Styling.Styles Build:/ArcMobileStyles.axaml[System.IServiceProvider ]
   method System.Object get_Current[]
   method System.Object GetService[System.Type ]
   method System.Object TryLoad[System.IServiceProvider , System.String ]
@@ -66,6 +67,7 @@
   method System.Uri get_BaseUri[]
   method System.Void Apply[Avalonia.Themes.Fluent.FluentTheme theme, Arc.Avalonia.Theme.ArcThemeOptions options]
   method System.Void PopParent[]
+  method System.Void Populate:/ArcMobileStyles.axaml[System.IServiceProvider , Avalonia.Styling.Styles ]
   method System.Void PushParent[System.Object ]
   method System.Void set_BaseUri[System.Uri ]
   property Avalonia.Themes.Fluent.FluentTheme FluentTheme {get}

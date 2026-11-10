@@ -62,7 +62,7 @@ Agent runtime `ArcAgentMessage/ArcMessageStatus`。Agent 事件协议（Started/
 
 ## 4. Markdown 去重
 
-唯一 Markdown 渲染实现 = `ArcMarkdownView`（解析层仍是 PuraMarkdown.Syntax + Markdig，只被 Markdown 包引用）：
+唯一 Markdown 渲染实现 = `ArcMarkdownView`（解析层仍是 PuraMarkdown.Core + Markdig，只被 Markdown 包引用）：
 - Blocks.AI `AiKit.Markdown` 子集渲染删除，保留薄包装（内部创建 ArcMarkdownView）；
 - Content `ArcMarkdown.BuildPreview` 等控件渲染删除，编辑器预览改为 ArcMarkdownView；`FromHtml/ToHtml/NormalizeUrl` 序列化保留；
 - Markdown 包的 Chat 控件全部移出/删除。
@@ -89,3 +89,4 @@ Agent runtime `ArcAgentMessage/ArcMessageStatus`。Agent 事件协议（Started/
   若未来坚持实心 Accent，需要给 Markdown 正文增加 on-accent 着色契约。
 - 消息操作按钮（复制/重生成）、Chat 快照序列化不在本波次。
 - Blocks.AI（L3）不能引用 Agent（L4），因此 AI block 页只用 Chat + 演示数据，Agent 对话在 Agent 示例页展示。
+

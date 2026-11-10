@@ -18,13 +18,13 @@
 | 不做自研帧调度/绘制缓存/主题版本失效协议 | 流式合并走 `Dispatcher`，不自建帧时钟 | 用户决策：渲染层不做（R8 门禁固化） |
 | 不做 Agent 运行时 | 顶层只做**表现运行时**（reducer + 视图），网络/模型/工具/定时器全在宿主 | 边界由 BannedApiAnalyzers + R9 门禁固化 |
 | 不引入第三方 UI 组件库 | 依赖白名单 fail-closed（仅官方 Avalonia 包） | R3 门禁 + 传递闭包校验 |
-| 唯一例外：Markdown 解析层 | `PuraMarkdown.Syntax` + `Markdig` 只允许出现在 `Arc.Avalonia.Markdown` | ADR 0006：禁止的是第三方 **UI** 库，不是所有非 UI 依赖；UI 仍全部 Arc 实现 |
+| 唯一例外：Markdown 解析层 | `PuraMarkdown.Core` + `Markdig` 只允许出现在 `Arc.Avalonia.Markdown` | ADR 0006：禁止的是第三方 **UI** 库，不是所有非 UI 依赖；UI 仍全部 Arc 实现 |
 
 ## 2. 分层架构
 
 ```text
 L0  官方平台      Avalonia 12.1.4 / Avalonia.Themes.Fluent / Avalonia.Fonts.Inter
-                 (Avalonia.Controls.DataGrid 仅 L2f Feature 包；PuraMarkdown.Syntax 仅 Markdown 包)
+                 (Avalonia.Controls.DataGrid 仅 L2f Feature 包；PuraMarkdown.Core 仅 Markdown 包)
  │
 L1  Foundation    Arc.Avalonia.Foundation（程序集名；csproj 路径仍 Arc.Avalonia）
      OKLCH 颜色引擎 / 82 token / 主题管理器 / 264 图标 / 动效 / 5 个原子控件 + ArcVirtualList
@@ -118,7 +118,7 @@ L5  宿主/叶子     Docs（文档站点，320+ 页）/ Docs.Abstractions（页
 
 ## 8. 内容能力：Markdown 族 + Chat 族
 
-* **`Arc.Avalonia.Markdown`（L2）**：解析层用 `PuraMarkdown.Syntax`（AST/诊断/大纲/流式稳定边界，无 Avalonia），Arc 负责全部渲染（块/行内/围栏、代码高亮、表格、图片/链接平台契约、本地化）。公共面：`ArcMarkdownView`（流式/选择/锚点）、`ArcMarkdownDocumentView`（宿主自管 AST）、`ArcMarkdownCodeBlock`，以及 `IArcMarkdownFenceRenderer` 扩展点。
+* **`Arc.Avalonia.Markdown`（L2）**：解析层用 `PuraMarkdown.Core`（AST/诊断/大纲/流式稳定边界，无 Avalonia），Arc 负责全部渲染（块/行内/围栏、代码高亮、表格、图片/链接平台契约、本地化）。公共面：`ArcMarkdownView`（流式/选择/锚点）、`ArcMarkdownDocumentView`（宿主自管 AST）、`ArcMarkdownCodeBlock`，以及 `IArcMarkdownFenceRenderer` 扩展点。
 * **流式策略**：只提交"稳定边界"之前的文本，尾部窗口每次 flush 重渲染；`CompleteAsync` 做一次完整解析保证与一次性解析一致。
 * **`Arc.Avalonia.Chat`（L2）**：唯一消息模型 `ArcChatMessage`（Id/Role/Author/Markdown/Status/Delivery/Attachments/Metadata/Error + Append/Complete/Changed），供人类聊天、AI 回答、Agent 运行时共用；控件 `ArcChatBubble`（正文=ArcMarkdownView）、`ArcChatView`（虚拟化消息列表 + typing/空状态 + 内嵌 composer）、`ArcChatComposer`；`ArcChatThread` 为 `[Obsolete]` 别名。
 * **去重**：全仓库唯一 Markdown 渲染实现 = `ArcMarkdownView`；Agent 的 `pura-agent` 围栏组件作为插件注册（choice/confirm），Blocks.AI 的渲染子集改为薄包装。
@@ -184,3 +184,4 @@ Arc.Avalonia.Chat（L2）：气泡与 composer；Arc.Avalonia.Markdown：正文�
 8. **文档即测试**：294 篇文档 × 323 个页面由 audit/smoke/shots 三件套持续验证，文档站是产品的一部分。
 9. **决策留痕**：每个结构性决定都有 ADR（分层/依赖/主题/控件键/契约/Markdown 依赖），评审记录在 `docs/analysis/`。
 10. **静态门禁 + 运行时探针**：静态规则防回退，`--theme-report`/`Verify` 防"编译通过但运行时失效"。
+

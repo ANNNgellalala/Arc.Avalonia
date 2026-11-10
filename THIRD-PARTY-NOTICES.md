@@ -11,8 +11,8 @@ works whose code, assets, fonts or design language reach consumers of these pack
 | [Avalonia](https://github.com/AvaloniaUI/Avalonia) (`Avalonia`, `Avalonia.Base`, `Avalonia.Controls`, `Avalonia.Desktop`, `Avalonia.Skia`, `Avalonia.Win32`, `Avalonia.X11`, `Avalonia.Native`) | MIT | UI framework, rendering, layout, input, windowing |
 | [Avalonia.Themes.Fluent](https://github.com/AvaloniaUI/Avalonia) | MIT | Official Fluent baseline that `ArcTheme` adapts on top of |
 | [Avalonia.Fonts.Inter](https://github.com/AvaloniaUI/Avalonia) | MIT | Inter font package used as the Arc body font |
-| [PuraMarkdown.Syntax](https://github.com/) (local package `0.1.0-alpha.1`) | MIT | Markdown parsing, Markdig AST facade, diagnostics/outline, stable-boundary streaming scanner for `Arc.Avalonia.Markdown` (ADR 0006). No Avalonia dependency and no UI code. |
-| [Markdig](https://github.com/xoofx/markdig) (transitive via `PuraMarkdown.Syntax`) | BSD-2-Clause | CommonMark/GFM parser used by the Markdown syntax layer |
+| [PuraMarkdown.Core](https://github.com/) (local package `0.1.0-alpha.1`) | MIT | Markdown parsing, Markdig AST facade, diagnostics/outline, stable-boundary streaming scanner for `Arc.Avalonia.Markdown` (ADR 0006). No Avalonia dependency and no UI code. |
+| [Markdig](https://github.com/xoofx/markdig) (transitive via `PuraMarkdown.Core`) | BSD-2-Clause | CommonMark/GFM parser used by the Markdown syntax layer |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) (transitive via `Avalonia.Skia`) | MIT | 2D rendering backend |
 | [HarfBuzzSharp](https://github.com/mono/SkiaSharp) (transitive via `Avalonia.Skia`) | MIT | Text shaping backend |
 
@@ -50,3 +50,4 @@ confined to `Arc.Avalonia.Markdown` (ADR 0006); no third-party UI component libr
 ---
 
 If you believe a work is missing from this list, please open an issue before publishing a release.
+

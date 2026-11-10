@@ -5,8 +5,8 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Markdig.Syntax;
-using PuraMarkdown.Security;
-using PuraMarkdown.Syntax;
+using PuraMarkdown.Core.Security;
+using PuraMarkdown.Core;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -170,4 +170,23 @@ public static class ArcMarkdownStringKeys
     public const string Submit = "markdown.submit";
     public const string Cancel = "markdown.cancel";
     public const string Confirm = "markdown.confirm";
+
+    /// <summary>Accessible name of the link context menu.</summary>
+    public const string LinkMenu = "markdown.linkMenu";
+
+    /// <summary>Menu row that copies the link target.</summary>
+    public const string CopyLink = "markdown.copyLink";
+
+    /// <summary>Feedback shown after the link target reaches the clipboard.</summary>
+    public const string LinkCopied = "markdown.linkCopied";
+
+    /// <summary>Menu row that opens the link target in the system browser.</summary>
+    public const string OpenInBrowser = "markdown.openInBrowser";
+
+    /// <summary>Warning copy when the browser launch fails.</summary>
+    public const string OpenLinkFailed = "markdown.openLinkFailed";
+
+    /// <summary>Tooltip on the disabled browser row (relative or non-navigable target).</summary>
+    public const string OpenLinkUnavailable = "markdown.openLinkUnavailable";
 }
+

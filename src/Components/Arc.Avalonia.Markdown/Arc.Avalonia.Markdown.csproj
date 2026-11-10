@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
     L2 Markdown family (ADR 0006): the production renderer for PuraMarkdown documents.
-    Parsing/streaming/diagnostics come from PuraMarkdown.Syntax (Markdig, no Avalonia); every
+    Parsing/streaming/diagnostics come from PuraMarkdown.Core (Markdig, no Avalonia); every
     control, theme and interaction is Arc. The package reads tokens only through ArcResources so
     it follows light/dark and all eight accents like the rest of the design system.
   -->
@@ -11,13 +11,13 @@
     <PackageId>Arc.Avalonia.Markdown</PackageId>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>Full Markdown rendering for Arc for Avalonia: PuraMarkdown syntax, Arc block and inline renderers, streaming, code highlighting, tables, agent components and the AI chat surface.</Description>
+    <Description>Full Markdown rendering for Arc for Avalonia: PuraMarkdown.Core syntax, Arc block and inline renderers, streaming, code highlighting, tables, agent components and the AI chat surface.</Description>
     <PackageTags>avalonia;markdown;markdown-renderer;streaming;ai;chat;design-system</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
-    <PackageReference Include="PuraMarkdown.Syntax" />
+    <PackageReference Include="PuraMarkdown.Core" />
     <PackageReference Include="Markdig" />
   </ItemGroup>
 
@@ -27,7 +27,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
-    <InternalsVisibleTo Include="Arc.Avalonia.Tests" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Verify" />
     <InternalsVisibleTo Include="Arc.Avalonia.Agent" />
   </ItemGroup>
 </Project>
+

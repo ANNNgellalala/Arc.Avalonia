@@ -56,7 +56,7 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 # package therefore never requires editing this script. The two meta packages keep an explicit dependency
 # shape check below; they are not expected to aggregate the Feature packages.
 # ---------------------------------------------------------------------------
-$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid', 'PuraMarkdown.Syntax', 'Markdig')
+$allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid', 'PuraMarkdown.Core', 'Markdig')
 
 # Layer families the meta packages must aggregate (dependency-shape contract for Arc.Avalonia / .All).
 $components = @(
@@ -392,4 +392,5 @@ if (-not $Quiet) {
 
 if ($issues.Count -gt 0) { exit 1 }
 exit 0
+
 

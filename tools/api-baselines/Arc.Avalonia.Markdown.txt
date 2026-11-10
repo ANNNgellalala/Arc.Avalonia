@@ -82,11 +82,17 @@
   field static System.String Copy
   field static System.String CopyCode
   field static System.String CopyFailed
+  field static System.String CopyLink
   field static System.String EmptyDocument
   field static System.String Image
   field static System.String ImageBlocked
   field static System.String ImageLoadFailed
   field static System.String ImageLoading
+  field static System.String LinkCopied
+  field static System.String LinkMenu
+  field static System.String OpenInBrowser
+  field static System.String OpenLinkFailed
+  field static System.String OpenLinkUnavailable
   field static System.String Submit
   field static System.String UnsupportedNode
   field System.Collections.Generic.List<System.Object> ParentsStack
@@ -101,7 +107,7 @@
   method Arc.Avalonia.Markdown.ArcMarkdownImageResult Refused[System.String reason]
   method Arc.Avalonia.Markdown.ArcMarkdownInteraction <Clone>$[]
   method Arc.Avalonia.Markdown.ArcMarkdownPipeline Build[]
-  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder ConfigureLimits[System.Action<PuraMarkdown.Security.PuraLimits> configure]
+  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder ConfigureLimits[System.Action<PuraMarkdown.Core.Security.PuraLimits> configure]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseCodeHighlighter[Arc.Avalonia.Markdown.IArcMarkdownCodeHighlighter highlighter]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseCommonMark[]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseFenceRenderer[Arc.Avalonia.Markdown.IArcMarkdownFenceRenderer renderer, System.Int32 priority]
@@ -110,8 +116,8 @@
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseMarkdownExtension[Markdig.IMarkdownExtension extension]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UsePlugin[Arc.Avalonia.Markdown.IArcMarkdownPlugin plugin]
   method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseRenderer[Arc.Avalonia.Markdown.IArcMarkdownNodeRenderer renderer, System.Int32 priority]
-  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseSanitizer[PuraMarkdown.Security.IAstSanitizer sanitizer]
-  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseUrlPolicy[PuraMarkdown.Security.IUrlPolicy urlPolicy]
+  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseSanitizer[PuraMarkdown.Core.Security.IAstSanitizer sanitizer]
+  method Arc.Avalonia.Markdown.ArcMarkdownPipelineBuilder UseUrlPolicy[PuraMarkdown.Core.Security.IUrlPolicy urlPolicy]
   method Arc.Avalonia.Markdown.ArcMarkdownStreamingSession BeginStreaming[Arc.Avalonia.Markdown.ArcMarkdownStreamingOptions options]
   method Arc.Avalonia.Markdown.ArcMarkdownStreamingStatistics <Clone>$[]
   method Arc.Avalonia.Markdown.ArcMarkdownWarning <Clone>$[]
@@ -160,7 +166,7 @@
   method System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Markdown.ArcMarkdownHighlightSpan> Highlight[System.String code, System.String language]
   method System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Markdown.ArcMarkdownHighlightSpan> Highlight[System.String code, System.String language]
   method System.Collections.Generic.IReadOnlyList<Avalonia.Controls.Control> RenderChildren[Markdig.Syntax.ContainerBlock container]
-  method System.Collections.Generic.IReadOnlyList<PuraMarkdown.Syntax.PuraHeading> GetOutline[]
+  method System.Collections.Generic.IReadOnlyList<PuraMarkdown.Core.PuraHeading> GetOutline[]
   method System.Double HeadingSize[System.Int32 level]
   method System.Int32 GetHashCode[]
   method System.Int32 GetHashCode[]
@@ -192,6 +198,7 @@
   method System.Threading.Tasks.Task SetTextAsync[System.String text, System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.Task WaitForIdleAsync[]
   method System.Threading.Tasks.Task<Arc.Avalonia.Markdown.ArcMarkdownImageResult> LoadAsync[System.String url, System.Threading.CancellationToken cancellationToken]
+  method System.Threading.Tasks.Task<System.Boolean> OpenInBrowserAsync[Avalonia.Controls.TopLevel topLevel, System.String url, System.Threading.CancellationToken cancellationToken]
   method System.Threading.Tasks.ValueTask DisposeAsync[]
   method System.Uri get_BaseUri[]
   method System.Void AbortStreaming[]
@@ -216,7 +223,7 @@
   method System.Void RefreshTheme[]
   method System.Void Render[]
   method System.Void Render[]
-  method System.Void RenderDocument[PuraMarkdown.Syntax.PuraDocument document]
+  method System.Void RenderDocument[PuraMarkdown.Core.PuraDocument document]
   method System.Void RenderInline[Markdig.Syntax.MarkdownObject node, Avalonia.Controls.Documents.InlineCollection target, Arc.Avalonia.Markdown.ArcMarkdownRenderContext context]
   method System.Void RenderInlineChildren[Markdig.Syntax.Inlines.ContainerInline container, Avalonia.Controls.Documents.InlineCollection target]
   method System.Void ScrollToEnd[]
@@ -278,13 +285,13 @@
   property Avalonia.Media.IBrush WarningBrush {get}
   property Avalonia.Media.Imaging.Bitmap Image {get;set}
   property Avalonia.Threading.IDispatcher Dispatcher {get;set}
-  property PuraMarkdown.Security.IUrlPolicy UrlPolicy {get;set}
-  property PuraMarkdown.Security.PuraLimits Limits {get;set}
-  property PuraMarkdown.Security.SanitizeResult Sanitized {get;set}
-  property PuraMarkdown.Syntax.PuraDocument Document {get;set}
-  property PuraMarkdown.Syntax.PuraOutline Outline {get}
-  property PuraMarkdown.Syntax.PuraOutline Outline {get}
-  property PuraMarkdown.Syntax.PuraSyntaxPipeline Syntax {get}
+  property PuraMarkdown.Core.PuraDocument Document {get;set}
+  property PuraMarkdown.Core.PuraOutline Outline {get}
+  property PuraMarkdown.Core.PuraOutline Outline {get}
+  property PuraMarkdown.Core.PuraSyntaxPipeline Syntax {get}
+  property PuraMarkdown.Core.Security.IUrlPolicy UrlPolicy {get;set}
+  property PuraMarkdown.Core.Security.PuraLimits Limits {get;set}
+  property PuraMarkdown.Core.Security.SanitizeResult Sanitized {get;set}
   property System.Action<Arc.Avalonia.Markdown.ArcMarkdownInteraction> InteractionSink {get;set}
   property System.Action<Arc.Avalonia.Markdown.ArcMarkdownLinkClick> LinkClickSink {get;set}
   property System.Action<Arc.Avalonia.Markdown.ArcMarkdownWarning> WarningSink {get;set}
@@ -309,7 +316,7 @@
   property System.Collections.Generic.IReadOnlyDictionary<System.String, Arc.Avalonia.Markdown.ArcMarkdownInteraction> InteractionStates {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Markdown.ArcMarkdownBlockInfo> Blocks {get}
   property System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Markdown.IArcMarkdownFenceRenderer> Fences {get}
-  property System.Collections.Generic.IReadOnlyList<PuraMarkdown.Syntax.PuraDiagnostic> Diagnostics {get}
+  property System.Collections.Generic.IReadOnlyList<PuraMarkdown.Core.PuraDiagnostic> Diagnostics {get}
   property System.Collections.Generic.IReadOnlyList<System.String> PluginNames {get}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}
   property System.Collections.Generic.IReadOnlyList<System.String> SelectedIds {get;set}

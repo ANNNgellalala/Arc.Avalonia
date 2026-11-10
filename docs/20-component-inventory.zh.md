@@ -153,7 +153,7 @@ L0 平台（官方 Avalonia 12.1.4：Avalonia / Themes.Fluent / Fonts.Inter；Da
 ## 10. M3 Markdown 波次增量（2026-11-08）
 
 新增 `Arc.Avalonia.Markdown`（L2，Chat 波次后 33 个包）与 `pura-agent` 组件；PuraMarkdown 的解析层作为唯一外部依赖特例
-（`PuraMarkdown.Syntax` + `Markdig`，仅该包，ADR 0006）。
+（`PuraMarkdown.Core` + `Markdig`，仅该包，ADR 0006）。
 
 | 维度 | 增量 | 现在 |
 |---|---|---|
@@ -192,6 +192,7 @@ Markdown 能力：CommonMark+GFM 全节点矩阵、代码高亮（17 语言族�
   Agent Composer/StreamingText、AgentUI Transcript/AskCard。计数口径：控件 = 发布程序集中 `Avalonia.Controls.Control` 可赋值的
   public 类型（反射，`.recon/InventoryProbe`）；类型 = `tools/api-baselines/*.txt` 的 `type` 行（含 XAML 生成类型）；主题/路由事件
   = `src/**` 源码 grep。
+
 
 
 

@@ -10,7 +10,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using PuraMarkdown.Syntax;
+using PuraMarkdown.Core;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -459,7 +459,7 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         {
             Options = CurrentOptions,
             Renderers = CurrentOptions.Pipeline.Renderers,
-            Sanitized = document.Sanitized ?? new PuraMarkdown.Security.SanitizeResult(),
+            Sanitized = document.Sanitized ?? new PuraMarkdown.Core.Security.SanitizeResult(),
             Dispatcher = Dispatcher.UIThread,
             IsStreaming = isStreaming,
             IsTail = isTail,
@@ -471,6 +471,10 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
                 var args = new ArcMarkdownLinkClickedEventArgs(click.Url, click.Text) { RoutedEvent = LinkClickedEvent, Source = this };
                 RaiseEvent(args);
                 click.Handled = args.HandledByHost;
+                if (!click.Handled && TryNavigateFragment(click.Url))
+                {
+                    click.Handled = true;
+                }
             },
             ImageLoadingSink = _ => { },
             ImageLoadedSink = (_, _) => { },
@@ -485,6 +489,21 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
 
         _interactionStates[interaction.ComponentId] = interaction;
         RaiseEvent(new ArcMarkdownInteractionEventArgs(interaction) { RoutedEvent = InteractionOccurredEvent, Source = this });
+    }
+
+    /// <summary>
+    /// In-document links (<c>#anchor</c>) scroll instead of opening the copy/open menu: a browser cannot
+    /// resolve a bare fragment, and the outline already knows where the heading is.
+    /// </summary>
+    private bool TryNavigateFragment(string url)
+    {
+        if (url.Length < 2 || url[0] != '#')
+        {
+            return false;
+        }
+
+        var anchor = Uri.UnescapeDataString(url[1..]);
+        return !string.IsNullOrEmpty(anchor) && ScrollToAnchor(anchor);
     }
 
     private void RenderDocument(PuraDocument document, bool isStreaming)
@@ -698,4 +717,5 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         }
     }
 }
+
 

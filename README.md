@@ -101,16 +101,16 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 
 Every package depends only on Avalonia's official packages (`Avalonia`, `Avalonia.Themes.Fluent`,
 `Avalonia.Fonts.Inter`), with one deliberate exception: `Arc.Avalonia.Markdown` also consumes the
-`PuraMarkdown.Syntax` parser facade and its `Markdig` dependency (ADR 0006). `tools/check-package.ps1`
+`PuraMarkdown.Core` parser facade and its `Markdig` dependency (ADR 0006). `tools/check-package.ps1`
 unpacks each nupkg and fails the release when any other dependency or any page/doc/demo asset is found.
 
 ### Build the packages locally
 
-`Arc.Avalonia.Markdown` consumes `PuraMarkdown.Syntax` from the sibling PuraMarkdown checkout. The local
+`Arc.Avalonia.Markdown` consumes `PuraMarkdown.Core` from the sibling PuraMarkdown checkout. The local
 feed is configured in `NuGet.config` (`../PuraMarkdown/artifacts/nuget`); produce it once with:
 
 ```powershell
-dotnet pack ../PuraMarkdown/src/PuraMarkdown.Syntax -c Release -o ../PuraMarkdown/artifacts/nuget
+dotnet pack ../PuraMarkdown/src/PuraMarkdown.Core -c Release -o ../PuraMarkdown/artifacts/nuget
 ```
 
 Then build the solution:
@@ -356,7 +356,7 @@ pages, and 14 agent/life scene pages) at up to 1400 px per slice.
 
 No commercial or third-party UI/component library is used. The only NuGet packages across the solution are
 **Avalonia**, **Avalonia.Desktop**, **Avalonia.Themes.Fluent** and **Avalonia.Fonts.Inter** (all MIT), plus —
-confined to `Arc.Avalonia.Markdown` — **PuraMarkdown.Syntax** (MIT) and its **Markdig** parser (BSD-2-Clause),
+confined to `Arc.Avalonia.Markdown` — **PuraMarkdown.Core** (MIT) and its **Markdig** parser (BSD-2-Clause),
 which supply the Markdown syntax layer while every control, theme and interaction stays Arc code (ADR 0006).
 Every control, chart and surface in this repository is our own XAML/C#. Pro components are implemented independently
 from Arc's public documentation and visual descriptions, without using or copying Pro source code.
@@ -389,6 +389,7 @@ the root of every NuGet package.
 * Fonts: **Inter** (SIL Open Font License) via `Avalonia.Fonts.Inter`.
 * The full third-party list (runtime packages, SkiaSharp/HarfBuzzSharp, fonts, icons, Arc UI, and the
   AG-UI semantic-only reference) is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
 
 
 

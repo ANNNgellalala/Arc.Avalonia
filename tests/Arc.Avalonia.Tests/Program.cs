@@ -21,12 +21,13 @@ using Arc.Avalonia.Demo;
 using Arc.Avalonia.Feature.DataGrid;
 using Arc.Avalonia.Icons;
 using Arc.Avalonia.Markdown;
+using Arc.Avalonia.Markdown.Controls;
 using Arc.Avalonia.Motion;
 using Arc.Avalonia.Services;
 using Arc.Avalonia.Theme;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
-using PuraMarkdown.Security;
+using PuraMarkdown.Core.Security;
 using Agent = Arc.Avalonia.Agent;
 using AgentUi = Arc.Avalonia.AgentUI.Controls;
 
@@ -1015,6 +1016,103 @@ public static class Program
                 Walk(paragraph).OfType<Image>().Any() &&
                 paragraphText.Contains("图片"));
 
+            // --- inline-link menu: copy / open in browser -------------------------------
+            var linkOptions = new ArcMarkdownOptions { Pipeline = pipeline };
+            var linkContext = new ArcMarkdownRenderContext
+            {
+                Options = linkOptions,
+                Renderers = pipeline.Renderers,
+                Sanitized = new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            var linkAnchor = new Button();
+            var linkMenu = new ArcMarkdownLinkMenu(linkAnchor, "https://uiarc.dev", linkContext);
+            var linkMenuContent = linkMenu.CreateContent();
+            var linkRows = linkMenu.Rows;
+            Check("markdown link menu offers copy and open rows",
+                linkRows.Count == 2 &&
+                Walk(linkMenuContent).OfType<ArcButton>().Count() == 2 &&
+                linkRows[0].Content as string == "复制链接" &&
+                linkRows[1].Content as string == "在浏览器中打开");
+
+            Check("markdown link menu enables open for an absolute url",
+                linkRows[1].IsEnabled &&
+                ArcMarkdownLinkMenu.CanOpenInBrowser("https://uiarc.dev", ArcMarkdownOptions.Default) &&
+                ArcMarkdownLinkMenu.CanOpenInBrowser("mailto:hi@uiarc.dev", ArcMarkdownOptions.Default));
+
+            var relativeMenu = new ArcMarkdownLinkMenu(linkAnchor, "#anchor", linkContext);
+            relativeMenu.CreateContent();
+            var relativeRows = relativeMenu.Rows;
+            Check("markdown link menu disables open for a relative target",
+                !relativeRows[1].IsEnabled &&
+                !ArcMarkdownLinkMenu.CanOpenInBrowser("#anchor", ArcMarkdownOptions.Default) &&
+                !ArcMarkdownLinkMenu.CanOpenInBrowser("./local.md", ArcMarkdownOptions.Default));
+
+            Check("markdown link menu keeps the browser row to browser schemes",
+                !ArcMarkdownLinkMenu.CanOpenInBrowser("ftp://example.com/file", ArcMarkdownOptions.Default) &&
+                !ArcMarkdownLinkMenu.CanOpenInBrowser("file:///C:/tmp/notes.txt", ArcMarkdownOptions.Default) &&
+                ArcMarkdownLinkMenu.CanOpenInBrowser("tel:+8610000000000", ArcMarkdownOptions.Default));
+
+            var fakeClipboard = new FakeMarkdownClipboard();
+            var copyContext = new ArcMarkdownRenderContext
+            {
+                Options = new ArcMarkdownOptions { Pipeline = pipeline, Clipboard = fakeClipboard },
+                Renderers = pipeline.Renderers,
+                Sanitized = new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            var copyMenu = new ArcMarkdownLinkMenu(linkAnchor, "https://uiarc.dev/docs/links", copyContext);
+            copyMenu.CreateContent();
+            var copyCompleted = PumpDispatcher(copyMenu.CopyLinkAsync(), TimeSpan.FromSeconds(10));
+            Check("markdown link menu copy writes the exact url and confirms it",
+                copyCompleted &&
+                fakeClipboard.Text == "https://uiarc.dev/docs/links" &&
+                copyMenu.Rows[0].Content as string == "链接已复制");
+
+            var fakeLinkHandler = new FakeMarkdownLinkHandler();
+            var hostContext = new ArcMarkdownRenderContext
+            {
+                Options = new ArcMarkdownOptions { Pipeline = pipeline, LinkHandler = fakeLinkHandler },
+                Renderers = pipeline.Renderers,
+                Sanitized = new SanitizeResult(),
+                Dispatcher = Dispatcher.UIThread,
+            };
+            var hostMenu = new ArcMarkdownLinkMenu(linkAnchor, "https://uiarc.dev/docs/links", hostContext);
+            hostMenu.CreateContent();
+            var hostOpenCompleted = PumpDispatcher(hostMenu.OpenInBrowserAsync(), TimeSpan.FromSeconds(10));
+            Check("markdown link menu open delegates to the host link handler",
+                hostOpenCompleted &&
+                hostMenu.Rows[1].IsEnabled &&
+                fakeLinkHandler.Urls.Count == 1 &&
+                fakeLinkHandler.Urls[0] == "https://uiarc.dev/docs/links");
+            Check("markdown link menu host handler allows a relative target",
+                ArcMarkdownLinkMenu.CanOpenInBrowser("./local.md", hostContext.Options));
+
+            var absoluteOpen = ArcMarkdownPlatform.OpenInBrowserAsync(null, "https://uiarc.dev");
+            var relativeOpen = ArcMarkdownPlatform.OpenInBrowserAsync(null, "relative/path");
+            PumpDispatcher(Task.WhenAll(absoluteOpen, relativeOpen), TimeSpan.FromSeconds(10));
+            Check("markdown platform browser launch requires a top level and an absolute uri",
+                absoluteOpen.IsCompletedSuccessfully && !absoluteOpen.Result &&
+                relativeOpen.IsCompletedSuccessfully && !relativeOpen.Result);
+
+            var chineseLocalizer = ArcMarkdownLocalizer.Default;
+            Check("markdown link menu localizes chinese copy",
+                chineseLocalizer.Get(ArcMarkdownStringKeys.LinkMenu) == "链接操作" &&
+                chineseLocalizer.Get(ArcMarkdownStringKeys.CopyLink) == "复制链接" &&
+                chineseLocalizer.Get(ArcMarkdownStringKeys.LinkCopied) == "链接已复制" &&
+                chineseLocalizer.Get(ArcMarkdownStringKeys.OpenInBrowser) == "在浏览器中打开" &&
+                chineseLocalizer.Get(ArcMarkdownStringKeys.OpenLinkFailed) == "打开链接失败" &&
+                chineseLocalizer.Get(ArcMarkdownStringKeys.OpenLinkUnavailable) == "该链接无法在浏览器中打开");
+
+            var englishLocalizer = ArcMarkdownEnglishLocalizer.Instance;
+            Check("markdown link menu localizes english copy",
+                englishLocalizer.Get(ArcMarkdownStringKeys.LinkMenu) == "Link actions" &&
+                englishLocalizer.Get(ArcMarkdownStringKeys.CopyLink) == "Copy link" &&
+                englishLocalizer.Get(ArcMarkdownStringKeys.LinkCopied) == "Link copied" &&
+                englishLocalizer.Get(ArcMarkdownStringKeys.OpenInBrowser) == "Open in browser" &&
+                englishLocalizer.Get(ArcMarkdownStringKeys.OpenLinkFailed) == "Could not open link" &&
+                englishLocalizer.Get(ArcMarkdownStringKeys.OpenLinkUnavailable) == "This link cannot be opened in a browser");
+
             var lists = blocks.OfType<ListBlock>().ToArray();
             var listControls = lists.Select(list => rendered[list]).ToArray();
             var listText = string.Concat(listControls.Select(TextOf));
@@ -1606,6 +1704,30 @@ public static class Program
             => palette.TryGetValue(key, out value);
     }
 
+    /// <summary>Captures what the Markdown link menu writes through <see cref="IArcMarkdownClipboard"/>.</summary>
+    private sealed class FakeMarkdownClipboard : IArcMarkdownClipboard
+    {
+        public string? Text { get; private set; }
+
+        public Task SetTextAsync(string text, CancellationToken cancellationToken = default)
+        {
+            Text = text;
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>Captures what the Markdown link menu opens through <see cref="IArcMarkdownLinkHandler"/>.</summary>
+    private sealed class FakeMarkdownLinkHandler : IArcMarkdownLinkHandler
+    {
+        public List<string> Urls { get; } = new();
+
+        public Task OpenAsync(string url, CancellationToken cancellationToken = default)
+        {
+            Urls.Add(url);
+            return Task.CompletedTask;
+        }
+    }
+
     /// <summary>Minimal fence plugin used to prove IArcMarkdownPlugin/IArcMarkdownFenceRenderer dispatch.</summary>
     private sealed class MarkdownTestFencePlugin : IArcMarkdownPlugin
     {
@@ -1675,6 +1797,7 @@ public static class Program
         }
     }
 }
+
 
 
 
