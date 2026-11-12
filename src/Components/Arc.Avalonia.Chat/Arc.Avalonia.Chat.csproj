@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Arc.Avalonia.Docs" />
+    <InternalsVisibleTo Include="Arc.Avalonia.Verify" />
     <InternalsVisibleTo Include="Arc.Avalonia.Tests" />
     <InternalsVisibleTo Include="Arc.Avalonia.Agent" />
     <InternalsVisibleTo Include="Arc.Avalonia.AgentUI" />

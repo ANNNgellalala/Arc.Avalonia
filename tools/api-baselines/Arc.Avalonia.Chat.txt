@@ -5,6 +5,9 @@
   ctor Arc.Avalonia.Chat.ArcChatAttachment[]
   ctor Arc.Avalonia.Chat.ArcChatComposer[]
   ctor Arc.Avalonia.Chat.ArcChatDraft[System.String Text, System.Collections.Generic.IReadOnlyList<Arc.Avalonia.Chat.ArcChatAttachment> Attachments]
+  ctor Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs[]
+  ctor Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent, System.String url]
+  ctor Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs[Avalonia.Interactivity.RoutedEvent routedEvent]
   ctor Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs[]
   ctor Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs[Arc.Avalonia.Chat.ArcChatDraft draft]
   ctor Arc.Avalonia.Chat.ArcChatView[]
@@ -14,15 +17,18 @@
   event System.EventHandler StopRequested
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatDraft> Send
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatDraft> Send
+  event System.EventHandler<Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs> LinkClicked
   event System.EventHandler<Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs> SendRouted
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageAdded
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageRemoved
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageUpdated
   event System.EventHandler<PuraMarkdown.Agent.PuraInteractionEventArgs> InteractionOccurred
+  event System.EventHandler<PuraMarkdown.Agent.Rendering.PuraWarningEventArgs> Warning
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode Always
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode NearBottom
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode Never
+  field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs> LinkClickedEvent
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs> SendEvent
   field static Avalonia.StyledProperty<Avalonia.Controls.Control> LeadingContentProperty
   field static Avalonia.StyledProperty<Avalonia.Thickness> KeyboardInsetsProperty
@@ -43,6 +49,7 @@
   method Avalonia.Styling.Styles Build:/Themes/ArcChatTheme.axaml[System.IServiceProvider ]
   method PuraMarkdown.Agent.Chat.PuraChatMessage FindMessage[System.String messageId]
   method PuraMarkdown.Agent.PuraMarkdownOptions CreateOptions[]
+  method PuraMarkdown.Agent.PuraMarkdownOptions CreateOptions[PuraMarkdown.Agent.Platform.ILinkHandler linkHandler]
   method PuraMarkdown.Agent.PuraPipeline BuildPipeline[]
   method PuraMarkdown.Agent.PuraStreamingSession BeginStreamingMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
   method System.Boolean Equals[Arc.Avalonia.Chat.ArcChatDraft other]
@@ -86,10 +93,12 @@
   property Avalonia.Thickness KeyboardInsets {get;set}
   property Avalonia.Thickness SafeArea {get;set}
   property PuraMarkdown.Agent.Chat.PuraChatView Host {get}
+  property PuraMarkdown.Agent.Platform.ILinkHandler LinkHandler {get;set}
   property PuraMarkdown.Agent.PuraMarkdownOptions Options {get;set}
   property PuraMarkdown.Agent.PuraStreamingSession ActiveSession {get}
   property System.Boolean AllowAttachments {get;set}
   property System.Boolean AllowAttachments {get;set}
+  property System.Boolean HandledByHost {get;set}
   property System.Boolean IsImage {get;set}
   property System.Boolean IsRunning {get;set}
   property System.Boolean IsStreaming {get}
@@ -108,8 +117,10 @@
   property System.String Text {get;set}
   property System.String Text {get;set}
   property System.String Url {get;set}
+  property System.String Url {get;set}
   property System.Uri BaseUri {get;set}
 type class Arc.Avalonia.Chat.ArcChatComposer : Avalonia.Controls.Primitives.TemplatedControl, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.LogicalTree.ILogical>, Avalonia.Collections.IAvaloniaListItemValidator<Avalonia.Visual>, Avalonia.Controls.IResourceHost, Avalonia.Controls.IResourceNode, Avalonia.Controls.ISetInheritanceParent, Avalonia.Controls.ISetLogicalParent, Avalonia.Controls.Templates.IDataTemplateHost, Avalonia.Diagnostics.IAvaloniaObjectDebug, Avalonia.IDataContextProvider, Avalonia.INamed, Avalonia.Input.IInputElement, Avalonia.LogicalTree.ILogical, Avalonia.Rendering.IVisualBrushInitialize, Avalonia.Styling.ISetterValue, Avalonia.Styling.IStyleHost, Avalonia.Styling.IThemeVariantHost, System.ComponentModel.INotifyPropertyChanged, System.ComponentModel.ISupportInitialize
+type class Arc.Avalonia.Chat.ArcChatLinkClickedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type class Arc.Avalonia.Chat.ArcChatSendRoutedEventArgs : Avalonia.Interactivity.RoutedEventArgs
 type class CompiledAvaloniaXaml.!AvaloniaResources
 type class CompiledAvaloniaXaml.!XamlLoader

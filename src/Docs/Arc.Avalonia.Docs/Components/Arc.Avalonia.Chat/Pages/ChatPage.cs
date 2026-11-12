@@ -89,7 +89,8 @@ public sealed class ChatPage : ArcPage
                 "- 新增定价页截图与空状态文案\n" +
                 "- 正文渲染全部交给 `PuraMarkdown.Agent`（`PuraChatView` + `PuraMarkdownView`）\n\n" +
                 "```csharp\nchat.AddMessage(new PuraChatMessage\n{\n    Role = PuraChatRole.Assistant,\n    Markdown = \"**Done**\",\n});\n```\n\n" +
-                "| 状态 | 含义 |\n| :--- | :--- |\n| Streaming | token 仍在到达 |\n| Complete | 生成完成 |\n| Failed | 生成失败 |"
+                "| 状态 | 含义 |\n| :--- | :--- |\n| Streaming | token 仍在到达 |\n| Complete | 生成完成 |\n| Failed | 生成失败 |" +
+                "\n\n参考 [Arc 文档](https://uiarc.dev) 与 [PuraMarkdown 迁移说明](https://uiarc.dev/docs/migration)。"
         });
 
         chat.AddMessage(new PuraChatMessage
@@ -119,12 +120,14 @@ public sealed class ChatPage : ArcPage
         });
 
         var caption = DemoUi.Caption(
-            "消息模型 = PuraChatMessage · 正文与工具卡 = PuraMarkdown.Agent 渲染 · 生成状态与错误行 · 系统消息 · 内置 composer。");
+            "消息模型 = PuraChatMessage · 正文与工具卡 = PuraMarkdown.Agent 渲染 · 生成状态与错误行 · 系统消息 · 内置 composer。" +
+            "正文里的链接可直接点击：默认用系统 launcher 打开，宿主可经 LinkClicked / LinkHandler 接管。");
 
         return DemoUi.Section(
             "会话视图",
             "ArcChatView 包装上游 PuraChatView：消息、Markdown 渲染、代码块/表格、pura-agent 围栏与流式生命周期" +
-            "都由 PuraMarkdown.Agent 提供；Arc 额外派生 token 主题、内置 composer 与无障碍名称。",
+            "都由 PuraMarkdown.Agent 提供；Arc 额外派生 token 主题、内置 composer、无障碍名称，并补齐上游缺失的" +
+            "消息内链接点击（LinkClicked / LinkHandler）。",
             new StackPanel { Spacing = 10, Children = { chat, caption } });
     }
 

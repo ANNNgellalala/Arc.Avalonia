@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Arc.Avalonia.Chat">
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -7,4 +8,24 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
+
+  <!--
+    Message links are rendered by PuraMarkdown.Agent as HyperlinkButton inside an InlineUIContainer. The
+    button's content row (19 px at the 14 px Arc body) is aligned to the top of the 23 px text line, so a link
+    sits ~4 px above the surrounding baseline, and the default link chrome (1 px transparent border, padding,
+    rounded background) adds another pixel of drift. Keep the upstream renderer (ADR 0007) and correct the
+    presentation here: drop the chrome and translate the control down onto the body baseline.
+  -->
+  <Style Selector="c|ArcChatView HyperlinkButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcAccent}" />
+    <Setter Property="RenderTransform">
+      <TranslateTransform Y="4" />
+    </Setter>
+  </Style>
 </Styles>

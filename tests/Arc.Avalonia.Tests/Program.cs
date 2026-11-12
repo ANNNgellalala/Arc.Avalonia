@@ -29,6 +29,7 @@ using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using PuraMarkdown.Agent;
 using PuraMarkdown.Agent.Chat;
+using PuraMarkdown.Agent.Platform;
 using PuraMarkdown.Core.Security;
 using Agent = Arc.Avalonia.Agent;
 using AgentUi = Arc.Avalonia.AgentUI.Controls;
@@ -1393,6 +1394,95 @@ public static class Program
                 draft.Attachments.Count == 2 &&
                 composer.Text.Length == 0 &&
                 composer.PendingAttachments.Count == 0);
+
+            // Link click: PuraMarkdown.Agent renders message links but leaves handling to the host, and
+            // PuraChatView exposes no link event -> a click would otherwise do nothing. Arc fills that gap
+            // (ADR 0007 keeps chat rendering upstream): it installs its own handler, raises LinkClicked first
+            // and lets a host ILinkHandler take over.
+            var linkChat = new ArcChatView();
+            string? clickedUrl = null;
+            var linkClicks = 0;
+            linkChat.LinkClicked += (_, args) =>
+            {
+                linkClicks++;
+                clickedUrl = args.Url;
+                args.HandledByHost = true;
+            };
+            Check("chat view installs an Arc link handler over the upstream null handler",
+                linkChat.Options?.LinkHandler is ArcChatLinkHandler);
+            var linkRouted = PumpDispatcher(
+                linkChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev"),
+                TimeSpan.FromSeconds(10));
+            Check("chat link click raises LinkClicked and HandledByHost suppresses the launcher",
+                linkRouted && linkClicks == 1 && clickedUrl == "https://uiarc.dev");
+
+            var hostLinkChat = new ArcChatView();
+            var hostLinkHandler = new FakePuraLinkHandler();
+            hostLinkChat.LinkHandler = hostLinkHandler;
+            var hostLinkRouted = PumpDispatcher(
+                hostLinkChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev/docs/links"),
+                TimeSpan.FromSeconds(10));
+            Check("chat link click falls back to a host ILinkHandler",
+                hostLinkRouted && hostLinkHandler.Urls.Count == 1 &&
+                hostLinkHandler.Urls[0] == "https://uiarc.dev/docs/links");
+
+            Check("chat link handler keeps the browser/mail scheme policy",
+                ArcChatLinkHandler.IsBrowserTarget("https://uiarc.dev") &&
+                ArcChatLinkHandler.IsBrowserTarget("http://uiarc.dev") &&
+                ArcChatLinkHandler.IsBrowserTarget("mailto:hi@uiarc.dev") &&
+                ArcChatLinkHandler.IsBrowserTarget("tel:+8610000000000") &&
+                !ArcChatLinkHandler.IsBrowserTarget("#anchor") &&
+                !ArcChatLinkHandler.IsBrowserTarget("./local.md") &&
+                !ArcChatLinkHandler.IsBrowserTarget("ftp://example.com/file") &&
+                !ArcChatLinkHandler.IsBrowserTarget("file:///C:/tmp/notes.txt"));
+
+            var silentLinkChat = new ArcChatView();
+            var silentClicks = 0;
+            string? silentWarningCode = null;
+            silentLinkChat.LinkClicked += (_, _) => silentClicks++;
+            silentLinkChat.Warning += (_, args) => silentWarningCode = args.Warning.Code;
+            var silentRouted = PumpDispatcher(
+                silentLinkChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev"),
+                TimeSpan.FromSeconds(10));
+            Check("chat link click without a TopLevel warns instead of throwing",
+                silentRouted && silentClicks == 1 &&
+                silentWarningCode == ArcChatLinkHandler.NoLauncherCode);
+
+            // Replacing Options must not turn message links into dead clicks (PuraChatView re-reads Options for
+            // new message views; PuraMarkdownOptions is immutable, so Arc copies it with its handler injected).
+            var replacedChat = new ArcChatView();
+            var replacedClicks = 0;
+            replacedChat.LinkClicked += (_, _) => replacedClicks++;
+            replacedChat.Options = ArcChatThemeAdapter.CreateOptions();
+            var replacedRouted = PumpDispatcher(
+                replacedChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev"),
+                TimeSpan.FromSeconds(10));
+            Check("chat view keeps the Arc link wiring after replacing Options",
+                replacedRouted && replacedClicks == 1 &&
+                replacedChat.Options!.LinkHandler is ArcChatLinkHandler);
+
+            var optionsHandlerChat = new ArcChatView();
+            var optionsLinkHandler = new FakePuraLinkHandler();
+            var optionsClicks = 0;
+            optionsHandlerChat.LinkClicked += (_, _) => optionsClicks++;
+            optionsHandlerChat.Options = ArcChatThemeAdapter.CreateOptions(optionsLinkHandler);
+            var optionsRouted = PumpDispatcher(
+                optionsHandlerChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev/from-options"),
+                TimeSpan.FromSeconds(10));
+            Check("chat view honors a link handler carried by replaced Options",
+                optionsRouted && optionsClicks == 1 &&
+                optionsLinkHandler.Urls.Count == 1 &&
+                optionsLinkHandler.Urls[0] == "https://uiarc.dev/from-options");
+
+            var failingChat = new ArcChatView();
+            string? failingCode = null;
+            failingChat.Warning += (_, args) => failingCode = args.Warning.Code;
+            failingChat.LinkHandler = new ThrowingPuraLinkHandler();
+            var failingRouted = PumpDispatcher(
+                failingChat.Options!.LinkHandler.OpenAsync("https://uiarc.dev"),
+                TimeSpan.FromSeconds(10));
+            Check("chat link handler failure degrades to an ARC-CHAT-LINK-001 warning",
+                failingRouted && failingCode == ArcChatLinkHandler.OpenFailedCode);
         }
         finally
         {
@@ -1677,6 +1767,25 @@ public static class Program
             Urls.Add(url);
             return Task.CompletedTask;
         }
+    }
+
+    /// <summary>Captures what the Chat link handler opens through an explicit host <see cref="ILinkHandler"/>.</summary>
+    private sealed class FakePuraLinkHandler : ILinkHandler
+    {
+        public List<string> Urls { get; } = new();
+
+        public Task OpenAsync(string url, CancellationToken cancellationToken = default)
+        {
+            Urls.Add(url);
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>Host handler that fails, so the Arc link handler has to degrade to a warning.</summary>
+    private sealed class ThrowingPuraLinkHandler : ILinkHandler
+    {
+        public Task OpenAsync(string url, CancellationToken cancellationToken = default) =>
+            throw new InvalidOperationException("link handler failed");
     }
 
     /// <summary>Minimal fence plugin used to prove IArcMarkdownPlugin/IArcMarkdownFenceRenderer dispatch.</summary>

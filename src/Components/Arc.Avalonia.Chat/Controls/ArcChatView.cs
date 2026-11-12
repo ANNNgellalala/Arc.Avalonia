@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using PuraMarkdown.Agent;
 using PuraMarkdown.Agent.Chat;
+using PuraMarkdown.Agent.Platform;
+using PuraMarkdown.Agent.Rendering;
 
 namespace Arc.Avalonia.Chat;
 
@@ -16,20 +19,30 @@ namespace Arc.Avalonia.Chat;
 public sealed class ArcChatView : ContentControl, IDisposable
 {
     private readonly PuraChatView _host;
+    private readonly ArcChatLinkHandler _linkHandler;
     private readonly ArcChatComposer _composer;
     private readonly Grid _root;
     private readonly Border _composerHost;
     private bool _showComposer;
     private bool _disposed;
+    private ILinkHandler? _optionsLinkHandler;
+
+    /// <summary>Identifies the <see cref="LinkClicked"/> routed event.</summary>
+    public static readonly RoutedEvent<ArcChatLinkClickedEventArgs> LinkClickedEvent =
+        RoutedEvent.Register<ArcChatView, ArcChatLinkClickedEventArgs>(nameof(LinkClicked), RoutingStrategies.Bubble);
 
     /// <summary>Creates the surface with the Arc theme mapped onto PuraMarkdown.Agent.</summary>
     public ArcChatView()
     {
-        _host = new PuraChatView { Options = ArcChatThemeAdapter.CreateOptions() };
+        // The upstream chat view defaults to NullLinkHandler and exposes no link event, so Arc installs its
+        // own handler to keep message links clickable (see ArcChatLinkHandler).
+        _linkHandler = new ArcChatLinkHandler(this);
+        _host = new PuraChatView { Options = ArcChatThemeAdapter.CreateOptions(_linkHandler) };
         _host.MessageAdded += (_, message) => MessageAdded?.Invoke(this, message);
         _host.MessageUpdated += (_, message) => MessageUpdated?.Invoke(this, message);
         _host.MessageRemoved += (_, message) => MessageRemoved?.Invoke(this, message);
         _host.InteractionOccurred += (_, args) => InteractionOccurred?.Invoke(this, args);
+        _host.Warning += (_, args) => Warning?.Invoke(this, args);
 
         _composer = new ArcChatComposer();
         _composer.Send += OnComposerSend;
@@ -54,12 +67,33 @@ public sealed class ArcChatView : ContentControl, IDisposable
     /// <summary>The upstream message collection (one model for human chat, AI answers and agents).</summary>
     public ObservableCollection<PuraChatMessage> Messages => _host.Messages;
 
-    /// <summary>Render options (pipeline + theme); defaults to the Arc token mapping.</summary>
+    /// <summary>
+    /// Render options (pipeline + theme); defaults to the Arc token mapping. Setting custom options keeps the
+    /// Arc link wiring: the options are copied with the Arc link handler installed, and a
+    /// <see cref="PuraMarkdownOptions.LinkHandler"/> carried by them stays the fallback for message links.
+    /// </summary>
     public PuraMarkdownOptions? Options
     {
         get => _host.Options;
-        set => _host.Options = value;
+        set
+        {
+            // PuraMarkdownOptions is immutable, so a host-supplied instance is copied with the Arc handler
+            // injected; its own LinkHandler (if any) is kept as the fallback so both seams stay usable.
+            _optionsLinkHandler = value is { LinkHandler: { } carried } &&
+                                  !ReferenceEquals(carried, _linkHandler) &&
+                                  carried is not NullLinkHandler
+                ? carried
+                : null;
+            _host.Options = value is null ? null : ArcChatThemeAdapter.WithLinkHandler(value, _linkHandler);
+        }
     }
+
+    /// <summary>
+    /// Host link handler. When set, a message link that <see cref="LinkClicked"/> did not handle is passed to
+    /// it instead of the built-in launcher (http/https/mailto/tel through <c>TopLevel.Launcher</c>). It wins
+    /// over a <see cref="PuraMarkdownOptions.LinkHandler"/> carried by <see cref="Options"/>.
+    /// </summary>
+    public ILinkHandler? LinkHandler { get; set; }
 
     /// <summary>The composer input surface; host it anywhere in the shell.</summary>
     public ArcChatComposer Composer => _composer;
@@ -124,6 +158,22 @@ public sealed class ArcChatView : ContentControl, IDisposable
     /// <summary>Raised when a pura-agent component reports an interaction.</summary>
     public event EventHandler<PuraInteractionEventArgs>? InteractionOccurred;
 
+    /// <summary>
+    /// Raised when a link inside a rendered message is activated, before Arc opens it. Set
+    /// <see cref="ArcChatLinkClickedEventArgs.HandledByHost"/> to take over the click.
+    /// </summary>
+    public event EventHandler<ArcChatLinkClickedEventArgs> LinkClicked
+    {
+        add => AddHandler(LinkClickedEvent, value);
+        remove => RemoveHandler(LinkClickedEvent, value);
+    }
+
+    /// <summary>
+    /// Recoverable render/link problems. Forwards the upstream warnings and adds Arc's
+    /// <c>ARC-CHAT-LINK-*</c> codes when a link cannot be handed to a launcher or a host handler fails.
+    /// </summary>
+    public event EventHandler<PuraWarningEventArgs>? Warning;
+
     /// <summary>Composer send; the host starts the run (e.g. through its agent transport).</summary>
     public event EventHandler<ArcChatDraft>? Send;
 
@@ -181,6 +231,21 @@ public sealed class ArcChatView : ContentControl, IDisposable
             ReplaceMessages(value);
         }
     }
+
+    /// <summary>Raises <see cref="LinkClicked"/> for <see cref="ArcChatLinkHandler"/> (UI thread, from the renderer).</summary>
+    internal void RaiseLinkClicked(ArcChatLinkClickedEventArgs args)
+    {
+        args.RoutedEvent = LinkClickedEvent;
+        args.Source = this;
+        RaiseEvent(args);
+    }
+
+    /// <summary>Link handler carried by host-supplied <see cref="Options"/> (fallback after <see cref="LinkHandler"/>).</summary>
+    internal ILinkHandler? OptionsLinkHandler => _optionsLinkHandler;
+
+    /// <summary>Reports a recoverable link problem through <see cref="Warning"/>.</summary>
+    internal void RaiseWarning(string code, string message) =>
+        Warning?.Invoke(this, new PuraWarningEventArgs(new PuraWarning(code, message, "LinkInline", nameof(ArcChatLinkHandler))));
 
     /// <inheritdoc />
     public void Dispose()

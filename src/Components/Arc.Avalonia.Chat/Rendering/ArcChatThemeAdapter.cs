@@ -3,6 +3,7 @@ using Avalonia.Styling;
 using Arc.Avalonia.Theme;
 using PuraMarkdown.Agent;
 using PuraMarkdown.Agent.Localization;
+using PuraMarkdown.Agent.Platform;
 
 namespace Arc.Avalonia.Chat;
 
@@ -13,7 +14,15 @@ namespace Arc.Avalonia.Chat;
 public static class ArcChatThemeAdapter
 {
     /// <summary>Builds the render options used by <see cref="ArcChatView"/>.</summary>
-    public static PuraMarkdownOptions CreateOptions()
+    public static PuraMarkdownOptions CreateOptions() => CreateOptions(null);
+
+    /// <summary>Builds the render options used by <see cref="ArcChatView"/> with an explicit link handler.</summary>
+    /// <param name="linkHandler">
+    /// Handler for message links. <see cref="ArcChatView"/> passes its own handler so clicks open
+    /// http/https/mailto/tel in the platform launcher; when a host builds options itself it should pass its
+    /// handler here (the upstream default, <see cref="NullLinkHandler"/>, opens nothing).
+    /// </param>
+    public static PuraMarkdownOptions CreateOptions(ILinkHandler? linkHandler)
     {
         var light = BuildTheme(ThemeVariant.Light, "arc-light");
         var dark = BuildTheme(ThemeVariant.Dark, "arc-dark");
@@ -25,8 +34,31 @@ public static class ArcChatThemeAdapter
             FollowSystemTheme = true,
             EnableTextSelection = true,
             Localizer = ChinesePuraLocalizer.Instance,
+            LinkHandler = linkHandler ?? NullLinkHandler.Instance,
         };
     }
+
+    /// <summary>
+    /// Copies <paramref name="source"/> with Arc's link handler installed, keeping every other render setting.
+    /// Used when a host replaces <see cref="ArcChatView.Options"/> so message links do not silently stop
+    /// working; <c>PuraMarkdownOptions</c> is immutable, hence the explicit copy.
+    /// </summary>
+    internal static PuraMarkdownOptions WithLinkHandler(PuraMarkdownOptions source, ILinkHandler linkHandler) => new()
+    {
+        Pipeline = source.Pipeline,
+        Theme = source.Theme,
+        DarkTheme = source.DarkTheme,
+        FollowSystemTheme = source.FollowSystemTheme,
+        InteractionEnabled = source.InteractionEnabled,
+        UrlPolicy = source.UrlPolicy,
+        ImageLoader = source.ImageLoader,
+        LinkHandler = linkHandler,
+        Clipboard = source.Clipboard,
+        Limits = source.Limits,
+        Localizer = source.Localizer,
+        EnableTextSelection = source.EnableTextSelection,
+        EnableBlockVirtualization = source.EnableBlockVirtualization,
+    };
 
     /// <summary>CommonMark + GFM + the built-in pura-agent components (choice/confirm/tool-call).</summary>
     public static PuraPipeline BuildPipeline() =>

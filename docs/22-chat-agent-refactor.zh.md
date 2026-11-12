@@ -5,6 +5,10 @@
 > 公共名 `ArcChatView` + `ArcChatThread` 作为 Obsolete 别名；Agent 对话默认气泡、无 Rows 模式开关；`ArcAgentAskCard` 合并进 ChoiceCard；
 > 四套消息模型统一为一套；删除除 `ArcMarkdownView` 以外的重复 Markdown 渲染。
 
+> **后续**：本文记录的是迁移前（0.10 波次）的自研 Chat 设计。之后按 ADR 0007 把 Chat/Agent 渲染整体委托给
+> `PuraMarkdown.Agent`，现状见 [docs/29](29-puramarkdown-agent-migration.zh.md) 与 [docs/20](20-component-inventory.zh.md) §13；
+> 其中上游缺失的消息内链接点击由 Arc 在 Chat 侧补齐（`LinkClicked` / `LinkHandler` / launcher）。
+
 ---
 
 ## 1. 最终结构
