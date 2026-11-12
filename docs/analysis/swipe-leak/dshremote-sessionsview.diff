@@ -1,0 +1,27 @@
+diff --git a/docs/analysis/swipe-leak/_before/SessionsView.axaml b/D:/Code/VibeCoding/DSHRemote/app/src/DshRemote.App/Views/SessionsView.axaml
+index 503bd29..f1b7979 100644
+--- a/docs/analysis/swipe-leak/_before/SessionsView.axaml
++++ b/D:/Code/VibeCoding/DSHRemote/app/src/DshRemote.App/Views/SessionsView.axaml
+@@ -111,12 +111,20 @@
+             <DataTemplate>
+               <Grid Margin="0,0,0,8" ClipToBounds="True">
+ 
+-                <!-- Hidden archive action revealed by dragging the row surface left -->
+-                <Button Classes="archive-action"
++                <!-- Hidden archive action revealed by dragging the row surface left.
++
++                     Opacity starts at 0 and is only raised while the row is being dragged or is open
++                     (see SessionsView.axaml.cs RowSwipeState.SetActionPainted). The card's rounded,
++                     antialiased edge and its 1px translucent border cannot fully cover a danger fill
++                     underneath, so leaving the action painted at rest leaks a red hairline along the
++                     row's right edge and corners. -->
++                <Button x:Name="ArchiveAction"
++                        Classes="archive-action"
+                         Content="归档"
+                         Command="{Binding ArchiveCommand}"
+                         CommandParameter="{Binding}"
+                         IsVisible="{Binding CanArchive}"
++                        Opacity="0"
+                         HorizontalAlignment="Right"
+                         Width="96" />
+ 

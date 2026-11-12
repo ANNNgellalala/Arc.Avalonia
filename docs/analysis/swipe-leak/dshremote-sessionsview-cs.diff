@@ -1,0 +1,103 @@
+diff --git a/docs/analysis/swipe-leak/_before/SessionsView.axaml.cs b/D:/Code/VibeCoding/DSHRemote/app/src/DshRemote.App/Views/SessionsView.axaml.cs
+index 6524473..413a780 100644
+--- a/docs/analysis/swipe-leak/_before/SessionsView.axaml.cs
++++ b/D:/Code/VibeCoding/DSHRemote/app/src/DshRemote.App/Views/SessionsView.axaml.cs
+@@ -91,6 +91,7 @@ public partial class SessionsView : UserControl
+         {
+             otherState.Transform.X = 0;
+             otherState.Open = false;
++            otherState.SetActionPainted(false);
+             _openRow = null;
+         }
+ 
+@@ -123,6 +124,7 @@ public partial class SessionsView : UserControl
+             }
+ 
+             _gestureDragging = true;
++            state.SetActionPainted(true);
+             e.Pointer.Capture(row);
+         }
+ 
+@@ -150,12 +152,14 @@ public partial class SessionsView : UserControl
+             {
+                 state.Transform.X = -ArchiveWidth;
+                 state.Open = true;
++                state.SetActionPainted(true);
+                 _openRow = row;
+             }
+             else
+             {
+                 state.Transform.X = 0;
+                 state.Open = false;
++                state.SetActionPainted(false);
+                 if (_openRow == row)
+                 {
+                     _openRow = null;
+@@ -179,6 +183,7 @@ public partial class SessionsView : UserControl
+         {
+             state.Transform.X = 0;
+             state.Open = false;
++            state.SetActionPainted(false);
+             if (_openRow == row)
+             {
+                 _openRow = null;
+@@ -202,16 +207,58 @@ public partial class SessionsView : UserControl
+             return existing;
+         }
+ 
+-        var created = new RowSwipeState();
++        var created = new RowSwipeState { Action = FindArchiveAction(row) };
+         row.Tag = created;
+         row.RenderTransform = created.Transform;
++        created.SetActionPainted(false);
+         return created;
+     }
+ 
++    /// <summary>The archive button sits under the row surface as the item template grid's other child.</summary>
++    private static Button? FindArchiveAction(Border row)
++    {
++        if (row.Parent is not Grid grid)
++        {
++            return null;
++        }
++
++        foreach (var child in grid.Children)
++        {
++            if (child is Button button && button.Classes.Contains("archive-action"))
++            {
++                return button;
++            }
++        }
++
++        return null;
++    }
++
+     private sealed class RowSwipeState
+     {
+         public TranslateTransform Transform { get; } = new();
+ 
+         public bool Open { get; set; }
++
++        /// <summary>The action painted underneath the row surface, visible only while dragged or open.</summary>
++        public Button? Action { get; set; }
++
++        /// <summary>
++        /// A closed row must not paint its action at all. The row card's rounded, antialiased edge and its
++        /// 1px translucent border do not fully cover what sits underneath, so an always-painted danger
++        /// button leaks a red hairline along the right edge and corners -> the action is toggled instead
++        /// of being relied on the card to hide it.
++        /// </summary>
++        public void SetActionPainted(bool painted)
++        {
++            if (Action is null)
++            {
++                return;
++            }
++
++            Action.Opacity = painted ? 1 : 0;
++            // A hidden action must not keep taking tab focus or hit tests either.
++            Action.IsTabStop = painted;
++            Action.IsHitTestVisible = painted;
++        }
+     }
+ }

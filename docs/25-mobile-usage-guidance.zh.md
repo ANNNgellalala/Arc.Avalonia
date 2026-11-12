@@ -70,7 +70,7 @@
 
 | 组件 | 真机结论 | 开发建议 |
 |---|---|---|
-| `ArcSwipeActions` | 演示行被裁切时"滑不到位/露出不全"；阈值与回弹需要真机手感确认 | 起判 8–10px 且横向主导（`|dx| > |dy|`）才接管；`PointerCaptureLost/Canceled` 复位；松手按 35% 停靠或回位（阻尼 0.24）；滑开后点空白收起；FullSwipe 只在超越阈值后执行 |
+| `ArcSwipeActions` | 演示行被裁切时"滑不到位/露出不全"；阈值与回弹需要真机手感确认 | 起判 8–10px 且横向主导（`\|dx\| > \|dy\|`）才接管；`PointerCaptureLost/Canceled` 复位；松手按**露出宽度的 50%** 停靠或回位（`ArcSwipeActions` 实际值；自绘可沿用 35–50%，阻尼 0.24）；滑开后点空白收起；FullSwipe 只在超越阈值后执行。**收起态 Arc 组件自身不绘制动作、无透色**（两侧 host `IsVisible=false`）；**宿主自绘滑动时必须让动作在收起态不参与绘制**（详见 [docs/28](28-swipe-actions-integration.zh.md)）；**可点击行**把可点击元素（Button / 带 Tapped 的表面）放进 `Content` 即可，轻点与横滑共存（2026-11-10 增强，见 [docs/28](28-swipe-actions-integration.zh.md) §2.7） |
 | `ArcChatView` / Markdown 流式 | 流式追加会抢用户上滑 | 拖拽 >8px 即暂停自动跟随，释放后近底（~56px）才恢复；不要用 `PointerWheelChanged` 当唯一滚动信号 |
 | 嵌套滚动（代码块/表格/聊天） | 横滑会带动页面纵滚 | 内层 `ScrollViewer` 设 `IsScrollChainingEnabled=false`，横向 `Auto`、纵向 `Disabled`（反之亦然） |
 | 轮播/卡片栈 | 与页面纵向滚动冲突 | 方向锁定后再接管手势；未锁定前不 `CapturePointer` |
@@ -108,6 +108,7 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 3. compact 下 TOC 直接隐藏，未提供"折叠到正文顶部"的替代。
 4. `ArcSwipeActions` 的阈值/停靠手感尚未在真机逐项标定（下一轮 4 组手势 + 截图对比）。
 5. `ArcChatView` 消息行点选（`ArcVirtualList`）拖拽后仍可能选中——需 8px 抑制。
+6. **列表行隐藏动作透色**（DSHRemote 会话列表，收起态右边缘/上下圆角可见砖红色细边）——**已定位、已修**（宿主侧）：宿主自绘滑动把 Danger 动作常驻画在圆角卡片下层，卡片边缘抗锯齿无法完全遮挡；修复为收起态不绘制动作（`Opacity=0` 随手势切换）。**非本库缺陷**：`ArcSwipeActions` 收起态两侧 host `IsVisible=false`，无透色。详见 [docs/27](27-swipe-action-color-leak-rca.zh.md) 与 [docs/28](28-swipe-actions-integration.zh.md)。
 
 ## 5.1 Android 中英混排 CJK 豆腐块（未解决，实测结论）
 
@@ -127,7 +128,7 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 - [ ] compact 断点 <900，单列 + 抽屉 + 16px 边距
 - [ ] 页面无固定像素宽度；宽内容用独立滚动容器
 - [ ] 命中区 ≥44×44，滚动条不常驻
-- [ ] 滑动组件：8–10px 起判、方向锁、capture 丢失复位、35% 停靠
+- [ ] 滑动组件：8–10px 起判、方向锁、capture 丢失复位、50% 停靠（自绘可 35–50%）
 - [ ] 流式/自动滚动不抢手指，回底才恢复跟随
 ### 5.2 内嵌 CJK 字体的第一次尝试（失败，已回滚）
 
@@ -160,7 +161,7 @@ adb -s <serial> shell dumpsys dropbox --print data_app_native_crash
 
 - 页面直达：`su 0 sh -c 'echo swipe-actions > /data/user/0/<pkg>/files/slug.txt'` 后启动，应用直接打开 Swipe actions 页（`MobileApp.ResolveLaunchSlug` 读 `GalleryAndroidApplication.DataDirectory`）；
 - 注入 `input swipe`（横向 600px、320ms）后截图可见**行被横向拖开并露出动作按钮**（左侧 "Unread" 动作块带图标/填充色），说明方向锁、阈值与露出逻辑在触摸设备上工作正常；
-- 小位移滑动（80px）不改变页面外观（阈值以下不误开）——与 8px 起判 + 35% 停靠的设计一致；
+- 小位移滑动（80px）不改变页面外观（阈值以下不误开）——与 8px 起判 + 50% 停靠的设计一致；
 - 纵向滚动仍由页面 `ScrollViewer` 接管，行不会误开。
 
 结论：`ArcSwipeActions` 的触摸行为符合设计（起判/方向锁/露出/回弹），无需再改阈值；如需更细的阻尼/停靠手感，属于产品调参而非缺陷。

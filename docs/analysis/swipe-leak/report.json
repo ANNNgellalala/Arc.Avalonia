@@ -1,0 +1,464 @@
+{
+  "generated_at": "2026-11-10 21:59:45 +08:00",
+  "page": "swipe-actions",
+  "width": 1180,
+  "offset": 300,
+  "ring_thickness": 6,
+  "ring_rule": "r >= 60 && r - g >= 25 && r - b >= 25 (outer 6 px band)",
+  "control_fill_rule": "r >= 150 && r - g >= 60 && r - b >= 55 (danger fill)",
+  "diagnostic_full_row_rule": "r >= 120 && r - g >= 50 && r - b >= 50 (whole row, diagnostics only)",
+  "assertion": "The closed demo row (last row; hidden trailing Archive neutral + Delete danger) must contain zero danger-colour pixels in the outer 6 px band of the row rectangle, i.e. on the antialiased border and rounded corners where a leak shows. Text is at least one row padding inside the surface, so LCD subpixel antialiasing fringes on glyphs cannot reach the scanned band. The opened trailing row is the positive control: its right-hand 168 px must contain the red Delete fill.",
+  "sanity": "The first demo row is closed and has no danger action at all; its outer band must also be zero, which proves the band predicate does not invent leaks.",
+  "build_command": "pwsh -NoProfile tools/build.ps1 -Project src/Apps/Arc.Avalonia.Gallery/Arc.Avalonia.Gallery.csproj",
+  "build_skipped": true,
+  "shots_command": "pwsh -NoProfile tools/shots.ps1 -Page swipe-actions -Theme both -Width 1180 -SkipBuild",
+  "canonical_shots": [
+    "shots/dark/10012-swipe-actions.png",
+    "shots/light/10012-swipe-actions.png"
+  ],
+  "themes": [
+    {
+      "theme": "dark",
+      "slice": "docs/analysis/swipe-leak/render/dark/10012-swipe-actions-o300.png",
+      "slice_size": {
+        "width": 1180,
+        "height": 1400
+      },
+      "annotated": "docs/analysis/swipe-leak/swipe-leak-dark-annotated.png",
+      "render_command": "dotnet D:\\Code\\VibeCoding\\Arc.Avalonia\\src\\Apps\\Arc.Avalonia.Gallery\\bin\\Debug\\net10.0\\Arc.Avalonia.Gallery.dll --shot D:\\Code\\VibeCoding\\Arc.Avalonia\\docs\\analysis\\swipe-leak\\render --page swipe-actions --theme dark --width 1180 --offset 300 --timeout 240",
+      "canvas": {
+        "Left": 58,
+        "Right": 913,
+        "Top": 813,
+        "Bottom": 1299,
+        "Width": 856,
+        "Height": 487,
+        "Color": 2368548
+      },
+      "surface_color": "#191919",
+      "scan_column": 486,
+      "ring_thickness": 6,
+      "ring_rule": "r >= 60 && r - g >= 25 && r - b >= 25 (outer 6 px band)",
+      "control_fill_rule": "r >= 150 && r - g >= 60 && r - b >= 55 (danger fill)",
+      "full_row_rule": "r >= 120 && r - g >= 50 && r - b >= 50 (whole row, diagnostics only)",
+      "rows": [
+        {
+          "index": 0,
+          "label": "closed neutral row",
+          "expectation": "sanity-ring-zero",
+          "asserted": true,
+          "closed": true,
+          "rect_slice": {
+            "x": 77,
+            "y": 821,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1121,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 98,
+          "full_row_danger_bbox_slice": {
+            "X": 111,
+            "Y": 845,
+            "W": 115,
+            "H": 18
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        },
+        {
+          "index": 1,
+          "label": "leading-open row (accent action)",
+          "expectation": "diagnostic-ring",
+          "asserted": false,
+          "closed": false,
+          "rect_slice": {
+            "x": 77,
+            "y": 968,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1268,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 50,
+          "full_row_danger_bbox_slice": {
+            "X": 117,
+            "Y": 992,
+            "W": 182,
+            "H": 25
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        },
+        {
+          "index": 2,
+          "label": "trailing-open row (Archive + danger Delete)",
+          "expectation": "control-fill",
+          "asserted": true,
+          "closed": false,
+          "rect_slice": {
+            "x": 77,
+            "y": 1080,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1380,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 352,
+          "ring_danger_bbox_slice": {
+            "X": 635,
+            "Y": 1084,
+            "W": 84,
+            "H": 67
+          },
+          "ring_danger_bbox_page": {
+            "x": 635,
+            "y": 1384,
+            "w": 84,
+            "h": 67
+          },
+          "full_row_danger_pixels": 5285,
+          "full_row_danger_bbox_slice": {
+            "X": 579,
+            "Y": 1084,
+            "W": 140,
+            "H": 67
+          },
+          "control_fill_pixels": 5251,
+          "control_fill_bbox_slice": {
+            "X": 635,
+            "Y": 1084,
+            "W": 84,
+            "H": 67
+          },
+          "ok": true
+        },
+        {
+          "index": 3,
+          "label": "closed row with hidden danger actions (ASSERTION)",
+          "expectation": "assertion-ring-zero",
+          "asserted": true,
+          "closed": true,
+          "rect_slice": {
+            "x": 77,
+            "y": 1192,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1492,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 62,
+          "full_row_danger_bbox_slice": {
+            "X": 112,
+            "Y": 1216,
+            "W": 135,
+            "H": 19
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        }
+      ],
+      "sanity": {
+        "row_index": 0,
+        "ring_danger_pixels": 0,
+        "ring_danger_bbox_slice": null,
+        "ok": true
+      },
+      "assertion": {
+        "row_index": 3,
+        "rect_slice": {
+          "x": 77,
+          "y": 1192,
+          "w": 646,
+          "h": 75
+        },
+        "rect_page": {
+          "x": 77,
+          "y": 1492,
+          "w": 646,
+          "h": 75
+        },
+        "ring_danger_pixels": 0,
+        "ring_danger_bbox_slice": null,
+        "ring_danger_bbox_page": null,
+        "full_row_danger_pixels": 62,
+        "closed": true,
+        "ok": true
+      },
+      "control": {
+        "row_index": 2,
+        "rect_slice": {
+          "x": 77,
+          "y": 1080,
+          "w": 646,
+          "h": 75
+        },
+        "region_width": 168,
+        "control_fill_pixels": 5251,
+        "control_fill_bbox_slice": {
+          "X": 635,
+          "Y": 1084,
+          "W": 84,
+          "H": 67
+        },
+        "ring_danger_pixels": 352,
+        "ok": true
+      },
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "slice": "docs/analysis/swipe-leak/render/light/10012-swipe-actions-o300.png",
+      "slice_size": {
+        "width": 1180,
+        "height": 1400
+      },
+      "annotated": "docs/analysis/swipe-leak/swipe-leak-light-annotated.png",
+      "render_command": "dotnet D:\\Code\\VibeCoding\\Arc.Avalonia\\src\\Apps\\Arc.Avalonia.Gallery\\bin\\Debug\\net10.0\\Arc.Avalonia.Gallery.dll --shot D:\\Code\\VibeCoding\\Arc.Avalonia\\docs\\analysis\\swipe-leak\\render --page swipe-actions --theme light --width 1180 --offset 300 --timeout 240",
+      "canvas": {
+        "Left": 58,
+        "Right": 913,
+        "Top": 812,
+        "Bottom": 1300,
+        "Width": 856,
+        "Height": 489,
+        "Color": 16316664
+      },
+      "surface_color": "#FFFFFF",
+      "scan_column": 486,
+      "ring_thickness": 6,
+      "ring_rule": "r >= 60 && r - g >= 25 && r - b >= 25 (outer 6 px band)",
+      "control_fill_rule": "r >= 150 && r - g >= 60 && r - b >= 55 (danger fill)",
+      "full_row_rule": "r >= 120 && r - g >= 50 && r - b >= 50 (whole row, diagnostics only)",
+      "rows": [
+        {
+          "index": 0,
+          "label": "closed neutral row",
+          "expectation": "sanity-ring-zero",
+          "asserted": true,
+          "closed": true,
+          "rect_slice": {
+            "x": 77,
+            "y": 821,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1121,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 131,
+          "full_row_danger_bbox_slice": {
+            "X": 110,
+            "Y": 845,
+            "W": 114,
+            "H": 19
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        },
+        {
+          "index": 1,
+          "label": "leading-open row (accent action)",
+          "expectation": "diagnostic-ring",
+          "asserted": false,
+          "closed": false,
+          "rect_slice": {
+            "x": 77,
+            "y": 968,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1268,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 147,
+          "full_row_danger_bbox_slice": {
+            "X": 107,
+            "Y": 992,
+            "W": 189,
+            "H": 29
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        },
+        {
+          "index": 2,
+          "label": "trailing-open row (Archive + danger Delete)",
+          "expectation": "control-fill",
+          "asserted": true,
+          "closed": false,
+          "rect_slice": {
+            "x": 77,
+            "y": 1080,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1380,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 356,
+          "ring_danger_bbox_slice": {
+            "X": 635,
+            "Y": 1084,
+            "W": 84,
+            "H": 67
+          },
+          "ring_danger_bbox_page": {
+            "x": 635,
+            "y": 1384,
+            "w": 84,
+            "h": 67
+          },
+          "full_row_danger_pixels": 5276,
+          "full_row_danger_bbox_slice": {
+            "X": 575,
+            "Y": 1084,
+            "W": 144,
+            "H": 67
+          },
+          "control_fill_pixels": 5246,
+          "control_fill_bbox_slice": {
+            "X": 576,
+            "Y": 1084,
+            "W": 143,
+            "H": 67
+          },
+          "ok": true
+        },
+        {
+          "index": 3,
+          "label": "closed row with hidden danger actions (ASSERTION)",
+          "expectation": "assertion-ring-zero",
+          "asserted": true,
+          "closed": true,
+          "rect_slice": {
+            "x": 77,
+            "y": 1192,
+            "w": 646,
+            "h": 75
+          },
+          "rect_page": {
+            "x": 77,
+            "y": 1492,
+            "w": 646,
+            "h": 75
+          },
+          "ring_thickness": 6,
+          "ring_danger_pixels": 0,
+          "ring_danger_bbox_slice": null,
+          "ring_danger_bbox_page": null,
+          "full_row_danger_pixels": 181,
+          "full_row_danger_bbox_slice": {
+            "X": 111,
+            "Y": 1216,
+            "W": 135,
+            "H": 19
+          },
+          "control_fill_pixels": null,
+          "control_fill_bbox_slice": null,
+          "ok": true
+        }
+      ],
+      "sanity": {
+        "row_index": 0,
+        "ring_danger_pixels": 0,
+        "ring_danger_bbox_slice": null,
+        "ok": true
+      },
+      "assertion": {
+        "row_index": 3,
+        "rect_slice": {
+          "x": 77,
+          "y": 1192,
+          "w": 646,
+          "h": 75
+        },
+        "rect_page": {
+          "x": 77,
+          "y": 1492,
+          "w": 646,
+          "h": 75
+        },
+        "ring_danger_pixels": 0,
+        "ring_danger_bbox_slice": null,
+        "ring_danger_bbox_page": null,
+        "full_row_danger_pixels": 181,
+        "closed": true,
+        "ok": true
+      },
+      "control": {
+        "row_index": 2,
+        "rect_slice": {
+          "x": 77,
+          "y": 1080,
+          "w": 646,
+          "h": 75
+        },
+        "region_width": 168,
+        "control_fill_pixels": 5246,
+        "control_fill_bbox_slice": {
+          "X": 576,
+          "Y": 1084,
+          "W": 143,
+          "H": 67
+        },
+        "ring_danger_pixels": 356,
+        "ok": true
+      },
+      "pass": true
+    }
+  ],
+  "pass": true
+}

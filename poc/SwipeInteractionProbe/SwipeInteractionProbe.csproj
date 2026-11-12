@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Behaviour probe for the tappable ArcSwipeActions row (task-3). Deliberately NOT in ArcUI.slnx;
+       offline restore through the repository NuGet.config. The local NuGet cache only carries
+       Avalonia.Headless for 12.1.5 while the repository pins 12.1.4, so this project opts every
+       Avalonia package to 12.1.5 and lets the referenced Arc assemblies resolve against it. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SwipeInteractionProbe</RootNamespace>
+    <AssemblyName>SwipeInteractionProbe</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <AvaloniaVersion>12.1.5</AvaloniaVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Headless" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.HarfBuzz" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Foundation\Arc.Avalonia\Arc.Avalonia.csproj" />
+    <ProjectReference Include="..\..\src\Components\Arc.Avalonia.Media\Arc.Avalonia.Media.csproj" />
+  </ItemGroup>
+</Project>

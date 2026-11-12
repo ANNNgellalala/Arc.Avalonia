@@ -1,0 +1,11 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:SwipeInteractionProbe"
+             x:Class="SwipeInteractionProbe.ProbeApp"
+             RequestedThemeVariant="Dark">
+  <!-- The probe only needs the Foundation base styles and the Media theme family (ArcSwipeActions).
+       The aggregate <arc:ArcTheme/> would drag in the Markdown family and its local feed. -->
+  <Application.Styles>
+    <local:ProbeTheme />
+  </Application.Styles>
+</Application>

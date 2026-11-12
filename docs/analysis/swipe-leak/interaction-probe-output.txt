@@ -1,0 +1,15 @@
+Swipe interaction probe | Avalonia 12.1.5.0 | headless drawing | reduced motion
+window 760x820, row width 640
+
+T1 PASS | taps=1 isOpen=False | tap on a pure-content row (expect taps=1, isOpen=False)
+T2 PASS | isOpen=True taps=0 | horizontal drag dx=-120 on a pure-content row (expect isOpen=True, taps=0)
+T3 PASS | clicks=1 isOpen=False | tap on the content Button (expect clicks=1, isOpen=False)
+T4 PASS | isOpen=True clicks=0 | horizontal drag dx=-120 starting on the content Button (expect isOpen=True, clicks=0)
+T5 PASS | openedBefore=True isOpenAfter=False clicks=0 | tap on an already open row (expect openedBefore=True, isOpen=False, clicks=0)
+T6 PASS | isOpen=False | vertical drag dy=80 (expect isOpen=False)
+T7 INFO tap inside a pure-content row wrapped in a Button: outer.Click=1 row.Tapped=1 row.IsOpen=False
+T7 INFO drag inside a pure-content row wrapped in a Button: row.IsOpen=True outer.Click=0 row.Tapped=0
+T7 INFO tap inside a Button-content row wrapped in a Button: inner.Click=1 outer.Click=1 row.Tapped=1 row.IsOpen=False
+T7 INFO drag inside a Button-content row wrapped in a Button: row.IsOpen=True inner.Click=0 outer.Click=0 row.Tapped=0
+
+PROBE PASS: T1-T6 all matched the expected interaction contract (T7 exploratory, see T7 INFO above).

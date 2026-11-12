@@ -1,0 +1,10 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SwipeInteractionProbe.ProbeTheme">
+  <!-- Fluent baseline for the plain Button used as row content, plus the Arc Foundation base styles and
+       the Media theme family that carries the ArcSwipeActions ControlTheme. The FluentTheme instance is
+       created in code because Avalonia 12's FluentTheme only exposes FluentTheme(IServiceProvider), the
+       same approach the aggregate ArcTheme uses. -->
+  <StyleInclude Source="avares://Arc.Avalonia.Foundation/Theme/ArcBaseStyles.axaml" />
+  <StyleInclude Source="avares://Arc.Avalonia.Media/Themes/ArcMediaTheme.axaml" />
+</Styles>

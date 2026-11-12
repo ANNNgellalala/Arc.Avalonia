@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Arc.Avalonia.Demo;
@@ -10,10 +11,16 @@ using Arc.Avalonia.Theme;
 namespace Arc.Avalonia.Media.Pages;
 
 /// <summary>
-/// Swipe actions' completeness preview: a row at rest, a row with the leading action revealed and a row
-/// with two trailing actions revealed (the last one destructive). The revealed rows are opened from code
-/// once they are attached, so every declared state is visible as a still frame without any input.
-/// Declared state keys match Docs/swipe-actions.json so the audit can compare the two lists.
+/// Swipe actions' completeness preview: a tappable row at rest, a row with the leading action revealed, a
+/// row with two trailing actions revealed (the last one destructive) and a second row at rest whose hidden
+/// trailing actions include the destructive delete. The first row's content is a Button, proving that a tap
+/// reaches the row content while a horizontal drag still reveals the actions (the press is observed in the
+/// tunnel phase and the pointer is only captured once the horizontal axis wins). The last row is the visual
+/// regression assertion for the closed-state colour leak: a resting row must not paint a single danger pixel,
+/// because both action hosts are invisible while the surface covers them (see tools/verify-swipe-leak.ps1).
+/// The revealed rows are opened from code once they are attached, so every declared state is visible as a
+/// still frame without any input. Declared state keys match Docs/swipe-actions.json so the audit can compare
+/// the two lists.
 /// </summary>
 public sealed class SwipeActionsPage : ArcItemPage
 {
@@ -22,16 +29,21 @@ public sealed class SwipeActionsPage : ArcItemPage
     public override IReadOnlyList<string> ImplementedStates => new[]
     {
         "state-closed", "state-leading-open", "state-trailing-open",
-        "variant-two-actions", "variant-danger-action"
+        "variant-two-actions", "variant-danger-action", "variant-tappable-row"
     };
 
     protected override Control BuildDemo(ArcDemoContext context)
     {
         var panel = new StackPanel { Spacing = 18, HorizontalAlignment = HorizontalAlignment.Left };
 
+        var tapCount = 0;
+        var tapStatus = DemoUi.Caption("点一下这一行：上面的计数会更新；从行上横向拖动则会露出动作，且不会触发点击。");
+
         panel.Children.Add(Captioned(
-            Row("Design review", "Design review", "9:41"),
-            "收起态：行回到原位，两侧动作完全藏起。"));
+            Row("Design review", "Design review", "9:41",
+                onActivated: () => tapStatus.Text = $"行内容被点击 {++tapCount} 次（横向滑动不会触发点击）。"),
+            "收起态 + 可点击行：行内容是一个 Button，轻点触发 Click；横向拖动仍会露出两侧动作，两者不冲突。"));
+        panel.Children.Add(tapStatus);
 
         panel.Children.Add(Captioned(
             Opened(Row("Invoice 2041", "Invoice 2041", "Yesterday"), side: 1,
@@ -50,21 +62,61 @@ public sealed class SwipeActionsPage : ArcItemPage
                 }),
             "右侧露出：同一侧并排两个动作，最外侧的删除使用危险色，大滑松手会直接执行它。"));
 
+        // Regression assertion for docs/analysis/swipe-leak: this row is closed, yet its hidden trailing
+        // actions include the destructive delete. ArcSwipeActions keeps both action hosts invisible until
+        // the row opens, so the resting surface must show no ArcDanger pixel at all. The scan in
+        // tools/verify-swipe-leak.ps1 targets this last row and uses the opened row above as a positive
+        // control for the danger-colour predicate.
+        panel.Children.Add(Captioned(
+            Row("Fortnightly report", "Fortnightly report", "Fri",
+                trailing: new List<ArcSwipeAction>
+                {
+                    new("Archive", "archive"),
+                    new("Delete", "trash-2", ArcSwipeActionTone.Danger)
+                }),
+            "收起态回归断言：行停在原位，右侧含危险色的动作完全藏起；这一行的表面上不得出现任何危险色像素。"));
+
         return panel;
     }
 
-    private static ArcSwipeActions Row(string sender, string subject, string time) => new()
+    private static ArcSwipeActions Row(string sender, string subject, string time,
+        IList<ArcSwipeAction>? trailing = null, System.Action? onActivated = null)
     {
-        Label = sender,
-        Width = 640,
-        HorizontalAlignment = HorizontalAlignment.Left,
-        Content = MailRow(sender, subject, time),
-        Trailing = new List<ArcSwipeAction>
+        Control content = MailRow(sender, subject, time);
+        if (onActivated is not null)
         {
-            new("Flag", "flag"),
-            new("Archive", "archive")
+            // The tappable-row pattern: an ordinary button inside Content. The component lets the tap
+            // through and only steals the pointer once a horizontal drag starts.
+            var button = new Button
+            {
+                Content = content,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Padding = new Thickness(0),
+                MinHeight = 0,
+                CornerRadius = new CornerRadius(0),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Cursor = new Cursor(StandardCursorType.Hand)
+            };
+            button.Click += (_, _) => onActivated();
+            content = button;
         }
-    };
+
+        return new ArcSwipeActions
+        {
+            Label = sender,
+            Width = 640,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Content = content,
+            Trailing = trailing ?? new List<ArcSwipeAction>
+            {
+                new("Flag", "flag"),
+                new("Archive", "archive")
+            }
+        };
+    }
 
     /// <summary>Opens one side after the first layout, so the template and its action buttons already exist.</summary>
     private static ArcSwipeActions Opened(ArcSwipeActions row, int side,

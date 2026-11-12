@@ -51,6 +51,12 @@ public sealed class ArcSwipeActionButton : Button
 /// resistance reveals them and settles on a spring; a long drag or flick commits the outermost action.
 /// Left and Right reveal the same actions from the keyboard, Tab walks into them and Escape puts the
 /// row away, so the gesture is never the only path.
+/// <para>
+/// The row content may itself be interactive (a Button that opens the detail, or a surface with a Tapped
+/// handler): the press is observed in the tunnel phase and the pointer is only captured once the
+/// horizontal axis wins, so a tap reaches the content while a drag still owns the gesture. Tapping an
+/// already open row closes it instead of activating the content.
+/// </para>
 /// </summary>
 [TemplatePart("PART_LeadingHost", typeof(StackPanel))]
 [TemplatePart("PART_TrailingHost", typeof(StackPanel))]
@@ -85,9 +91,11 @@ public class ArcSwipeActions : ContentControl
     private double _offset;
     private Point _pressPoint;
     private double _startOffset;
+    private bool _pressed;
     private bool _dragging;
     private bool _axisLocked;
     private bool _wasOpen;
+    private bool _openAtPress;
 
     static ArcSwipeActions()
     {
@@ -100,6 +108,14 @@ public class ArcSwipeActions : ContentControl
     {
         Focusable = true;
         IsTabStop = true;
+
+        // Listen in the tunnel phase so a press is seen before the row content gets it, but do not
+        // consume it: the content may be a Button (or a Tapped surface) that has to receive the tap.
+        // The component only takes the pointer once the horizontal gesture is unambiguous - see
+        // OnPreviewPointerMoved. This is what lets a tappable row and swipe actions coexist.
+        AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, OnPreviewPointerMoved, RoutingStrategies.Tunnel);
+        AddHandler(PointerReleasedEvent, OnPreviewPointerReleased, RoutingStrategies.Tunnel);
     }
 
     /// <summary>Actions under the left edge, revealed by swiping right. The first commits on a full swipe.</summary>
@@ -363,9 +379,8 @@ public class ArcSwipeActions : ContentControl
         }
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        base.OnPointerPressed(e);
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed is false)
         {
             return;
@@ -385,21 +400,55 @@ public class ArcSwipeActions : ContentControl
             }
         }
 
-        Focus(NavigationMethod.Pointer);
         _tween.Stop();
-        _dragging = true;
+        _pressed = true;
+        _dragging = false;
         _axisLocked = false;
         _pressPoint = e.GetPosition(this);
         _startOffset = _offset;
-        e.Pointer.Capture(this);
-        e.Handled = true;
+        _openAtPress = IsOpen;
+
+        if (_openAtPress)
+        {
+            // An open row owns the tap: consume the press so the content underneath does not
+            // activate. The tap closes the row (see OnPreviewPointerReleased).
+            e.Handled = true;
+            return;
+        }
+
+        // Taps on a resting row must reach the content (Button.Click / Tapped), so the press is
+        // left unhandled and the pointer is not captured yet. Focus the row for keyboard users
+        // only when nothing inside the content can take the focus itself.
+        if (!IsInteractiveSource(e.Source))
+        {
+            Focus(NavigationMethod.Pointer);
+        }
     }
 
-    protected override void OnPointerMoved(PointerEventArgs e)
+    /// <summary>True when the press landed on a focusable element inside the row content.</summary>
+    private bool IsInteractiveSource(object? source)
     {
-        base.OnPointerMoved(e);
-        if (!_dragging || e.Pointer.Captured != this)
+        for (var visual = source as Visual; visual is not null && visual != this; visual = visual.GetVisualParent())
         {
+            if (visual is Control { Focusable: true })
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void OnPreviewPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!_pressed)
+        {
+            return;
+        }
+
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed is false)
+        {
+            _pressed = false;
             return;
         }
 
@@ -416,13 +465,20 @@ public class ArcSwipeActions : ContentControl
 
             if (Math.Abs(dy) > Math.Abs(dx) + 2)
             {
-                _dragging = false;
-                e.Pointer.Capture(null);
+                // A vertical gesture belongs to the scroll host; forget this press entirely.
+                _pressed = false;
                 return;
             }
 
             _axisLocked = true;
+            _dragging = true;
+            _openAtPress = false;
             Classes.Set("dragging", true);
+
+            // The horizontal axis has won, so the component now owns the pointer. A pressed control
+            // in the content loses capture and cancels its click - exactly what a drag should do.
+            e.Pointer.Capture(this);
+            Focus(NavigationMethod.Pointer);
         }
 
         ApplyOffset(Resist(_startOffset + dx));
@@ -447,14 +503,30 @@ public class ArcSwipeActions : ContentControl
         return value;
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    private void OnPreviewPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        base.OnPointerReleased(e);
-        if (!_dragging)
+        if (!_pressed)
         {
             return;
         }
 
+        _pressed = false;
+
+        if (!_dragging)
+        {
+            // A tap, not a drag. On an open row the press was consumed and a tap closes it; on a
+            // resting row the event stays unhandled so the row content can activate itself.
+            if (_openAtPress)
+            {
+                _openAtPress = false;
+                Close();
+                e.Handled = true;
+            }
+
+            return;
+        }
+
+        _openAtPress = false;
         _dragging = false;
         Classes.Set("dragging", false);
         if (e.Pointer.Captured == this)
@@ -537,9 +609,12 @@ public class ArcSwipeActions : ContentControl
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);
+        _pressed = false;
+        _openAtPress = false;
         if (_dragging)
         {
             _dragging = false;
+            _axisLocked = false;
             Classes.Set("dragging", false);
             Close();
         }
@@ -549,7 +624,10 @@ public class ArcSwipeActions : ContentControl
     {
         base.OnDetachedFromVisualTree(e);
         _tween.Stop();
+        _pressed = false;
         _dragging = false;
+        _axisLocked = false;
+        _openAtPress = false;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

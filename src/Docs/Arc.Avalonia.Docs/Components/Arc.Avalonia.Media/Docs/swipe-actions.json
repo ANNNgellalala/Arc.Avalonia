@@ -5,7 +5,8 @@
   "purpose": [
     "列表行（邮件、通知、任务）的快捷操作不必一直占着表面。拖动整行时，左右两侧的按钮从行底下露出来；越界后按 0.24 的阻尼跟随，让手势读起来是弹性而不是失控。",
     "两侧可以挂不同的 ArcSwipeAction 列表，每个动作带标签、图标与 Tone（Neutral / Accent / Danger）。FullSwipe 为 true 时，拖过阈值再松手会直接执行这一侧最外侧的动作。",
-    "手势不是唯一入口：聚焦行之后按 Left / Right 会露出同一组动作，Tab 走进按钮，Escape 把行收起。动作按钮的按钮类型、数量与颜色在触摸和键盘两条路径上完全一致。"
+    "手势不是唯一入口：聚焦行之后按 Left / Right 会露出同一组动作，Tab 走进按钮，Escape 把行收起。动作按钮的按钮类型、数量与颜色在触摸和键盘两条路径上完全一致。",
+    "行内容本身可以是一个可点击控件（Button，或带 Tapped 的表面）：按压只在隧道阶段被观察，横向锁定后才夺取指针，所以轻点会触发内容自己的 Click / Tapped，横向拖动仍会露出动作，两者不会互相吞掉；行已展开时轻点只会收起行，不会误触内容。"
   ],
   "whenToUse": [
     "触屏或触控板优先的列表（邮件、通知、审批）需要每行一两个快速动作。",
@@ -14,7 +15,7 @@
   ],
   "whenNotToUse": [
     "动作需要文字说明或存在多个分支时，改用 dropdown-menu 或 context-menu，滑出的按钮放不下解释。",
-    "行本身要响应点击（打开详情）时不要包滑动层，按压会被用来起拖。",
+    "行本身要响应点击（打开详情）时，把可点击元素（Button 或带 Tapped 的表面）放进 Content：轻点会到达内容，横向拖动才会被滑动层接管；**不要**再把整个滑动行包进外层 Button——外层按钮拦不住横向拖动（行仍会打开），却会让一次轻点同时触发内容 Click / 行 Tapped 与外层 Button.Click（headless 实测 2–3 次激活）。",
     "需要拖拽调整顺序或搬运内容时，用专门的拖拽排序组件，方向与语义都不同。"
   ],
   "variants": [
@@ -22,7 +23,8 @@
     { "key": "state-leading-open", "label": "Leading open", "note": "右滑露出左侧动作（例如标记未读）" },
     { "key": "state-trailing-open", "label": "Trailing open", "note": "左滑露出右侧动作（归档、删除）" },
     { "key": "variant-two-actions", "label": "Two actions", "note": "同一侧并排两个动作，各占 84px" },
-    { "key": "variant-danger-action", "label": "Danger action", "note": "删除动作使用危险色填充" }
+    { "key": "variant-danger-action", "label": "Danger action", "note": "删除动作使用危险色填充" },
+    { "key": "variant-tappable-row", "label": "Tappable row", "note": "行内容是可点击控件（Button / Tapped 表面）：轻点触发内容，横向拖动露出动作" }
   ],
   "relations": [
     { "type": "alternative", "target": "context-menu", "note": "桌面端同一组行操作更多用右键菜单承载" },
@@ -59,6 +61,11 @@
       "title": "在 XAML 中声明元素",
       "language": "xaml",
       "code": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:media=\"clr-namespace:Arc.Avalonia.Media.Controls;assembly=Arc.Avalonia.Media\">\n  <media:ArcSwipeActions Label=\"Invoice 2041\">\n    <media:ArcSwipeActions.Trailing>\n      <media:ArcSwipeAction Label=\"Archive\" Icon=\"archive\" />\n      <media:ArcSwipeAction Label=\"Delete\" Icon=\"trash-2\" Tone=\"Danger\" />\n    </media:ArcSwipeActions.Trailing>\n  </media:ArcSwipeActions>\n</Window>"
+    },
+    {
+      "title": "行内容可点击：轻点与滑动共存",
+      "language": "csharp",
+      "code": "var row = new ArcSwipeActions\n{\n    Label = \"Invoice 2041\",\n    Trailing = new List<ArcSwipeAction>\n    {\n        new(\"Archive\", \"archive\")\n    },\n    // 轻点触发这个 Button，横向拖动则由 ArcSwipeActions 接管并露出动作\n    Content = new Button\n    {\n        Command = openInvoice,\n        Background = Brushes.Transparent,\n        BorderThickness = new Thickness(0),\n        Padding = new Thickness(0),\n        HorizontalAlignment = HorizontalAlignment.Stretch,\n        HorizontalContentAlignment = HorizontalAlignment.Stretch,\n        Content = BuildMailRow(\"Accounts\", \"Invoice 2041\", \"Yesterday\")\n    }\n};"
     }
   ],
   "api": {
