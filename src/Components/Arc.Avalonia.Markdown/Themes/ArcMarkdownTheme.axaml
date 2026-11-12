@@ -8,4 +8,23 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
+
+  <!--
+    Link context menu: the flyout presenter is a floating Arc surface. The class is set by
+    ArcMarkdownLinkMenu so only Markdown link menus are reskinned; other flyouts keep the host theme.
+    No BoxShadow setter on purpose: FlyoutPresenter has no BoxShadow property in Avalonia 12 and the flyout
+    is a popup window whose content is clipped to its bounds, so ArcShadowFloating would be cut off. Elevation
+    comes from the platform popup chrome (Win32/Android window shadow), like every other Avalonia flyout.
+  -->
+  <Style Selector="FlyoutPresenter.arc-markdown-link-menu">
+    <Setter Property="Background" Value="{DynamicResource ArcSurfaceRaised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ArcBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ArcRadiusPanel}" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="MinWidth" Value="180" />
+    <Setter Property="FontFamily" Value="{DynamicResource ArcFontBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource ArcForeground}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+  </Style>
 </Styles>

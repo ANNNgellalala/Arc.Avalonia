@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
+using Arc.Avalonia.Markdown.Controls;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using PuraMarkdown.Core.Security;
@@ -100,9 +101,17 @@ public sealed class ArcMarkdownRenderContext
     public void Warn(string code, string message, string? nodeType = null, string? renderer = null)
         => WarningSink?.Invoke(new ArcMarkdownWarning(code, message, nodeType, renderer));
 
-    /// <summary>Creates a text block honouring the selection option.</summary>
+    /// <summary>
+    /// Creates a text block honouring the selection option, with inline-link gestures attached. Links are
+    /// rendered as text runs rather than embedded controls, so the host text block owns the pointer hit
+    /// testing that opens the link menu (see <see cref="ArcMarkdownLinkInteraction"/>).
+    /// </summary>
     public TextBlock CreateTextBlock()
-        => Options.EnableTextSelection ? new SelectableTextBlock() : new TextBlock();
+    {
+        var text = Options.EnableTextSelection ? new SelectableTextBlock() : new TextBlock();
+        ArcMarkdownLinkInteraction.Attach(text, this);
+        return text;
+    }
 }
 
 /// <summary>A renderer warning surfaced to the host.</summary>

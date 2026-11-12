@@ -30,6 +30,12 @@ public sealed class ArcMarkdownLocalizer : IArcMarkdownLocalizer
         [ArcMarkdownStringKeys.Submit] = "提交",
         [ArcMarkdownStringKeys.Cancel] = "取消",
         [ArcMarkdownStringKeys.Confirm] = "确认",
+        [ArcMarkdownStringKeys.LinkMenu] = "链接操作",
+        [ArcMarkdownStringKeys.CopyLink] = "复制链接",
+        [ArcMarkdownStringKeys.LinkCopied] = "链接已复制",
+        [ArcMarkdownStringKeys.OpenInBrowser] = "在浏览器中打开",
+        [ArcMarkdownStringKeys.OpenLinkFailed] = "打开链接失败",
+        [ArcMarkdownStringKeys.OpenLinkUnavailable] = "该链接无法在浏览器中打开",
     });
 
     /// <inheritdoc />
@@ -74,6 +80,12 @@ public sealed class ArcMarkdownEnglishLocalizer : IArcMarkdownLocalizer
             ArcMarkdownStringKeys.Submit => "Submit",
             ArcMarkdownStringKeys.Cancel => "Cancel",
             ArcMarkdownStringKeys.Confirm => "Confirm",
+            ArcMarkdownStringKeys.LinkMenu => "Link actions",
+            ArcMarkdownStringKeys.CopyLink => "Copy link",
+            ArcMarkdownStringKeys.LinkCopied => "Link copied",
+            ArcMarkdownStringKeys.OpenInBrowser => "Open in browser",
+            ArcMarkdownStringKeys.OpenLinkFailed => "Could not open link",
+            ArcMarkdownStringKeys.OpenLinkUnavailable => "This link cannot be opened in a browser",
             _ => key,
         };
 

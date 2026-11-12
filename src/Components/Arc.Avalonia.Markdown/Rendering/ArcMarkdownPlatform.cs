@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 
 namespace Arc.Avalonia.Markdown;
@@ -13,6 +14,36 @@ public static class ArcMarkdownPlatform
 
     /// <summary>Default clipboard: no-op; the view falls back to the Avalonia TopLevel clipboard.</summary>
     public static IArcMarkdownClipboard DefaultClipboard { get; } = new NoopClipboard();
+
+    /// <summary>
+    /// Opens an absolute URL with the host platform launcher (system browser, mail client, ...). This is the
+    /// default action of the "open in browser" row of the link menu; hosts that need in-app navigation still
+    /// install their own <see cref="IArcMarkdownLinkHandler"/>.
+    /// </summary>
+    /// <param name="topLevel">Top level that owns the launcher (usually <c>TopLevel.GetTopLevel(control)</c>).</param>
+    /// <param name="url">Absolute URL to open.</param>
+    /// <param name="cancellationToken">Cancels before the launch request is issued.</param>
+    /// <returns>True when the platform launcher accepted the URI.</returns>
+    public static async Task<bool> OpenInBrowserAsync(
+        TopLevel? topLevel,
+        string url,
+        CancellationToken cancellationToken = default)
+    {
+        if (topLevel is null || string.IsNullOrWhiteSpace(url) ||
+            !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        var launcher = topLevel.Launcher;
+        if (launcher is null)
+        {
+            return false;
+        }
+
+        return await launcher.LaunchUriAsync(uri).ConfigureAwait(true);
+    }
 
     /// <summary>Creates an image loader from a delegate (return null to refuse).</summary>
     public static IArcMarkdownImageLoader ImageLoader(Func<string, CancellationToken, Task<Bitmap?>> load)

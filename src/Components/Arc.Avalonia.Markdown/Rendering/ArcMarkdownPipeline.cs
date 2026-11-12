@@ -164,6 +164,10 @@ public sealed class ArcMarkdownPipelineBuilder
     public ArcMarkdownPipelineBuilder UseGfm()
     {
         _syntax.UseGfm();
+        // GFM's autolinker only fires at a line start / after whitespace, so Chinese prose such as
+        // 下载页：https://… keeps the URL as plain text. The extra parser accepts CJK punctuation
+        // boundaries and emits the same AutolinkInline nodes; hosts no longer need to pre-process URLs.
+        _syntax.UseBareUrlAutolinks();
         return this;
     }
 

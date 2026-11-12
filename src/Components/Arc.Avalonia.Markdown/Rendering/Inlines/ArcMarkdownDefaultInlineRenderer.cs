@@ -18,7 +18,8 @@ namespace Arc.Avalonia.Markdown;
 /// strikethrough/inserted/marked/sub-superscript, links, autolinks, task markers, images and HTML
 /// entities are appended as <see cref="Run"/>/<see cref="Span"/>/<see cref="InlineUIContainer"/>
 /// entries inside the host text block. Links go through <see cref="ArcMarkdownRenderContext.LinkClickSink"/>
-/// so the host can mark a click handled; images load asynchronously and degrade to a placeholder.
+/// so the host can mark a click handled; an unhandled click opens the copy/open-in-browser menu instead of
+/// navigating straight away. Images load asynchronously and degrade to a placeholder.
 /// </summary>
 internal static class ArcMarkdownDefaultInlineRenderer
 {
@@ -252,86 +253,24 @@ internal static class ArcMarkdownDefaultInlineRenderer
         ArcMarkdownRenderContext context,
         LinkInline? label)
     {
-        var style = context.Style;
-        var content = new TextBlock
-        {
-            TextWrapping = TextWrapping.NoWrap,
-            Foreground = style.Accent,
-            TextDecorations = TextDecorations.Underline,
-        };
+        // Links are text runs, not embedded controls: a run shares the body line box/baseline (the old
+        // HyperlinkButton path inflated the line height and lifted the label ~1 descender), wraps like prose
+        // and stays selectable. ArcMarkdownLinkInteraction resolves taps against the character cells and
+        // opens the copy/open-in-browser menu, so the interaction contract is unchanged.
+        var link = new ArcMarkdownLinkInline(url, displayText, title, context.Style.Accent);
 
         if (label is not null)
         {
             // Keep emphasis inside the link label, but never nest the link itself again.
-            RenderChildren(label, content.Inlines!, context);
+            RenderChildren(label, link.Inlines!, context);
         }
 
-        if (content.Inlines is not { Count: > 0 })
+        if (link.Inlines is not { Count: > 0 })
         {
-            content.Inlines!.Add(new Run(displayText));
+            link.Inlines!.Add(new Run(displayText));
         }
 
-        var button = new HyperlinkButton
-        {
-            Content = content,
-            // A little vertical padding grows the touch target of an inline link without breaking the line box.
-            Padding = new Thickness(2, 2, 2, 2),
-            MinHeight = 24,
-            Background = null,
-            BorderThickness = new Thickness(0),
-            CornerRadius = new CornerRadius(0),
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        AutomationProperties.SetName(button, displayText);
-        AutomationProperties.SetHelpText(button, url);
-        if (!string.IsNullOrEmpty(title))
-        {
-            ToolTip.SetTip(button, title);
-        }
-
-        // Swiping over a document must not open a link: the guard cancels clicks after an 8 px drag.
-        var tapGuard = new ArcMarkdownTapGuard();
-        tapGuard.Attach(button);
-
-        // Token-only hover/focus feedback: the framework accent colour never leaks into Arc surfaces.
-        button.PointerEntered += (_, _) => content.Opacity = 0.82;
-        button.PointerExited += (_, _) => content.Opacity = 1;
-        button.GotFocus += (_, _) => content.FontWeight = FontWeight.Medium;
-        button.LostFocus += (_, _) => content.ClearValue(TextBlock.FontWeightProperty);
-
-        button.Click += async (_, _) =>
-        {
-            if (tapGuard.IsCancelled)
-            {
-                return;
-            }
-
-            var click = new ArcMarkdownLinkClick(url, displayText);
-            try
-            {
-                context.LinkClickSink?.Invoke(click);
-            }
-            catch (Exception ex)
-            {
-                context.Warn("ARC-MD-LINK-002", $"链接点击回调失败：{ex.Message}", nameof(LinkInline));
-            }
-
-            if (click.Handled)
-            {
-                return;
-            }
-
-            try
-            {
-                await context.Options.LinkHandler.OpenAsync(url).ConfigureAwait(true);
-            }
-            catch (Exception ex)
-            {
-                context.Warn("ARC-MD-LINK-001", $"打开链接失败：{ex.Message}", nameof(LinkInline));
-            }
-        };
-
-        target.Add(new InlineUIContainer(button));
+        target.Add(link);
     }
 
     private static Span CreateMutedSpan(string text, ArcMarkdownRenderContext context)

@@ -1031,10 +1031,34 @@ public static class Program
                 runs.Any(run => !run.FontWeight.Equals(FontWeight.Normal)) &&
                 runs.Any(run => run.FontStyle == FontStyle.Italic) &&
                 runs.Any(run => run.TextDecorations is { Count: > 0 }));
-            Check("markdown paragraph renders link and image placeholder",
-                Walk(paragraph).OfType<HyperlinkButton>().Any() &&
+            // Inline links are text runs now, not embedded HyperlinkButtons: the label must share the body
+            // line box/baseline (the embedded control lifted it by a descender and inflated the line height).
+            var paragraphLinks = AllInlines(paragraph).OfType<ArcMarkdownLinkInline>().ToArray();
+            Check("markdown paragraph renders links as inline text runs",
+                paragraphLinks.Length >= 1 &&
+                !Walk(paragraph).OfType<HyperlinkButton>().Any() &&
+                paragraphLinks.All(link => link.TextDecorations is { Count: > 0 }) &&
+                paragraphLinks.All(link => link.Url.StartsWith("http", StringComparison.Ordinal)) &&
                 Walk(paragraph).OfType<Image>().Any() &&
                 paragraphText.Contains("图片"));
+
+            // Bare URLs after CJK punctuation (no space before the scheme) must still become links: Markdig's
+            // GFM autolinker only fires after whitespace, which misses 下载页：https://… in Chinese prose.
+            var cjkDocument = pipeline.Syntax.ParseDocument("下载页：https://example.com/gateway/download\n");
+            var cjkParagraph = cjkDocument.Markdown.OfType<ParagraphBlock>().First();
+            Check("markdown autolinks a bare url after CJK punctuation",
+                cjkParagraph.Inline is { } cjkInline && FindAutolink(cjkInline) == "https://example.com/gateway/download");
+
+            // Character-offset mapping must count a hard break as the platform newline: Avalonia's LineBreak
+            // run emits Environment.NewLine and the text layout indexes the whole sequence (2 chars on Windows).
+            var breakInlines = new InlineCollection
+            {
+                new Run("ab"),
+                new LineBreak(),
+                new Run("c"),
+            };
+            Check("markdown inline-link mapping counts a hard break as the platform newline",
+                ArcMarkdownLinkInline.TextLength(breakInlines) == 3 + Environment.NewLine.Length);
 
             // --- inline-link menu: copy / open in browser -------------------------------
             var linkOptions = new ArcMarkdownOptions { Pipeline = pipeline };
@@ -1645,8 +1669,63 @@ public static class Program
         }
     }
 
-    private static IEnumerable<Run> AllRuns(Control control)
+    /// <summary>Every inline under a rendered node (nested spans included).</summary>
+    private static IEnumerable<Inline> AllInlines(Control control)
     {
+        foreach (var candidate in Walk(control))
+        {
+            if (candidate is not TextBlock { Inlines: { } inlines })
+            {
+                continue;
+            }
+
+            foreach (var inline in inlines)
+            {
+                foreach (var nested in InlinesInInline(inline))
+                {
+                    yield return nested;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<Inline> InlinesInInline(Inline inline)
+    {
+        yield return inline;
+        if (inline is not Span { Inlines: { } nestedInlines })
+        {
+            yield break;
+        }
+
+        foreach (var nested in nestedInlines)
+        {
+            foreach (var child in InlinesInInline(nested))
+            {
+                yield return child;
+            }
+        }
+    }
+
+    /// <summary>First autolink URL in a parsed inline tree (null when the URL stayed literal text).</summary>
+    private static string? FindAutolink(Markdig.Syntax.Inlines.ContainerInline container)
+    {
+        for (var inline = container.FirstChild; inline is not null; inline = inline.NextSibling)
+        {
+            if (inline is Markdig.Syntax.Inlines.AutolinkInline autolink)
+            {
+                return autolink.Url;
+            }
+
+            if (inline is Markdig.Syntax.Inlines.ContainerInline nested && FindAutolink(nested) is { } url)
+            {
+                return url;
+            }
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<Run> AllRuns(Control control)    {
         foreach (var candidate in Walk(control))
         {
             if (candidate is not TextBlock { Inlines: { } inlines })
