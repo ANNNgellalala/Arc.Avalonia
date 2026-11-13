@@ -4,17 +4,18 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using PuraMarkdown.Agent;
 using PuraMarkdown.Agent.Chat;
-using PuraMarkdown.Agent.Platform;
-using PuraMarkdown.Agent.Rendering;
+using PuraMarkdown.UI;
+using PuraMarkdown.UI.Platform;
+using PuraMarkdown.UI.Rendering;
 
 namespace Arc.Avalonia.Chat;
 
 /// <summary>
 /// Arc's chat surface. The messages, their rendering (Markdown, code, tables, pura-agent components) and the
-/// streaming lifecycle all come from <see cref="PuraChatView"/> in PuraMarkdown.Agent (ADR 0007); Arc only
-/// supplies the design-system wrapper, the composer and the token-derived theme mapping.
+/// streaming lifecycle all come from <see cref="PuraChatView"/> (PuraMarkdown.Agent) on top of the
+/// PuraMarkdown.UI render engine (ADR 0007/0008); Arc only supplies the design-system wrapper, the composer
+/// and the token-derived theme mapping.
 /// </summary>
 public sealed class ArcChatView : ContentControl, IDisposable
 {
@@ -31,7 +32,7 @@ public sealed class ArcChatView : ContentControl, IDisposable
     public static readonly RoutedEvent<ArcChatLinkClickedEventArgs> LinkClickedEvent =
         RoutedEvent.Register<ArcChatView, ArcChatLinkClickedEventArgs>(nameof(LinkClicked), RoutingStrategies.Bubble);
 
-    /// <summary>Creates the surface with the Arc theme mapped onto PuraMarkdown.Agent.</summary>
+    /// <summary>Creates the surface with the Arc theme mapped onto the PuraMarkdown render engine.</summary>
     public ArcChatView()
     {
         // The upstream chat view defaults to NullLinkHandler and exposes no link event, so Arc installs its

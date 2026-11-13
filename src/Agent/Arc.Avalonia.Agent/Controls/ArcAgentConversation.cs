@@ -13,7 +13,8 @@ using Arc.Avalonia.Controls;
 using Arc.Avalonia.Theme;
 using PuraMarkdown.Agent;
 using PuraMarkdown.Agent.Chat;
-using PuraMarkdown.Agent.Rendering;
+using PuraMarkdown.UI;
+using PuraMarkdown.UI.Rendering;
 
 namespace Arc.Avalonia.Agent;
 

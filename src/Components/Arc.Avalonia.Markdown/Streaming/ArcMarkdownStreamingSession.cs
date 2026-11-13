@@ -1,16 +1,21 @@
-using System.Text;
 using Avalonia.Threading;
-using PuraMarkdown.Core;
-using PuraMarkdown.Core;
+using PuraMarkdown.UI;
 
 namespace Arc.Avalonia.Markdown;
 
 /// <summary>Streaming lifecycle state.</summary>
 public enum ArcMarkdownStreamingState
 {
+    /// <summary>Created, no append yet.</summary>
     Created,
+
+    /// <summary>Appending.</summary>
     Streaming,
+
+    /// <summary>Completed normally.</summary>
     Completed,
+
+    /// <summary>Aborted (or faulted) keeping partial content.</summary>
     Aborted,
 }
 
@@ -30,7 +35,7 @@ public sealed class ArcMarkdownStreamingOptions
     public bool Synchronous { get; init; }
 }
 
-/// <summary>Streaming diagnostics: how much was parsed, how often and where the stable boundary sits.</summary>
+/// <summary>Streaming diagnostics: transported from the upstream <see cref="PuraStreamingSession"/>.</summary>
 public sealed record ArcMarkdownStreamingStatistics(
     int Flushes,
     int Parses,
@@ -55,308 +60,125 @@ public sealed record ArcMarkdownStreamingStatistics(
 }
 
 /// <summary>
-/// Append-only streaming session for <see cref="ArcMarkdownView"/>. Text is committed at stable block
-/// boundaries (top-level blank lines outside open fences) and only the committed window plus the unstable
-/// tail window are parsed and re-rendered, so a long answer does not rebuild the whole document on every
-/// token. Parsing runs on a background worker; rendering is coalesced onto the UI dispatcher frame by frame.
-/// <para>
-/// <see cref="Append"/> may be called from any thread. <see cref="CompleteAsync"/> parses the whole text once
-/// and replaces the streamed windows, so the final result is identical to a one-shot render.
-/// </para>
+/// Append-only streaming session for <see cref="ArcMarkdownView"/>. 0.2 wraps the upstream
+/// <see cref="PuraStreamingSession"/> (PuraMarkdown.UI): stable-boundary commits, background parsing, tail
+/// window and UI coalescing all live upstream; Arc keeps this public surface for compatibility.
 /// </summary>
 public sealed partial class ArcMarkdownStreamingSession : IAsyncDisposable
 {
-    private const string CompletedAnnouncement = "回复已完成";
-
     private readonly ArcMarkdownView _view;
+    private readonly PuraStreamingSession _inner;
     private readonly ArcMarkdownStreamingOptions _options;
-    private readonly ArcMarkdownOptions _markdownOptions;
-    private readonly PuraSyntaxOptions _syntaxOptions;
-    private readonly StringBuilder _text = new();
-    private readonly object _gate = new();
-    private readonly TaskCompletionSource _finished = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly SemaphoreSlim _signal = new(0, 1);
-    private readonly CancellationTokenSource _cts = new();
-    private readonly List<FlushWaiter> _flushWaiters = [];
-
-    private PuraDocument? _committed;
-    private Exception? _lastWorkerError;
-    private Task? _worker;
-    private ArcMarkdownStreamingState _state;
-    private int _committedOffset;
-    private int _version;
-    private int _flushes;
-    private int _parses;
-    private int _commits;
-    private int _forcedCommits;
-    private int _workerErrors;
-    private int _appliedChars;
-    private int _processedChars;
-    private int _lastAppliedVersion;
-    private bool _follow;
-    private bool _closed;
-    private bool _finishStarted;
-    private bool _tailPaused;
     private bool _disposed;
+    private bool _announcedCompleted;
+    private bool _announcedAborted;
 
-    internal ArcMarkdownStreamingSession(ArcMarkdownView view, ArcMarkdownStreamingOptions options)
+    internal ArcMarkdownStreamingSession(
+        ArcMarkdownView view,
+        PuraStreamingSession inner,
+        ArcMarkdownStreamingOptions options)
     {
         _view = view;
+        _inner = inner;
         _options = options;
-        _markdownOptions = view.CurrentOptions;
-        _syntaxOptions = ArcMarkdownView.SyntaxOptions(_markdownOptions);
-        _follow = options.AutoScrollToEnd;
-        _state = ArcMarkdownStreamingState.Created;
+        _inner.Completed += OnInnerCompleted;
+        _inner.Aborted += OnInnerAborted;
+        _inner.Faulted += OnInnerFaulted;
     }
 
     /// <summary>Current lifecycle state (thread safe).</summary>
-    public ArcMarkdownStreamingState State
-    {
-        get
-        {
-            lock (_gate)
-            {
-                return _state;
-            }
-        }
-    }
+    public ArcMarkdownStreamingState State => MapState(_inner.State);
 
     /// <summary>Text received so far.</summary>
-    public string CurrentText
-    {
-        get
-        {
-            lock (_gate)
-            {
-                return _text.ToString();
-            }
-        }
-    }
+    public string CurrentText => _inner.CurrentText;
 
     /// <summary>Characters appended but not yet reflected by a rendered window.</summary>
-    public int PendingChars
-    {
-        get
-        {
-            lock (_gate)
-            {
-                return Math.Max(0, _text.Length - _appliedChars);
-            }
-        }
-    }
+    public int PendingChars => _inner.PendingChars;
 
-    /// <summary>Last background worker exception, if any. A failed pass never throws into the host.</summary>
-    public Exception? LastWorkerError
-    {
-        get
-        {
-            lock (_gate)
-            {
-                return _lastWorkerError;
-            }
-        }
-    }
+    /// <summary>Last background worker exception, if any.</summary>
+    public Exception? LastWorkerError => _inner.LastWorkerError;
 
-    /// <summary>True when an unclosed block exceeded <see cref="ArcMarkdownStreamingOptions.MaxTailChars"/>.</summary>
-    public bool IsTailPaused
-    {
-        get
-        {
-            lock (_gate)
-            {
-                return _tailPaused;
-            }
-        }
-    }
+    /// <summary>True when an unclosed block exceeded the tail budget.</summary>
+    public bool IsTailPaused => _inner.Statistics.TailDeferred;
 
-    /// <summary>Raised after a streaming window has been applied to the view (UI thread).</summary>
+    /// <summary>Raised after a streaming window has been applied (best effort; upstream does not expose per-window callbacks).</summary>
     public event EventHandler? Updated;
 
-    /// <summary>Raised once when the session completes and the final document has been rendered (UI thread).</summary>
+    /// <summary>Raised once when the session completes and the final document has been rendered.</summary>
     public event EventHandler? Completed;
 
-    /// <summary>Raised once when the session is aborted and the partial document has been rendered (UI thread).</summary>
+    /// <summary>Raised once when the session is aborted and the partial document has been rendered.</summary>
     public event EventHandler? Aborted;
 
-    /// <summary>Statistics snapshot.</summary>
+    /// <summary>Statistics snapshot transported from the upstream session.</summary>
     public ArcMarkdownStreamingStatistics Statistics
     {
         get
         {
-            lock (_gate)
+            var s = _inner.Statistics;
+            return new ArcMarkdownStreamingStatistics(
+                s.FlushCount,
+                0,
+                s.CommittedChars,
+                s.TailChars,
+                s.TotalChars)
             {
-                return new ArcMarkdownStreamingStatistics(
-                    _flushes,
-                    _parses,
-                    _committedOffset,
-                    Math.Max(0, _text.Length - _committedOffset),
-                    _text.Length)
-                {
-                    Commits = _commits,
-                    ForcedCommits = _forcedCommits,
-                    AppliedChars = _appliedChars,
-                    ProcessedChars = _processedChars,
-                    WorkerErrors = _workerErrors,
-                };
-            }
+                Commits = s.Commits,
+                ForcedCommits = 0,
+                AppliedChars = s.AppliedChars,
+                ProcessedChars = Math.Max(0, s.TotalChars - s.TailChars),
+                WorkerErrors = _inner.LastWorkerError is null ? 0 : 1,
+            };
         }
     }
 
-    /// <summary>Appends a text delta and schedules a coalesced UI update. Safe from any thread.</summary>
-    public void Append(string delta)
-    {
-        if (string.IsNullOrEmpty(delta))
-        {
-            return;
-        }
+    /// <summary>Appends a text delta and schedules a coalesced UI update.</summary>
+    /// <param name="delta">Text delta.</param>
+    public void Append(string delta) => _inner.Append(delta);
 
-        lock (_gate)
-        {
-            if (_state is ArcMarkdownStreamingState.Completed or ArcMarkdownStreamingState.Aborted || _closed)
-            {
-                return;
-            }
-
-            if (_state == ArcMarkdownStreamingState.Created)
-            {
-                _state = ArcMarkdownStreamingState.Streaming;
-            }
-
-            _text.Append(delta);
-            if (!_options.Synchronous && _worker is null)
-            {
-                _worker = Task.Run(WorkerLoopAsync);
-            }
-
-            WakeWorkerLocked();
-        }
-
-        if (_options.Synchronous)
-        {
-            ApplySynchronously();
-        }
-    }
-
-    /// <summary>Appends a delta without blocking the caller.</summary>
+    /// <summary>Appends a text delta without blocking the caller.</summary>
+    /// <param name="delta">Text delta.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public Task AppendAsync(ReadOnlyMemory<char> delta, CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return Task.FromCanceled(cancellationToken);
-        }
+        => _inner.AppendAsync(delta, cancellationToken);
 
-        Append(delta.ToString());
-        return Task.CompletedTask;
+    /// <summary>Waits until every delta appended before this call has been processed by a worker pass.</summary>
+    /// <returns>Completion task.</returns>
+    public async Task FlushAsync()
+    {
+        await _inner.FlushAsync().ConfigureAwait(false);
+        Updated?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Waits until every delta appended before this call has been processed by a worker pass (and applied
-    /// when the tail was not paused). Safe to await from the UI thread.
-    /// </summary>
-    public Task FlushAsync()
-    {
-        if (_options.Synchronous)
-        {
-            ApplySynchronously();
-            return Task.CompletedTask;
-        }
-
-        lock (_gate)
-        {
-            if (_state is ArcMarkdownStreamingState.Completed or ArcMarkdownStreamingState.Aborted || _closed)
-            {
-                return Task.CompletedTask;
-            }
-
-            if (_worker is null)
-            {
-                if (_text.Length == 0)
-                {
-                    return Task.CompletedTask;
-                }
-
-                _worker = Task.Run(WorkerLoopAsync);
-            }
-
-            var waiter = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            _flushWaiters.Add(new FlushWaiter(_text.Length, waiter));
-            WakeWorkerLocked();
-            return waiter.Task;
-        }
-    }
-
-    /// <summary>Alias for <see cref="FlushAsync"/> that reads more naturally at call sites.</summary>
+    /// <summary>Alias for <see cref="FlushAsync"/>.</summary>
     public Task WaitForIdleAsync() => FlushAsync();
 
-    /// <summary>Completes the stream: parses and renders the whole text once, replacing the windows.</summary>
+    /// <summary>Completes the stream: the upstream parses/renders the whole text once, replacing windows.</summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        await FinishAsync(ArcMarkdownStreamingState.Completed, cancellationToken).ConfigureAwait(false);
+        await _inner.CompleteAsync(cancellationToken).ConfigureAwait(false);
+        OnFinished(faulted: false);
     }
 
     /// <summary>Aborts the stream, keeping and rendering the partial text.</summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task AbortAsync(CancellationToken cancellationToken = default)
     {
-        await FinishAsync(ArcMarkdownStreamingState.Aborted, cancellationToken).ConfigureAwait(false);
+        await _inner.AbortAsync(cancellationToken).ConfigureAwait(false);
+        OnFinished(faulted: false);
     }
 
-    internal void AbortSilently()
-    {
-        if (!TryBeginFinish(ArcMarkdownStreamingState.Aborted, out var text))
-        {
-            return;
-        }
-
-        CancelWorker();
-
-        void Render()
-        {
-            try
-            {
-                _view.ClearStreamingTail();
-                _view.RenderDocument(ParseFull(text));
-                _view.SetActiveSession(null);
-            }
-            catch (Exception ex)
-            {
-                _lastWorkerError = ex;
-            }
-
-            RaiseAborted();
-        }
-
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            Render();
-        }
-        else
-        {
-            Dispatcher.UIThread.Post(Render, DispatcherPriority.Background);
-        }
-    }
+    internal void AbortSilently() => _ = AbortAsync();
 
     internal void NotifyUserScrolled()
     {
-        lock (_gate)
-        {
-            if (_options.AutoScrollToEnd)
-            {
-                _follow = false;
-            }
-        }
+        // 0.2: follow mode is owned by Arc's outer ScrollViewer; nothing to forward.
     }
 
-    /// <summary>Re-arms follow mode once the reader scrolls back to the end (touch follow latch).</summary>
     internal void NotifyUserScrolledToEnd()
     {
-        lock (_gate)
-        {
-            if (_options.AutoScrollToEnd)
-            {
-                _follow = true;
-            }
-        }
+        // 0.2: follow mode is owned by Arc's outer ScrollViewer; nothing to forward.
     }
 
     /// <inheritdoc />
@@ -368,486 +190,68 @@ public sealed partial class ArcMarkdownStreamingSession : IAsyncDisposable
         }
 
         _disposed = true;
-        if (!_finished.Task.IsCompleted)
-        {
-            AbortSilently();
-        }
-
-        try
-        {
-            await _finished.Task.ConfigureAwait(false);
-        }
-        catch
-        {
-            // The finished task never faults.
-        }
-
-        CancelWorker();
-        var worker = _worker;
-        if (worker is not null)
-        {
-            try
-            {
-                await worker.ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                // Normal shutdown.
-            }
-        }
-
-        DrainWaiters();
-        _signal.Dispose();
-        _cts.Dispose();
+        _inner.Completed -= OnInnerCompleted;
+        _inner.Aborted -= OnInnerAborted;
+        _inner.Faulted -= OnInnerFaulted;
+        await _inner.DisposeAsync().ConfigureAwait(false);
     }
 
-    private async Task FinishAsync(ArcMarkdownStreamingState finalState, CancellationToken cancellationToken)
+    private void OnInnerCompleted(object? sender, EventArgs e) => OnFinished(faulted: false);
+
+    private void OnInnerAborted(object? sender, EventArgs e) => OnFinished(faulted: false);
+
+    private void OnInnerFaulted(object? sender, PuraStreamingFaultedEventArgs e) => OnFinished(faulted: true);
+
+    private void OnFinished(bool faulted)
     {
-        if (!TryBeginFinish(finalState, out var text))
+        var text = _inner.CurrentText;
+        void Finish()
         {
-            await _finished.Task.ConfigureAwait(false);
-            return;
-        }
-
-        CancelWorker();
-        var document = await ParseFinalAsync(text, cancellationToken).ConfigureAwait(false);
-        await RunOnUiThreadAsync(() => RenderFinal(finalState, text, document)).ConfigureAwait(false);
-        DrainWaiters();
-        _finished.TrySetResult();
-    }
-
-    private bool TryBeginFinish(ArcMarkdownStreamingState finalState, out string text)
-    {
-        lock (_gate)
-        {
-            if (_finishStarted || _state is ArcMarkdownStreamingState.Completed or ArcMarkdownStreamingState.Aborted)
-            {
-                text = string.Empty;
-                return false;
-            }
-
-            _finishStarted = true;
-            _state = finalState;
-            _closed = true;
-            text = _text.ToString();
-            return true;
-        }
-    }
-
-    private async Task<PuraDocument> ParseFinalAsync(string text, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await Task.Run(() => ParseFull(text), cancellationToken).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            return ParseFull(text);
-        }
-        catch (Exception ex)
-        {
-            _lastWorkerError = ex;
-            return ParseFull(text);
-        }
-    }
-
-    private void RenderFinal(ArcMarkdownStreamingState finalState, string text, PuraDocument document)
-    {
-        try
-        {
-            if (finalState == ArcMarkdownStreamingState.Completed)
-            {
-                _view.ClearStreamingTail();
-            }
-
-            _view.RenderDocument(document);
-            _view.SetActiveSession(null);
-            if (_follow)
+            _view.AdoptStreamedText(text);
+            if (_options.AutoScrollToEnd)
             {
                 _view.ScrollToEnd();
             }
 
-            if (finalState == ArcMarkdownStreamingState.Completed)
+            if (faulted)
             {
-                _view.Announce(text.Length == 0 ? string.Empty : CompletedAnnouncement);
-                RaiseCompleted();
-            }
-            else
-            {
-                RaiseAborted();
-            }
-        }
-        catch (Exception ex)
-        {
-            _lastWorkerError = ex;
-            if (finalState == ArcMarkdownStreamingState.Completed)
-            {
-                RaiseCompleted();
-            }
-            else
-            {
-                RaiseAborted();
-            }
-        }
-    }
+                if (!_announcedAborted)
+                {
+                    _announcedAborted = true;
+                    Aborted?.Invoke(this, EventArgs.Empty);
+                }
 
-    private void RaiseCompleted()
-    {
-        try
-        {
-            Completed?.Invoke(this, EventArgs.Empty);
-        }
-        catch (Exception ex)
-        {
-            _lastWorkerError = ex;
-        }
-        finally
-        {
-            _finished.TrySetResult();
-        }
-    }
-
-    private void RaiseAborted()
-    {
-        try
-        {
-            Aborted?.Invoke(this, EventArgs.Empty);
-        }
-        catch (Exception ex)
-        {
-            _lastWorkerError = ex;
-        }
-        finally
-        {
-            _finished.TrySetResult();
-        }
-    }
-
-    private async Task WorkerLoopAsync()
-    {
-        while (true)
-        {
-            try
-            {
-                await _signal.WaitAsync(_cts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (ObjectDisposedException)
-            {
                 return;
             }
 
-            if (IsClosed())
+            var state = _inner.State;
+            if (state == PuraStreamingState.Completed && !_announcedCompleted)
             {
-                return;
+                _announcedCompleted = true;
+                Completed?.Invoke(this, EventArgs.Empty);
             }
-
-            var passChars = 0;
-            try
+            else if (state != PuraStreamingState.Completed && !_announcedAborted)
             {
-                lock (_gate)
-                {
-                    passChars = _text.Length;
-                }
-
-                var update = BuildWindows();
-                if (update is not null)
-                {
-                    await ApplyOnUiThreadAsync(update).ConfigureAwait(false);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                lock (_gate)
-                {
-                    _lastWorkerError = ex;
-                    _workerErrors++;
-                }
-            }
-            finally
-            {
-                lock (_gate)
-                {
-                    _processedChars = Math.Max(_processedChars, passChars);
-                }
-
-                DrainWaiters();
-            }
-
-            if (IsClosed())
-            {
-                return;
-            }
-        }
-    }
-
-    private WindowUpdate? BuildWindows()
-    {
-        string text;
-        int committedOffset;
-        PuraDocument? committed;
-        lock (_gate)
-        {
-            if (_closed || _state is ArcMarkdownStreamingState.Completed or ArcMarkdownStreamingState.Aborted)
-            {
-                return null;
-            }
-
-            if (_text.Length == 0)
-            {
-                return null;
-            }
-
-            text = _text.ToString();
-            committedOffset = _committedOffset;
-            committed = _committed;
-        }
-
-        var boundary = StreamingBlockScanner.FindStableBoundary(text, committedOffset);
-        var forced = false;
-        var tailLength = text.Length - boundary;
-        if (boundary == committedOffset && tailLength > _options.TailWindowChars)
-        {
-            var lastBreak = text.LastIndexOf("\n\n", StringComparison.Ordinal);
-            if (lastBreak >= committedOffset)
-            {
-                var candidate = lastBreak + 2;
-                if (StreamingBlockScanner.FindStableBoundary(text[..candidate], 0) == candidate)
-                {
-                    boundary = candidate;
-                    forced = true;
-                }
+                _announcedAborted = true;
+                Aborted?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        var newCommitted = committed;
-        var committedChanged = false;
-        if (boundary > committedOffset || committed is null)
-        {
-            var committedText = text[..boundary];
-            newCommitted = Parse(committedText);
-            committedChanged = true;
-        }
-
-        tailLength = text.Length - boundary;
-        var tailPaused = tailLength > _options.MaxTailChars;
-        PuraDocument? tail = null;
-        if (!tailPaused && tailLength > 0)
-        {
-            tail = Parse(text[boundary..]);
-        }
-
-        lock (_gate)
-        {
-            if (_closed)
-            {
-                return null;
-            }
-
-            _tailPaused = tailPaused;
-            if (committedChanged)
-            {
-                _committed = newCommitted;
-                _committedOffset = boundary;
-                _commits++;
-                if (forced)
-                {
-                    _forcedCommits++;
-                }
-            }
-
-            return new WindowUpdate(
-                Interlocked.Increment(ref _version),
-                newCommitted!,
-                tail,
-                text.Length,
-                boundary,
-                tailPaused);
-        }
-    }
-
-    private void ApplySynchronously()
-    {
-        if (!Dispatcher.UIThread.CheckAccess())
-        {
-            // Synchronous mode is intended for tests/console hosts; rendering still has to happen on the UI
-            // thread when a real application is running behind the view.
-            Dispatcher.UIThread.InvokeAsync(ApplySynchronously, DispatcherPriority.Background).GetAwaiter().GetResult();
-            return;
-        }
-
-        var update = BuildWindows();
-        if (update is not null)
-        {
-            ApplyCore(update);
-        }
-    }
-
-    private async Task ApplyOnUiThreadAsync(WindowUpdate update)
-    {
         if (Dispatcher.UIThread.CheckAccess())
         {
-            ApplyCore(update);
-            return;
+            Finish();
         }
-
-        await Dispatcher.UIThread.InvokeAsync(() => ApplyCore(update), DispatcherPriority.Background).GetTask().ConfigureAwait(false);
+        else
+        {
+            Dispatcher.UIThread.Post(Finish, DispatcherPriority.Background);
+        }
     }
 
-    private void ApplyCore(WindowUpdate update)
+    private static ArcMarkdownStreamingState MapState(PuraStreamingState state) => state switch
     {
-        lock (_gate)
-        {
-            if (_closed || _state is ArcMarkdownStreamingState.Completed or ArcMarkdownStreamingState.Aborted)
-            {
-                return;
-            }
-
-            if (update.Version < _lastAppliedVersion)
-            {
-                return;
-            }
-
-            _lastAppliedVersion = update.Version;
-            _appliedChars = Math.Max(_appliedChars, update.TailPaused ? update.CommittedOffset : update.TextLength);
-            _flushes++;
-        }
-
-        if (!ReferenceEquals(_view.ActiveSession, this))
-        {
-            return;
-        }
-
-        _view.ApplyStreamingWindows(update.Committed, update.Tail);
-        if (_follow)
-        {
-            _view.ScrollToEnd();
-        }
-
-        Updated?.Invoke(this, EventArgs.Empty);
-    }
-
-    private PuraDocument Parse(string text)
-    {
-        lock (_gate)
-        {
-            _parses++;
-        }
-
-        return _markdownOptions.Pipeline.Syntax.ParseDocument(text, Interlocked.Increment(ref _version), _syntaxOptions);
-    }
-
-    private PuraDocument ParseFull(string text)
-    {
-        lock (_gate)
-        {
-            _parses++;
-        }
-
-        return _markdownOptions.Pipeline.Syntax.ParseDocument(text, Interlocked.Increment(ref _version), _syntaxOptions);
-    }
-
-    private void WakeWorkerLocked()
-    {
-        try
-        {
-            if (_signal.CurrentCount == 0)
-            {
-                _signal.Release();
-            }
-        }
-        catch (SemaphoreFullException)
-        {
-            // Another producer already signalled.
-        }
-        catch (ObjectDisposedException)
-        {
-            // Session disposed.
-        }
-    }
-
-    private void CancelWorker()
-    {
-        try
-        {
-            _cts.Cancel();
-        }
-        catch (ObjectDisposedException)
-        {
-            // Already disposed.
-        }
-
-        lock (_gate)
-        {
-            WakeWorkerLocked();
-        }
-    }
-
-    private bool IsClosed()
-    {
-        lock (_gate)
-        {
-            return _closed;
-        }
-    }
-
-    private void DrainWaiters()
-    {
-        List<FlushWaiter>? ready = null;
-        lock (_gate)
-        {
-            if (_flushWaiters.Count > 0)
-            {
-                for (var i = _flushWaiters.Count - 1; i >= 0; i--)
-                {
-                    if (_flushWaiters[i].TargetChars > _processedChars)
-                    {
-                        continue;
-                    }
-
-                    (ready ??= []).Add(_flushWaiters[i]);
-                    _flushWaiters.RemoveAt(i);
-                }
-            }
-        }
-
-        if (ready is null)
-        {
-            return;
-        }
-
-        foreach (var waiter in ready)
-        {
-            waiter.Completion.TrySetResult();
-        }
-    }
-
-    private static async Task RunOnUiThreadAsync(Action action)
-    {
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            action();
-            return;
-        }
-
-        await Dispatcher.UIThread.InvokeAsync(action, DispatcherPriority.Background).GetTask().ConfigureAwait(false);
-    }
-
-    private sealed record FlushWaiter(int TargetChars, TaskCompletionSource Completion);
-
-    private sealed record WindowUpdate(
-        int Version,
-        PuraDocument Committed,
-        PuraDocument? Tail,
-        int TextLength,
-        int CommittedOffset,
-        bool TailPaused);
+        PuraStreamingState.Completed => ArcMarkdownStreamingState.Completed,
+        PuraStreamingState.Aborted or PuraStreamingState.Faulted => ArcMarkdownStreamingState.Aborted,
+        PuraStreamingState.Created => ArcMarkdownStreamingState.Created,
+        _ => ArcMarkdownStreamingState.Streaming,
+    };
 }
-

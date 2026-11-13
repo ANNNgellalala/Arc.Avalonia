@@ -118,6 +118,23 @@ function Get-DepsPolicyVerdict {
                 }
                 return [pscustomobject]@{ allowed = $false; category = 'scope'; kind = 'agent-chat-bridge-outside-scope'; reason = 'PuraMarkdown.Agent 只允许 Arc.Avalonia.Chat / Arc.Avalonia.Agent 直接 PackageReference（ADR 0007）' }
             }
+            'markdownUiEngine' {
+                # ADR 0008 有范围例外：只校验“直接 PackageReference”（Markdown/Chat/Agent）。
+                # 经 Markdown/Chat/Agent 链条传递到 Theme/Meta/All 的 PuraMarkdown.UI 属正常闭包。
+                if (-not $IsDirectPackage) {
+                    return [pscustomobject]@{ allowed = $true; category = 'markdown-ui-engine-transitive'; kind = ''; reason = 'PuraMarkdown.UI 传递依赖；直接引用范围由 markdownUiEngine 校验' }
+                }
+                $allowed = $false
+                if ($null -ne $entry.PSObject.Properties['allowedProjects']) {
+                    foreach ($pattern in @($entry.allowedProjects)) {
+                        if (Test-GatesGlobMatch -Name $ProjectRel -Pattern ([string]$pattern)) { $allowed = $true; break }
+                    }
+                }
+                if ($allowed) {
+                    return [pscustomobject]@{ allowed = $true; category = 'markdown-ui-engine'; kind = ''; reason = 'ADR 0008 有范围例外：Markdown/Chat/Agent 直接引用 PuraMarkdown.UI' }
+                }
+                return [pscustomobject]@{ allowed = $false; category = 'scope'; kind = 'markdown-ui-engine-outside-scope'; reason = 'PuraMarkdown.UI 只允许 Arc.Avalonia.Markdown / Arc.Avalonia.Chat / Arc.Avalonia.Agent 直接 PackageReference（ADR 0008）' }
+            }
             default {
                 return [pscustomobject]@{ allowed = $true; category = 'direct'; kind = ''; reason = '官方直接依赖' }
             }
@@ -675,6 +692,7 @@ if ($buildOnlySeen.Count -gt 0) {
 }
 $rule.notes.Add('节点键 = csproj PackageId（缺省 AssemblyName，再缺省工程名）；libraries[].path 按 NuGet 语义相对工程目录解析。')
 $rule.notes.Add('agentChatBridge（PuraMarkdown.Agent）只校验 csproj 的直接 PackageReference；经 Chat/Agent 传递到 Theme/Meta/All 的依赖走 allowedTransitive 白名单。')
+$rule.notes.Add('markdownUiEngine（PuraMarkdown.UI）同样只校验直接 PackageReference：Markdown/Chat/Agent 可直接引用，其它包经它们传递获得；越界即 markdown-ui-engine-outside-scope 红项（ADR 0008）。')
 $rule.notes.Add("R3 当前无 known-red 基线：任何命中都是新增违规，必须修。")
 $report.notes.Add('Apps 与发布库共用同一策略；Avalonia.Desktop 只在 -IncludeApps 扫描 src/Apps 时判定为应用专用合法。')
 $report.notes.Add('SelfTest: pwsh -NoProfile tools/check-deps.ps1 -SelfTest')

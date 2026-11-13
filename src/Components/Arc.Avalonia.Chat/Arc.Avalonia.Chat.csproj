@@ -3,6 +3,9 @@
     L2 Chat family (ADR 0007): the chat surface is a thin Arc wrapper over PuraMarkdown.Agent's
     PuraChatView/PuraChatMessage (Markdown, pura-agent components and streaming all live upstream);
     Arc supplies the token-derived theme mapping (ArcChatThemeAdapter) and the composer input surface.
+    PuraMarkdown 0.2 split the render engine out of PuraMarkdown.Agent: PuraMarkdownOptions/PuraTheme/
+    PuraStreamingSession/ILinkHandler now live in PuraMarkdown.UI, which Chat therefore references
+    explicitly too (it uses those types directly; the Agent package re-exports nothing).
   -->
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Chat</RootNamespace>
@@ -17,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="PuraMarkdown.Agent" />
+    <PackageReference Include="PuraMarkdown.UI" />
   </ItemGroup>
 
   <ItemGroup>

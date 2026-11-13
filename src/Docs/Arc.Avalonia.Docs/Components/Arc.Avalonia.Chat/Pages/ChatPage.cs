@@ -7,6 +7,7 @@ using Arc.Avalonia.Chat;
 using Arc.Avalonia.Controls;
 using Arc.Avalonia.Demo;
 using PuraMarkdown.Agent;
+using PuraMarkdown.UI;
 using PuraMarkdown.Agent.Chat;
 
 namespace Arc.Avalonia.Chat.Pages;

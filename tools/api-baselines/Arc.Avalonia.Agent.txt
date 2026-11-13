@@ -90,8 +90,8 @@
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentWorkspaceChangedEventArgs> Changed
   event System.EventHandler<Arc.Avalonia.Agent.ArcAgentWorkspaceChangedEventArgs> Changed
   event System.EventHandler<Arc.Avalonia.Agent.ArcApprovalDecision> DecisionRequested
-  event System.EventHandler<PuraMarkdown.Agent.PuraInteractionEventArgs> InteractionOccurred
-  event System.EventHandler<PuraMarkdown.Agent.Rendering.PuraWarningEventArgs> Warning
+  event System.EventHandler<PuraMarkdown.UI.PuraInteractionEventArgs> InteractionOccurred
+  event System.EventHandler<PuraMarkdown.UI.Rendering.PuraWarningEventArgs> Warning
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Agent.ArcAgentChangeKind EventApplied
   field static Arc.Avalonia.Agent.ArcAgentChangeKind PhaseChanged
@@ -193,7 +193,7 @@
   field static Avalonia.Interactivity.RoutedEvent<Arc.Avalonia.Agent.ArcAgentToolRetryEventArgs> RetryRequestedEvent
   field static Avalonia.StyledProperty<Arc.Avalonia.Agent.IArcAgentSession> SessionProperty
   field static Avalonia.StyledProperty<Arc.Avalonia.Agent.IArcAgentWorkspace> WorkspaceProperty
-  field static Avalonia.StyledProperty<PuraMarkdown.Agent.PuraMarkdownOptions> MarkdownOptionsProperty
+  field static Avalonia.StyledProperty<PuraMarkdown.UI.PuraMarkdownOptions> MarkdownOptionsProperty
   field static Avalonia.StyledProperty<System.Boolean> ShowHeaderProperty
   field static Avalonia.StyledProperty<System.String> EmptyTextProperty
   field static Avalonia.StyledProperty<System.String> TitleProperty
@@ -690,7 +690,7 @@
   property Arc.Avalonia.Chat.ArcChatComposer Composer {get}
   property Arc.Avalonia.Chat.ArcChatView Chat {get}
   property PuraMarkdown.Agent.Chat.PuraChatMessageStatus Status {get;set}
-  property PuraMarkdown.Agent.PuraMarkdownOptions MarkdownOptions {get;set}
+  property PuraMarkdown.UI.PuraMarkdownOptions MarkdownOptions {get;set}
   property System.Boolean AfterCurrentStep {get;set}
   property System.Boolean AllowFreeText {get;set}
   property System.Boolean Approved {get;set}

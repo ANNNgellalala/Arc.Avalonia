@@ -8,7 +8,9 @@
       1. 包集合：恰好是「所有 IsPackable=true 的 csproj」推导出的包（含 2 个 meta：Arc.Avalonia / Arc.Avalonia.All），
          不得出现 Docs/Abstractions/Gallery/samples/POC 包；
       2. 依赖：只允许 Avalonia 官方包（Avalonia/Avalonia.Themes.Fluent/Avalonia.Fonts.Inter）
-         与 Arc.Avalonia.* 包；Arc 依赖版本必须是同一 lockstep 版本；禁止 third-party 与 Docs 依赖；
+         与 Arc.Avalonia.* 包；第三方例外仅 ADR 0006/0007/0008 的 PuraMarkdown.Core/Markdig
+         （Markdown）与 PuraMarkdown.UI（Markdown/Chat/Agent）、PuraMarkdown.Agent（Chat/Agent）；
+         Arc 依赖版本必须是同一 lockstep 版本；禁止其他 third-party 与 Docs 依赖；
       3. 内容：非 meta 包必须有 lib/net10.0/<AssemblyName>.dll 与同名 .xml；
          任何包都不得含 Pages/、Docs/、demo PNG 或其他页面资源；
       4. 许可：LICENSE、README.md、THIRD-PARTY-NOTICES.md 位于包根，nuspec 声明 license=file LICENSE、
@@ -57,10 +59,12 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 # shape check below; they are not expected to aggregate the Feature packages.
 # ---------------------------------------------------------------------------
 $allowedExternal = @('Avalonia', 'Avalonia.Themes.Fluent', 'Avalonia.Fonts.Inter', 'Avalonia.Controls.DataGrid', 'PuraMarkdown.Core', 'Markdig')
-# 按包放行的外部依赖（ADR 0007）：PuraMarkdown.Agent 只允许 Chat/Agent 声明；Markdown 仍只有 Core+Markdig。
+# 按包放行的外部依赖（ADR 0007 + ADR 0008）：PuraMarkdown.UI 是 0.2 拆出的 Markdown 控件/渲染引擎，
+# Markdown 委托它渲染，Chat/Agent 直接消费其类型；PuraMarkdown.Agent 仍只允许 Chat/Agent 声明。
 $allowedExternalByPackage = @{
-    'Arc.Avalonia.Chat'  = @('PuraMarkdown.Agent')
-    'Arc.Avalonia.Agent' = @('PuraMarkdown.Agent')
+    'Arc.Avalonia.Markdown' = @('PuraMarkdown.UI')
+    'Arc.Avalonia.Chat'     = @('PuraMarkdown.Agent', 'PuraMarkdown.UI')
+    'Arc.Avalonia.Agent'    = @('PuraMarkdown.Agent', 'PuraMarkdown.UI')
 }
 
 # Layer families the meta packages must aggregate (dependency-shape contract for Arc.Avalonia / .All).
@@ -362,7 +366,7 @@ $report = [ordered]@{
     expectedVersion = $ExpectedVersion
     rules       = @([ordered]@{
             id            = 'R5'
-            title         = '包产物不含 Pages/Docs/demo，依赖仅 Avalonia 官方包与 lockstep Arc 包'
+            title         = '包产物不含 Pages/Docs/demo，依赖仅 Avalonia 官方包、lockstep Arc 包与 ADR 白名单的 PuraMarkdown 包'
             status        = $status
             checked       = $rows.Count
             newViolations = $issues.Count

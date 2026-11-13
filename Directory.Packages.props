@@ -3,8 +3,12 @@
     M1-T4: NuGet central package management (CPM). Versions live here, csproj files only declare
     <PackageReference Include="..." />. Keep this list to Avalonia's official packages - the dependency
     policy (tools/deps-policy.json) and tools/check-package.ps1 fail the build on anything else.
-    The only exception is the Markdown family: PuraMarkdown.Core (parser facade, no Avalonia) and its
-    Markdig dependency are allowed in src/Components/Arc.Avalonia.Markdown only (ADR 0006).
+    The only exception is the PuraMarkdown family (all MIT, version 0.2.0-alpha.1, local sibling feed):
+      * PuraMarkdown.Core (parser facade, no Avalonia) + its Markdig dependency: Arc.Avalonia.Markdown (ADR 0006);
+      * PuraMarkdown.UI (Avalonia controls/render engine/skin contracts): Arc.Avalonia.Markdown delegates
+        rendering to it (ADR 0008) and Chat/Agent consume its types directly (ADR 0007);
+      * PuraMarkdown.Agent (Agent/Chat/Testing extensions): Arc.Avalonia.Chat / Arc.Avalonia.Agent (ADR 0007);
+      * PuraMarkdown.Extension is NOT referenced by Arc.
 
     POC projects pin their own experiment versions, so poc/Directory.Packages.props opts them out.
   -->
@@ -23,11 +27,14 @@
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
     <!-- M2-G4: Agent 边界检查（仅 analyzer，PrivateAssets=all）。本地缓存有 3.3.2 / 5.4.0-beta。 -->
     <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.2" />
-    <!-- Markdown 组件族：PuraMarkdown 语法层 + 其 Markdig 解析依赖（ADR 0006）。
-         PuraMarkdown.Core 只依赖 Markdig、不依赖 Avalonia；渲染全部由 Arc 实现。 -->
-    <PackageVersion Include="PuraMarkdown.Core" Version="0.1.0-alpha.1" />
-    <!-- Agent/Chat rendering engine: UI controls for markdown, chat and pura-agent components. Allowed only in Arc.Avalonia.Chat / Arc.Avalonia.Agent (ADR 0007). -->
-    <PackageVersion Include="PuraMarkdown.Agent" Version="0.1.0-alpha.1" />
+    <!-- Markdown 语法层（ADR 0006）：Markdig 解析、PuraDocument、大纲、诊断、流式扫描；无 Avalonia。 -->
+    <PackageVersion Include="PuraMarkdown.Core" Version="0.2.0-alpha.1" />
+    <!-- Markdown 控件/渲染引擎（ADR 0008）：PuraMarkdownView + 增量流式 + 块级虚拟化 + 换肤扩展契约。
+         直接引用范围：Arc.Avalonia.Markdown（委托渲染）、Arc.Avalonia.Chat / Arc.Avalonia.Agent（消费类型）。 -->
+    <PackageVersion Include="PuraMarkdown.UI" Version="0.2.0-alpha.1" />
+    <!-- Agent/Chat rendering engine: Agent 组件/工具卡/Chat 视图（依赖 PuraMarkdown.UI）。
+         直接引用范围：Arc.Avalonia.Chat / Arc.Avalonia.Agent（ADR 0007）。 -->
+    <PackageVersion Include="PuraMarkdown.Agent" Version="0.2.0-alpha.1" />
     <PackageVersion Include="Markdig" Version="1.5.1" />
   </ItemGroup>
 </Project>

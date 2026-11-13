@@ -8,6 +8,8 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using PuraMarkdown.Core.Security;
 using PuraMarkdown.Core;
+using PuraMarkdown.UI;
+using PuraMarkdown.UI.Rendering;
 
 namespace Arc.Avalonia.Markdown;
 
@@ -79,6 +81,11 @@ public sealed class ArcMarkdownPipeline
     /// <summary>Names of registered plugins, in registration order.</summary>
     public IReadOnlyList<string> PluginNames { get; }
 
+    /// <summary>PuraMarkdown.UI engine pipeline: Arc renderers are adapted into it as node renderers.</summary>
+    internal PuraPipeline PuraPipeline { get; private set; } = null!;
+
+    internal void SetPuraPipeline(PuraPipeline pipeline) => PuraPipeline = pipeline;
+
     /// <summary>The default CommonMark + GFM pipeline with every built-in Arc renderer.</summary>
     public static ArcMarkdownPipeline Default { get; } = new ArcMarkdownPipelineBuilder()
         .UseCommonMark()
@@ -99,8 +106,8 @@ public sealed class ArcMarkdownRendererRegistry
         IArcMarkdownNodeRenderer fallback)
     {
         _fallback = fallback;
-        _nodes = nodes.OrderByDescending(entry => entry.Priority).ToList();
-        _fences = fences.OrderByDescending(entry => entry.Priority).ToList();
+        _nodes = nodes.OrderByDescending(entry => entry.Item2).ToList();
+        _fences = fences.OrderByDescending(entry => entry.Item2).ToList();
     }
 
     /// <summary>Renderers applicable to <paramref name="node"/>, highest priority first (capped).</summary>
@@ -147,6 +154,7 @@ public sealed class ArcMarkdownRendererRegistry
 public sealed class ArcMarkdownPipelineBuilder
 {
     private readonly PuraSyntaxBuilder _syntax = new();
+    private readonly PuraPipelineBuilder _pura = new();
     private readonly List<(IArcMarkdownNodeRenderer Renderer, int Priority)> _nodes = [];
     private readonly List<(IArcMarkdownFenceRenderer Renderer, int Priority)> _fences = [];
     private readonly List<IArcMarkdownPlugin> _plugins = [];
@@ -157,6 +165,7 @@ public sealed class ArcMarkdownPipelineBuilder
     public ArcMarkdownPipelineBuilder UseCommonMark()
     {
         _syntax.UseCommonMark();
+        _pura.UseCommonMark();
         return this;
     }
 
@@ -168,6 +177,8 @@ public sealed class ArcMarkdownPipelineBuilder
         // 下载页：https://… keeps the URL as plain text. The extra parser accepts CJK punctuation
         // boundaries and emits the same AutolinkInline nodes; hosts no longer need to pre-process URLs.
         _syntax.UseBareUrlAutolinks();
+        _pura.UseGfm();
+        _pura.UseMarkdownExtension(BareUrlAutolinks.Extension);
         return this;
     }
 
@@ -175,6 +186,7 @@ public sealed class ArcMarkdownPipelineBuilder
     public ArcMarkdownPipelineBuilder UseMarkdownExtension(IMarkdownExtension extension)
     {
         _syntax.UseMarkdownExtension(extension);
+        _pura.UseMarkdownExtension(extension);
         return this;
     }
 
@@ -182,6 +194,7 @@ public sealed class ArcMarkdownPipelineBuilder
     public ArcMarkdownPipelineBuilder UseSanitizer(IAstSanitizer sanitizer)
     {
         _syntax.UseSanitizer(sanitizer);
+        _pura.UseSanitizer(sanitizer);
         return this;
     }
 
@@ -252,11 +265,27 @@ public sealed class ArcMarkdownPipelineBuilder
         var nodes = new List<(IArcMarkdownNodeRenderer, int)>(_nodes);
         var fences = new List<(IArcMarkdownFenceRenderer, int)>(_fences);
         var fallback = ArcMarkdownDefaults.Register(nodes, fences);
-        return new ArcMarkdownPipeline(
+        var registry = new ArcMarkdownRendererRegistry(nodes, fences, fallback);
+        var pipeline = new ArcMarkdownPipeline(
             _syntax.Build(),
-            new ArcMarkdownRendererRegistry(nodes, fences, fallback),
+            registry,
             _highlighter,
             _plugins.Select(plugin => plugin.Name).ToArray());
+
+        // 0.2：Arc renderer pipeline 作为 PuraMarkdown.UI 引擎的 node renderer 运行。
+        // 优先级偏移到内置默认渲染器（0）之上；同一 priority 内按 Arc 原顺序（高优先在前）保持。
+        var ordered = nodes
+            .OrderByDescending(entry => entry.Item2)
+            .ToList();
+        for (var index = 0; index < ordered.Count; index++)
+        {
+            _pura.UseRenderer(
+                new ArcNodeRendererAdapter(registry, ordered[index].Item1, pipeline),
+                10_000 - index);
+        }
+
+        pipeline.SetPuraPipeline(_pura.Build());
+        return pipeline;
     }
 }
 

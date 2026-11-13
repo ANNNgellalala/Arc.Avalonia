@@ -1,37 +1,41 @@
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Layout;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using PuraMarkdown.Core;
+using PuraMarkdown.Core.Security;
+using PuraMarkdown.UI;
+using PuraMarkdown.UI.Engine;
+using PuraMarkdown.UI.Rendering;
 
 namespace Arc.Avalonia.Markdown;
 
 /// <summary>
-/// The Arc Markdown document view: parses Markdown with the PuraMarkdown syntax layer and renders it
-/// with Arc controls and tokens. Supports full documents, pre-parsed documents, append-only streaming
-/// sessions, outline/anchor navigation, selection and copy, and agent-component interaction state.
+/// The Arc Markdown document view. 0.2 delegates parsing, rendering engine, streaming, virtualization and
+/// scroll-follow behaviour to <see cref="PuraMarkdownView"/> (PuraMarkdown.UI); Arc keeps its own renderer
+/// pipeline (registered as node renderers through <see cref="ArcMarkdownPipeline"/>), Arc tokens/theme and
+/// the public Arc surface (events, outline, blocks, interaction state, copy/announce).
 /// </summary>
 [TemplatePart("PART_Scroll", typeof(ScrollViewer))]
 [TemplatePart("PART_Host", typeof(Panel))]
 public partial class ArcMarkdownView : TemplatedControl, IDisposable
 {
+    /// <summary><see cref="Markdown"/> 样式属性。</summary>
     public static readonly StyledProperty<string> MarkdownProperty =
         AvaloniaProperty.Register<ArcMarkdownView, string>(nameof(Markdown), string.Empty);
 
+    /// <summary><see cref="Options"/> 样式属性。</summary>
     public static readonly StyledProperty<ArcMarkdownOptions?> OptionsProperty =
         AvaloniaProperty.Register<ArcMarkdownView, ArcMarkdownOptions?>(nameof(Options));
 
-    private readonly List<(MarkdownObject Node, Control Control)> _committed = [];
-    private readonly List<(MarkdownObject Node, Control Control)> _tailControls = [];
-    private readonly Dictionary<string, Control> _anchors = new(StringComparer.Ordinal);
+    private readonly PuraMarkdownView _engine;
     private readonly Dictionary<string, ArcMarkdownInteraction> _interactionStates = new(StringComparer.Ordinal);
 
     private ScrollViewer? _scroll;
@@ -41,17 +45,24 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     private string? _plainText;
     private bool _subscribedToTheme;
     private bool _disposed;
-
-    // Touch follow-mode: a drag pauses streaming auto-scroll (mirrors the chat transcript behaviour).
-    private const double DragSlop = 8;
-    private Point _pointerOrigin;
-    private bool _pointerPressed;
-    private bool _userPausedFollow;
+    private int _version;
+    private bool _updatingOptions;
 
     static ArcMarkdownView()
     {
-        MarkdownProperty.Changed.AddClassHandler<ArcMarkdownView>((view, _) => view.Render());
-        OptionsProperty.Changed.AddClassHandler<ArcMarkdownView>((view, _) => view.Render());
+        MarkdownProperty.Changed.AddClassHandler<ArcMarkdownView>((view, _) => view.OnMarkdownChanged());
+        OptionsProperty.Changed.AddClassHandler<ArcMarkdownView>((view, _) => view.OnOptionsChanged());
+    }
+
+    /// <summary>Creates the view.</summary>
+    public ArcMarkdownView()
+    {
+        _engine = new PuraMarkdownView();
+        _engine.Warning += OnEngineWarning;
+        _engine.LinkClicked += OnEngineLinkClicked;
+        _engine.InteractionOccurred += OnEngineInteraction;
+        _engine.Announced += (_, text) => Announced?.Invoke(this, text);
+        _engine.RenderCompleted += OnEngineRenderCompleted;
     }
 
     /// <summary>Markdown source. Setting it re-renders the whole document.</summary>
@@ -107,11 +118,12 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     /// <summary>Top-level block metadata of the last render.</summary>
     public IReadOnlyList<ArcMarkdownBlockInfo> Blocks { get; private set; } = Array.Empty<ArcMarkdownBlockInfo>();
 
-    /// <summary>Outline (headings and fold ranges) of the last parsed document.</summary>
-    public PuraOutline? Outline => _document?.Outline;
+    /// <summary>Outline (headings and fold ranges) of the last rendered document.</summary>
+    public PuraOutline? Outline => _document?.Outline ?? _engine.Document?.Outline;
 
     /// <summary>Diagnostics produced by the syntax sanitizer.</summary>
-    public IReadOnlyList<PuraDiagnostic> Diagnostics => _document?.Diagnostics ?? Array.Empty<PuraDiagnostic>();
+    public IReadOnlyList<PuraDiagnostic> Diagnostics
+        => _document?.Diagnostics ?? _engine.Document?.Diagnostics ?? Array.Empty<PuraDiagnostic>();
 
     /// <summary>Currently active streaming session, if any.</summary>
     public ArcMarkdownStreamingSession? ActiveSession => _activeSession;
@@ -125,65 +137,105 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     /// <summary>Current options (never null).</summary>
     public ArcMarkdownOptions CurrentOptions => Options ?? ArcMarkdownOptions.Default;
 
-    /// <summary>Scroll viewer hosting the blocks.</summary>
+    /// <summary>Scroll viewer hosting the document.</summary>
     public ScrollViewer? ScrollViewer => _scroll;
 
-    /// <summary>Re-renders the current <see cref="Markdown"/>.</summary>
+    /// <summary>Internal snapshot used by the Pura bridge (renderers read persisted component state).</summary>
+    internal IReadOnlyDictionary<string, ArcMarkdownInteraction> InteractionStatesSnapshot => _interactionStates;
+
+    /// <summary>Re-renders the current <see cref="Markdown"/> (synchronous).</summary>
     public void Render()
     {
-        if (_host is null)
-        {
-            return;
-        }
-
-        var options = CurrentOptions;
-        var text = Markdown ?? string.Empty;
-        var document = options.Pipeline.Syntax.ParseDocument(text, NextVersion(), SyntaxOptions(options));
-        RenderDocument(document, isStreaming: false);
+        EnsureEngineOptions();
+        _engine.Render();
+        AdoptEngineDocument();
     }
 
     /// <summary>Renders an already parsed document without re-parsing.</summary>
+    /// <param name="document">Parsed PuraMarkdown syntax document.</param>
     public void RenderDocument(PuraDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
-        RenderDocument(document, isStreaming: false);
+        EnsureEngineOptions();
+        _engine.RenderDocument(document);
+        _document = document;
+        _plainText = null;
+        UpdateBlocksFromEngine();
     }
 
     /// <summary>Starts an append-only streaming session.</summary>
+    /// <param name="options">Streaming options.</param>
+    /// <returns>The Arc streaming session wrapper.</returns>
     public ArcMarkdownStreamingSession BeginStreaming(ArcMarkdownStreamingOptions? options = null)
     {
-        AbortStreaming();
-        _activeSession = new ArcMarkdownStreamingSession(this, options ?? new ArcMarkdownStreamingOptions());
+        if (_activeSession is { State: ArcMarkdownStreamingState.Streaming })
+        {
+            throw new InvalidOperationException("已有进行中的流式会话");
+        }
+
+        var streamingOptions = options ?? new ArcMarkdownStreamingOptions();
+        EnsureEngineOptions();
+        var inner = _engine.BeginStreaming(MapStreamingOptions(streamingOptions));
+        _activeSession = new ArcMarkdownStreamingSession(this, inner, streamingOptions);
         return _activeSession;
     }
 
-    /// <summary>Aborts the active session, keeping the text received so far.</summary>
+    /// <summary>Aborts the active streaming session, keeping the partial document.</summary>
     public void AbortStreaming()
     {
-        var session = _activeSession;
-        _activeSession = null;
-        if (session is { State: ArcMarkdownStreamingState.Streaming })
+        if (_activeSession is { State: ArcMarkdownStreamingState.Streaming } session)
         {
-            session.AbortSilently();
+            _ = session.AbortAsync();
         }
     }
 
-    /// <summary>Refreshes tokens and re-renders (call after a theme or accent change).</summary>
+    /// <summary>Refreshes Arc tokens and re-renders.</summary>
     public void RefreshTheme()
     {
         ArcMarkdownStyle.Current = new ArcMarkdownStyle();
+        _engine.RefreshTheme();
+        RebuildEngineOptions();
         Render();
     }
 
-    /// <summary>Parses the text once without rendering, warming fonts and JIT paths.</summary>
+    /// <summary>Warms the render path with representative Markdown.</summary>
+    /// <param name="markdown">Markdown used for warming.</param>
     public void Prewarm(string markdown)
-        => CurrentOptions.Pipeline.Syntax.ParseDocument(markdown ?? string.Empty, NextVersion(), SyntaxOptions(CurrentOptions));
+    {
+        EnsureEngineOptions();
+        _engine.Prewarm(markdown);
+    }
 
     /// <summary>Returns the outline headings.</summary>
+    /// <returns>Headings in document order.</returns>
     public IReadOnlyList<PuraHeading> GetOutline()
-        => _document?.Outline.Headings ?? Array.Empty<PuraHeading>();
+    {
+        var document = _document ?? _engine.Document;
+        if (document is not null)
+        {
+            return document.Outline.Headings;
+        }
 
-    /// <summary>Extracts the plain text of the current document.</summary>
+        var text = GetPlainText();
+        if (string.IsNullOrEmpty(text))
+        {
+            return Array.Empty<PuraHeading>();
+        }
+
+        try
+        {
+            return CurrentOptions.Pipeline.Syntax
+                .ParseDocument(text, NextVersion(), SyntaxOptions(CurrentOptions))
+                .Outline.Headings;
+        }
+        catch
+        {
+            return Array.Empty<PuraHeading>();
+        }
+    }
+
+    /// <summary>Returns the plain text of the current content.</summary>
+    /// <returns>Plain text without Markdown markers.</returns>
     public string GetPlainText()
     {
         if (_plainText is not null)
@@ -191,13 +243,19 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
             return _plainText;
         }
 
-        if (_document is null)
+        var document = _document ?? _engine.Document;
+        if (document is null)
         {
-            return Markdown ?? string.Empty;
+            if (_activeSession is not null)
+            {
+                return _activeSession.CurrentText;
+            }
+
+            return _engine.GetPlainText();
         }
 
         var builder = new StringBuilder();
-        foreach (var block in _document.Markdown)
+        foreach (var block in document.Markdown)
         {
             AppendBlockText(block, builder);
         }
@@ -206,7 +264,8 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         return _plainText;
     }
 
-    /// <summary>Copies the plain text of the document to the clipboard.</summary>
+    /// <summary>Copies the plain text to the Arc clipboard (and the top-level clipboard when default).</summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task CopyAllAsync(CancellationToken cancellationToken = default)
     {
         var text = GetPlainText();
@@ -226,43 +285,50 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         }
     }
 
-    /// <summary>Scrolls the heading with the given outline anchor into view.</summary>
+    /// <summary>Scrolls the given heading anchor into view.</summary>
+    /// <param name="anchor">Anchor text, with or without a leading <c>#</c>.</param>
+    /// <returns>True when a target was found and scrolled.</returns>
     public bool ScrollToAnchor(string anchor)
     {
-        if (!_anchors.TryGetValue(anchor, out var control))
+        if (string.IsNullOrWhiteSpace(anchor))
         {
             return false;
         }
 
-        control.BringIntoView();
-        return true;
+        return _engine.ScrollToAnchor(anchor.TrimStart('#'));
     }
 
-    /// <summary>Scrolls to the end (streaming follow mode).</summary>
+    /// <summary>Scrolls to the end of the document (outer Arc scroll host).</summary>
     public void ScrollToEnd()
     {
-        if (_scroll is not null)
-        {
-            _scroll.Offset = new Vector(_scroll.Offset.X, _scroll.Extent.Height);
-        }
+        _scroll?.ScrollToEnd();
     }
 
-    /// <summary>Stores an agent interaction for re-render/virtualization restore.</summary>
+    /// <summary>Stores an interaction state for re-render/virtualization restore.</summary>
+    /// <param name="interaction">Interaction record.</param>
     public void SetInteractionState(ArcMarkdownInteraction interaction)
-        => _interactionStates[interaction.ComponentId] = interaction;
+    {
+        ArgumentNullException.ThrowIfNull(interaction);
+        _interactionStates[interaction.ComponentId] = interaction;
+    }
 
-    /// <summary>Applies a set of stored interactions.</summary>
+    /// <summary>Applies stored interaction states and re-renders.</summary>
+    /// <param name="states">Interaction records.</param>
     public void ApplyInteractionStates(IEnumerable<ArcMarkdownInteraction> states)
     {
+        ArgumentNullException.ThrowIfNull(states);
         foreach (var state in states)
         {
             _interactionStates[state.ComponentId] = state;
         }
 
-        Render();
+        if (!string.IsNullOrWhiteSpace(Markdown))
+        {
+            Render();
+        }
     }
 
-    /// <summary>Clears stored interactions.</summary>
+    /// <summary>Clears stored interaction states and re-renders.</summary>
     public void ClearInteractionStates()
     {
         if (_interactionStates.Count == 0)
@@ -271,10 +337,14 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         }
 
         _interactionStates.Clear();
-        Render();
+        if (!string.IsNullOrWhiteSpace(Markdown))
+        {
+            Render();
+        }
     }
 
-    /// <summary>Announces a message to assistive technology.</summary>
+    /// <summary>Raises an accessibility announcement.</summary>
+    /// <param name="message">Announcement text.</param>
     public void Announce(string message) => Announced?.Invoke(this, message);
 
     /// <inheritdoc />
@@ -295,7 +365,18 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
             _scroll.ScrollChanged += OnScrollChanged;
         }
 
-        Render();
+        if (_host is not null)
+        {
+            _host.Children.Clear();
+            _host.Children.Add(_engine);
+            _engine.HorizontalAlignment = HorizontalAlignment.Stretch;
+        }
+
+        RebuildEngineOptions();
+        if (!string.IsNullOrEmpty(Markdown))
+        {
+            _engine.Markdown = Markdown;
+        }
     }
 
     /// <inheritdoc />
@@ -330,12 +411,10 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     /// <inheritdoc />
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        // Wheel is not a touch gesture: it is a helpful extra signal, never the only one. In Avalonia
-        // Delta.Y > 0 scrolls up, i.e. away from the streaming end, so that direction pauses follow.
         base.OnPointerWheelChanged(e);
         if (e.Delta.Y > 0)
         {
-            PauseFollow();
+            _userPausedFollow = true;
         }
         else if (e.Delta.Y < 0)
         {
@@ -344,27 +423,286 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     }
 
     /// <inheritdoc />
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    public void Dispose()
     {
-        base.OnPointerPressed(e);
-        _pointerPressed = true;
-        _pointerOrigin = e.GetPosition(this);
-    }
-
-    /// <inheritdoc />
-    protected override void OnPointerMoved(PointerEventArgs e)
-    {
-        base.OnPointerMoved(e);
-        if (!_pointerPressed)
+        if (_disposed)
         {
             return;
         }
 
-        var position = e.GetPosition(this);
-        if (Math.Abs(position.X - _pointerOrigin.X) > DragSlop || Math.Abs(position.Y - _pointerOrigin.Y) > DragSlop)
+        _disposed = true;
+        if (_activeSession is not null)
         {
-            PauseFollow();
+            _ = _activeSession.DisposeAsync();
+            _activeSession = null;
         }
+
+        _engine.Dispose();
+        DetachThemeHandler();
+        GC.SuppressFinalize(this);
+    }
+
+    internal static PuraSyntaxOptions SyntaxOptions(ArcMarkdownOptions options)
+        => options.Pipeline.Syntax.CreateOptions(options.Limits, options.UrlPolicy);
+
+    internal int NextVersion() => ++_version;
+
+    /// <summary>Called by the streaming wrapper when the stream completes/aborts.</summary>
+    /// <param name="text">Final streamed text.</param>
+    internal void AdoptStreamedText(string text)
+    {
+        try
+        {
+            _document = CurrentOptions.Pipeline.Syntax.ParseDocument(text, NextVersion(), SyntaxOptions(CurrentOptions));
+        }
+        catch
+        {
+            _document = null;
+        }
+
+        _plainText = null;
+        UpdateBlocksFromEngine();
+    }
+
+    internal void RaiseArcInteraction(ArcMarkdownInteraction interaction)
+    {
+        if (!CurrentOptions.InteractionEnabled)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(interaction.ComponentId))
+        {
+            _interactionStates[interaction.ComponentId] = interaction;
+        }
+
+        RaiseEvent(new ArcMarkdownInteractionEventArgs(interaction)
+        {
+            RoutedEvent = InteractionOccurredEvent,
+            Source = this,
+        });
+    }
+
+    internal void RaiseArcWarning(ArcMarkdownWarning warning)
+    {
+        RaiseEvent(new ArcMarkdownWarningEventArgs(warning)
+        {
+            RoutedEvent = WarningEvent,
+            Source = this,
+        });
+    }
+
+    internal void HandleArcLinkClick(ArcMarkdownLinkClick click)
+    {
+        var args = new ArcMarkdownLinkClickedEventArgs(click.Url, click.Text)
+        {
+            RoutedEvent = LinkClickedEvent,
+            Source = this,
+        };
+        RaiseEvent(args);
+        click.Handled = args.HandledByHost;
+        if (!click.Handled && TryNavigateFragment(click.Url))
+        {
+            click.Handled = true;
+        }
+    }
+
+    private void OnMarkdownChanged()
+    {
+        _plainText = null;
+        EnsureEngineOptions();
+        _engine.Markdown = Markdown ?? string.Empty;
+        AdoptEngineDocument();
+    }
+
+    private void OnOptionsChanged()
+    {
+        if (_updatingOptions)
+        {
+            return;
+        }
+
+        RebuildEngineOptions();
+        if (!string.IsNullOrEmpty(Markdown))
+        {
+            _engine.Markdown = Markdown;
+        }
+    }
+
+    private void EnsureEngineOptions()
+    {
+        if (_engine.Options is null)
+        {
+            RebuildEngineOptions();
+        }
+    }
+
+    private void RebuildEngineOptions()
+    {
+        var arcOptions = CurrentOptions;
+        var state = new ArcMarkdownHostState
+        {
+            Options = arcOptions,
+            Pipeline = arcOptions.Pipeline,
+            View = this,
+        };
+        _updatingOptions = true;
+        try
+        {
+            _engine.Options = ArcMarkdownPuraOptions.Create(arcOptions, arcOptions.Pipeline, state);
+        }
+        finally
+        {
+            _updatingOptions = false;
+        }
+    }
+
+    private void OnEngineRenderCompleted(object? sender, PuraRenderCompletedEventArgs e)
+    {
+        AdoptEngineDocument();
+    }
+
+    private void AdoptEngineDocument()
+    {
+        if (_engine.Document is not null)
+        {
+            _document = _engine.Document;
+            _plainText = null;
+            UpdateBlocksFromEngine();
+        }
+    }
+
+    private void UpdateBlocksFromEngine()
+    {
+        var blocks = _engine.Blocks;
+        if (blocks.Count == 0)
+        {
+            if (_document is not null)
+            {
+                var fromDocument = new List<ArcMarkdownBlockInfo>(_document.Markdown.Count);
+                var index = 0;
+                foreach (var node in _document.Markdown)
+                {
+                    fromDocument.Add(new ArcMarkdownBlockInfo(
+                        index++,
+                        node.GetType().Name,
+                        node.Span.Start,
+                        node.Span.End,
+                        node.Line));
+                }
+
+                Blocks = fromDocument;
+            }
+
+            return;
+        }
+
+        var infos = new List<ArcMarkdownBlockInfo>(blocks.Count);
+        foreach (var record in blocks)
+        {
+            infos.Add(new ArcMarkdownBlockInfo(
+                record.Index,
+                record.Node.GetType().Name,
+                record.Start,
+                record.End,
+                record.Node.Line));
+        }
+
+        Blocks = infos;
+    }
+
+    private void OnEngineWarning(object? sender, PuraWarningEventArgs e)
+        => RaiseArcWarning(new ArcMarkdownWarning(
+            e.Warning.Code,
+            e.Warning.Message,
+            e.Warning.NodeType,
+            e.Warning.Renderer));
+
+    private void OnEngineLinkClicked(object? sender, PuraLinkClickedEventArgs e)
+        => HandleArcLinkClick(new ArcMarkdownLinkClick(e.Url, e.Text ?? e.Url));
+
+    private void OnEngineInteraction(object? sender, PuraInteractionEventArgs e)
+    {
+        var interaction = new ArcMarkdownInteraction(
+            e.ComponentType,
+            e.ComponentId ?? string.Empty,
+            e.SelectedIds,
+            e.Confirmed ?? false);
+        RaiseArcInteraction(interaction);
+    }
+
+    private static PuraStreamingOptions MapStreamingOptions(ArcMarkdownStreamingOptions options)
+        => new()
+        {
+            TailWindowChars = options.TailWindowChars,
+            MaxTailChars = options.MaxTailChars,
+            AutoScrollToEnd = options.AutoScrollToEnd,
+            Synchronous = options.Synchronous,
+        };
+
+    private void OnThemeVariantChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshTheme);
+
+    private void DetachThemeHandler()
+    {
+        if (_subscribedToTheme && Application.Current is not null)
+        {
+            Application.Current.ActualThemeVariantChanged -= OnThemeVariantChanged;
+            _subscribedToTheme = false;
+        }
+    }
+
+    private bool TryNavigateFragment(string url)
+    {
+        if (url.Length < 2 || url[0] != '#')
+        {
+            return false;
+        }
+
+        var anchor = Uri.UnescapeDataString(url[1..]);
+        return !string.IsNullOrEmpty(anchor) && ScrollToAnchor(anchor);
+    }
+
+    private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (sender is not ScrollViewer scroll)
+        {
+            return;
+        }
+
+        var maximum = Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height);
+        var distance = maximum - Math.Max(0, scroll.Offset.Y);
+        if (e.OffsetDelta.Y < -0.5)
+        {
+            _userPausedFollow = true;
+        }
+        else if (!_pointerPressed && _userPausedFollow && distance <= 56)
+        {
+            _userPausedFollow = false;
+        }
+    }
+
+    private void ResumeFollowIfNearEnd()
+    {
+        if (!_userPausedFollow || _scroll is null)
+        {
+            return;
+        }
+
+        var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
+        if (maximum - Math.Max(0, _scroll.Offset.Y) <= 56)
+        {
+            _userPausedFollow = false;
+        }
+    }
+
+    private bool _pointerPressed;
+    private bool _userPausedFollow;
+
+    /// <inheritdoc />
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        _pointerPressed = true;
     }
 
     /// <inheritdoc />
@@ -380,317 +718,6 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
     {
         base.OnPointerCaptureLost(e);
         _pointerPressed = false;
-        ResumeFollowIfNearEnd();
-    }
-
-    private void PauseFollow()
-    {
-        _userPausedFollow = true;
-        _activeSession?.NotifyUserScrolled();
-    }
-
-    private void ResumeFollowIfNearEnd()
-    {
-        if (!_userPausedFollow || _scroll is null)
-        {
-            return;
-        }
-
-        var maximum = Math.Max(0, _scroll.Extent.Height - _scroll.Viewport.Height);
-        if (maximum - Math.Max(0, _scroll.Offset.Y) <= 56)
-        {
-            _userPausedFollow = false;
-            _activeSession?.NotifyUserScrolledToEnd();
-        }
-    }
-
-    private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
-    {
-        if (sender is not ScrollViewer scroll)
-        {
-            return;
-        }
-
-        var maximum = Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height);
-        var distance = maximum - Math.Max(0, scroll.Offset.Y);
-
-        // Scrolling up (finger drag or wheel) pauses streaming follow: never yank the reader back down.
-        if (e.OffsetDelta.Y < -0.5)
-        {
-            PauseFollow();
-        }
-        else if (!_pointerPressed && _userPausedFollow && distance <= 56)
-        {
-            _userPausedFollow = false;
-            _activeSession?.NotifyUserScrolledToEnd();
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _disposed = true;
-        AbortStreaming();
-        DetachThemeHandler();
-        GC.SuppressFinalize(this);
-    }
-
-    private void OnThemeVariantChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(RefreshTheme);
-
-    private void DetachThemeHandler()
-    {
-        if (_subscribedToTheme && Application.Current is not null)
-        {
-            Application.Current.ActualThemeVariantChanged -= OnThemeVariantChanged;
-            _subscribedToTheme = false;
-        }
-    }
-
-    internal static PuraSyntaxOptions SyntaxOptions(ArcMarkdownOptions options)
-        => options.Pipeline.Syntax.CreateOptions(options.Limits, options.UrlPolicy);
-
-    internal ArcMarkdownRenderContext CreateContext(PuraDocument document, bool isStreaming, bool isTail)
-        => new()
-        {
-            Options = CurrentOptions,
-            Renderers = CurrentOptions.Pipeline.Renderers,
-            Sanitized = document.Sanitized ?? new PuraMarkdown.Core.Security.SanitizeResult(),
-            Dispatcher = Dispatcher.UIThread,
-            IsStreaming = isStreaming,
-            IsTail = isTail,
-            ComponentStates = _interactionStates,
-            InteractionSink = OnInteraction,
-            WarningSink = warning => RaiseEvent(new ArcMarkdownWarningEventArgs(warning) { RoutedEvent = WarningEvent, Source = this }),
-            LinkClickSink = click =>
-            {
-                var args = new ArcMarkdownLinkClickedEventArgs(click.Url, click.Text) { RoutedEvent = LinkClickedEvent, Source = this };
-                RaiseEvent(args);
-                click.Handled = args.HandledByHost;
-                if (!click.Handled && TryNavigateFragment(click.Url))
-                {
-                    click.Handled = true;
-                }
-            },
-            ImageLoadingSink = _ => { },
-            ImageLoadedSink = (_, _) => { },
-        };
-
-    private void OnInteraction(ArcMarkdownInteraction interaction)
-    {
-        if (!CurrentOptions.InteractionEnabled)
-        {
-            return;
-        }
-
-        _interactionStates[interaction.ComponentId] = interaction;
-        RaiseEvent(new ArcMarkdownInteractionEventArgs(interaction) { RoutedEvent = InteractionOccurredEvent, Source = this });
-    }
-
-    /// <summary>
-    /// In-document links (<c>#anchor</c>) scroll instead of opening the copy/open menu: a browser cannot
-    /// resolve a bare fragment, and the outline already knows where the heading is.
-    /// </summary>
-    private bool TryNavigateFragment(string url)
-    {
-        if (url.Length < 2 || url[0] != '#')
-        {
-            return false;
-        }
-
-        var anchor = Uri.UnescapeDataString(url[1..]);
-        return !string.IsNullOrEmpty(anchor) && ScrollToAnchor(anchor);
-    }
-
-    private void RenderDocument(PuraDocument document, bool isStreaming)
-    {
-        if (_host is null)
-        {
-            _document = document;
-            _plainText = null;
-            return;
-        }
-
-        _host.Children.Clear();
-        _committed.Clear();
-        _tailControls.Clear();
-        _anchors.Clear();
-
-        var context = CreateContext(document, isStreaming, isTail: false);
-        var index = 0;
-        var blocks = new List<ArcMarkdownBlockInfo>(document.Markdown.Count);
-        foreach (var node in document.Markdown)
-        {
-            var control = context.RenderBlock(node);
-            AddBlockControl(node, control);
-            blocks.Add(new ArcMarkdownBlockInfo(index++, node.GetType().Name, node.Span.Start, node.Span.End, node.Line));
-            if (node is HeadingBlock heading)
-            {
-                var anchor = FindAnchor(document, heading);
-                if (anchor is not null)
-                {
-                    _anchors[anchor] = control;
-                }
-            }
-        }
-
-        Blocks = blocks;
-        _document = document;
-        _plainText = null;
-    }
-
-    private void AddBlockControl(MarkdownObject node, Control control)
-    {
-        _host!.Children.Add(control);
-        _committed.Add((node, control));
-    }
-
-    internal void ApplyStreamingWindows(PuraDocument committed, PuraDocument? tail)
-    {
-        if (_host is null)
-        {
-            _document = committed;
-            return;
-        }
-
-        // Fall back to a full rebuild when the committed block list is not a prefix of what is on screen
-        // (reference-definition reparse, page switch, theme change).
-        var compatible = _committed.Count <= committed.Markdown.Count;
-        if (compatible)
-        {
-            for (var i = 0; i < _committed.Count; i++)
-            {
-                if (!SameKind(_committed[i].Node, committed.Markdown[i]))
-                {
-                    compatible = false;
-                    break;
-                }
-            }
-        }
-
-        if (!compatible)
-        {
-            RenderDocument(committed, isStreaming: true);
-        }
-        else
-        {
-            var context = CreateContext(committed, isStreaming: true, isTail: false);
-            for (var i = _committed.Count; i < committed.Markdown.Count; i++)
-            {
-                var node = committed.Markdown[i];
-                AddBlockControl(node, context.RenderBlock(node));
-            }
-        }
-
-        var previousTail = _tailControls.ToArray();
-        foreach (var entry in previousTail)
-        {
-            _host.Children.Remove(entry.Control);
-        }
-
-        _tailControls.Clear();
-
-        if (tail is not null && tail.Markdown.Count > 0)
-        {
-            var tailContext = CreateContext(tail, isStreaming: true, isTail: true);
-            var index = 0;
-            foreach (var node in tail.Markdown)
-            {
-                Control control;
-                if (index < previousTail.Length
-                    && SameKind(previousTail[index].Node, node)
-                    && TryUpdateIncremental(previousTail[index].Node, node, previousTail[index].Control, tailContext))
-                {
-                    control = previousTail[index].Control;
-                }
-                else
-                {
-                    control = tailContext.RenderBlock(node);
-                }
-
-                _tailControls.Add((node, control));
-                _host.Children.Add(control);
-                index++;
-            }
-        }
-
-        _document = committed;
-        _plainText = null;
-        Blocks = _committed
-            .Select((entry, index) => new ArcMarkdownBlockInfo(index, entry.Node.GetType().Name, entry.Node.Span.Start, entry.Node.Span.End, entry.Node.Line))
-            .ToArray();
-    }
-
-    internal void ClearStreamingTail()
-    {
-        if (_host is null)
-        {
-            return;
-        }
-
-        foreach (var entry in _tailControls)
-        {
-            _host.Children.Remove(entry.Control);
-        }
-
-        _tailControls.Clear();
-    }
-
-    internal void SetActiveSession(ArcMarkdownStreamingSession? session) => _activeSession = session;
-
-    internal int NextVersion() => ++_version;
-
-    private int _version;
-
-    private static bool SameKind(MarkdownObject left, MarkdownObject right)
-        => left.GetType() == right.GetType();
-
-    /// <summary>
-    /// Streaming tail update: reuse the existing control when the node type is unchanged and the
-    /// renderer implements <see cref="IArcMarkdownIncrementalRenderer"/>, so the unstable tail does
-    /// not rebuild its whole visual tree on every flush.
-    /// </summary>
-    private static bool TryUpdateIncremental(
-        MarkdownObject oldNode,
-        MarkdownObject newNode,
-        Control control,
-        ArcMarkdownRenderContext context)
-    {
-        foreach (var renderer in context.Renderers.ResolveCandidates(newNode, context))
-        {
-            if (renderer is not IArcMarkdownIncrementalRenderer incremental)
-            {
-                continue;
-            }
-
-            try
-            {
-                if (!incremental.CanUpdate(oldNode, newNode, context))
-                {
-                    continue;
-                }
-
-                incremental.Update(control, newNode, context);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    private static string? FindAnchor(PuraDocument document, HeadingBlock heading)
-    {
-        // PuraOutline preserves heading order; match by inline text.
-        var text = ArcMarkdownDefaultInlineRenderer.GetInlineText(heading.Inline).Trim();
-        return document.Outline.Headings.FirstOrDefault(entry => entry.Level == heading.Level && entry.Text == text)?.Anchor;
     }
 
     private static void AppendBlockText(MarkdownObject block, StringBuilder builder)
@@ -717,5 +744,3 @@ public partial class ArcMarkdownView : TemplatedControl, IDisposable
         }
     }
 }
-
-

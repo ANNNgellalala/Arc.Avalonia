@@ -2,14 +2,16 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Arc.Avalonia.Theme;
 using PuraMarkdown.Agent;
-using PuraMarkdown.Agent.Localization;
-using PuraMarkdown.Agent.Platform;
+using PuraMarkdown.UI;
+using PuraMarkdown.UI.Localization;
+using PuraMarkdown.UI.Platform;
 
 namespace Arc.Avalonia.Chat;
 
 /// <summary>
-/// Maps Arc design tokens onto the PuraMarkdown.Agent theme/pipeline. Arc keeps ownership of the palette
-/// (light/dark + accents); PuraMarkdown.Agent owns the Markdown/Chat/Agent rendering.
+/// Maps Arc design tokens onto the PuraMarkdown render pipeline (PuraMarkdown.UI builds the theme/options;
+/// PuraMarkdown.Agent adds the pura-agent fence components). Arc keeps ownership of the palette
+/// (light/dark + accents); PuraMarkdown.UI owns the Markdown/Chat rendering.
 /// </summary>
 public static class ArcChatThemeAdapter
 {

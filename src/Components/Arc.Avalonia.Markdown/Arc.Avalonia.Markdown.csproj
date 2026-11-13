@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    L2 Markdown family (ADR 0006): the production renderer for PuraMarkdown documents.
-    Parsing/streaming/diagnostics come from PuraMarkdown.Core (Markdig, no Avalonia); every
-    control, theme and interaction is Arc. The package reads tokens only through ArcResources so
-    it follows light/dark and all eight accents like the rest of the design system.
+    L2 Markdown family (ADR 0006 + ADR 0008): the Arc surface over the PuraMarkdown 0.2 split.
+    Parsing/streaming/diagnostics come from PuraMarkdown.Core (Markdig, no Avalonia); the markdown
+    control/render engine, incremental streaming, block virtualization and the skin extension contracts
+    (IPuraPlugin, renderer decorations, PuraParts/PuraClasses) come from PuraMarkdown.UI. Arc keeps its
+    renderer pipeline/token skin, the design-system controls and all interactions, and reads tokens only
+    through ArcResources so it follows light/dark and all eight accents like the rest of the design system.
   -->
   <PropertyGroup>
     <RootNamespace>Arc.Avalonia.Markdown</RootNamespace>
@@ -11,13 +13,14 @@
     <PackageId>Arc.Avalonia.Markdown</PackageId>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>Full Markdown rendering for Arc for Avalonia: PuraMarkdown.Core syntax, Arc block and inline renderers, streaming, code highlighting, tables, agent components and the AI chat surface.</Description>
+    <Description>Full Markdown rendering for Arc for Avalonia: PuraMarkdown.Core syntax + PuraMarkdown.UI control/render engine (upstream rendering delegated), Arc token skin and renderer pipeline, streaming, code highlighting, tables, agent components and the AI chat surface.</Description>
     <PackageTags>avalonia;markdown;markdown-renderer;streaming;ai;chat;design-system</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="PuraMarkdown.Core" />
+    <PackageReference Include="PuraMarkdown.UI" />
     <PackageReference Include="Markdig" />
   </ItemGroup>
 

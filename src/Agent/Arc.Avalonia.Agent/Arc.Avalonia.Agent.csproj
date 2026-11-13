@@ -19,6 +19,10 @@
     <PackageReference Include="Avalonia" />
     <!-- M2-G5: chat/agent rendering engine (ADR 0007); only Chat and Agent may reference it. -->
     <PackageReference Include="PuraMarkdown.Agent" />
+    <!-- PuraMarkdown 0.2 split: PuraMarkdownOptions/PuraTheme/PuraStreamingSession/PuraInteractionEventArgs
+         live in PuraMarkdown.UI now; Agent consumes those types directly (ArcAgentConversation), so it is a
+         direct (audited) reference rather than an accidental transitive one. -->
+    <PackageReference Include="PuraMarkdown.UI" />
     <!--
       M2-G4 boundary CI: Microsoft's official banned-symbol analyzer, build-only. The banned list lives in
       tools/BannedSymbols.txt and is wired as an AdditionalFiles item below; RS0030 is promoted to an error

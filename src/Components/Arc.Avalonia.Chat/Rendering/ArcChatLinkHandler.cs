@@ -2,12 +2,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using PuraMarkdown.Agent.Platform;
+using PuraMarkdown.UI.Platform;
 
 namespace Arc.Avalonia.Chat;
 
 /// <summary>
-/// Arc's fill-in for the link handling that PuraMarkdown.Agent leaves to the host (ADR 0007 keeps chat
+/// Arc's fill-in for the link handling that PuraMarkdown.UI leaves to the host (ADR 0007 keeps chat
 /// rendering upstream, but the upstream chat view defaults to <see cref="NullLinkHandler"/> and exposes no
 /// link-click event, so a message link would otherwise do nothing). This handler raises
 /// <see cref="ArcChatView.LinkClicked"/>, then lets the host take over (the <see cref="ArcChatView.LinkHandler"/>

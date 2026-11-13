@@ -22,8 +22,8 @@
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageAdded
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageRemoved
   event System.EventHandler<PuraMarkdown.Agent.Chat.PuraChatMessage> MessageUpdated
-  event System.EventHandler<PuraMarkdown.Agent.PuraInteractionEventArgs> InteractionOccurred
-  event System.EventHandler<PuraMarkdown.Agent.Rendering.PuraWarningEventArgs> Warning
+  event System.EventHandler<PuraMarkdown.UI.PuraInteractionEventArgs> InteractionOccurred
+  event System.EventHandler<PuraMarkdown.UI.Rendering.PuraWarningEventArgs> Warning
   field Avalonia.Controls.INameScope AvaloniaNameScope
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode Always
   field static Arc.Avalonia.Chat.ArcChatAutoScrollMode NearBottom
@@ -48,10 +48,10 @@
   method Avalonia.Controls.ResourceDictionary Build:/Themes/ArcChatTheme.Resources.axaml[System.IServiceProvider ]
   method Avalonia.Styling.Styles Build:/Themes/ArcChatTheme.axaml[System.IServiceProvider ]
   method PuraMarkdown.Agent.Chat.PuraChatMessage FindMessage[System.String messageId]
-  method PuraMarkdown.Agent.PuraMarkdownOptions CreateOptions[]
-  method PuraMarkdown.Agent.PuraMarkdownOptions CreateOptions[PuraMarkdown.Agent.Platform.ILinkHandler linkHandler]
-  method PuraMarkdown.Agent.PuraPipeline BuildPipeline[]
-  method PuraMarkdown.Agent.PuraStreamingSession BeginStreamingMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
+  method PuraMarkdown.UI.PuraMarkdownOptions CreateOptions[]
+  method PuraMarkdown.UI.PuraMarkdownOptions CreateOptions[PuraMarkdown.UI.Platform.ILinkHandler linkHandler]
+  method PuraMarkdown.UI.PuraPipeline BuildPipeline[]
+  method PuraMarkdown.UI.PuraStreamingSession BeginStreamingMessage[PuraMarkdown.Agent.Chat.PuraChatMessage message]
   method System.Boolean Equals[Arc.Avalonia.Chat.ArcChatDraft other]
   method System.Boolean Equals[System.Object obj]
   method System.Boolean op_Equality[Arc.Avalonia.Chat.ArcChatDraft left, Arc.Avalonia.Chat.ArcChatDraft right]
@@ -93,9 +93,9 @@
   property Avalonia.Thickness KeyboardInsets {get;set}
   property Avalonia.Thickness SafeArea {get;set}
   property PuraMarkdown.Agent.Chat.PuraChatView Host {get}
-  property PuraMarkdown.Agent.Platform.ILinkHandler LinkHandler {get;set}
-  property PuraMarkdown.Agent.PuraMarkdownOptions Options {get;set}
-  property PuraMarkdown.Agent.PuraStreamingSession ActiveSession {get}
+  property PuraMarkdown.UI.Platform.ILinkHandler LinkHandler {get;set}
+  property PuraMarkdown.UI.PuraMarkdownOptions Options {get;set}
+  property PuraMarkdown.UI.PuraStreamingSession ActiveSession {get}
   property System.Boolean AllowAttachments {get;set}
   property System.Boolean AllowAttachments {get;set}
   property System.Boolean HandledByHost {get;set}
