@@ -1,44 +1,53 @@
-# 21 · Markdown 组件族（PuraMarkdown 语法 + Arc 渲染）
+# 21 · Markdown 组件族（PuraMarkdown 语法/渲染引擎 + Arc token skin）
 
-> 状态：M3 波次实现记录。目标：把 PuraMarkdown 的解析/流式/Agent 语法能力接到 Arc 设计系统里，
-> 由 Arc 提供**生产级**的 Markdown 渲染控件（PuraMarkdown 自带的 Avalonia 渲染只作为 Demo）。
+> 状态：M3 波次实现记录 + PuraMarkdown 0.2 迁移（2026-11-13）。目标：把 PuraMarkdown 的解析/流式/渲染引擎
+> 接到 Arc 设计系统里，由 Arc 提供**生产级**的 Markdown 渲染控件与 token skin（ADR 0008）。
 
 ---
 
 ## 1. 边界与依赖
 
 ```text
-PuraMarkdown.Core (独立包，Markdig 1.5.1，无 Avalonia)
+PuraMarkdown.Core (独立包，Markdig 1.5.1，无 Avalonia，ADR 0006)
   PuraSyntaxBuilder / PuraSyntaxPipeline
   PuraDocument = MarkdownDocument + Version + Diagnostics + Outline
   ParseIncremental / StreamingBlockScanner
         │ Markdig AST + 诊断/大纲
         ▼
+PuraMarkdown.UI (Avalonia 控件/渲染引擎，ADR 0008)
+  PuraMarkdownView / PuraDocumentView / PuraMarkdownOptions / PuraTheme
+  增量流式（PuraStreamingSession）+ 渲染调度/帧预算 + 块级虚拟化
+  换肤扩展契约：IPuraPlugin、renderer 装饰/覆盖、PuraParts / PuraClasses
+        │
+        ▼
 Arc.Avalonia.Markdown (L2 组件族)
-  ArcMarkdownView / ArcMarkdownDocumentView / ArcMarkdownCodeBlock
-  Arc 节点渲染器（块/行内/围栏）+ 代码高亮 + 流式会话 + 本地化 + 图片/链接平台契约
+  ArcMarkdownView / ArcMarkdownDocumentView / ArcMarkdownCodeBlock（Arc 宿主控件壳）
+  ArcMarkdownPipeline（Arc renderer pipeline）+ Arc token skin（ArcMarkdownTheme.axaml）
+  链接/图片/剪贴板平台契约 + 本地化 + warning/无障碍包装
         │
         ▼
 Arc.Avalonia.Chat (L2)  /  Arc.Avalonia.Agent (L4)
-  Chat 用 ArcMarkdownView 渲染气泡正文；Agent 用 pura-agent 围栏渲染 choice/confirm，并按 Timeline 组合气泡与事件卡
+  Chat 由 PuraChatView（PuraMarkdown.Agent）渲染气泡正文；Agent 用 pura-agent 围栏渲染 choice/confirm，
+  并按 Timeline 组合气泡与事件卡（ADR 0007）
 ```
 
 * **解析/诊断/大纲/流式边界**归 PuraMarkdown.Core；Arc 不复制 Markdig 节点，也不重新实现解析。
-* **所有 UI**（控件、主题、token、交互、无障碍、本地化）归 Arc。没有引用 PuraMarkdown 的 Avalonia 渲染包。
-* 依赖例外：`PuraMarkdown.Core` 与 `Markdig` 只允许出现在 `Arc.Avalonia.Markdown`（ADR 0006）；
-  其它 Arc 包的依赖白名单不变。渲染层没有第三方 UI 库。
-* 本地构建：`PuraMarkdown.Core` 来自 sibling checkout 的本地包源（`NuGet.config` 里的
-  `../PuraMarkdown/artifacts/nuget`），首次构建前在 PuraMarkdown 仓库执行
-  `dotnet pack src/PuraMarkdown.Core -c Release -o artifacts/nuget`。
+* **Markdown 渲染引擎**（控件、节点渲染、增量流式、虚拟化、调度）归 PuraMarkdown.UI；**Arc token skin、
+  renderer pipeline、宿主控件壳、平台契约与本地化**归 Arc（ADR 0008）。
+* 依赖例外：`PuraMarkdown.Core`/`PuraMarkdown.UI`/`Markdig` 只允许在 `Arc.Avalonia.Markdown`、`Chat`、`Agent`
+  的有范围白名单内出现；其它 Arc 包的依赖白名单不变。
+* 本地构建：`PuraMarkdown.Core`/`PuraMarkdown.UI`/`PuraMarkdown.Agent` 均来自 sibling checkout 的本地包源
+  （`NuGet.config` 里的 `../PuraMarkdown/artifacts/nuget`），首次构建前在 PuraMarkdown 仓库执行
+  `dotnet pack ArcUI 相关工程 -c Release -o artifacts/nuget`（至少含 Core/UI/Agent 三个包）。
 
-## 1.1 上游包改名（2026-11-10，PuraMarkdown ADR-0028）
+## 1.1 上游包改名（2026-11-10，PuraMarkdown ADR-0028；0.1 时代映射）
 
 PuraMarkdown 把 3 个包改名为职责对齐的 id，并同步对齐命名空间（**不保留旧包 id / 旧命名空间**）：
 
-| 旧 | 新 | Arc 是否使用 |
+| 旧 | 新（0.1 形态） | Arc 是否使用（0.1） |
 | --- | --- | --- |
 | `PuraMarkdown.Syntax` | **`PuraMarkdown.Core`**（Markdig 解析、`PuraDocument`、大纲、诊断、流式扫描；无 Avalonia） | ✅ 唯一使用 |
-| `PuraMarkdown`（UI 控件） | `PuraMarkdown.Agent`（Avalonia 渲染控件 + Agent/Chat/Testing） | ⚠️ 部分使用：仅 Chat/Agent 与 Agent 迁移委托（ADR 0007）；Markdown 包仍不使用 |
+| `PuraMarkdown`（UI 控件） | `PuraMarkdown.Agent`（Avalonia 渲染控件 + Agent/Chat/Testing）；0.2 起拆为 `PuraMarkdown.UI` + `PuraMarkdown.Agent`，见 §1.3 | ⚠️ 部分使用：仅 Chat/Agent 与 Agent 迁移委托（ADR 0007）；Markdown 包 0.2 起获准使用 UI |
 | `PuraMarkdown.Plugins` | `PuraMarkdown.Extension`（ColorCode/Mermaid，渲染引擎依赖只在此包） | ❌ 不使用 |
 
 命名空间映射：`PuraMarkdown.Syntax` / 根 `PuraMarkdown` → **`PuraMarkdown.Core`**；`PuraMarkdown.Security` → **`PuraMarkdown.Core.Security`**。版本仍为 `0.1.0-alpha.1`。
@@ -54,25 +63,48 @@ Arc 侧同步修改：`Directory.Packages.props`、`Arc.Avalonia.Markdown.csproj
 依赖边界（ADR 0007 有范围例外）：
 
 * `PuraMarkdown.Agent` 只允许 `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` **直接引用**；
-* 本包（`Arc.Avalonia.Markdown`）与 Foundation/其它 L2/L3 包仍只允许 `PuraMarkdown.Core`（+ `Markdig`），
-  不随 Chat/Agent 迁移改变渲染实现；
+* 0.2 起本包（`Arc.Avalonia.Markdown`）获准直接引用 `PuraMarkdown.Core` + `PuraMarkdown.UI`（+ `Markdig`），
+  渲染委托上游引擎（ADR 0008）；Foundation/其它 L2/L3 包仍不得直接引用 PuraMarkdown 的 Avalonia 包；
 * 传递依赖 `Avalonia.Controls.ItemsRepeater`、`JsonSchema.Net`（→ `JsonPointer.Net` / `Json.More.Net` /
-  `Humanizer.Core`）只在经此例外路径进入闭包，`tools/check-deps.ps1` 的 `agentChatBridge` scope 会拒绝越界包；
+  `Humanizer.Core`）只在经这些例外路径进入闭包，`tools/check-deps.ps1` 的 `agentChatBridge` /
+  `markdownUiEngine` scope 会拒绝越界包；
 * 许可证与用途登记在 [`THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md)。
 
 Chat/Agent 的目标 API、删除清单与兼容性见 [docs/29](29-puramarkdown-agent-migration.zh.md) §2–§5。
+
+## 1.3 PuraMarkdown 0.2 拆分与渲染委托（2026-11-13，ADR 0008）
+
+PuraMarkdown 0.2 把 0.1 的单个 `PuraMarkdown.Agent` 拆成两个包（版本统一 `0.2.0-alpha.1`）：
+
+| 包 | 职责 | Arc 直接引用范围 |
+| --- | --- | --- |
+| **`PuraMarkdown.UI`** | Avalonia Markdown 控件/渲染引擎：`PuraMarkdownView`/`PuraDocumentView`、`PuraMarkdownOptions`/`PuraTheme`、增量流式（`PuraStreamingSession`）、渲染调度/帧预算、块级虚拟化、换肤扩展契约（`IPuraPlugin`、renderer 装饰、`PuraParts`/`PuraClasses`） | `Arc.Avalonia.Markdown`（委托渲染）、`Arc.Avalonia.Chat` / `Arc.Avalonia.Agent`（直接消费类型） |
+| **`PuraMarkdown.Agent`** | pura-agent 组件（choice/confirm/tool-call）、`PuraChatView`、Testing；依赖 `PuraMarkdown.UI` | `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent`（ADR 0007） |
+
+命名空间迁移：通用 Markdown/主题/流式/平台类型从 `PuraMarkdown.Agent[...]` 迁到
+`PuraMarkdown.UI[...]`（`Rendering`/`Localization`/`Platform` 相应变为 `PuraMarkdown.UI.*`）；
+Agent 专属类型仍在 `PuraMarkdown.Agent`，Chat 视图在 `PuraMarkdown.Agent.Chat`。
+
+Arc 侧边界（`markdownUiEngine` scope）：
+
+* `PuraMarkdown.UI` 只允许上述三个工程**直接 `PackageReference`**；Theme/Meta/All 等经 Markdown/Chat/Agent
+  链条传递获得属正常闭包，Foundation/其它包直接引用即 `markdown-ui-engine-outside-scope` 红项；
+* Markdown 包保留 Arc 的 renderer pipeline（`ArcMarkdownPipeline`）、Arc token skin
+  （`Themes/ArcMarkdownTheme.axaml`）、宿主控件壳与平台契约；渲染引擎（节点渲染、流式、虚拟化、调度）交给上游；
+* `Directory.Packages.props` 统一锁定 Core/UI/Agent = `0.2.0-alpha.1`，Avalonia 12.1.5 与上游一致；
+  `tools/check-package.ps1` 按包放行（Markdown → UI；Chat/Agent → Agent + UI）。
 
 ## 2. 包内容
 
 | 组件 | 作用 |
 |---|---|
-| `ArcMarkdownView` | 文档渲染宿主：Markdown → 解析 → Arc 控件树；流式、大纲、锚点、选择/复制、交互状态 |
+| `ArcMarkdownView` | 文档渲染宿主：Markdown → PuraMarkdown.Core 解析 → PuraMarkdown.UI 渲染引擎 → Arc token skin；流式、大纲、锚点、选择/复制、交互状态仍由 Arc 暴露 |
 | `ArcMarkdownDocumentView` | 已解析 `PuraDocument` 的渲染宿主（宿主自己解析/缓存 AST 时使用） |
-| `ArcMarkdownCodeBlock` | 围栏代码：语言标签、行号、token 高亮、复制、长代码折叠 |
-| 节点渲染器 | CommonMark + GFM 全节点矩阵：heading/paragraph/quote/list/task list/table/code/thematic break/html 回退/强调/行内代码/链接/图片/自动链接/换行 |
-| `pura-agent` 组件 | Chat/Agent 侧改由 `PuraMarkdown.Agent` 的 `AgentPlugin`/`PuraToolCallCard`/choice/confirm 承担（ADR 0007）；本包只消费 Core 的 AST/诊断，不依赖该 UI 库 |
-| 平台契约 | 图片加载、链接打开、剪贴板、本地化都可注入；默认离线安全 |
-| 主题 | `<arc:ArcTheme/>` 已聚合 `ArcMarkdownTheme.axaml`；所有颜色/字号/圆角走 token |
+| `ArcMarkdownCodeBlock` | 围栏代码：语言标签、行号、token 高亮、复制、长代码折叠（上游围栏渲染 + Arc 主题） |
+| 节点渲染/流式引擎 | CommonMark + GFM 全节点矩阵与增量流式、渲染调度、块级虚拟化由 `PuraMarkdown.UI` 提供（ADR 0008）；Arc 的 `ArcMarkdownPipeline` 负责注册/装饰渲染器并套 token skin |
+| `pura-agent` 组件 | Chat/Agent 侧改由 `PuraMarkdown.Agent` 的 `AgentPlugin`/`PuraToolCallCard`/choice/confirm 承担（ADR 0007）；本包只消费 Core 的 AST/诊断 + UI 的渲染引擎，不直接依赖 Agent 包 |
+| 平台契约 | 图片加载、链接打开、剪贴板、本地化都可注入；默认离线安全（`PuraMarkdown.UI.Platform` 类型经 Arc 包装） |
+| 主题 | `<arc:ArcTheme/>` 已聚合 `ArcMarkdownTheme.axaml`；所有颜色/字号/圆角走 token（Arc skin 覆盖上游渲染） |
 
 ## 3. 公共 API（宿主视角）
 
@@ -183,7 +215,8 @@ view.SetInteractionState(...);    // 持久化/虚拟化恢复
   文本 run（不再产生 `HyperlinkButton`/`InlineUIContainer`）」「CJK 全角标点后的裸 URL 自动链接」；Chat 断言见 docs/22；
 * 视觉回归：`.recon/link-baseline-probe`（真实桌面窗口）对 360 dp 手机宽度验证链接字号 16、行盒 = 普通行盒、
   基线偏移 0、长 URL 自然换行；`.recon/link-verify` 保留 before/after 证据（见 [docs/30](30-inline-link-inline-flow.zh.md)）；
-* 11 个仓库门禁（`tools/check-all.ps1`）绿；`check-package` 中本包依赖闭包只含 `PuraMarkdown.Core` / `Markdig`，`PuraMarkdown.Agent` 仅允许出现在 Chat/Agent 包（ADR 0007）。
+* 11 个仓库门禁（`tools/check-all.ps1`）绿；`check-package` 中本包依赖闭包为 `PuraMarkdown.Core` /
+  `PuraMarkdown.UI` / `Markdig`（ADR 0008）；`PuraMarkdown.Agent` 仅允许出现在 Chat/Agent 包（ADR 0007）。
 
 ## 7. 已知限制
 
@@ -206,8 +239,9 @@ view.SetInteractionState(...);    // 持久化/虚拟化恢复
 * 链接打开默认走系统浏览器（`TopLevel.Launcher`）：Android/iOS 由平台 launcher 接管；无 launcher 的宿主
   （离屏/无窗口）只会发 warning `ARC-MD-LINK-005`。相对路径链接必须由宿主 `LinkHandler` 处理，否则
   「在浏览器中打开」禁用；
-* **块级虚拟化不在本包范围**：`ArcMarkdownView` 一次性实例化整篇文档的块；超长内容请拆页，或使用
-  `Arc.Avalonia.Chat.ArcChatView` 的消息级虚拟化（L1 `ArcVirtualList`，1000 条消息只实例化约 10 行）。
+* **块级虚拟化**：PuraMarkdown.UI 提供块级虚拟化能力（`PuraMarkdownOptions.BlockVirtualization`），是否开启由
+  Arc 侧 `ArcMarkdownOptions`/`ArcMarkdownView` 的迁移结果决定；未开启时 `ArcMarkdownView` 仍一次性实例化整篇
+  文档的块，超长内容请拆页，或使用 `Arc.Avalonia.Chat.ArcChatView` 的消息级虚拟化（1000 条消息只实例化约 10 行）。
 
 
 

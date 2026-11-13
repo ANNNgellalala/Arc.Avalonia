@@ -59,8 +59,9 @@ Read the analysis first:
   service layer (`ArcWindow`, dialog/notification/navigation/file-picker), the windowed tree table and the
   `Feature.DataGrid` package for large data sets.
 * [`docs/21-markdown-components.zh.md`](docs/21-markdown-components.zh.md) — the Markdown component family: PuraMarkdown
-  syntax (Markdig AST, diagnostics, stable-boundary streaming) rendered with Arc controls, plus code highlighting
-  and the fence/plugin contracts.
+  syntax (Markdig AST, diagnostics, stable-boundary streaming) plus the `PuraMarkdown.UI` control/render engine
+  (PuraMarkdown 0.2, ADR 0008), skinned with Arc tokens, code highlighting and the fence/plugin contracts.
+* [`docs/31-markdown-puramarkdown-0.2-migration.zh.md`](docs/31-markdown-puramarkdown-0.2-migration.zh.md) — Markdown 0.2 migration reference: `ArcMarkdownView` delegates to the PuraMarkdown.UI engine, Arc keeps its renderer pipeline/token skin, adapter/bridge/theme files, dependency-gate updates and verification.
 * [`docs/22-chat-agent-refactor.zh.md`](docs/22-chat-agent-refactor.zh.md) — the Chat/Agent refactor: one
   `ArcChatMessage` model, the `ArcChatView` bubble surface and composer, the unified Agent conversation
   (bubbles + tool/reasoning/approval event cards) and the removal of the duplicate Markdown renderers.
@@ -93,23 +94,29 @@ Then call `ArcThemeManager.Apply(app, ArcColorScheme.Light, ArcAccent.Neutral)` 
 | `Arc.Avalonia.Theme` | L2.5 aggregate theme (Fluent baseline, tokens, component themes) | you already reference individual component packages |
 | `Arc.Avalonia.Foundation` | L1 tokens/palette/icons/motion + the atomic controls | only the design-system primitives |
 | `Arc.Avalonia.{Inputs,Actions,Navigation,Overlays,Feedback,DataDisplay,Charts,Pickers,Effects,Content,Media,Chat}` | L2 component families | you prefer component-level dependencies |
-| `Arc.Avalonia.Markdown` | L2 Markdown family: PuraMarkdown syntax + Arc renderers (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownCodeBlock`), streaming sessions, highlighter, plugin/fence contracts | you render Markdown documents, AI answers or agent message bodies |
+| `Arc.Avalonia.Markdown` | L2 Markdown family: `PuraMarkdown.Core` syntax + `PuraMarkdown.UI` control/render engine (delegated rendering, ADR 0008) with the Arc token skin (`ArcMarkdownView`, `ArcMarkdownDocumentView`, `ArcMarkdownCodeBlock`, `ArcMarkdownPipeline`), streaming sessions, highlighter, plugin/fence contracts | you render Markdown documents, AI answers or agent message bodies |
 | `Arc.Avalonia.Chat` | L2 chat family: `ArcChatView` hosts `PuraChatView` from **PuraMarkdown.Agent** (messages, Markdown/pura-agent rendering, streaming, snapshots all upstream) + Arc-token theme mapping (`ArcChatThemeAdapter`) + `ArcChatComposer` input surface; message links are clickable (Arc fills the upstream gap: `LinkClicked` / `LinkHandler`, http/https/mailto/tel open via the platform launcher, host can take over) | you build chat, AI answers or an agent conversation |
 | `Arc.Avalonia.Agent` | L4 agent top layer: pure presentation runtime (event reducer, workspace/session projection, streaming coalescer, approval/attention/artifact queues) + `ArcAgentSurface` / `ArcAgentConversation`; transcript rendering, tool-call cards and pura-agent choice/confirm components come from **PuraMarkdown.Agent** (ADR 0007) | building an agent UI on your own runtime |
 | `Arc.Avalonia.AgentUI`, `Arc.Avalonia.LifeToday` | Agent leaf controls and life surfaces (run bar, approval sheet, background dock, attention inbox) | agent / daily-planning UI |
 | `Arc.Avalonia.Special.*`, `Arc.Avalonia.Blocks.*` | L3 composition cases | Special components and page blocks |
 
 Every package depends only on Avalonia's official packages (`Avalonia`, `Avalonia.Themes.Fluent`,
-`Avalonia.Fonts.Inter`), with one deliberate exception: `Arc.Avalonia.Markdown` also consumes the
-`PuraMarkdown.Core` parser facade and its `Markdig` dependency (ADR 0006). `tools/check-package.ps1`
-unpacks each nupkg and fails the release when any other dependency or any page/doc/demo asset is found.
+`Avalonia.Fonts.Inter`), with two deliberate scoped exceptions: `Arc.Avalonia.Markdown` also consumes the
+`PuraMarkdown.Core` parser facade + `PuraMarkdown.UI` render engine and the `Markdig` dependency
+(ADR 0006/0008), and `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` consume the `PuraMarkdown.Agent` /
+`PuraMarkdown.UI` Agent/Chat surface (ADR 0007). Both are registered as scoped exceptions in
+`tools/deps-policy.json`; `tools/check-package.ps1` unpacks each nupkg and fails the release when any
+other dependency or any page/doc/demo asset is found.
 
 ### Build the packages locally
 
-`Arc.Avalonia.Markdown` consumes `PuraMarkdown.Core` from the sibling PuraMarkdown checkout. The local
-feed is configured in `NuGet.config` (`../PuraMarkdown/artifacts/nuget`); produce it once with:
+The Markdown/Chat/Agent families consume the PuraMarkdown packages from the sibling PuraMarkdown
+checkout. The local feed is configured in `NuGet.config` (`../PuraMarkdown/artifacts/nuget`); produce it
+once with (PuraMarkdown 0.2: `PuraMarkdown.Core`, `PuraMarkdown.UI`, `PuraMarkdown.Agent`):
 
 ```powershell
+dotnet pack ../PuraMarkdown/src/PuraMarkdown.UI -c Release -o ../PuraMarkdown/artifacts/nuget
+dotnet pack ../PuraMarkdown/src/PuraMarkdown.Agent -c Release -o ../PuraMarkdown/artifacts/nuget
 dotnet pack ../PuraMarkdown/src/PuraMarkdown.Core -c Release -o ../PuraMarkdown/artifacts/nuget
 ```
 
@@ -354,12 +361,15 @@ pages, and 14 agent/life scene pages) at up to 1400 px per slice.
 
 ## Dependencies
 
-No commercial or third-party UI/component library is used. The only NuGet packages across the solution are
-**Avalonia**, **Avalonia.Desktop**, **Avalonia.Themes.Fluent** and **Avalonia.Fonts.Inter** (all MIT), plus —
-confined to `Arc.Avalonia.Markdown` — **PuraMarkdown.Core** (MIT) and its **Markdig** parser (BSD-2-Clause),
-which supply the Markdown syntax layer while every control, theme and interaction stays Arc code (ADR 0006).
-Every control, chart and surface in this repository is our own XAML/C#. Pro components are implemented independently
-from Arc's public documentation and visual descriptions, without using or copying Pro source code.
+No commercial UI/component library is used. The NuGet packages across the solution are **Avalonia** and
+its official packages (all MIT), plus the MIT-licensed **PuraMarkdown** family, which is confined to
+scoped exceptions: **PuraMarkdown.Core** (parser facade) and **PuraMarkdown.UI** (Avalonia Markdown
+control/render engine, ADR 0008) in `Arc.Avalonia.Markdown` — with the **Markdig** parser
+(BSD-2-Clause) — while `Arc.Avalonia.Chat` / `Arc.Avalonia.Agent` consume **PuraMarkdown.Agent** and
+**PuraMarkdown.UI** for the Agent/Chat surface (ADR 0007). Arc keeps the design system, the Markdown
+token skin/renderer pipeline, the composer and every other XAML/C# control. Pro components are
+implemented independently from Arc's public documentation and visual descriptions, without using or
+copying Pro source code.
 
 Package versions are centralised in `Directory.Packages.props` (NuGet central package management); the
 dependency policy and its gates live in [`tools/deps-policy.json`](tools/deps-policy.json),

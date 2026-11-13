@@ -3,6 +3,7 @@
 > 决策（用户指令）：**Agent/Chat 的渲染引擎改用 `PuraMarkdown.Agent`，不再自研**。
 > 背景：上游 ADR-0027/0028 把 7 包合并为 3 包并改名，`PuraMarkdown.Agent` = Avalonia 渲染控件 + Chat + Agent 组件 + Testing；版本 `0.1.0-alpha.1`；依赖 Avalonia 12.1.5（Arc 已同步升级）。
 > 相关：[ADR 0006](adr/0006-markdown-puramarkdown-dependency.md)、[docs/21](21-markdown-components.zh.md)、[docs/22](22-chat-agent-refactor.zh.md)。
+> **0.2 更新（2026-11-13）**：上游 PuraMarkdown 拆为 Core/UI/Agent/Extension 四包；`Arc.Avalonia.Markdown` 也完成迁移（[ADR 0008](adr/0008-markdown-ui-engine-delegation.md)）：`ArcMarkdownView` 委托 `PuraMarkdownView` 渲染引擎（调度/帧预算/流式/虚拟化），Arc 保留自己的 renderer pipeline 与 token skin；`Arc.Avalonia.Chat/Agent` 升级到 `PuraMarkdown.Agent 0.2.0-alpha.1`（渲染仍由 upstream `PuraChatView` 承担）。本文 §1 中"通用 Markdown 不在迁移范围"的口径由 ADR 0008 取代。
 
 ---
 
@@ -18,7 +19,7 @@
 | 主题 token 映射（Arc 色板 → `PuraTheme`） | Arc（适配层，几十行） |
 | Agent 表现运行时（事件 reducer / workspace / 审批队列 / artifact） | Arc（保留，这是 Arc 的差异化价值，不是"渲染"） |
 | 布局壳、输入框（composer）、审批托盘、注意力收件箱 | Arc（宿主 UI 外壳；输入框是表单控件，不属于 chat 渲染） |
-| 通用 Markdown L2 包（`Arc.Avalonia.Markdown`，给文档/业务页面用） | Arc 保留（基于 Core 的 Arc 风格渲染器，不在本次迁移范围） |
+| 通用 Markdown L2 包（`Arc.Avalonia.Markdown`，给文档/业务页面用） | **0.2 起委托 `PuraMarkdown.UI` 引擎**（ADR 0008）：`ArcMarkdownView` 内部宿主 `PuraMarkdownView`；Arc 保留 renderer pipeline（作为 Pura node renderer 适配）、token 主题与公开事件/API |
 
 **结论**：Arc 保留 `Arc.Avalonia.Markdown`（通用 Markdown 渲染，Arc 设计系统风格）；`Arc.Avalonia.Chat` 与 `Arc.Avalonia.Agent` 的聊天/Agent 渲染全部委托给 `PuraMarkdown.Agent`。
 

@@ -40,3 +40,7 @@ PuraMarkdown 已经把 Markdown 解析与 Avalonia 渲染解耦：`PuraMarkdown.
 ## 变更记录
 
 * **2026-11-10 包改名（上游 ADR-0028）**：`PuraMarkdown.Syntax` → **`PuraMarkdown.Core`**，命名空间 `PuraMarkdown.Syntax`/根 `PuraMarkdown` → `PuraMarkdown.Core`、`PuraMarkdown.Security` → `PuraMarkdown.Core.Security`；版本仍为 `0.1.0-alpha.1`。本 ADR 的决策内容不变：Arc 仍只允许 `PuraMarkdown.Core`（+ 其 `Markdig` 依赖）出现在 `Arc.Avalonia.Markdown`，其它包不得引用。同步更新了 `Directory.Packages.props`、`tools/deps-policy.json`、`tools/check-package.ps1`、README/文档与第三方声明。
+* **2026-11-13 PuraMarkdown 0.2 包拆分（本仓 ADR 0008）**：上游把 Avalonia 渲染能力从 `PuraMarkdown.Agent` 拆出为 **`PuraMarkdown.UI`**（`PuraMarkdownView` + 增量流式 + 渲染调度/帧预算 + 块级虚拟化 + 换肤扩展契约），版本 `0.2.0-alpha.1`。本 ADR 的边界因此扩展为：
+  * `Arc.Avalonia.Markdown` 获准直接引用 **`PuraMarkdown.Core` + `PuraMarkdown.UI`**（`+ Markdig`）：解析/流式诊断仍来自 Core，**渲染委托上游 UI 引擎**；Arc 保留 `ArcMarkdownPipeline`/renderer pipeline、Arc token skin（`ArcMarkdownTheme.axaml`）、控件壳、链接/图片/剪贴板平台契约与本地化；
+  * 其它发布包仍不得直接引用 `PuraMarkdown.Core`/`PuraMarkdown.UI`；Theme/Meta/All 经 Markdown/Chat/Agent 链条传递获得属正常闭包；
+  * `tools/deps-policy.json` 新增 `markdownUiEngine` scope（`allowedProjects` 限 Markdown/Chat/Agent），`tools/check-package.ps1` 按包放行；细节与验证见 [ADR 0008](0008-markdown-ui-engine-delegation.md)。
