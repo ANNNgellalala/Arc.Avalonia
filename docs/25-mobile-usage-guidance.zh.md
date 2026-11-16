@@ -11,7 +11,7 @@
 ### 1.1 用可用的 Android SDK（API 36）
 
 * 现象：`error XA5207: 找不到适用于 API 级别 36 的 android.jar`；`dotnet workload` 又不可用时无法自动补装。
-* 建议：`net10.0-android` 只接受 `TargetPlatformVersion 36.0/36.1`，宿主机器必须有 `platforms/android-36` + `build-tools` + JDK 21；构建时显式传 `-p:AndroidSdkDirectory=... -p:JavaSdkDirectory=...`。同机其它 App 若能装，优先复用它的 SDK 目录。
+* 建议：`net10.0-android` 只接受 `TargetPlatformVersion 36.0/36.1`，宿主机器必须有 `platforms/android-36` + `build-tools` + JDK 21；构建时可显式传 `-p:AndroidSdkDirectory=... -p:JavaSdkDirectory=...`。同机其它 App 若能装，优先复用它的 SDK 目录。省略 `-p:AndroidSdkDirectory` 时，`Arc.Avalonia.Gallery.Android.csproj` 按「`ANDROID_HOME` → 本机已装的完整 API 36 SDK → 用户目录 `%LOCALAPPDATA%\Android\Sdk`」顺序自动发现；用户目录里只有 android-33 时会在发现阶段落空并报 XA5207，因此不要把它当作唯一来源。
 
 ### 1.2 Activity 主题必须是 AppCompat 后代（**最常见的"打开即崩溃"**）
 

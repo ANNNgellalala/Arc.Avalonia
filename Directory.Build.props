@@ -4,7 +4,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
-    <AvaloniaVersion>12.1.4</AvaloniaVersion>
+    <!-- Kept in sync with the Avalonia entries in Directory.Packages.props: the solution itself is
+         versioned by central package management, but POC/sample projects that opt out (see
+         poc/Directory.Packages.props) pin `Version="$(AvaloniaVersion)"` and would silently restore a
+         different patch line than the packages the libraries are built against. -->
+    <AvaloniaVersion>12.1.5</AvaloniaVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- Avalonia's stats build task writes a telemetry log outside the workspace; disable it. -->
     <UsedAvaloniaProducts></UsedAvaloniaProducts>

@@ -6,7 +6,13 @@
 
     Build:
       dotnet build src/Apps/Arc.Avalonia.Gallery.Android/Arc.Avalonia.Gallery.Android.csproj ^
-        -c Release -f net10.0-android -m:1 -nodeReuse:false -p:AndroidSdkDirectory=C:\Users\ANNNgel\AppData\Local\Android\Sdk
+        -c Release -f net10.0-android -m:1 -nodeReuse:false -p:AndroidSdkDirectory=<sdk with platforms/android-36>
+
+    The .NET 10 Android workload only accepts API 36, so the SDK directory must contain
+    platforms/android-36 + build-tools + JDK 21 (docs/25 §1). The per-user SDK on this machine only ships
+    android-33 and fails with XA5207, so discovery prefers an explicit -p:AndroidSdkDirectory, then
+    ANDROID_HOME, then the full API-36 SDK already installed on this machine, and only then the per-user
+    default.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0-android</TargetFramework>
@@ -18,7 +24,9 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>0.9.0-alpha</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">C:\Users\ANNNgel\AppData\Local\Android\Sdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_HOME)' != ''">$(ANDROID_HOME)</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('D:\SmartBillAndroidSdk\platforms\android-36\android.jar')">D:\SmartBillAndroidSdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">$(LOCALAPPDATA)\Android\Sdk</AndroidSdkDirectory>
     <IsPackable>false</IsPackable>
     <!-- Plain adb install needs the managed assemblies inside the APK; otherwise the runtime expects the Fast Deployment override directory and aborts. -->
     <!-- Mirror the known-good SmartBill / DSHRemote Android hosts: no linker, no AOT, no trimming,

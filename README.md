@@ -18,6 +18,10 @@ dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll 
 dotnet src/Apps/Arc.Avalonia.Gallery/bin/Debug/net10.0/Arc.Avalonia.Gallery.dll --smoke    # 323 pages, 0 failures
 ```
 
+> ⚠️ 别双击 `Arc.Avalonia.Gallery.exe`：会触发 Windows 附件管理器「打开文件 - 安全警告」或 SmartScreen。
+> 启动 / 构建 / 门禁的完整规范见 [`docs/32-运行与启动规范.zh.md`](docs/32-运行与启动规范.zh.md)；
+> 需要构建时一律用 `pwsh -File tools/build.ps1`（带构建锁，别用裸 `dotnet build`）。
+
 Read the analysis first:
 
 * [`docs/01-arc-analysis.zh.md`](docs/01-arc-analysis.zh.md) — what Arc is, the full component inventory,
@@ -118,6 +122,16 @@ once with (PuraMarkdown 0.2: `PuraMarkdown.Core`, `PuraMarkdown.UI`, `PuraMarkdo
 dotnet pack ../PuraMarkdown/src/PuraMarkdown.UI -c Release -o ../PuraMarkdown/artifacts/nuget
 dotnet pack ../PuraMarkdown/src/PuraMarkdown.Agent -c Release -o ../PuraMarkdown/artifacts/nuget
 dotnet pack ../PuraMarkdown/src/PuraMarkdown.Core -c Release -o ../PuraMarkdown/artifacts/nuget
+```
+
+Repacking the same package version does not refresh a warm cache: NuGet keeps serving the copy already
+extracted in the global packages folder, so the build silently links against the previous assemblies. After
+rebuilding the sibling checkout, drop the cached PuraMarkdown versions before restoring:
+
+```powershell
+$packages = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { "$env:USERPROFILE\.nuget\packages" }
+Get-ChildItem $packages -Directory -Filter 'puramarkdown.*' |
+    ForEach-Object { Get-ChildItem $_.FullName -Directory | Remove-Item -Recurse -Force }
 ```
 
 Then build the solution:
