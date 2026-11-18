@@ -28,9 +28,8 @@
     <Authors Condition="'$(Authors)' == ''">Arc for Avalonia contributors</Authors>
     <Company Condition="'$(Company)' == ''">Arc for Avalonia</Company>
     <Copyright Condition="'$(Copyright)' == ''">Copyright (c) 2026 Arc for Avalonia contributors</Copyright>
-    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/arc-avalonia/arc.avalonia</PackageProjectUrl>
-    <!-- TODO(M1-T4): replace with the real remote before the first public push. -->
-    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/arc-avalonia/arc.avalonia</RepositoryUrl>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/ANNNgellalala/Arc.Avalonia</PackageProjectUrl>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/ANNNgellalala/Arc.Avalonia</RepositoryUrl>
     <RepositoryType Condition="'$(RepositoryType)' == ''">git</RepositoryType>
     <PackageTags Condition="'$(PackageTags)' == ''">avalonia;ui;design-system;controls;arc</PackageTags>
     <PackageLicenseFile Condition="'$(PackageLicenseFile)' == ''">LICENSE</PackageLicenseFile>

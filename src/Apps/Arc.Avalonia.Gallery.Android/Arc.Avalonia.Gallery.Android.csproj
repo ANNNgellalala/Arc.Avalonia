@@ -6,13 +6,12 @@
 
     Build:
       dotnet build src/Apps/Arc.Avalonia.Gallery.Android/Arc.Avalonia.Gallery.Android.csproj ^
-        -c Release -f net10.0-android -m:1 -nodeReuse:false -p:AndroidSdkDirectory=<sdk with platforms/android-36>
+        -c Release -f net10.0-android -m:1 -nodeReuse:false
 
     The .NET 10 Android workload only accepts API 36, so the SDK directory must contain
-    platforms/android-36 + build-tools + JDK 21 (docs/25 §1). The per-user SDK on this machine only ships
-    android-33 and fails with XA5207, so discovery prefers an explicit -p:AndroidSdkDirectory, then
-    ANDROID_HOME, then the full API-36 SDK already installed on this machine, and only then the per-user
-    default.
+    platforms/android-36 + build-tools + JDK 21 (docs/25 §1). The SDK is discovered by the ordered
+    candidate list in the first PropertyGroup below; in the normal case the ANDROID_HOME that Android
+    Studio or the command-line tools export is enough, and no per-machine path needs to be passed.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0-android</TargetFramework>
@@ -24,9 +23,40 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>0.9.0-alpha</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <!--
+      Android SDK discovery (docs/25 §1.1). Resolved here, at evaluation time, because the workload's
+      own resolver runs later and its failure mode (XA5207: no android.jar for API 36) does not say
+      which directory it looked at.
+
+      Precedence — first hit wins, nothing machine-specific is baked in:
+
+        1. -p:AndroidSdkDirectory      explicit on the command line (CI matrix, tools/build.ps1)
+        2. ARC_ANDROID_SDK             repo-scoped override, for an SDK installed where Android tooling
+                                       does not look (e.g. another drive); leaves ANDROID_HOME untouched
+                                       so other projects keep using the SDK they expect
+        3. ANDROID_HOME                what Android Studio / the command-line tools export
+        4. ANDROID_SDK_ROOT            deprecated alias, still written by older installers
+        5. probed standard locations   accepted only if they really contain platforms/android-36 —
+                                       the per-user Android Studio default usually holds just the
+                                       platform the last build targeted (often android-33), and
+                                       pointing the build at it turns "no usable SDK" into a
+                                       confusing XA5207 much later
+
+      Explicit settings (1-4) are trusted as written: if one of them names an SDK without API 36, the
+      XA5207 then correctly points at the directory that is wrong.
+
+      When nothing matches, AndroidSdkDirectory is deliberately left empty instead of guessing. The
+      workload then reports "Android SDK not found", which is the honest diagnosis — better than
+      building against a half-provisioned SDK. The fix is to install platform 36, or to export
+      ANDROID_HOME / set ARC_ANDROID_SDK to an SDK that has it.
+    -->
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ARC_ANDROID_SDK)' != ''">$(ARC_ANDROID_SDK)</AndroidSdkDirectory>
     <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_HOME)' != ''">$(ANDROID_HOME)</AndroidSdkDirectory>
-    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('D:\SmartBillAndroidSdk\platforms\android-36\android.jar')">D:\SmartBillAndroidSdk</AndroidSdkDirectory>
-    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == ''">$(LOCALAPPDATA)\Android\Sdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_SDK_ROOT)' != ''">$(ANDROID_SDK_ROOT)</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(LOCALAPPDATA)\Android\Sdk\platforms\android-36\android.jar')">$(LOCALAPPDATA)\Android\Sdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(USERPROFILE)\Android\Sdk\platforms\android-36\android.jar')">$(USERPROFILE)\Android\Sdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(SystemDrive)\Android\Sdk\platforms\android-36\android.jar')">$(SystemDrive)\Android\Sdk</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and Exists('$(ProgramData)\Android\Sdk\platforms\android-36\android.jar')">$(ProgramData)\Android\Sdk</AndroidSdkDirectory>
     <IsPackable>false</IsPackable>
     <!-- Plain adb install needs the managed assemblies inside the APK; otherwise the runtime expects the Fast Deployment override directory and aborts. -->
     <!-- Mirror the known-good SmartBill / DSHRemote Android hosts: no linker, no AOT, no trimming,
@@ -36,7 +66,8 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <PublishTrimmed>false</PublishTrimmed>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
-    <ImplicitUsings>enable</ImplicitUsings>    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

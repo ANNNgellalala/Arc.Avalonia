@@ -11,7 +11,19 @@
 ### 1.1 用可用的 Android SDK（API 36）
 
 * 现象：`error XA5207: 找不到适用于 API 级别 36 的 android.jar`；`dotnet workload` 又不可用时无法自动补装。
-* 建议：`net10.0-android` 只接受 `TargetPlatformVersion 36.0/36.1`，宿主机器必须有 `platforms/android-36` + `build-tools` + JDK 21；构建时可显式传 `-p:AndroidSdkDirectory=... -p:JavaSdkDirectory=...`。同机其它 App 若能装，优先复用它的 SDK 目录。省略 `-p:AndroidSdkDirectory` 时，`Arc.Avalonia.Gallery.Android.csproj` 按「`ANDROID_HOME` → 本机已装的完整 API 36 SDK → 用户目录 `%LOCALAPPDATA%\Android\Sdk`」顺序自动发现；用户目录里只有 android-33 时会在发现阶段落空并报 XA5207，因此不要把它当作唯一来源。
+* 建议：`net10.0-android` 只接受 `TargetPlatformVersion 36.0/36.1`，宿主机器必须有 `platforms/android-36` + `build-tools` + JDK 21。JDK 路径可按需显式传 `-p:JavaSdkDirectory=...`。
+* SDK 目录由 `Arc.Avalonia.Gallery.Android.csproj` 在求值期按阶梯自动推导，**仓库里没有写死任何机器路径**，优先级从高到低：
+
+  | 来源 | 用途 |
+  |---|---|
+  | `-p:AndroidSdkDirectory=...` | 命令行显式指定（CI 矩阵、`tools/build.ps1`） |
+  | `ARC_ANDROID_SDK` | 仓库级覆盖：SDK 装在 Android 工具链不认识的位置（例如别的盘）时用，且不会污染 `ANDROID_HOME` |
+  | `ANDROID_HOME` | Android Studio / command-line tools 导出的标准变量，**正常情况只需要这一条** |
+  | `ANDROID_SDK_ROOT` | 已废弃的旧别名，老安装器仍会写 |
+  | 标准安装位置探测 | `%LOCALAPPDATA%\Android\Sdk`、`%USERPROFILE%\Android\Sdk`、`%SystemDrive%\Android\Sdk`、`%ProgramData%\Android\Sdk`，**且必须真的含 `platforms/android-36` 才会被采用** |
+
+* 为什么前四项不做 API 36 校验：它们是用户/CI 的显式意图，若指向缺 36 的 SDK，XA5207 正好指出"错在这个目录"。而最后一项的探测必须校验——Android Studio 的用户目录常只留上次构建用到的平台（本机就是 android-33），指过去只会把"没有可用 SDK"拖成几层之后的 XA5207。
+* 全部落空时**故意保持为空**，让 workload 报自己的"Android SDK not found"，而不是猜一个半成品目录；此时装 `platforms;android-36`，或导出 `ANDROID_HOME` / 设 `ARC_ANDROID_SDK` 指向含 36 的 SDK。
 
 ### 1.2 Activity 主题必须是 AppCompat 后代（**最常见的"打开即崩溃"**）
 
